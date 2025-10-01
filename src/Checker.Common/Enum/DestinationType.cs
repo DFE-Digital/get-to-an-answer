@@ -1,0 +1,8 @@
+namespace Checker.Common.Enum;
+
+public enum DestinationType
+{
+    Question = 1,
+    ExternalLink = 2,
+    InternalPage = 3
+}

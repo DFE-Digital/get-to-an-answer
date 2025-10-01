@@ -1,0 +1,6 @@
+@Checker.Api_HostAddress = http://localhost:5265
+
+GET {{Checker.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
