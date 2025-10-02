@@ -23,6 +23,7 @@ public class BranchingController(CheckerDbContext db) : Controller
         {
             OwnerId = userId,
             TenantId = tenantId,
+            QuestionnaireId = request.QuestionnaireId,
             Title = request.Title,
             Description = request.Description,
             

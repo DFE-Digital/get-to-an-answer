@@ -11,62 +11,62 @@ namespace Checker.Api.Controllers;
 [ApiController]
 [Route("/")]
 [Authorize]
-public class AnswerController(CheckerDbContext db) : Controller
+public class Conditionontroller(CheckerDbContext db) : Controller
 {
-    [HttpPost("answers")]
-    public IActionResult CreateAnswer(CreateAnswerRequestDto request)
+    [HttpPost("conditions")]
+    public IActionResult CreateCondition(CreateConditionRequestDto request)
     {
         var userId = User.FindFirstValue("oid")!;   // Azure AD Object ID
         var tenantId = User.FindFirstValue("tid")!; // Tenant ID
         
-        db.Answers.Add(new AnswerEntity
+        db.Conditions.Add(new ConditionEntity
         {
             OwnerId = userId,
             TenantId = tenantId,
+            BranchingId = request.BranchingId,
             QuestionId = request.QuestionId,
-            Content = request.Content,
-            Description = request.Description,
+            AnswerIds = request.AnswerIds,
         });
         
         db.SaveChanges();
         
-        return Ok("Answer created.");
+        return Ok("Condition created.");
     }
     
-    [HttpGet("answers/{id}")]
-    public IActionResult GetAnswer(int id)
+    [HttpGet("conditions/{id}")]
+    public IActionResult GetCondition(int id)
     {
         // Extract user and tenant from claims
         var userId = User.FindFirstValue("oid");   // Azure AD Object ID
         var tenantId = User.FindFirstValue("tid"); // Tenant ID
 
         // Example: check ownership in your persistence layer
-        var answer = db.Answers
+        var condition = db.Conditions
             .FirstOrDefault(q => q.Id == id && q.TenantId == tenantId);
 
-        if (answer == null)
+        if (condition == null)
             return NotFound();
 
-        if (answer.OwnerId != userId)
+        if (condition.OwnerId != userId)
             return Forbid();
         
-        // Logic to create a answer
-        return Ok(answer);
+        // Logic to create a condition
+        return Ok(condition);
     }
     
-    [HttpGet("questions/{questionId}/answers")]
-    public IActionResult GetAnswers(int questionId)
+    [HttpGet("branchings/{branchingId}/conditions")]
+    public IActionResult GetConditions(int branchingId)
     {
         var tenantId = User.FindFirstValue("tid"); // Tenant ID
 
-        var answers = db.Answers
-            .Where(q => q.QuestionId == questionId && q.TenantId == tenantId);
+        var conditions = db.Conditions
+            .Where(q => q.BranchingId == branchingId && q.TenantId == tenantId);
         
-        return Ok(answers);
+        return Ok(conditions);
     }
 
-    [HttpPut("answers/{id}")]
-    public IActionResult UpdateAnswer(int id, UpdateAnswerRequestDto request)
+    [HttpPut("conditions/{id}")]
+    public IActionResult UpdateCondition(int id, UpdateConditionRequestDto request)
     {
         // Extract user and tenant from claims
         var userId = User.FindFirstValue("oid");   // Azure AD Object ID
@@ -75,42 +75,40 @@ public class AnswerController(CheckerDbContext db) : Controller
         if (tenantId == null)
             return Unauthorized();
         
-        var answer = new AnswerEntity
+        var condition = new ConditionEntity
         {
             Id = id,
             TenantId = tenantId,
         };
 
-        db.Answers.Attach(answer);
+        db.Conditions.Attach(condition);
         
-        answer.Content = request.Content;
-        answer.Description = request.Description;
+        condition.QuestionId = request.QuestionId;
+        condition.AnswerIds = request.AnswerIds;
         
-        db.Entry(answer).Property(s => s.Content).IsModified = true;
-        db.Entry(answer).Property(s => s.Description).IsModified = true;
+        db.Entry(condition).Property(s => s.QuestionId).IsModified = true;
+        db.Entry(condition).Property(s => s.AnswerIds).IsModified = true;
         
-        // Logic to update a answer, answer, or branching logic
-        return Ok("Answer updated.");
+        // Logic to update a condition, answer, or condition logic
+        return Ok("Condition updated.");
     }
 
-    [HttpDelete("answers/{id}")]
-    public IActionResult DeleteAnswer(int id)
+    [HttpDelete("conditions/{id}")]
+    public IActionResult DeleteCondition(int id)
     {
-        // Extract user and tenant from claims
         var tenantId = User.FindFirstValue("tid")!; // Tenant ID
         
-        var answer = new AnswerEntity
+        var condition = new ConditionEntity
         {
             Id = id,
             TenantId = tenantId,
         };
 
-        db.Answers.Attach(answer);
-        db.Answers.Remove(answer);
+        db.Conditions.Attach(condition);
+        db.Conditions.Remove(condition);
         
         db.SaveChanges();
         
-        // Logic to delete a answer
-        return Ok("Answer deleted.");
+        return Ok("Condition deleted.");
     }
 }

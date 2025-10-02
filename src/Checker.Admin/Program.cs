@@ -1,4 +1,5 @@
 using Checker.Api.Infrastructure.Persistence;
+using GovUk.Frontend.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,7 @@ builder.Services.AddDbContext<CheckerDbContext>(options =>
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddGovUkFrontend();
 
 var app = builder.Build();
 
@@ -26,6 +28,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+app.UseGovUkFrontend();
 app.MapRazorPages()
     .WithStaticAssets();
 

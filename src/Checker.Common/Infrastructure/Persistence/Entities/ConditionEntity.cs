@@ -24,7 +24,7 @@ public class ConditionEntity
     public int QuestionId { get; set; }
 
     [MinLength(1)]
-    public required List<int> AnswerIds { get; set; }
+    public List<int> AnswerIds { get; set; }
 
     // Foreign key
     public int BranchingId { get; set; }

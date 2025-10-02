@@ -6,5 +6,5 @@ namespace Checker.Common.Domain.Request.Update;
 public class UpdateConditionRequestDto
 {
     public required int QuestionId { get; set; }
-    public required string AnswerIds { get; set; }
+    public required List<int> AnswerIds { get; set; }
 } 
