@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Checker.Api.Infrastructure.Persistence;
 using Checker.Common.Domain.Request.Create;
 using Checker.Common.Domain.Request.Update;
+using Checker.Common.Infrastructure.Persistence;
 using Checker.Common.Infrastructure.Persistence.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

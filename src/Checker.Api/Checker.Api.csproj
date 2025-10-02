@@ -18,4 +18,8 @@
       <ProjectReference Include="..\Checker.Common\Checker.Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Infrastructure\Persistence\" />
+    </ItemGroup>
+
 </Project>

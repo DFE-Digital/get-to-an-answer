@@ -1,4 +1,4 @@
-using GovUk.Frontend.AspNetCore;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 
@@ -11,7 +11,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddGovUkFrontend();
 
 var app = builder.Build();
 
@@ -32,7 +31,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
-app.UseGovUkFrontend();
+
 app.MapRazorPages()
     .WithStaticAssets();
 
