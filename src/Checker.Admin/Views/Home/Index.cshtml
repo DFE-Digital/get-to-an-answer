@@ -1,8 +1,67 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+  ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region"
+         aria-labelledby="govuk-notification-banner-title" data-govuk-notification-banner-init="">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Important
+        </h2></div>
+      <div class="govuk-notification-banner__content">
+        <h3 class="govuk-notification-banner__heading">This is your team</h3>
+        
+        <p>You can create questionnaire in this team and test them, but only admin can make them live.</p>
+        <a class="govuk-link" href="/groups/9R6te7wT/request_upgrade">Find out how to make questionnaires live</a>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<h1 class="govuk-heading-l">
+  <span class="govuk-caption-l">Your team</span><span class="govuk-visually-hidden"> - </span>
+  Care Leavers
+</h1>
+
+
+<ul class="govuk-list govuk-list--spaced govuk-!-margin-bottom-5">
+  <li><a class="govuk-link" href="/groups/9R6te7wT/edit">Change the name of this team</a></li>
+  <li><a class="govuk-link" href="/groups/9R6te7wT/members">Edit members of this team</a></li>
+
+</ul>
+
+<a class="govuk-button govuk-button--start" data-module="govuk-button" draggable="false" role="button"
+   href="/Page/NewQuestionnaire" data-govuk-button-init="">Create a questionnaire
+  <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19"
+       viewBox="0 0 33 40" focusable="false" aria-hidden="true">
+    <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z"></path>
+  </svg>
+</a>
+
+<div class="app-scrolling-wrapper" role="region" tabindex="0" aria-label="Questionnaires in ‘Care Leavers’">
+
+  <table class="govuk-table">
+    <caption class="govuk-table__caption govuk-table__caption--m">Questionnaires in ‘Care Leavers’</caption>
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header" scope="col">Questionnaire name</th>
+      <th class="govuk-table__header" scope="col">Created by</th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col">Status</th>
+    </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell"><a class="govuk-link" href="/forms/262709">This is a research form</a></td>
+      <td class="govuk-table__cell">Junior Owolabi</td>
+      <td class="govuk-table__cell govuk-table__cell--numeric">
+        <div class="app-form-states"><strong class="govuk-tag govuk-tag--yellow">Draft</strong>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
 </div>
