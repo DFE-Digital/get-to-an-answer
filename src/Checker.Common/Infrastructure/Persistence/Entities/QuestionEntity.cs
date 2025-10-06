@@ -34,6 +34,10 @@ public class QuestionEntity
 
     [Required]
     public QuestionType Type { get; set; }
+    
+    public DateTime CreatedAt { get; set; }
+    
+    public DateTime UpdatedAt { get; set; }
 
     // Navigation properties
     public ICollection<AnswerEntity> Answers { get; set; } = new List<AnswerEntity>();

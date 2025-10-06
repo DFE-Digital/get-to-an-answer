@@ -31,12 +31,6 @@ public class HomeController(ILogger<HomeController> logger) : Controller
         return View("AddQuestion", new ConfigViewModel());
     }
 
-    [HttpGet("Page/Questions/{questionId}/Type")]
-    public IActionResult SetQuestionTypePage(int questionId)
-    {
-        return View("SetQuestionType", new ConfigViewModel());
-    }
-
     [HttpGet("Page/Branches/{branchId}")]
     public IActionResult AddBranchingPage(int branchId)
     {

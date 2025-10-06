@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Checker.Common.Enum;
 
 namespace Checker.Common.Infrastructure.Persistence.Entities;
 
@@ -25,6 +26,16 @@ public class AnswerEntity
     public string Content { get; set; }
     
     public string Description { get; set; }
+    
+    public float Score { get; set; }
+    
+    public DestinationType DestinationType { get; set; }
+    
+    public string Destination { get; set; }
+    
+    public DateTime CreatedAt { get; set; }
+    
+    public DateTime UpdatedAt { get; set; }
 
     // Foreign key
     public int QuestionId { get; set; }

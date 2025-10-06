@@ -3,15 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Checker.Common.Infrastructure.Persistence;
 
-public class CheckerDbContext : DbContext
+public class CheckerDbContext(DbContextOptions<CheckerDbContext> options) : DbContext(options)
 {
-    public CheckerDbContext(DbContextOptions<CheckerDbContext> options)
-        : base(options) { }
-
     public DbSet<QuestionEntity> Questions { get; set; }
     public DbSet<AnswerEntity> Answers { get; set; }
-    public DbSet<BranchingEntity> Branching { get; set; }
-    public DbSet<ConditionEntity> Conditions { get; set; }
     public DbSet<QuestionnaireEntity> Questionnaires { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

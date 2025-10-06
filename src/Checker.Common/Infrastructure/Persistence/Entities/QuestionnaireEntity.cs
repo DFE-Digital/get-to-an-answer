@@ -26,9 +26,12 @@ public class QuestionnaireEntity
     public string Title { get; set; }
 
     public string Description { get; set; }
+    
+    public DateTime CreatedAt { get; set; }
+    
+    public DateTime UpdatedAt { get; set; }
 
     // Navigation properties
-    public ICollection<BranchingEntity> Branching { get; set; } = new List<BranchingEntity>();
     public ICollection<QuestionEntity> Questions { get; set; } = new List<QuestionEntity>();
 }
 
