@@ -15,6 +15,8 @@ namespace Checker.Common.Domain
         public DateTime CreatedAt { get; set; }
     
         public DateTime UpdatedAt { get; set; }
+    
+        public EntityStatus Status { get; set; } = EntityStatus.Draft;
     }
 
     

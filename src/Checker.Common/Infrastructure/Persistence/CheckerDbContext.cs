@@ -8,6 +8,7 @@ public class CheckerDbContext(DbContextOptions<CheckerDbContext> options) : DbCo
     public DbSet<QuestionEntity> Questions { get; set; }
     public DbSet<AnswerEntity> Answers { get; set; }
     public DbSet<QuestionnaireEntity> Questionnaires { get; set; }
+    public DbSet<QuestionnaireEntity> QuestionnaireHistory { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

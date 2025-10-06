@@ -34,6 +34,8 @@ public class QuestionEntity
 
     [Required]
     public QuestionType Type { get; set; }
+
+    [Required] public EntityStatus Status { get; set; } = EntityStatus.Draft;
     
     public DateTime CreatedAt { get; set; }
     

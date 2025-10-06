@@ -20,12 +20,21 @@ public class QuestionnaireEntity
      * Maps to Oid claim
      */
     public string OwnerId { get; set; }
+    
+    /**
+     * List of authenticated government users invited by the owner/members
+     */
+    public List<string> InvitedUsers { get; set; } = new();
 
     [Required]
     [MaxLength(500)]
     public string Title { get; set; }
 
     public string Description { get; set; }
+    
+    public int Version { get; set; }
+    
+    public EntityStatus Status { get; set; } = EntityStatus.Draft;
     
     public DateTime CreatedAt { get; set; }
     
