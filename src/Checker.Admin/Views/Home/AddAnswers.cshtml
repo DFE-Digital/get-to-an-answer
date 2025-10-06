@@ -29,6 +29,57 @@
                      <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description to help people understand what this option is.</div>
                      <textarea id="pages-question-input-hint-text-field" class="govuk-textarea" rows="5" aria-describedby="pages-question-input-hint-text-hint" name="pages_question_input[hint_text]"></textarea>
                   </div>
+                  
+                  <div class="govuk-form-group">
+                     <label for="pages-question-input-hint-text-field" class="govuk-label">Target (optional)</label>
+                     <div id="contact-hint" class="govuk-hint">
+                        Select a destination to go to if this answer is selected
+                     </div>
+                     <div class="govuk-radios" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                           <input class="govuk-radios__input" id="contact" name="contact" type="radio" value="email" data-aria-controls="conditional-contact">
+                           <label class="govuk-label govuk-radios__label" for="contact">
+                              Question
+                           </label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-contact">
+                           <div class="govuk-form-group">
+                              <label class="govuk-label" for="contact-by-email">
+                                 Select a question
+                              </label>
+                              <input class="govuk-input govuk-!-width-one-third" id="contact-by-email" name="contactByEmail" type="email" spellcheck="false" autocomplete="email">
+                           </div>
+                        </div>
+                        <div class="govuk-radios__item">
+                           <input class="govuk-radios__input" id="contact-2" name="contact" type="radio" value="phone" data-aria-controls="conditional-contact-2">
+                           <label class="govuk-label govuk-radios__label" for="contact-2">
+                              Phone
+                           </label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-contact-2">
+                           <div class="govuk-form-group">
+                              <label class="govuk-label" for="contact-by-phone">
+                                 Phone number
+                              </label>
+                              <input class="govuk-input govuk-!-width-one-third" id="contact-by-phone" name="contactByPhone" type="tel" autocomplete="tel">
+                           </div>
+                        </div>
+                        <div class="govuk-radios__item">
+                           <input class="govuk-radios__input" id="contact-3" name="contact" type="radio" value="text" data-aria-controls="conditional-contact-3">
+                           <label class="govuk-label govuk-radios__label" for="contact-3">
+                              Text message
+                           </label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-contact-3">
+                           <div class="govuk-form-group">
+                              <label class="govuk-label" for="contact-by-text">
+                                 Mobile phone number
+                              </label>
+                              <input class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="contactByText" type="tel" autocomplete="tel">
+                           </div>
+                        </div>
+                     </div>
+                  </div>
                   <button type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary app-select-options__button" data-module="govuk-button" data-prevent-double-click="true" name="remove" value="0" data-govuk-button-init="">Remove <span class="govuk-visually-hidden">option 1</span></button>
                </li>
                <li class="app-select-options__list-item">
