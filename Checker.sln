@@ -1,14 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checker.Api", "src\Checker.Api\Checker.Api.csproj", "{186AA880-ACAB-4EEE-80C6-D63202901DB7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "src\Api\Api.csproj", "{186AA880-ACAB-4EEE-80C6-D63202901DB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checker.Web", "src\Checker.Web\Checker.Web.csproj", "{04E4F06E-8BF4-4543-88BA-DB113A918794}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "src\Common\Common.csproj", "{C8971158-BAF3-458F-A1BE-6172F8C7299D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checker.Common", "src\Checker.Common\Checker.Common.csproj", "{C8971158-BAF3-458F-A1BE-6172F8C7299D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin", "src\Admin\Admin.csproj", "{423EE00A-40C5-4C71-96EE-0477D987BD0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checker.Admin.Portal", "src\Checker.Admin.Portal\Checker.Admin.Portal.csproj", "{C2C7A2A6-8067-4BB5-B602-17109C08F78F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Checker.Admin", "src\Checker.Admin\Checker.Admin.csproj", "{423EE00A-40C5-4C71-96EE-0477D987BD0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend", "src\Frontend\Frontend.csproj", "{A19300FF-3A6B-4033-B313-32D550D26E61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,21 +18,17 @@ Global
 		{186AA880-ACAB-4EEE-80C6-D63202901DB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{186AA880-ACAB-4EEE-80C6-D63202901DB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{186AA880-ACAB-4EEE-80C6-D63202901DB7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{04E4F06E-8BF4-4543-88BA-DB113A918794}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{04E4F06E-8BF4-4543-88BA-DB113A918794}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{04E4F06E-8BF4-4543-88BA-DB113A918794}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{04E4F06E-8BF4-4543-88BA-DB113A918794}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C8971158-BAF3-458F-A1BE-6172F8C7299D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C8971158-BAF3-458F-A1BE-6172F8C7299D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8971158-BAF3-458F-A1BE-6172F8C7299D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8971158-BAF3-458F-A1BE-6172F8C7299D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C2C7A2A6-8067-4BB5-B602-17109C08F78F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2C7A2A6-8067-4BB5-B602-17109C08F78F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C2C7A2A6-8067-4BB5-B602-17109C08F78F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C2C7A2A6-8067-4BB5-B602-17109C08F78F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{423EE00A-40C5-4C71-96EE-0477D987BD0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{423EE00A-40C5-4C71-96EE-0477D987BD0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{423EE00A-40C5-4C71-96EE-0477D987BD0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{423EE00A-40C5-4C71-96EE-0477D987BD0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A19300FF-3A6B-4033-B313-32D550D26E61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A19300FF-3A6B-4033-B313-32D550D26E61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A19300FF-3A6B-4033-B313-32D550D26E61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A19300FF-3A6B-4033-B313-32D550D26E61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

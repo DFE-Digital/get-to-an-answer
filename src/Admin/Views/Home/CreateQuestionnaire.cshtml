@@ -1,0 +1,31 @@
+﻿@{
+  ViewData["Title"] = "Home Page";
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="/groups/9R6te7wT">Back to Care Leavers</a>
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="/Admin/Questionnaires/Create" accept-charset="UTF-8" method="post">
+      <div class="govuk-form-group">
+        <h1 class="govuk-label-wrapper">
+          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the name of your form?</label>
+        </h1>
+        <div class="govuk-hint" id="forms-name-input-name-hint">The form name will be shown at the top of each page of the form. Use a name
+          that describes what the form will help people to do. For example ‘Apply for a
+          juggling licence’.
+        </div>
+        <input id="forms-name-input-name-field" class="govuk-input" aria-describedby="forms-name-input-name-hint" type="text" name="Title">
+      </div>
+      <div class="govuk-form-group">
+        <label for="pages-question-input-hint-text-field" class="govuk-label">Hint text (optional)</label>
+        <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description of what the questionnaire is about.</div>
+        <textarea id="pages-question-input-hint-text-field" class="govuk-textarea" rows="5" aria-describedby="pages-question-input-hint-text-hint" name="Description"></textarea>
+      </div>
+      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
+    </form>
+  </div>
+</div>

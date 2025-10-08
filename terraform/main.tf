@@ -17,6 +17,11 @@ provider "azurerm" {
   features {}
 }
 
+# Add Microsoft Graph provider for Entra ID app registration
+provider "msgraph" {
+  tenant_id = null # Uses az cli / env by default; set explicitly if needed
+}
+
 ########################
 # Variables
 ########################
@@ -31,6 +36,20 @@ variable "location" {
   type        = string
   description = "Azure region."
   default     = "westeurope"
+}
+
+# Optional: custom AAD display name
+variable "aad_app_display_name" {
+  type        = string
+  description = "Display name for Azure AD application registration."
+  default     = "WebAppArchitecture"
+}
+
+# Optional: allowed redirect origins (comma-separated) for frontend/admin (can be updated post-deploy)
+variable "allowed_redirect_hosts" {
+  type        = list(string)
+  description = "Allowed HTTPS hosts to be used for OIDC redirects (e.g., frontend/admin FQDNs)."
+  default     = []
 }
 
 variable "api_image" {
@@ -71,6 +90,59 @@ variable "db_name" {
   type        = string
   description = "Name of the SQL database."
   default     = "appdb"
+}
+
+resource "azurerm_container_app_environment" "cae" {
+  name                = "${var.project_name}-cae"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.law.id
+}
+
+########################
+# Azure AD (Entra ID) App Registration + Secret (via Microsoft Graph)
+########################
+
+# Application registration
+resource "msgraph_application" "app" {
+  display_name = var.aad_app_display_name
+
+  web {
+    # Redirect URIs can be updated after first deploy if hosts aren’t known yet
+    redirect_uris = [
+      for h in var.allowed_redirect_hosts : "https://${h}/signin-oidc"
+    ]
+    logout_url = length(var.allowed_redirect_hosts) > 0 ? "https://${var.allowed_redirect_hosts[0]}/signout-oidc" : null
+    implicit_grant {
+      access_token_issuance_enabled = false
+      id_token_issuance_enabled     = true
+    }
+  }
+
+  api {
+    requested_access_token_version = 2
+  }
+
+  sign_in_audience = "AzureADMyOrg"
+}
+
+# Service principal (enterprise application)
+resource "msgraph_service_principal" "sp" {
+  application_id = msgraph_application.app.application_id
+}
+
+# Client secret (ensure lifecycle so it's not needlessly recreated)
+resource "msgraph_application_password" "client_secret" {
+  application_id = msgraph_application.app.id
+  display_name   = "terraform-client-secret"
+  end_date_relative = "87600h" # ~10 years; reduce for production policies
+  # lifecycle ignore optional
+  lifecycle {
+    ignore_changes = [
+      end_date_time
+    ]
+  }
 }
 
 ########################
@@ -168,6 +240,17 @@ locals {
   memory = "1.0Gi"
 }
 
+# Common AAD secrets/vars to inject into all apps
+locals {
+  aad_tenant_id     = data.azurerm_client_config.current.tenant_id
+  aad_client_id     = msgraph_application.app.application_id
+  aad_client_secret = msgraph_application_password.client_secret.value
+  aad_instance      = "https://login.microsoftonline.com/"
+  aad_audience      = msgraph_application.app.application_id
+}
+
+data "azurerm_client_config" "current" {}
+
 # API Service
 resource "azurerm_container_app" "api" {
   name                         = "${var.project_name}-api"
@@ -200,6 +283,7 @@ resource "azurerm_container_app" "api" {
     value = var.enable_acr_admin ? azurerm_container_registry.acr.admin_password : null
   }
 
+  # Existing DB secret
   secret {
     name  = "sql-conn"
     value = local.sql_connection_string
@@ -216,6 +300,14 @@ resource "azurerm_container_app" "api" {
         name        = "ConnectionStrings__Default"
         secret_name = "sql-conn"
       }
+      
+      # AAD config exposed to API
+      env { name = "AzureAd__Instance", value       = local.aad_instance }
+      env { name = "AzureAd__Domain",    value       = "" } # optional, if you need it
+      env { name = "AzureAd__TenantId",  value       = local.aad_tenant_id }
+      env { name = "AzureAd__ClientId",  value       = local.aad_client_id }
+      env { name = "AzureAd__Audience",  value       = local.aad_audience }
+      env { name = "AzureAd__ClientSecret", secret_name = "aad-client-secret" }
     }
 
     scale {
@@ -277,6 +369,16 @@ resource "azurerm_container_app" "frontend" {
         name  = "API_BASE_URL"
         value = "https://${azurerm_container_app.api.latest_revision_fqdn}"
       }
+
+      # AAD config exposed to Front-End
+      env { name = "AzureAd__Instance",  value       = local.aad_instance }
+      env { name = "AzureAd__Domain",    value       = "" }
+      env { name = "AzureAd__TenantId",  value       = local.aad_tenant_id }
+      env { name = "AzureAd__ClientId",  value       = local.aad_client_id }
+      env { name = "AzureAd__Audience",  value       = local.aad_audience }
+      env { name = "AzureAd__ClientSecret", secret_name = "aad-client-secret" }
+      # For MVC callback
+      env { name = "ASPNETCORE_URLS", value = "http://+:80" }
     }
 
     scale {
@@ -338,6 +440,15 @@ resource "azurerm_container_app" "admin" {
         name  = "API_BASE_URL"
         value = "https://${azurerm_container_app.api.latest_revision_fqdn}"
       }
+
+      # AAD config exposed to Admin
+      env { name = "AzureAd__Instance",  value       = local.aad_instance }
+      env { name = "AzureAd__Domain",    value       = "" }
+      env { name = "AzureAd__TenantId",  value       = local.aad_tenant_id }
+      env { name = "AzureAd__ClientId",  value       = local.aad_client_id }
+      env { name = "AzureAd__Audience",  value       = local.aad_audience }
+      env { name = "AzureAd__ClientSecret", secret_name = "aad-client-secret" }
+      env { name = "ASPNETCORE_URLS", value = "http://+:80" }
     }
 
     scale {
@@ -463,4 +574,17 @@ output "sql_server_fqdn" {
 
 output "acr_login_server" {
   value = azurerm_container_registry.acr.login_server
+}
+
+output "aad_tenant_id" {
+  value = local.aad_tenant_id
+}
+
+output "aad_client_id" {
+  value = local.aad_client_id
+}
+
+output "aad_client_secret_note" {
+  value     = "Client secret is stored as Container App secret 'aad-client-secret' for api/frontend/admin."
+  sensitive = false
 }
