@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 using Common.Enum;
 
 namespace Common.Infrastructure.Persistence.Entities;
@@ -30,7 +31,9 @@ public class QuestionnaireEntity
     [MaxLength(500)]
     public string Title { get; set; }
 
-    public string Description { get; set; }
+    
+    [MaxLength(10000)]
+    public string? Description { get; set; }
     
     public int Version { get; set; }
     

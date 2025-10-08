@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Controllers;
 
 [ApiController]
-//[Authorize]
 public class QuestionnaireController(CheckerDbContext db) : ControllerBase
 {
     [HttpPost("questionnaires")]
+    [Authorize]
     public IActionResult CreateQuestionnaire(CreateQuestionnaireRequestDto request)
     {
         var userId = User.FindFirstValue("oid")!;   // Azure AD Object ID

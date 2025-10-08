@@ -13,15 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
 
 // Register an HttpClient with a pre-configured base address
-var httpClientBuilder = builder.Services.AddHttpClient("ApiClient", client =>
+builder.Services.AddHttpClient("ApiClient", client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
 });
-
-if (builder.Environment.IsDevelopment())
-{
-    //httpClientBuilder.AddHttpMessageHandler(() => new DevTokenHandler(new Uri(apiBaseUrl))); // same host as API;
-}
 
 builder.Services.AddSingleton<IApiClient, ApiClient>(options =>
 {
@@ -31,7 +26,7 @@ builder.Services.AddSingleton<IApiClient, ApiClient>(options =>
 
 if (builder.Environment.IsDevelopment())
 {
-    //builder.CreateMockAzureAdClient();
+    builder.Services.AddMockAzureAdForMvc();
 }
 else
 {
@@ -66,7 +61,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseMockMvcDevEndpoints();
+}
 
 app.MapStaticAssets();
 

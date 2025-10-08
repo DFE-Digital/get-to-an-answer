@@ -35,9 +35,17 @@ public class HomeController : Controller
         return View("CreateQuestionnaire", new QuestionnaireViewModel());
     }
 
-    [HttpPost("Admin/Questionnaire/Create")]
+    [HttpPost("Admin/Questionnaires/Create")]
     public async Task<IActionResult> PerformQuestionnaireCreation(CreateQuestionnaireRequestDto request)
     {
+        if (!ModelState.IsValid)
+        {
+            return View("CreateQuestionnaire", new QuestionnaireViewModel
+            {
+                CreateQuestionnaire = request
+            }); // return errors to the same page
+        }
+        
         var questionnaire = await _apiClient.CreateQuestionnaireAsync(request);
 
         if (questionnaire == null)

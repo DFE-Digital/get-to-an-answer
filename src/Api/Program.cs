@@ -29,7 +29,7 @@ builder.Services.AddSwaggerGen(options =>
 
 if (builder.Environment.IsDevelopment())
 {
-    //builder.CreateMockAzureAdClient();
+    builder.Services.AddMockAzureAdForApi();
 }
 else
 {
@@ -50,7 +50,7 @@ else
 builder.Services.AddOpenApi();
 
 //builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
+//builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
@@ -67,25 +67,16 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty; // Serve Swagger UI at the app's root
 });
 
-if (app.Environment.IsDevelopment())
-{
-    /*app.MapPost("/dev/token", (Func<string, string, IEnumerable<Claim>?, string> tokenFactory, TokenRequest req) =>
-        {
-            var extra = new List<Claim>();
-            if (req.Roles is { Count: > 0 }) extra.AddRange(req.Roles.Select(r => new Claim(ClaimTypes.Role, r)));
-            if (req.Scopes is { Count: > 0 }) extra.AddRange(req.Scopes.Select(s => new Claim("scp", s)));
-            var jwt = tokenFactory(req.Sub ?? "user1", req.Name ?? "Dev User", extra);
-            return Results.Ok(new { access_token = jwt, token_type = "Bearer" });
-        })
-        .WithTags("dev");*/
-}
-else
+if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
-    
-    app.UseAuthentication();
-    app.UseAuthorization();
 }
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseMockBearerIfMissing(); // optional: inject bearer when missing
+}
+app.UseAuthorization();
     
 app.MapControllers();
 
