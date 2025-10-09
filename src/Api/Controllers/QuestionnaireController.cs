@@ -3,6 +3,7 @@ using Api.Infrastructure.Persistence;
 using Common.Domain;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
+using Common.Enum;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -39,9 +40,6 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
             Description = entity.Description
         };
         
-        // consider for the future
-        //return CreatedAtAction(nameof(GetQuestionnaire), new { id = entity.Id }, dto);
-        
         return Ok(dto);
     }
     
@@ -54,7 +52,8 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
 
         // Example: check ownership in your persistence layer
         var questionnaire = db.Questionnaires
-            .FirstOrDefault(q => q.Id == id && q.TenantId == tenantId);
+            .FirstOrDefault(q => q.Id == id && q.TenantId == tenantId
+                                            && q.Status != EntityStatus.Deleted);
 
         if (questionnaire == null)
             return NotFound();
@@ -62,7 +61,6 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         if (questionnaire.OwnerId != userId)
             return Forbid();
         
-        // Logic to create a questionnaire
         return Ok(questionnaire);
     }
     
@@ -72,7 +70,8 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         var tenantId = User.FindFirstValue("tid"); // Tenant ID
 
         var questionnaires = db.Questionnaires
-            .Where(q => q.TenantId == tenantId);
+            .Where(q => q.TenantId == tenantId
+                        && q.Status != EntityStatus.Deleted);
         
         return Ok(questionnaires);
     }
@@ -101,7 +100,6 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         db.Entry(questionnaire).Property(s => s.Title).IsModified = true;
         db.Entry(questionnaire).Property(s => s.Description).IsModified = true;
         
-        // Logic to update a questionnaire, answer, or branching logic
         return Ok("Questionnaire updated.");
     }
 

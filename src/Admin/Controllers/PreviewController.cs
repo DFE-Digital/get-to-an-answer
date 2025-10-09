@@ -23,13 +23,21 @@ public class PreviewController(ILogger<HomeController> logger, IApiClient apiCli
         });
     }
     
-    [HttpGet("Admin/Questionnaires/{questionnaireId}/Next/Preview")]
+    [HttpPost("Admin/Questionnaires/{questionnaireId}/Next/Preview")]
     public async Task<IActionResult> GetNextStatePage(int questionnaireId, GetNextStateRequest request)
     {
+        var destination = await apiClient.GetNextState(questionnaireId, request);
+        
+        if (destination == null)
+            return NotFound();
+
+        if (destination.Type == DestinationType.ExternalLink && destination.Content != null)
+            return Redirect(destination.Content);
+        
         return View("PreviewQuestionnaire", new QuestionnaireViewModel
         {
             NextStateRequest = new GetNextStateRequest(),
-            Destination = await apiClient.GetNextState(questionnaireId, request)
+            Destination = destination
         });
     }
 }

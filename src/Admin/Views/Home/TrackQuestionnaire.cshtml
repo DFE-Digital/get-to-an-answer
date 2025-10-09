@@ -66,13 +66,13 @@
     <div class="govuk-button-group">
       @if (Model.Questionnaire?.Status == EntityStatus.Draft)
       {
-        <a class="govuk-button govuk-button--primary" data-module="govuk-button" href="/forms/262709/delete" data-govuk-button-init="">Publish questionnaire</a>
+        <a class="govuk-button govuk-button--primary" data-module="govuk-button" href="/Admin/Questionnaires/@Model.Questionnaire.Id/Publish/Confirm" data-govuk-button-init="">Publish questionnaire</a>
       } 
       else if (Model.Questionnaire?.Status == EntityStatus.Published)
       {
-        <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="/forms/262709/delete" data-govuk-button-init="">Unpublish questionnaire</a>
+        <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="/Admin/Questionnaires/@Model.Questionnaire.Id/Unpublish/Confirm" data-govuk-button-init="">Unpublish questionnaire</a>
       }
-      <a class="govuk-button govuk-button--warning" data-module="govuk-button" href="/forms/262709/delete" data-govuk-button-init="">Delete questionnaire</a>
+      <a class="govuk-button govuk-button--warning" data-module="govuk-button" href="/Admin/Questionnaires/@Model.Questionnaire?.Id/Delete/Confirm" data-govuk-button-init="">Delete questionnaire</a>
     </div>
   </div>
 </div>

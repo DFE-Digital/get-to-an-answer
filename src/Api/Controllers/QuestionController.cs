@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Api.Infrastructure.Persistence;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
+using Common.Enum;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -29,6 +30,9 @@ public class QuestionController(CheckerDbContext db) : Controller
             Content = request.Content,
             Description = request.Description,
             Type = request.Type,
+            Order = db.Questions.Count(x => x.QuestionnaireId == request.QuestionnaireId
+                                            && x.Status != EntityStatus.Deleted
+                                            && x.TenantId == tenantId) + 1,
         });
         
         db.SaveChanges();
@@ -45,7 +49,9 @@ public class QuestionController(CheckerDbContext db) : Controller
 
         // Example: check ownership in your persistence layer
         var question = db.Questions
-            .FirstOrDefault(q => q.Id == id && q.TenantId == tenantId);
+            .FirstOrDefault(q => q.Id == id 
+                                 && q.TenantId == tenantId
+                                 && q.Status != EntityStatus.Deleted);
 
         if (question == null)
             return NotFound();
@@ -63,7 +69,9 @@ public class QuestionController(CheckerDbContext db) : Controller
         var tenantId = User.FindFirstValue("tid"); // Tenant ID
 
         var questions = db.Questions
-            .Where(q => q.QuestionnaireId == questionnaireId && q.TenantId == tenantId);
+            .Where(q => q.QuestionnaireId == questionnaireId 
+                        && q.TenantId == tenantId
+                        && q.Status != EntityStatus.Deleted);
         
         return Ok(questions);
     }
@@ -95,11 +103,15 @@ public class QuestionController(CheckerDbContext db) : Controller
         // Logic to update a question, answer, or branching logic
         return Ok("Question updated.");
     }
-
-    [HttpDelete("questions/{id}")]
-    public IActionResult DeleteQuestion(int id)
+    
+    [HttpPut("questions/{id}/status")]
+    public IActionResult UpdateQuestionStatus(int id, UpdateQuestionStatusRequestDto request)
     {
-        var tenantId = User.FindFirstValue("tid")!; // Tenant ID
+        // Extract user and tenant from claims
+        var tenantId = User.FindFirstValue("tid"); // Tenant ID
+        
+        if (tenantId == null)
+            return Unauthorized();
         
         var question = new QuestionEntity
         {
@@ -108,12 +120,22 @@ public class QuestionController(CheckerDbContext db) : Controller
         };
 
         db.Questions.Attach(question);
-        db.Questions.Remove(question);
         
-        db.SaveChanges();
+        question.Status = request.Status;
         
-        // Logic to delete a question
-        return Ok("Question deleted.");
+        db.Entry(question).Property(s => s.Status).IsModified = true;
+        
+        // Logic to update a question, answer, or branching logic
+        return Ok("Question updated.");
+    }
+
+    [HttpDelete("questions/{id}")]
+    public IActionResult DeleteQuestion(int id)
+    {
+        return UpdateQuestionStatus(id, new UpdateQuestionStatusRequestDto
+        {
+            Status = EntityStatus.Deleted
+        });
     }
     
     [HttpDelete("questionnaires/{questionnaireId}/questions/{id}/move-down")]
@@ -140,7 +162,10 @@ public class QuestionController(CheckerDbContext db) : Controller
 
         // Find the next item in order within the same scope
         var next = await db.Questions
-            .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == current.Order + direction && x.TenantId == tenantId);
+            .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId 
+                                      && x.Order == current.Order + direction 
+                                      && x.TenantId == tenantId
+                                      && x.Status != EntityStatus.Deleted);
 
         // If already last, nothing to do
         if (next == null) return NoContent();

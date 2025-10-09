@@ -44,11 +44,10 @@ public class WebController(CheckerDbContext db) : Controller
     {
         var tenantId = User.FindFirstValue("tid")!; // Tenant ID
 
-        var selectedAnswerIds = request.SelectedAnswerIds;
+        var selectedAnswerId = request.SelectedAnswerId;
         
-        var topAnswer = await db.Answers.Where(x => selectedAnswerIds.Contains(x.Id) && x.QuestionId == request.CurrentQuestionId && x.TenantId == tenantId)
-            .OrderBy(x => x.Score)   
-            .FirstOrDefaultAsync();
+        var topAnswer = await db.Answers.FirstOrDefaultAsync(x => x.Id == selectedAnswerId 
+                                                                  && x.TenantId == tenantId);
         
         if (topAnswer == null)
             return BadRequest();

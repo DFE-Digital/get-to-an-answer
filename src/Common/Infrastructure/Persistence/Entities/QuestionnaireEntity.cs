@@ -42,8 +42,6 @@ public class QuestionnaireEntity
     public DateTime CreatedAt { get; set; }
     
     public DateTime UpdatedAt { get; set; }
-    
-    public bool IsDeleted { get; set; }
 
     // Navigation properties
     public ICollection<QuestionEntity> Questions { get; set; } = new List<QuestionEntity>();

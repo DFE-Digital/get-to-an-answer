@@ -6,5 +6,5 @@ public class GetNextStateRequest
     
     public int CurrentQuestionOrder { get; set; }
 
-    public List<int> SelectedAnswerIds { get; set; } = new();
+    public int SelectedAnswerId { get; set; }
 }

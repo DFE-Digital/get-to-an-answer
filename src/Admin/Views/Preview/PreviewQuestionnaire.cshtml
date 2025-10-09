@@ -1,14 +1,15 @@
-﻿@model QuestionnaireViewModel?
+﻿@using Common.Enum
+@model QuestionnaireViewModel
 
 @{
   ViewData["Title"] = "Create a new questionnaire";
-  var hasErrors = Model?.CreateQuestionnaire != null && !ViewData.ModelState.IsValid;
+  var hasErrors = Model.NextStateRequest != null && !ViewData.ModelState.IsValid;
   string? ErrorFor(string key) => ViewData.ModelState.ContainsKey(key) && ViewData.ModelState[key]?.Errors.Count > 0
     ? ViewData.ModelState[key]!.Errors[0].ErrorMessage
     : null;
 
-  var hasTitleError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Title)) != null;
-  var hasDescError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Description)) != null;
+  //var hasTitleError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Title)) != null;
+  //var hasDescError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Description)) != null;
 }
 
 @section BeforeContent
@@ -48,40 +49,84 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <form action="/Admin/Questionnaires/Create" accept-charset="UTF-8" method="post">
-      <div class="govuk-form-group">
-        <fieldset class="govuk-fieldset" aria-describedby="signIn-hint">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-            <h1 class="govuk-fieldset__heading">
-              How do you want to sign in?
-            </h1>
-          </legend>
-          <div id="signIn-hint" class="govuk-hint">
-            You’ll need an account to prove your identity and complete your Self Assessment
-          </div>
-          <div class="govuk-radios" data-module="govuk-radios">
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="signIn" name="signIn" type="radio" value="government-gateway" aria-describedby="signIn-item-hint">
-              <label class="govuk-label govuk-radios__label" for="signIn">
-                Sign in with Government Gateway
-              </label>
-              <div id="signIn-item-hint" class="govuk-hint govuk-radios__hint">
-                You’ll have a user ID if you’ve registered for Self Assessment or filed a tax return online before
+    @if (Model.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
+    {
+      <form action="/Admin/Questionnaires/Create" accept-charset="UTF-8" method="post">
+        <div class="govuk-form-group">
+          <fieldset class="govuk-fieldset" aria-describedby="signIn-hint">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+              <h1 class="govuk-fieldset__heading">
+                @Model.Destination.Question.Content
+              </h1>
+            </legend>
+            @if (Model.Destination.Question.Description != null)
+            {
+              <div id="signIn-hint" class="govuk-hint">
+                @Model.Destination.Question.Description
               </div>
-            </div>
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="signIn-2" name="signIn" type="radio" value="govuk-one-login" aria-describedby="signIn-2-item-hint">
-              <label class="govuk-label govuk-radios__label" for="signIn-2">
-                Sign in with GOV.UK One Login
-              </label>
-              <div id="signIn-2-item-hint" class="govuk-hint govuk-radios__hint">
-                If you don’t have a GOV.UK One Login, you can create one
+            }
+            @if (Model.Destination.Question.Type == QuestionType.SingleSelect) 
+            { 
+              <div class="govuk-radios" data-module="govuk-radios">
+                @foreach (var answer in Model.Destination.Question.Answers)
+                {
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="signIn" name="signIn" type="radio" value="government-gateway" aria-describedby="signIn-item-hint">
+                    <label class="govuk-label govuk-radios__label" for="signIn">
+                      @answer.Content
+                    </label>
+                    @if (answer.Description != null)
+                    {
+                      <div id="signIn-item-hint" class="govuk-hint govuk-radios__hint">
+                        @answer.Description
+                      </div>
+                    }
+                  </div>
+                }
               </div>
-            </div>
-          </div>
-        </fieldset>
-      </div>
-      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
-    </form>
+            }
+            else if (Model.Destination.Question.Type == QuestionType.MultiSelect)
+            {
+              <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                @foreach (var answer in Model.Destination.Question.Answers)
+                {
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="nationality" name="nationality" type="checkbox" value="british" aria-describedby="nationality-item-hint">
+                    <label class="govuk-label govuk-checkboxes__label" for="nationality">
+                      @answer.Content
+                    </label>
+                    @if (answer.Description != null)
+                    {
+                      <div id="nationality-item-hint" class="govuk-hint govuk-checkboxes__hint">
+                        @answer.Description
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+            else if (Model.Destination.Question.Type == QuestionType.DropdownSelect)
+            {
+              <div class="govuk-form-group">
+                <label class="govuk-label" for="sort">
+                  Sort by
+                </label>
+                <select class="govuk-select" id="sort" name="sort">
+                  @foreach (var answer in Model.Destination.Question.Answers)
+                  {
+                    <option value="@answer.Id">@answer.Content</option>
+                  }
+                </select>
+              </div>
+            }
+          </fieldset>
+        </div>
+        <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
+      </form>
+    }
+    else if (Model.Destination?.Type == DestinationType.InternalPage)
+    {
+      <p>@Model.Destination.Content</p>
+    }
   </div>
 </div>
