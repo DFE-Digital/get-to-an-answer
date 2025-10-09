@@ -34,6 +34,7 @@ public class QuestionController(CheckerDbContext db) : Controller
             Order = db.Questions.Count(x => x.QuestionnaireId == request.QuestionnaireId
                                             && x.Status != EntityStatus.Deleted
                                             && x.TenantId == tenantId) + 1,
+            CreatedAt = DateTime.UtcNow
         };
         
         db.Questions.Add(entity);
@@ -60,6 +61,7 @@ public class QuestionController(CheckerDbContext db) : Controller
 
         // Example: check ownership in your persistence layer
         var question = db.Questions
+            .Include(q => q.Answers)
             .FirstOrDefault(q => q.Id == id 
                                  && q.TenantId == tenantId
                                  && q.Status != EntityStatus.Deleted);
@@ -71,7 +73,23 @@ public class QuestionController(CheckerDbContext db) : Controller
             return Forbid();
         
         // Logic to create a question
-        return Ok(question);
+        return Ok(new QuestionDto
+        {
+            Id = question.Id,
+            Content = question.Content,
+            Description = question.Description,
+            Order = question.Order,
+            Status = question.Status,
+            Answers = question.Answers.Select(a => new AnswerDto
+            {
+                Id = a.Id,
+                Content = a.Content,
+                QuestionId = a.QuestionId,
+                Score = a.Score,
+                DestinationType = a.DestinationType,
+            }).ToList(),
+            Type = question.Type
+        });
     }
     
     [HttpGet("questionnaires/{questionnaireId}/questions")]
@@ -107,9 +125,13 @@ public class QuestionController(CheckerDbContext db) : Controller
         
         question.Content = request.Content;
         question.Description = request.Description;
+        question.Type = request.Type;
+        question.UpdatedAt = DateTime.UtcNow;
         
         db.Entry(question).Property(s => s.Content).IsModified = true;
         db.Entry(question).Property(s => s.Description).IsModified = true;
+        db.Entry(question).Property(s => s.Type).IsModified = true;
+        db.Entry(question).Property(s => s.UpdatedAt).IsModified = true;
         
         // Logic to update a question, answer, or branching logic
         return Ok("Question updated.");
@@ -133,6 +155,7 @@ public class QuestionController(CheckerDbContext db) : Controller
         db.Questions.Attach(question);
         
         question.Status = request.Status;
+        question.UpdatedAt = DateTime.UtcNow;
         
         db.Entry(question).Property(s => s.Status).IsModified = true;
         
@@ -184,6 +207,9 @@ public class QuestionController(CheckerDbContext db) : Controller
 
         // Swap orders
         (current.Order, next.Order) = (next.Order, current.Order);
+        
+        current.UpdatedAt = DateTime.UtcNow;
+        next.UpdatedAt = DateTime.UtcNow;
 
         await db.SaveChangesAsync();
         

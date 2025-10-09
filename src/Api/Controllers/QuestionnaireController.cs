@@ -26,7 +26,8 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
             OwnerId = userId,
             TenantId = tenantId,
             Title = request.Title,
-            Description = request.Description
+            Description = request.Description,
+            CreatedAt = DateTime.UtcNow
         };
         
         db.Questionnaires.Add(entity);
@@ -96,11 +97,38 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         
         questionnaire.Title = request.Title;
         questionnaire.Description = request.Description;
+        questionnaire.UpdatedAt = DateTime.UtcNow;
         
         db.Entry(questionnaire).Property(s => s.Title).IsModified = true;
         db.Entry(questionnaire).Property(s => s.Description).IsModified = true;
+        db.Entry(questionnaire).Property(s => s.UpdatedAt).IsModified = true;
         
         return Ok("Questionnaire updated.");
+    }
+    
+    [HttpPut("questionnaires/{id}/status")]
+    public IActionResult UpdateQuestionnaireStatus(int id, UpdateQuestionnaireStatusRequestDto request)
+    {
+        // Extract user and tenant from claims
+        var tenantId = User.FindFirstValue("tid"); // Tenant ID
+        
+        if (tenantId == null)
+            return Unauthorized();
+        
+        var question = new QuestionEntity
+        {
+            Id = id,
+            TenantId = tenantId,
+        };
+
+        db.Questions.Attach(question);
+        
+        question.Status = request.Status;
+        question.UpdatedAt = DateTime.UtcNow;
+        
+        db.Entry(question).Property(s => s.Status).IsModified = true;
+        
+        return Ok("Question updated.");
     }
 
     [HttpDelete("questionnaires/{id}")]

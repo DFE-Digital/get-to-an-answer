@@ -7,7 +7,7 @@
 
 @section BeforeContent 
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/groups/9R6te7wT">Back to Care Leavers Questionnaire</a>
+  <a class="govuk-back-link govuk-!-display-none-print" href="/Admin/Questions/@Model.QuestionId/Edit">Back to Care Leavers Questionnaire</a>
 }
 
 <div class="govuk-grid-row">
@@ -24,82 +24,7 @@
          <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Add answer options to your list</legend>
             <ul class="govuk-list app-select-options">
-               @if (Model?.Answers?.Count == 0)
-               {
-                  <li class="app-select-options__list-item">
-                     <input type="hidden" name="QuestionnaireId" value="@Model.QuestionnaireId" autocomplete="off">
-                     <input type="hidden" name="QuestionId" value="@Model.QuestionId" autocomplete="off">
-                     <div class="govuk-form-group" classes="app-select-options__form-group">
-                        <label for="forms-selections-settings-form-selection-options-name-field-0" class="govuk-label">Option 1</label>
-                        <input id="forms-selections-settings-form-selection-options-name-field-0" class="govuk-input govuk-input--width-20" type="text"
-                               name="Answers[0].Content">
-                     </div>
-                     <div class="govuk-form-group">
-                        <label for="pages-question-input-hint-text-field" class="govuk-label">Hint text (optional)</label>
-                        <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description to help people understand what this option is.</div>
-                        <textarea id="pages-question-input-hint-text-field" class="govuk-textarea" rows="5" aria-describedby="pages-question-input-hint-text-hint" 
-                        name="Answers[0].Description"></textarea>
-                     </div>
-                     <div class="govuk-form-group">
-                        <label for="pages-question-input-hint-text-field" class="govuk-label">Score (optional)</label>
-                        <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description to help people understand what this option is.</div>
-                        <input id="forms-selections-settings-form-selection-options-name-field-0" class="govuk-input govuk-input--width-20" type="number"
-                               name="Answers[0].Score">
-                     </div>
-
-                     <div class="govuk-form-group">
-                        <label for="pages-question-input-hint-text-field" class="govuk-label">Target (optional)</label>
-                        <div id="contact-hint" class="govuk-hint">
-                           Select a destination to go to if this answer is selected
-                        </div>
-                        <div class="govuk-radios" data-module="govuk-radios">
-                           <div class="govuk-radios__item">
-                              <input class="govuk-radios__input" id="contact" name="Answers[0].DestinationType" type="radio" value="Question" data-aria-controls="conditional-contact">
-                              <label class="govuk-label govuk-radios__label" for="contact">
-                                 Question
-                              </label>
-                           </div>
-                           <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-contact">
-                              <div class="govuk-form-group">
-                                 <label class="govuk-label" for="target-question">
-                                    Select a target question
-                                 </label>
-                                 <select class="govuk-select" id="target-question" name="Answers[0].QuestionId">
-                                    <option value="question1">Question 3?</option>
-                                 </select>
-                              </div>
-                           </div>
-                           <div class="govuk-radios__item">
-                              <input class="govuk-radios__input" id="contact-3" name="Answers[0].DestinationType" type="radio" value="ExternalLink" data-aria-controls="conditional-contact-3">
-                              <label class="govuk-label govuk-radios__label" for="contact-3">
-                                 External Link
-                              </label>
-                           </div>
-                           <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-contact-3">
-                              <div class="govuk-form-group">
-                                 <label class="govuk-label" for="contact-by-text">
-                                    Enter an external link
-                                 </label>
-                                 <input class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="Answers[0].Destination" type="url" autocomplete="url">
-                              </div>
-                           </div>
-                           <div class="govuk-radios__item">
-                              <input class="govuk-radios__input" id="contact-2" name="Answers[0].DestinationType" type="radio" value="0" data-aria-controls="conditional-type-2">
-                              <label class="govuk-label govuk-radios__label" for="contact-2">
-                                 None
-                              </label>
-                           </div>
-                           <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-type-2">
-                              <div class="govuk-form-group">
-
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                     <button type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary app-select-options__button" data-module="govuk-button" data-prevent-double-click="true" name="remove" value="0" data-govuk-button-init="">Remove <span class="govuk-visually-hidden">option 1</span></button>
-                  </li>
-               }
-               else
+               @if (Model?.Answers?.Count > 0)
                {
                   var answers = Model?.Answers ?? [];
                   
@@ -108,9 +33,9 @@
                      var answer = answers[i];
                      
                      <li class="app-select-options__list-item">
-                        <input type="hidden" name="QuestionnaireId" value="@answer.QuestionnaireId" autocomplete="off">
-                        <input type="hidden" name="QuestionId" value="@answer.QuestionId" autocomplete="off">
-                        <input type="hidden" name="Id" value="@answer.Id" autocomplete="off">
+                        <input type="hidden" name="Answers[@i].QuestionnaireId" value="@answer.QuestionnaireId" autocomplete="off">
+                        <input type="hidden" name="Answers[@i].QuestionId" value="@answer.QuestionId" autocomplete="off">
+                        <input type="hidden" name="Answers[@i].Id" value="@answer.Id" autocomplete="off">
                         <div class="govuk-form-group" classes="app-select-options__form-group">
                            <label for="forms-selections-settings-form-selection-options-name-field-0" class="govuk-label">Option @(i+1)</label>
                            <input id="forms-selections-settings-form-selection-options-name-field-0" class="govuk-input govuk-input--width-20" type="text"
@@ -120,7 +45,13 @@
                            <label for="pages-question-input-hint-text-field" class="govuk-label">Hint text (optional)</label>
                            <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description to help people understand what this option is.</div>
                            <textarea id="pages-question-input-hint-text-field" class="govuk-textarea" rows="5" aria-describedby="pages-question-input-hint-text-hint" 
-                           value="@answer.Description" name="Answers[@i].Description"></textarea>
+                           name="Answers[@i].Description">@answer.Description</textarea>
+                        </div>
+                        <div class="govuk-form-group">
+                           <label for="pages-question-input-hint-text-field" class="govuk-label">Score (optional)</label>
+                           <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description to help people understand what this option is.</div>
+                           <input id="forms-selections-settings-form-selection-options-name-field-0" class="govuk-input govuk-input--width-20" type="number"
+                                  value="@answer.Score" name="Answers[@i].Score">
                         </div>
 
                         <div class="govuk-form-group">
@@ -130,58 +61,142 @@
                            </div>
                            <div class="govuk-radios" data-module="govuk-radios">
                               <div class="govuk-radios__item">
-                                 <input class="govuk-radios__input" id="contact" name="Answers[@i].DestinationType" type="radio" value="Question" data-aria-controls="conditional-contact"
+                                 <input class="govuk-radios__input" id="q-answer-@i" name="Answers[@i].DestinationType" 
+                                        type="radio" value="Question" data-aria-controls="conditional-q-answer-@i"
                                         @(answer.DestinationType == DestinationType.Question ? "checked" : "")>
-                                 <label class="govuk-label govuk-radios__label" for="contact">
+                                 <label class="govuk-label govuk-radios__label" for="q-answer-@i">
                                     Question
                                  </label>
                               </div>
-                              <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-contact">
+                              <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-q-answer-@i">
                                  <div class="govuk-form-group">
-                                    <label class="govuk-label" for="target-question">
+                                    <label class="govuk-label" for="target-question-@i">
                                        Select a target question
                                     </label>
-                                    <select class="govuk-select" id="target-question" name="Answers[@i].QuestionId">
+                                    <select class="govuk-select" id="target-question-@i" name="Answers[@i].DestinationQuestionId">
                                        <option value="question1">Question 3?</option>
                                     </select>
                                  </div>
                               </div>
                               <div class="govuk-radios__item">
-                                 <input class="govuk-radios__input" id="contact-3" name="Answers[@i].DestinationType" type="radio" value="ExternalLink" data-aria-controls="conditional-contact-3"
+                                 <input class="govuk-radios__input" id="e-answer-@i" name="Answers[@i].DestinationType" 
+                                        type="radio" value="ExternalLink" data-aria-controls="conditional-e-answer-@i"
                                         @(answer.DestinationType == DestinationType.ExternalLink ? "checked" : "")>
-                                 <label class="govuk-label govuk-radios__label" for="contact-3">
+                                 <label class="govuk-label govuk-radios__label" for="e-answer-@i">
                                     External Link
                                  </label>
                               </div>
-                              <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-contact-3">
+                              <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-e-answer-@i">
                                  <div class="govuk-form-group">
-                                    <label class="govuk-label" for="contact-by-text">
+                                    <label class="govuk-label" for="target-link-@i">
                                        Enter an external link
                                     </label>
-                                    <input class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="Answers[@i].Destination" type="url" autocomplete="url">
+                                    <input class="govuk-input govuk-!-width-one-third" id="target-link-@i" name="Answers[@i].Destination" type="url" autocomplete="url">
                                  </div>
                               </div>
                               <div class="govuk-radios__item">
-                                 <input class="govuk-radios__input" id="contact-2" name="Answers[@i].DestinationType" type="radio" value="" data-aria-controls="conditional-contact-2"
+                                 <input class="govuk-radios__input" id="n-answer-@i" name="Answers[@i].DestinationType" 
+                                        type="radio" value="" data-aria-controls="conditional-n-answer-@i"
                                         @(answer.DestinationType == null ? "checked" : "")>
-                                 <label class="govuk-label govuk-radios__label" for="contact-2">
+                                 <label class="govuk-label govuk-radios__label" for="n-answer-@i">
                                     None
                                  </label>
                               </div>
-                              <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-type-2">
+                              <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-n-answer-@i">
 
                               </div>
                            </div>
                         </div>
-                        <button type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary app-select-options__button" data-module="govuk-button" data-prevent-double-click="true" name="remove" value="0" data-govuk-button-init="">Remove <span class="govuk-visually-hidden">option 1</span></button>
+                        <button type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary app-select-options__button" 
+                                data-module="govuk-button" data-prevent-double-click="true" name="remove" value="0" data-govuk-button-init="">Remove</button>
                      </li>
                   }
+               }
+               
+               @if (Model != null && (Model.AddEmptyAnswerOption || Model.Answers?.Count == 0))
+               {
+                  var index = Model.AddEmptyAnswerOption ? Model.Answers?.Count : 0;
+                  
+                  <li class="app-select-options__list-item">
+                     <input type="hidden" name="QuestionnaireId" value="@Model.QuestionnaireId" autocomplete="off">
+                     <input type="hidden" name="QuestionId" value="@Model.QuestionId" autocomplete="off">
+                     <div class="govuk-form-group" classes="app-select-options__form-group">
+                        <label for="forms-selections-settings-form-selection-options-name-field-0" class="govuk-label">Option @(index+1)</label>
+                        <input id="forms-selections-settings-form-selection-options-name-field-0" class="govuk-input govuk-input--width-20" type="text"
+                               name="Answers[@index].Content">
+                     </div>
+                     <div class="govuk-form-group">
+                        <label for="pages-question-input-hint-text-field" class="govuk-label">Hint text (optional)</label>
+                        <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description to help people understand what this option is.</div>
+                        <textarea id="pages-question-input-hint-text-field" class="govuk-textarea" rows="5" aria-describedby="pages-question-input-hint-text-hint" 
+                        name="Answers[@index].Description"></textarea>
+                     </div>
+                     <div class="govuk-form-group">
+                        <label for="pages-question-input-hint-text-field" class="govuk-label">Score (optional)</label>
+                        <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description to help people understand what this option is.</div>
+                        <input id="forms-selections-settings-form-selection-options-name-field-0" class="govuk-input govuk-input--width-20" type="number"
+                               name="Answers[@index].Score">
+                     </div>
+
+                     <div class="govuk-form-group">
+                        <label for="pages-question-input-hint-text-field" class="govuk-label">Target (optional)</label>
+                        <div id="contact-hint" class="govuk-hint">
+                           Select a destination to go to if this answer is selected
+                        </div>
+                        <div class="govuk-radios" data-module="govuk-radios">
+                           <div class="govuk-radios__item">
+                              <input class="govuk-radios__input" id="q-answer-@index" name="Answers[@index].DestinationType" type="radio" value="Question" data-aria-controls="conditional-q-answer-@index">
+                              <label class="govuk-label govuk-radios__label" for="q-answer-@index">
+                                 Question
+                              </label>
+                           </div>
+                           <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-q-answer-@index">
+                              <div class="govuk-form-group">
+                                 <label class="govuk-label" for="target-question">
+                                    Select a target question
+                                 </label>
+                                 <select class="govuk-select" id="target-question" name="Answers[@index].DestinationQuestionId">
+                                    <option value="question1">Question 3?</option>
+                                 </select>
+                              </div>
+                           </div>
+                           <div class="govuk-radios__item">
+                              <input class="govuk-radios__input" id="e-answer-@index" name="Answers[@index].DestinationType" type="radio" value="ExternalLink" data-aria-controls="conditional-e-answer-@index">
+                              <label class="govuk-label govuk-radios__label" for="answer-e-@index">
+                                 External Link
+                              </label>
+                           </div>
+                           <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-e-answer-@index">
+                              <div class="govuk-form-group">
+                                 <label class="govuk-label" for="contact-by-text">
+                                    Enter an external link
+                                 </label>
+                                 <input class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="Answers[@index].Destination" type="url" autocomplete="url">
+                              </div>
+                           </div>
+                           <div class="govuk-radios__item">
+                              <input class="govuk-radios__input" id="n-answer-@index" name="Answers[@index].DestinationType" type="radio" value="0" data-aria-controls="conditional-n-answer-@index">
+                              <label class="govuk-label govuk-radios__label" for="n-answer-@index">
+                                 None
+                              </label>
+                           </div>
+                           <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-n-answer-@index">
+                              <div class="govuk-form-group">
+
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <button type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary app-select-options__button" data-module="govuk-button" data-prevent-double-click="true" name="remove" value="0" data-govuk-button-init="">Remove <span class="govuk-visually-hidden">option 1</span></button>
+                  </li>
                }
             </ul>
          </fieldset>
          <div class="govuk-!-margin-bottom-8">
             <div class="govuk-button-group">
-               <button type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-prevent-double-click="true" name="add_another" data-govuk-button-init="">Add another option</button>
+               <button type="submit" 
+                       formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary" data-module="govuk-button" 
+                       data-prevent-double-click="true" name="AddEmptyAnswerOption" value="true" data-govuk-button-init="">Add another option</button>
                <a class="govuk-link" href="/forms/262709/pages/1050713/edit/selection/bulk-options">Enter all the options into one text box</a>
             </div>
          </div>

@@ -29,4 +29,6 @@ public class QuestionnaireViewModel : ConfigViewModel
     public DestinationDto? Destination { get; set; }
     public int? QuestionnaireId { get; set; }
     public int? QuestionId { get; set; }
+    
+    public bool AddEmptyAnswerOption { get; set; }
 }

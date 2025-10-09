@@ -31,6 +31,7 @@ public class AnswerController(CheckerDbContext db) : Controller
             Description = request.Description,
             Destination = request.Destination,
             DestinationType = request.DestinationType,
+            CreatedAt = DateTime.UtcNow
         };
         
         db.Answers.Add(entity);
@@ -101,9 +102,19 @@ public class AnswerController(CheckerDbContext db) : Controller
         
         answer.Content = request.Content;
         answer.Description = request.Description;
+        answer.Destination = request.Destination;
+        answer.DestinationType = request.DestinationType;
+        answer.Score = request.Score;
+        answer.UpdatedAt = DateTime.UtcNow;
         
         db.Entry(answer).Property(s => s.Content).IsModified = true;
         db.Entry(answer).Property(s => s.Description).IsModified = true;
+        db.Entry(answer).Property(s => s.Destination).IsModified = true;
+        db.Entry(answer).Property(s => s.DestinationType).IsModified = true;
+        db.Entry(answer).Property(s => s.Score).IsModified = true;
+        db.Entry(answer).Property(s => s.UpdatedAt).IsModified = true;
+        
+        db.SaveChanges();
         
         // Logic to update a answer, answer, or branching logic
         return Ok("Answer updated.");

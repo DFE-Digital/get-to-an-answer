@@ -179,15 +179,17 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
                 Content = question.Content,
                 Description = question.Description,
                 Type = question.Type
-            }
+            },
+            Answers = question.Answers
         });
     }
 
     [HttpGet("Admin/Questionnaires/{questionnaireId}/Questions/{questionId}/Answers/Edit")]
-    public async Task<IActionResult> AddAnswersPage(int questionnaireId, int questionId)
+    public async Task<IActionResult> AddAnswersPage(int questionnaireId, int questionId, bool addEmptyAnswerOption = false)
     {
         return View("AddAnswers", new QuestionnaireViewModel
         {
+            AddEmptyAnswerOption = addEmptyAnswerOption,
             QuestionnaireId = questionnaireId,
             QuestionId = questionId,
             Answers = await apiClient.GetAnswersAsync(questionId)
@@ -195,7 +197,9 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpPost("Admin/Questionnaires/{questionnaireId}/Questions/{questionId}/Answers/Edit")]
-    public async Task<IActionResult> SaveAnswers(int questionnaireId, int questionId, [FromForm(Name = "Answers")] List<UpdateAnswerRequestDto> requests)
+    public async Task<IActionResult> SaveAnswers(int questionnaireId, int questionId, 
+        [FromForm(Name = "Answers")] List<UpdateAnswerRequestDto> requests, 
+        [FromForm(Name = "AddEmptyAnswerOption")] bool addEmptyAnswerOption)
     {
         await Task.WhenAll(requests.Select<UpdateAnswerRequestDto, Task>(req =>
         {
@@ -215,8 +219,8 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
                 Score = req.Score,
             });
         }));
-        
-        return RedirectToAction(nameof(AddAnswersPage), new { questionId, questionnaireId });
+
+        return await AddAnswersPage(questionnaireId, questionId, addEmptyAnswerOption);
     }
 
     public IActionResult Privacy()
