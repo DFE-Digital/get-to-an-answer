@@ -6,6 +6,7 @@ using Common.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
+using Common.Enum;
 
 namespace Admin.Controllers;
 
@@ -48,8 +49,73 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         
         return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId = questionnaire.Id });
     }
+    
+    [HttpPost("Admin/Questionnaires/{questionnaireId}/Questions/Create")]
+    public async Task<IActionResult> PerformQuestionnaireCreation(int questionnaireId, CreateQuestionRequestDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View("AddQuestion", new QuestionnaireViewModel
+            {
+                CreateQuestion = request
+            }); // return errors to the same page
+        }
+        
+        request.QuestionnaireId = questionnaireId;
+        
+        var question = await apiClient.CreateQuestionAsync(request);
 
-    [HttpGet("Admin/Questionnaires/{questionnaireId}/Edit")]
+        if (question == null)
+        {
+            return BadRequest();
+        }
+        
+        return RedirectToAction(nameof(QuestionPage), new { questionId = question.Id });
+    }
+    
+    [HttpGet("Admin/Questionnaires/{questionnaireId}/Publish/Confirm")]
+    public async Task<IActionResult> ConfirmQuestionnairePublish(int questionnaireId)
+    {
+        return View("PublishQuestionnaireConfirmation", new QuestionnaireViewModel
+        {
+            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId)
+        });
+    }
+    
+    [HttpPost("Admin/Questionnaires/{questionnaireId}/Publish")]
+    public async Task<IActionResult> PublishQuestionnaire(int questionnaireId)
+    {
+        await apiClient.UpdateQuestionStatusAsync(questionnaireId, new UpdateQuestionStatusRequestDto
+        {
+            Id = questionnaireId,
+            Status = EntityStatus.Published
+        });
+        
+        return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId });
+    }
+    
+    [HttpGet("Admin/Questionnaires/{questionnaireId}/Delete/Confirm")]
+    public async Task<IActionResult> ConfirmQuestionnaireDelete(int questionnaireId)
+    {
+        return View("DeleteQuestionnaireConfirmation", new QuestionnaireViewModel
+        {
+            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId)
+        });
+    }
+    
+    [HttpPost("Admin/Questionnaires/{questionnaireId}/Delete")]
+    public async Task<IActionResult> DeleteQuestionnaire(int questionnaireId)
+    {
+        await apiClient.UpdateQuestionStatusAsync(questionnaireId, new UpdateQuestionStatusRequestDto
+        {
+            Id = questionnaireId,
+            Status = EntityStatus.Deleted
+        });
+        
+        return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId });
+    }
+
+    [HttpGet("Admin/Questionnaires/{questionnaireId}/Track")]
     public async Task<IActionResult> QuestionnaireTrackingPage(int questionnaireId)
     {
         return View("TrackQuestionnaire", new QuestionnaireViewModel
@@ -58,31 +124,99 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
 
+    [HttpGet("Admin/Questionnaires/{questionnaireId}/Edit")]
+    public async Task<IActionResult> QuestionnaireEditPage(int questionnaireId)
+    {
+        var questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId);
+        
+        if (questionnaire == null)
+            return NotFound();
+        
+        return View("EditQuestionnaire", new QuestionnaireViewModel
+        {
+            UpdateQuestionnaire = new UpdateQuestionnaireRequestDto
+            {
+                Id = questionnaireId,
+                Title = questionnaire.Title, 
+                Description = questionnaire.Description
+            }
+        });
+    }
+
     [HttpGet("Admin/Questionnaires/{questionnaireId}/Questions")]
     public async Task<IActionResult> QuestionManagementPage(int questionnaireId)
     {
         return View("ManageQuestions", new QuestionnaireViewModel
         {
+            QuestionnaireId = questionnaireId,
             Questions = await apiClient.GetQuestionsAsync(questionnaireId)
         });
     }
 
-    [HttpGet("Admin/Questions/{questionId}")]
-    public IActionResult QuestionPage(int questionId)
+    [HttpGet("Admin/Questionnaires/{questionnaireId}/Questions/Create")]
+    public async Task<IActionResult> QuestionCreationPage(int questionnaireId)
     {
-        return View("AddQuestion", new ConfigViewModel());
+        return View("AddQuestion", new QuestionnaireViewModel
+        {
+            QuestionnaireId = questionnaireId
+        });
     }
 
-    [HttpGet("Admin/Questions/{branchId}/Answers")]
-    public IActionResult AddAnswersPage(int branchId)
+    [HttpGet("Admin/Questions/{questionId}/Edit")]
+    public async Task<IActionResult> QuestionPage(int questionId)
     {
-        return View("AddAnswers", new ConfigViewModel());
+        var question = await apiClient.GetQuestionAsync(questionId);
+        
+        if (question == null)
+            return NotFound();
+        
+        return View("EditQuestion", new QuestionnaireViewModel
+        {
+            QuestionnaireId = question.QuestionnaireId,
+            UpdateQuestion = new UpdateQuestionRequestDto
+            {
+                Id = question.Id,
+                Content = question.Content,
+                Description = question.Description,
+                Type = question.Type
+            }
+        });
     }
 
-    [HttpGet("Admin/Questionnaires/{questionnaireId}/Preview")]
-    public IActionResult PreviewModePage(int questionnaireId)
+    [HttpGet("Admin/Questionnaires/{questionnaireId}/Questions/{questionId}/Answers/Edit")]
+    public async Task<IActionResult> AddAnswersPage(int questionnaireId, int questionId)
     {
-        return View("AddAnswers", new ConfigViewModel());
+        return View("AddAnswers", new QuestionnaireViewModel
+        {
+            QuestionnaireId = questionnaireId,
+            QuestionId = questionId,
+            Answers = await apiClient.GetAnswersAsync(questionId)
+        });
+    }
+
+    [HttpPost("Admin/Questionnaires/{questionnaireId}/Questions/{questionId}/Answers/Edit")]
+    public async Task<IActionResult> SaveAnswers(int questionnaireId, int questionId, [FromForm(Name = "Answers")] List<UpdateAnswerRequestDto> requests)
+    {
+        await Task.WhenAll(requests.Select<UpdateAnswerRequestDto, Task>(req =>
+        {
+            if (req.Id is { } id)
+            {
+                return apiClient.UpdateAnswerAsync(id, req);
+            }
+            
+            return apiClient.CreateAnswerAsync(new CreateAnswerRequestDto
+            {
+                Content = req.Content,
+                Description = req.Description,
+                Destination = req.Destination,
+                DestinationType = req.DestinationType,
+                QuestionId = questionId,
+                QuestionnaireId = req.QuestionnaireId,
+                Score = req.Score,
+            });
+        }));
+        
+        return RedirectToAction(nameof(AddAnswersPage), new { questionId, questionnaireId });
     }
 
     public IActionResult Privacy()

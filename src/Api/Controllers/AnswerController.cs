@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Api.Infrastructure.Persistence;
+using Common.Domain;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Common.Infrastructure.Persistence;
@@ -19,19 +20,34 @@ public class AnswerController(CheckerDbContext db) : Controller
     {
         var userId = User.FindFirstValue("oid")!;   // Azure AD Object ID
         var tenantId = User.FindFirstValue("tid")!; // Tenant ID
-        
-        db.Answers.Add(new AnswerEntity
+
+        var entity = new AnswerEntity
         {
             OwnerId = userId,
             TenantId = tenantId,
+            QuestionnaireId = request.QuestionnaireId,
             QuestionId = request.QuestionId,
             Content = request.Content,
             Description = request.Description,
-        });
+            Destination = request.Destination,
+            DestinationType = request.DestinationType,
+        };
+        
+        db.Answers.Add(entity);
         
         db.SaveChanges();
         
-        return Ok("Answer created.");
+        return Ok(new AnswerDto
+        {
+            Id = entity.Id,
+            Content = entity.Content,
+            Description = entity.Description,
+            Destination = entity.Destination,
+            DestinationType = entity.DestinationType,
+            QuestionId = entity.QuestionId,
+            QuestionnaireId = entity.QuestionnaireId,
+            Score = entity.Score,
+        });
     }
     
     [HttpGet("answers/{id}")]
@@ -51,7 +67,6 @@ public class AnswerController(CheckerDbContext db) : Controller
         if (answer.OwnerId != userId)
             return Forbid();
         
-        // Logic to create a answer
         return Ok(answer);
     }
     
@@ -63,7 +78,7 @@ public class AnswerController(CheckerDbContext db) : Controller
         var answers = db.Answers
             .Where(q => q.QuestionId == questionId && q.TenantId == tenantId);
         
-        return Ok(answers);
+        return Ok(answers.ToList());
     }
 
     [HttpPut("answers/{id}")]

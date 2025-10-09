@@ -14,7 +14,7 @@ public class AnswerEntity
     /*
      * Shorthand name for this answer.
      */
-    public string RefName { get; set; }
+    public string? RefName { get; set; }
     
     /**
      * Maps to tid claim
@@ -30,7 +30,7 @@ public class AnswerEntity
     [MaxLength(250)]
     public string Content { get; set; }
     
-    public string Description { get; set; }
+    public string? Description { get; set; }
     
     public float Score { get; set; }
     
@@ -44,5 +44,7 @@ public class AnswerEntity
 
     // Foreign key
     public int QuestionId { get; set; }
-    public QuestionEntity Question { get; set; }
+    public QuestionEntity? Question { get; set; }
+    
+    public int QuestionnaireId { get; set; }
 }

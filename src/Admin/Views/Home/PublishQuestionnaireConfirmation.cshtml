@@ -6,23 +6,18 @@
 
 @section BeforeContent
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/groups/9R6te7wT">Back to Care Leavers</a>
+  <a class="govuk-back-link govuk-!-display-none-print" href="/Admin/Questionnaires/@Model.Questionnaire?.Id/Track">Back to questionnaire '@Model.Questionnaire?.Title'</a>
 }
 
-<div class="govuk-width-container">
-  <a href="#" class="govuk-back-link">Back</a>
-  <main class="govuk-main-wrapper " id="main-content" role="main">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds-from-desktop">
-        <h1 class="govuk-heading-l">Are you sure you want to publish this questionnaire?</h1>
-        <p class="govuk-body">By submitting this application you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
-        <form action="/Admin/Questionnaires/@Model.Questionnaire?.Id/Publish" method="post" novalidate>
-          <div class="govuk-button-group">
-            <button class="govuk-button govuk-button--warning" type="submit">Yes</button>
-            <button class="govuk-button govuk-button--secondary" type="submit">Cancel</button>
-          </div>
-        </form>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds-from-desktop">
+    <h1 class="govuk-heading-l">Are you sure you want to publish this questionnaire?</h1>
+    <p class="govuk-body">By submitting this application you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
+    <form action="/Admin/Questionnaires/@Model.Questionnaire?.Id/Publish" method="post" novalidate>
+      <div class="govuk-button-group">
+        <button class="govuk-button govuk-button--primary" type="submit">Yes</button>
+        <a class="govuk-button govuk-button--secondary" href="/Admin/Questionnaires/@Model.Questionnaire?.Id/Track">Cancel</a>
       </div>
-    </div>
-  </main>
+    </form>
+  </div>
 </div>

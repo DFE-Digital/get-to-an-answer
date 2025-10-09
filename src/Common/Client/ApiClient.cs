@@ -21,6 +21,7 @@ public interface IApiClient
     Task<List<QuestionDto>> GetQuestionsAsync(int questionnaireId);
     Task<QuestionDto?> CreateQuestionAsync(CreateQuestionRequestDto request);
     Task<string?> UpdateQuestionAsync(int questionId, UpdateQuestionRequestDto request);
+    Task<string?> UpdateQuestionStatusAsync(int questionId, UpdateQuestionStatusRequestDto request);
     Task<string?> DeleteQuestionAsync(int questionId);
     
     Task<AnswerDto?> GetAnswerAsync(int answerId);
@@ -130,6 +131,14 @@ public class ApiClient : IApiClient
     public async Task<string?> UpdateQuestionAsync(int questionId, UpdateQuestionRequestDto request)
     {
         var response = await _httpClient.PutAsJsonAsync($"questions/{questionId}", request);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string>();
+    }
+    
+    public async Task<string?> UpdateQuestionStatusAsync(int questionId, UpdateQuestionStatusRequestDto request)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"questions/{questionId}/status", request);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<string>();

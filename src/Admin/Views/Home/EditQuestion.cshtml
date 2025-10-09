@@ -1,0 +1,134 @@
+﻿@using Common.Enum
+@model QuestionnaireViewModel
+
+@{
+  ViewData["Title"] = "Home Page";
+  var hasErrors = Model?.UpdateQuestion != null && !ViewData.ModelState.IsValid;
+  string? ErrorFor(string key) => ViewData.ModelState.ContainsKey(key) && ViewData.ModelState[key]?.Errors.Count > 0
+     ? ViewData.ModelState[key]!.Errors[0].ErrorMessage
+     : null;
+
+  var hasTitleError = Model?.UpdateQuestion != null && ErrorFor(nameof(Model.UpdateQuestion.Content)) != null;
+  var hasDescError = Model?.UpdateQuestion != null && ErrorFor(nameof(Model.UpdateQuestion.Description)) != null;
+  var hasTypeError = Model?.UpdateQuestion != null && ErrorFor(nameof(Model.UpdateQuestion.Type)) != null;
+}
+
+@section BeforeContent 
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="/groups/9R6te7wT">Back to Care Leavers Questionnaire</a>
+}
+
+@if (hasErrors)
+{
+   <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+      <h2 class="govuk-error-summary__title" id="error-summary-title">
+         There is a problem
+      </h2>
+      <div class="govuk-error-summary__body">
+         <ul class="govuk-list govuk-error-summary__list">
+            @foreach (var kvp in ViewData.ModelState.Where(ms => ms.Value!.Errors.Count > 0))
+            {
+               var fieldName = kvp.Key;
+               var message = kvp.Value!.Errors[0].ErrorMessage;
+               // The href should link to the input id for accessibility
+               <li><a href="#@fieldName">@message</a></li>
+            }
+         </ul>
+      </div>
+   </div>
+}
+
+<div class="govuk-grid-row">
+   <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">
+         <span class="govuk-caption-l">Question 1</span>
+         <span class="govuk-visually-hidden"> - </span>
+         Add question
+      </h1>
+      <form action="/Admin/Questions/@Model?.UpdateQuestion?.Id/Edit" accept-charset="UTF-8" method="post">
+         <input type="hidden" name="Id" value="@Model?.UpdateQuestion?.Id" autocomplete="off">
+         <div class="govuk-form-group">
+            <label for="pages-question-input-question-text-field" class="govuk-label govuk-label--m">Question text</label>
+            <div class="govuk-hint" id="pages-question-input-question-text-hint">Ask the question the way you would in person. For example, ‘Which of these countries have you lived in?’</div>
+            <input id="pages-question-input-question-text-field" class="govuk-input" aria-describedby="pages-question-input-question-text-hint" type="text" name="Content" value="@Model?.UpdateQuestion?.Content">
+         </div>
+         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+         <div class="govuk-form-group">
+            <label for="pages-question-input-hint-text-field" class="govuk-label govuk-label--m">Hint text (optional)</label>
+            <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short hint to help people answer the question. For a question where people can select more than one answer you might want to use ‘Select all that apply’.</div>
+            <textarea id="pages-question-input-hint-text-field" class="govuk-textarea" rows="5" aria-describedby="pages-question-input-hint-text-hint" name="Description" value="@Model?.UpdateQuestion?.Description"></textarea>
+         </div>
+         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+         
+         <div class="govuk-form-group">
+            <label for="pages-question-input-hint-text-field" class="govuk-label govuk-label--m">Question Type</label>
+            <div class="govuk-hint" id="pages-question-input-hint-text-hint">Select the question type and the way to answers will be presented.</div>
+            <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
+               <div class="govuk-radios__item">
+                  <input id="pages-selection-type-input-only-one-option-true-field" aria-describedby="pages-selection-type-input-only-one-option-true-hint" 
+                         class="govuk-radios__input" type="radio" value="SingleSelect" name="Type" 
+                         @(Model?.UpdateQuestion?.Type == QuestionType.SingleSelect ? "checked" : "")>
+                  <label for="pages-selection-type-input-only-one-option-true-field" class="govuk-label govuk-radios__label">One option from a small list</label>
+                  <div class="govuk-hint govuk-radios__hint" id="pages-selection-type-input-only-one-option-true-hint">Your list can have up to 10 options</div>
+               </div>
+               <div class="govuk-radios__item">
+                  <input id="pages-selection-type-input-only-one-option-false-field" aria-describedby="pages-selection-type-input-only-one-option-false-hint" 
+                         class="govuk-radios__input" type="radio" value="MultiSelect" name="Type" 
+                         @(Model?.UpdateQuestion?.Type == QuestionType.MultiSelect ? "checked" : "")>
+                  <label for="pages-selection-type-input-only-one-option-false-field" class="govuk-label govuk-radios__label">One option from a long list</label>
+                  <div class="govuk-hint govuk-radios__hint" id="pages-selection-type-input-only-one-option-false-hint">Your list can have up to 25 options</div>
+               </div>
+               <div class="govuk-radios__item">
+                  <input id="pages-selection-type-input-only-one-option-false-field" aria-describedby="pages-selection-type-input-only-one-option-false-hint" 
+                         class="govuk-radios__input" type="radio" value="DropdownSelect" name="Type" 
+                         @(Model?.UpdateQuestion?.Type == QuestionType.DropdownSelect ? "checked" : "")>
+                  <label for="pages-selection-type-input-only-one-option-false-field" class="govuk-label govuk-radios__label">One or more options</label>
+                  <div class="govuk-hint govuk-radios__hint" id="pages-selection-type-input-only-one-option-false-hint">Your list can have up to 10 options</div>
+               </div>
+            </div>
+         </div>
+         
+         
+         <div class="govuk-summary-card app-summary-card">
+            <div class="govuk-summary-card__title-wrapper">
+               <h2 class="govuk-summary-card__title">Answers</h2>
+               <ul class="govuk-summary-card__actions">
+                  <li class="govuk-summary-card__action">
+                     <a class="govuk-link" href="/Admin/Questionnaires/@Model?.QuestionnaireId/Questions/@Model?.UpdateQuestion?.Id/Answers/Edit">Edit</a>
+                  </li>
+               </ul>
+            </div>
+            <div class="govuk-summary-card__content">
+               <table class="govuk-table">
+                  <thead class="govuk-table__head">
+                  <tr class="govuk-table__row">
+                     <th scope="col" class="govuk-table__header">Answer</th>
+                     <th scope="col" class="govuk-table__header">Score</th>
+                     <th scope="col" class="govuk-table__header">Target Type</th>
+                  </tr>
+                  </thead>
+                  <tbody class="govuk-table__body">
+                  @foreach (var answer in Model?.Answers ?? [])
+                  {
+                     <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">@answer.Content</td>
+                        <td class="govuk-table__cell">@answer.Score</td>
+                        <td class="govuk-table__cell">@answer.DestinationType</td>
+                     </tr>
+                  }
+                  </tbody>
+               </table>
+            </div>
+         </div>
+         
+         <ul class="govuk-list govuk-list--spaced">
+            <li>
+               <button type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-!-margin-bottom-3" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save question</button>
+            </li>
+            <li>
+               <a class="govuk-button govuk-button--warning" data-module="govuk-button" href="/forms/262709/pages/1050713/delete" data-govuk-button-init="">Delete question</a>
+            </li>
+         </ul>
+      </form>
+   </div>
+</div>

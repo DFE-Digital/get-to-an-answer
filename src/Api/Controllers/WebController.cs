@@ -16,7 +16,7 @@ public class WebController(CheckerDbContext db) : Controller
         
         var initialQuestion = await db.Questions
             .Include(x => x.Answers)
-            .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == 0 && x.TenantId == tenantId);
+            .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == 1 && x.TenantId == tenantId);
         
         if (initialQuestion == null)
             return BadRequest();

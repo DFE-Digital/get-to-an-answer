@@ -1,19 +1,19 @@
-﻿@model QuestionnaireViewModel?
+﻿@model QuestionnaireViewModel
 
 @{
-  ViewData["Title"] = "Create a new questionnaire";
-  var hasErrors = Model?.CreateQuestionnaire != null && !ViewData.ModelState.IsValid;
+  ViewData["Title"] = "Edit the questionnaire";
+  var hasErrors = Model?.UpdateQuestionnaire != null && !ViewData.ModelState.IsValid;
   string? ErrorFor(string key) => ViewData.ModelState.ContainsKey(key) && ViewData.ModelState[key]?.Errors.Count > 0
     ? ViewData.ModelState[key]!.Errors[0].ErrorMessage
     : null;
 
-  var hasTitleError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Title)) != null;
-  var hasDescError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Description)) != null;
+  var hasTitleError = Model?.UpdateQuestionnaire != null && ErrorFor(nameof(Model.UpdateQuestionnaire.Title)) != null;
+  var hasDescError = Model?.UpdateQuestionnaire != null && ErrorFor(nameof(Model.UpdateQuestionnaire.Description)) != null;
 }
 
 @section BeforeContent
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/groups/9R6te7wT">Back to Care Leavers</a>
+  <a class="govuk-back-link govuk-!-display-none-print" href="/Admin/Questionnaires/@Model?.UpdateQuestionnaire?.Id/Track">Back to questionnaire '@Model?.UpdateQuestionnaire?.Title'</a>
 }
 
 @if (hasErrors)
@@ -38,10 +38,10 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <form action="/Admin/Questionnaires/Create" accept-charset="UTF-8" method="post">
+    <form action="/Admin/Questionnaires/@Model.UpdateQuestionnaire.Id/Create" accept-charset="UTF-8" method="post">
       <div class="govuk-form-group">
         <h1 class="govuk-label-wrapper">
-          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">Change the title of your question</label>
+          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">Change the title of your questionnaire</label>
         </h1>
         <div class="govuk-hint" id="forms-name-input-name-hint">The form name will be shown at the top of each page of the form. Use a name
           that describes what the form will help people to do. For example ‘Apply for a
@@ -50,7 +50,7 @@
         @if (hasTitleError)
         {
           <p class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.CreateQuestionnaire.Title))
+            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.UpdateQuestionnaire.Title))
           </p>
         }
 
@@ -58,7 +58,7 @@
                aria-describedby="forms-name-input-name-hint"
                type="text"
                name="Title"
-               value="@(Model?.CreateQuestionnaire?.Title ?? "")">
+               value="@(Model?.UpdateQuestionnaire?.Title ?? "")">
       </div>
       <div class="govuk-form-group">
         <label for="pages-question-input-hint-text-field" class="govuk-label">Hint text (optional)</label>
@@ -66,13 +66,13 @@
         @if (hasDescError)
         {
           <p class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.CreateQuestionnaire.Description))
+            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.UpdateQuestionnaire.Description))
           </p>
         }
         <textarea class="govuk-textarea @(hasDescError ? "govuk-textarea--error" : "")"
               id="Description"
               name="Description"
-              rows="5">@(Model?.CreateQuestionnaire?.Description ?? "")</textarea>
+              rows="5">@(Model?.UpdateQuestionnaire?.Description ?? "")</textarea>
       </div>
       <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
     </form>

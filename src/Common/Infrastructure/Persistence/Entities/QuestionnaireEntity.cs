@@ -30,7 +30,6 @@ public class QuestionnaireEntity
     [Required]
     [MaxLength(500)]
     public string Title { get; set; }
-
     
     [MaxLength(10000)]
     public string? Description { get; set; }

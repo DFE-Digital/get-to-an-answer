@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Api.Infrastructure.Persistence;
+using Common.Domain;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Common.Enum;
@@ -21,8 +22,8 @@ public class QuestionController(CheckerDbContext db) : Controller
     {
         var userId = User.FindFirstValue("oid")!;   // Azure AD Object ID
         var tenantId = User.FindFirstValue("tid")!; // Tenant ID
-        
-        db.Questions.Add(new QuestionEntity
+
+        var entity = new QuestionEntity
         {
             OwnerId = userId,
             TenantId = tenantId,
@@ -33,11 +34,21 @@ public class QuestionController(CheckerDbContext db) : Controller
             Order = db.Questions.Count(x => x.QuestionnaireId == request.QuestionnaireId
                                             && x.Status != EntityStatus.Deleted
                                             && x.TenantId == tenantId) + 1,
-        });
+        };
+        
+        db.Questions.Add(entity);
         
         db.SaveChanges();
         
-        return Ok("Question created.");
+        return Ok(new QuestionDto
+        {
+            Id = entity.Id,
+            Content = entity.Content,
+            Description = entity.Description,
+            Type = entity.Type,
+            Order = entity.Order,
+            Status = entity.Status
+        });
     }
     
     [HttpGet("questions/{id}")]
@@ -134,6 +145,7 @@ public class QuestionController(CheckerDbContext db) : Controller
     {
         return UpdateQuestionStatus(id, new UpdateQuestionStatusRequestDto
         {
+            Id = id,
             Status = EntityStatus.Deleted
         });
     }
