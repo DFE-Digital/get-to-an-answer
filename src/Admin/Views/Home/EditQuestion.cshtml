@@ -15,7 +15,7 @@
 
 @section BeforeContent 
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/groups/9R6te7wT">Back to Care Leavers Questionnaire</a>
+  <a class="govuk-back-link govuk-!-display-none-print" href="/Admin/Questionnaires/@Model?.QuestionnaireId/Track">Back to Care Leavers Questionnaire</a>
 }
 
 @if (hasErrors)
@@ -46,6 +46,7 @@
          Add question
       </h1>
       <form action="/Admin/Questions/@Model?.UpdateQuestion?.Id/Edit" accept-charset="UTF-8" method="post">
+         <input type="hidden" name="QuestionnaireId" value="@Model?.UpdateQuestion?.QuestionnaireId" autocomplete="off">
          <input type="hidden" name="Id" value="@Model?.UpdateQuestion?.Id" autocomplete="off">
          <div class="govuk-form-group">
             <label for="pages-question-input-question-text-field" class="govuk-label govuk-label--m">Question text</label>
@@ -59,36 +60,36 @@
             <textarea id="pages-question-input-hint-text-field" class="govuk-textarea" rows="5" aria-describedby="pages-question-input-hint-text-hint" name="Description" value="@Model?.UpdateQuestion?.Description"></textarea>
          </div>
          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-         
+
          <div class="govuk-form-group">
             <label for="pages-question-input-hint-text-field" class="govuk-label govuk-label--m">Question Type</label>
             <div class="govuk-hint" id="pages-question-input-hint-text-hint">Select the question type and the way to answers will be presented.</div>
             <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
                <div class="govuk-radios__item">
-                  <input id="pages-selection-type-input-only-one-option-true-field" aria-describedby="pages-selection-type-input-only-one-option-true-hint" 
-                         class="govuk-radios__input" type="radio" value="SingleSelect" name="Type" 
+                  <input id="pages-selection-type-input-only-one-option-true-field" aria-describedby="pages-selection-type-input-only-one-option-true-hint"
+                         class="govuk-radios__input" type="radio" value="SingleSelect" name="Type"
                          @(Model?.UpdateQuestion?.Type == QuestionType.SingleSelect ? "checked" : "")>
                   <label for="pages-selection-type-input-only-one-option-true-field" class="govuk-label govuk-radios__label">One option from a small list</label>
                   <div class="govuk-hint govuk-radios__hint" id="pages-selection-type-input-only-one-option-true-hint">Your list can have up to 10 options</div>
                </div>
                <div class="govuk-radios__item">
-                  <input id="pages-selection-type-input-only-one-option-false-field" aria-describedby="pages-selection-type-input-only-one-option-false-hint" 
-                         class="govuk-radios__input" type="radio" value="MultiSelect" name="Type" 
-                         @(Model?.UpdateQuestion?.Type == QuestionType.MultiSelect ? "checked" : "")>
+                  <input id="pages-selection-type-input-only-one-option-false-field" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
+                         class="govuk-radios__input" type="radio" value="DropdownSelect" name="Type"
+                         @(Model?.UpdateQuestion?.Type == QuestionType.DropdownSelect ? "checked" : "")>
                   <label for="pages-selection-type-input-only-one-option-false-field" class="govuk-label govuk-radios__label">One option from a long list</label>
                   <div class="govuk-hint govuk-radios__hint" id="pages-selection-type-input-only-one-option-false-hint">Your list can have up to 25 options</div>
                </div>
                <div class="govuk-radios__item">
-                  <input id="pages-selection-type-input-only-one-option-false-field" aria-describedby="pages-selection-type-input-only-one-option-false-hint" 
-                         class="govuk-radios__input" type="radio" value="DropdownSelect" name="Type" 
-                         @(Model?.UpdateQuestion?.Type == QuestionType.DropdownSelect ? "checked" : "")>
+                  <input id="pages-selection-type-input-only-one-option-false-field" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
+                         class="govuk-radios__input" type="radio" value="MultiSelect" name="Type"
+                         @(Model?.UpdateQuestion?.Type == QuestionType.MultiSelect ? "checked" : "")>
                   <label for="pages-selection-type-input-only-one-option-false-field" class="govuk-label govuk-radios__label">One or more options</label>
                   <div class="govuk-hint govuk-radios__hint" id="pages-selection-type-input-only-one-option-false-hint">Your list can have up to 10 options</div>
                </div>
             </div>
          </div>
-         
-         
+
+
          <div class="govuk-summary-card app-summary-card">
             <div class="govuk-summary-card__title-wrapper">
                <h2 class="govuk-summary-card__title">Answers</h2>
@@ -120,7 +121,7 @@
                </table>
             </div>
          </div>
-         
+
          <ul class="govuk-list govuk-list--spaced">
             <li>
                <button type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-!-margin-bottom-3" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save question</button>

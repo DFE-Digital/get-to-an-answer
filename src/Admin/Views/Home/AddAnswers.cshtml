@@ -74,7 +74,23 @@
                                        Select a target question
                                     </label>
                                     <select class="govuk-select" id="target-question-@i" name="Answers[@i].DestinationQuestionId">
-                                       <option value="question1">Question 3?</option>
+                                       @{
+                                          var questions = Model?.Questions ?? [];
+
+                                          var first = questions.FirstOrDefault();
+
+                                          var selectedQuestion = questions.FirstOrDefault(q => q?.Id == answer.DestinationQuestionId, first);
+                                       }
+
+                                       @foreach (var question in questions)
+                                       {
+                                          var selected = selectedQuestion?.Id == question.Id;
+
+                                          var question1 = question;
+                                          <option value="@question.Id" selected="@selected">
+                                             @question1.Content
+                                          </option>
+                                       }
                                     </select>
                                  </div>
                               </div>
@@ -91,7 +107,8 @@
                                     <label class="govuk-label" for="target-link-@i">
                                        Enter an external link
                                     </label>
-                                    <input class="govuk-input govuk-!-width-one-third" id="target-link-@i" name="Answers[@i].Destination" type="url" autocomplete="url">
+                                    <input class="govuk-input govuk-!-width-one-third" id="target-link-@i" 
+                                           value="@answer.Destination" name="Answers[@i].Destination" type="url" autocomplete="url">
                                  </div>
                               </div>
                               <div class="govuk-radios__item">
@@ -156,7 +173,10 @@
                                     Select a target question
                                  </label>
                                  <select class="govuk-select" id="target-question" name="Answers[@index].DestinationQuestionId">
-                                    <option value="question1">Question 3?</option>
+                                    @foreach (var question in Model?.Questions ?? [])
+                                    {
+                                       <option value="@question.Id">@question.Content</option>
+                                    }
                                  </select>
                               </div>
                            </div>

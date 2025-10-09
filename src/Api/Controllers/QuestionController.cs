@@ -44,6 +44,7 @@ public class QuestionController(CheckerDbContext db) : Controller
         return Ok(new QuestionDto
         {
             Id = entity.Id,
+            QuestionnaireId = entity.QuestionnaireId,
             Content = entity.Content,
             Description = entity.Description,
             Type = entity.Type,
@@ -76,6 +77,7 @@ public class QuestionController(CheckerDbContext db) : Controller
         return Ok(new QuestionDto
         {
             Id = question.Id,
+            QuestionnaireId = question.QuestionnaireId,
             Content = question.Content,
             Description = question.Description,
             Order = question.Order,
@@ -133,6 +135,8 @@ public class QuestionController(CheckerDbContext db) : Controller
         db.Entry(question).Property(s => s.Type).IsModified = true;
         db.Entry(question).Property(s => s.UpdatedAt).IsModified = true;
         
+        db.SaveChanges();
+        
         // Logic to update a question, answer, or branching logic
         return Ok("Question updated.");
     }
@@ -159,7 +163,8 @@ public class QuestionController(CheckerDbContext db) : Controller
         
         db.Entry(question).Property(s => s.Status).IsModified = true;
         
-        // Logic to update a question, answer, or branching logic
+        db.SaveChanges();
+        
         return Ok("Question updated.");
     }
 

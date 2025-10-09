@@ -6,6 +6,7 @@ namespace Common.Domain.Request.Update;
 public class UpdateQuestionRequestDto
 {
     public int Id { get; set; }
+    public int QuestionnaireId { get; set; }
     public required string Content { get; set; }
     public string? Description { get; set; }
     

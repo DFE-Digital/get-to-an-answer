@@ -30,6 +30,7 @@ public class AnswerController(CheckerDbContext db) : Controller
             Content = request.Content,
             Description = request.Description,
             Destination = request.Destination,
+            DestinationQuestionId = request.DestinationQuestionId,
             DestinationType = request.DestinationType,
             CreatedAt = DateTime.UtcNow
         };
@@ -45,6 +46,7 @@ public class AnswerController(CheckerDbContext db) : Controller
             Description = entity.Description,
             Destination = entity.Destination,
             DestinationType = entity.DestinationType,
+            DestinationQuestionId = request.DestinationQuestionId,
             QuestionId = entity.QuestionId,
             QuestionnaireId = entity.QuestionnaireId,
             Score = entity.Score,
@@ -104,6 +106,7 @@ public class AnswerController(CheckerDbContext db) : Controller
         answer.Description = request.Description;
         answer.Destination = request.Destination;
         answer.DestinationType = request.DestinationType;
+        answer.DestinationQuestionId = request.DestinationQuestionId;
         answer.Score = request.Score;
         answer.UpdatedAt = DateTime.UtcNow;
         
@@ -111,6 +114,7 @@ public class AnswerController(CheckerDbContext db) : Controller
         db.Entry(answer).Property(s => s.Description).IsModified = true;
         db.Entry(answer).Property(s => s.Destination).IsModified = true;
         db.Entry(answer).Property(s => s.DestinationType).IsModified = true;
+        db.Entry(answer).Property(s => s.DestinationQuestionId).IsModified = true;
         db.Entry(answer).Property(s => s.Score).IsModified = true;
         db.Entry(answer).Property(s => s.UpdatedAt).IsModified = true;
         

@@ -24,14 +24,20 @@ public class PreviewController(ILogger<HomeController> logger, IApiClient apiCli
     }
     
     [HttpPost("Admin/Questionnaires/{questionnaireId}/Next/Preview")]
-    public async Task<IActionResult> GetNextStatePage(int questionnaireId, GetNextStateRequest request)
+    public async Task<IActionResult> GetNextStatePage(int questionnaireId, GetNextStateRequest request, 
+        [FromForm(Name = "Scores")] Dictionary<int, float> scores)
     {
+        if (request.SelectedAnswerIds.Count > 1)
+        {
+            request.SelectedAnswerId = scores.OrderByDescending(kv => kv.Value).First().Key;
+        }
+        
         var destination = await apiClient.GetNextState(questionnaireId, request);
         
         if (destination == null)
             return NotFound();
 
-        if (destination.Type == DestinationType.ExternalLink && destination.Content != null)
+        if (destination is { Type: DestinationType.ExternalLink, Content: not null })
             return Redirect(destination.Content);
         
         return View("PreviewQuestionnaire", new QuestionnaireViewModel

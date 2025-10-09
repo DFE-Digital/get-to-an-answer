@@ -12,20 +12,20 @@
   //var hasDescError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Description)) != null;
 }
 
-@section BeforeContent
+@section BeforeContainer
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/groups/9R6te7wT">Back to Care Leavers</a>
-}
-
-<section class="dfe-page-grey" id="main-content-header">
-  <div class="govuk-width-container" id="main-header-container">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-xl">Check your care leaver support</h1>
+  <section class="dfe-page-grey" id="main-content-header">
+    <div class="govuk-width-container" id="main-header-container">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <h1 class="govuk-heading-xl">Check your care leaver support</h1>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+}
+
+
 
 @if (hasErrors)
 {
@@ -51,7 +51,9 @@
   <div class="govuk-grid-column-two-thirds">
     @if (Model.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
     {
-      <form action="/Admin/Questionnaires/Create" accept-charset="UTF-8" method="post">
+      <form action="/Admin/Questionnaires/@Model.Destination.Question.QuestionnaireId/Next/Preview" accept-charset="UTF-8" method="post">
+        <input type="hidden" name="CurrentQuestionId" value="@Model.Destination.Question.Id" autocomplete="off">
+        <input type="hidden" name="CurrentQuestionOrder" value="@Model.Destination.Question.Order" autocomplete="off">
         <div class="govuk-form-group">
           <fieldset class="govuk-fieldset" aria-describedby="signIn-hint">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -71,7 +73,8 @@
                 @foreach (var answer in Model.Destination.Question.Answers)
                 {
                   <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="signIn" name="signIn" type="radio" value="government-gateway" aria-describedby="signIn-item-hint">
+                    <input type="hidden" name="Scores.@answer.Id" value="@answer.Score" autocomplete="off">
+                    <input class="govuk-radios__input" id="signIn" name="SelectedAnswerId" type="radio" value="@answer.Id" aria-describedby="signIn-item-hint">
                     <label class="govuk-label govuk-radios__label" for="signIn">
                       @answer.Content
                     </label>
@@ -91,7 +94,8 @@
                 @foreach (var answer in Model.Destination.Question.Answers)
                 {
                   <div class="govuk-checkboxes__item">
-                    <input class="govuk-checkboxes__input" id="nationality" name="nationality" type="checkbox" value="british" aria-describedby="nationality-item-hint">
+                    <input type="hidden" name="Scores.@answer.Id" value="@answer.Score" autocomplete="off">
+                    <input class="govuk-checkboxes__input" id="nationality" name="SelectedAnswerIds" type="checkbox" value="@answer.Id" aria-describedby="nationality-item-hint">
                     <label class="govuk-label govuk-checkboxes__label" for="nationality">
                       @answer.Content
                     </label>
@@ -111,12 +115,16 @@
                 <label class="govuk-label" for="sort">
                   Sort by
                 </label>
-                <select class="govuk-select" id="sort" name="sort">
+                <select class="govuk-select" id="sort" name="SelectedAnswerId">
                   @foreach (var answer in Model.Destination.Question.Answers)
                   {
                     <option value="@answer.Id">@answer.Content</option>
                   }
                 </select>
+                @foreach (var answer in Model.Destination.Question.Answers)
+                {
+                  <input type="hidden" name="Scores.@answer.Id" value="@answer.Score" autocomplete="off">
+                }
               </div>
             }
           </fieldset>

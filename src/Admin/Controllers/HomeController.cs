@@ -142,6 +142,14 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
             }
         });
     }
+    
+    [HttpPost("Admin/Questionnaires/{questionnaireId}/Edit")]
+    public async Task<IActionResult> SaveQuestionnaire(int questionnaireId, UpdateQuestionnaireRequestDto request)
+    {
+        await apiClient.UpdateQuestionnaireAsync(questionnaireId, request);
+        
+        return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId });
+    }
 
     [HttpGet("Admin/Questionnaires/{questionnaireId}/Questions")]
     public async Task<IActionResult> QuestionManagementPage(int questionnaireId)
@@ -176,12 +184,21 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
             UpdateQuestion = new UpdateQuestionRequestDto
             {
                 Id = question.Id,
+                QuestionnaireId = question.QuestionnaireId,
                 Content = question.Content,
                 Description = question.Description,
                 Type = question.Type
             },
             Answers = question.Answers
         });
+    }
+    
+    [HttpPost("Admin/Questions/{questionId}/Edit")]
+    public async Task<IActionResult> SaveQuestion(int questionId, UpdateQuestionRequestDto request)
+    {
+        await apiClient.UpdateQuestionAsync(questionId, request);
+        
+        return RedirectToAction(nameof(QuestionManagementPage), new { questionnaireId = request.QuestionnaireId });
     }
 
     [HttpGet("Admin/Questionnaires/{questionnaireId}/Questions/{questionId}/Answers/Edit")]
@@ -192,7 +209,9 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
             AddEmptyAnswerOption = addEmptyAnswerOption,
             QuestionnaireId = questionnaireId,
             QuestionId = questionId,
-            Answers = await apiClient.GetAnswersAsync(questionId)
+            Answers = await apiClient.GetAnswersAsync(questionId),
+            Questions = (await apiClient.GetQuestionsAsync(questionnaireId))
+                .Where(q => q.Id != questionId).ToList()
         });
     }
 

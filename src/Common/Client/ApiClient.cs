@@ -196,7 +196,7 @@ public class ApiClient : IApiClient
 
     public async Task<QuestionDto?> GetInitialQuestion(int questionnaireId)
     {
-        var response = await _httpClient.GetAsync($"questionnaire/{questionnaireId}/initial");
+        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireId}/initial");
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<QuestionDto>();
@@ -204,7 +204,7 @@ public class ApiClient : IApiClient
 
     public async Task<DestinationDto?> GetNextState(int questionnaireId, GetNextStateRequest request)
     {
-        var response = await _httpClient.PostAsJsonAsync($"questionnaire/{questionnaireId}/next", request);
+        var response = await _httpClient.PostAsJsonAsync($"questionnaires/{questionnaireId}/next", request);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<DestinationDto>();

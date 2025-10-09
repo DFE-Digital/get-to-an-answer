@@ -103,6 +103,8 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         db.Entry(questionnaire).Property(s => s.Description).IsModified = true;
         db.Entry(questionnaire).Property(s => s.UpdatedAt).IsModified = true;
         
+        db.SaveChanges();
+        
         return Ok("Questionnaire updated.");
     }
     
@@ -127,6 +129,8 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         question.UpdatedAt = DateTime.UtcNow;
         
         db.Entry(question).Property(s => s.Status).IsModified = true;
+        
+        db.SaveChanges();
         
         return Ok("Question updated.");
     }
