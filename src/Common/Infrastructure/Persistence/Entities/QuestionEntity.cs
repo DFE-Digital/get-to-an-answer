@@ -12,7 +12,7 @@ public class QuestionEntity
     public int Id { get; set; }
     
     public int QuestionnaireId { get; set; }
-    
+
     /**
      * Maps to tid claim
      */

@@ -10,11 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-if (builder.Environment.IsDevelopment())
-{
-    builder.CreateMockAzureAdClient();
-}
-else
+if (!builder.Environment.IsDevelopment())
 {
     builder.Services
         .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
@@ -31,15 +27,10 @@ builder.Services.AddControllersWithViews()
 var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
 
 // Register an HttpClient with a pre-configured base address
-var httpClientBuilder = builder.Services.AddHttpClient("ApiClient", client =>
+builder.Services.AddHttpClient("ApiClient", client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
 });
-
-if (builder.Environment.IsDevelopment())
-{
-    httpClientBuilder.AddHttpMessageHandler(() => new DevTokenHandler(new Uri(apiBaseUrl))); // same host as API;
-}
 
 var app = builder.Build();
 

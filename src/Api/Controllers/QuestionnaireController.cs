@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Api.Infrastructure.Persistence;
+using Common.Domain;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Common.Infrastructure.Persistence;
@@ -14,22 +15,34 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
 {
     [HttpPost("questionnaires")]
     [Authorize]
-    public IActionResult CreateQuestionnaire(CreateQuestionnaireRequestDto request)
+    public async Task<IActionResult> CreateQuestionnaire(CreateQuestionnaireRequestDto request)
     {
         var userId = User.FindFirstValue("oid")!;   // Azure AD Object ID
         var tenantId = User.FindFirstValue("tid")!; // Tenant ID
         
-        db.Questionnaires.Add(new QuestionnaireEntity
+        var entity = new QuestionnaireEntity
         {
             OwnerId = userId,
             TenantId = tenantId,
             Title = request.Title,
             Description = request.Description
-        });
+        };
         
-        db.SaveChanges();
+        db.Questionnaires.Add(entity);
         
-        return Ok("Questionnaire created.");
+        await db.SaveChangesAsync();
+        
+        var dto = new QuestionnaireDto
+        {
+            Id = entity.Id,
+            Title = entity.Title,
+            Description = entity.Description
+        };
+        
+        // consider for the future
+        //return CreatedAtAction(nameof(GetQuestionnaire), new { id = entity.Id }, dto);
+        
+        return Ok(dto);
     }
     
     [HttpGet("questionnaires/{id}")]

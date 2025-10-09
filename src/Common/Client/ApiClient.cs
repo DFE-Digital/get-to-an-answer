@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Common.Domain;
+using Common.Domain.Frontend;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,11 @@ public interface IApiClient
     Task<AnswerDto?> CreateAnswerAsync(CreateAnswerRequestDto request);
     Task<string?> UpdateAnswerAsync(int answerId, UpdateAnswerRequestDto request);
     Task<string?> DeleteAnswerAsync(int answerId);
+    
+    // === For Service Users ===
+    
+    Task<QuestionDto?> GetInitialQuestion(int questionnaireId);
+    Task<DestinationDto?> GetNextState(int questionnaireId, GetNextStateRequest request);
 }
 
 public class ApiClient : IApiClient
@@ -177,5 +183,21 @@ public class ApiClient : IApiClient
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<string>();
+    }
+
+    public async Task<QuestionDto?> GetInitialQuestion(int questionnaireId)
+    {
+        var response = await _httpClient.GetAsync($"questionnaire/{questionnaireId}/initial");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<QuestionDto>();
+    }
+
+    public async Task<DestinationDto?> GetNextState(int questionnaireId, GetNextStateRequest request)
+    {
+        var response = await _httpClient.PostAsJsonAsync($"questionnaire/{questionnaireId}/next", request);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<DestinationDto>();
     }
 }

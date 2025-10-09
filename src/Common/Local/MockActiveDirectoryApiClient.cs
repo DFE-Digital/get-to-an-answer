@@ -23,51 +23,7 @@ namespace Common.Local;
 
 public static class MockActiveDirectoryApiClient
 {
-    public static void CreateMockAzureAdClient(this WebApplicationBuilder builder)
-    {
-        // Mock issuer settings
-        const string mockIssuer = "https://mock.local.ad";
-        const string mockAudience = "mock-api";
-        const string mockSigningKey = "super-secret-dev-signing-key-change-me"; // dev only
-
-        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(mockSigningKey));
-
-        builder.Services
-            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidIssuer = mockIssuer,
-                    ValidateAudience = true,
-                    ValidAudience = mockAudience,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = signingKey,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.FromSeconds(10)
-                };
-            });
-
-        // Expose a simple in-app token factory for local testing
-        builder.Services.AddSingleton<Func<string, string, IEnumerable<Claim>?, string>>(_ => (subject, name, extraClaims) =>
-        {
-            var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(
-                issuer: mockIssuer,
-                audience: mockAudience,
-                claims: new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, subject),
-                    new Claim(ClaimTypes.Name, name ?? subject)
-                }.Concat(extraClaims ?? Enumerable.Empty<Claim>()),
-                notBefore: DateTime.UtcNow,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: creds
-            );
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        });
-    }
+    
 }
 
 // Simple options for the mock user
@@ -107,6 +63,8 @@ internal sealed class MockAuthenticationHandler : AuthenticationHandler<Authenti
         {
             new(ClaimTypes.Name, o.Name ?? "Dev User"),
             new(ClaimTypes.Email, o.Email ?? "dev.user@example.test"),
+            new("tid", "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"),
+            new("oid", "11111aaa-22bb-c33c-dd44-eeeee5555ee5"),
             new(ClaimTypes.NameIdentifier, o.NameIdentifier ?? o.ObjectId ?? Guid.NewGuid().ToString()),
             new("http://schemas.microsoft.com/identity/claims/objectidentifier", o.ObjectId ?? Guid.NewGuid().ToString()),
             new("http://schemas.microsoft.com/identity/claims/tenantid", o.TenantId ?? "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"),

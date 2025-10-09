@@ -1,7 +1,7 @@
 ﻿@model QuestionnaireViewModel?
 
 @{
-  ViewData["Title"] = "Create a new questionnaire";
+  ViewData["Title"] = "Edit the questionnaire";
   var hasErrors = Model?.CreateQuestionnaire != null && !ViewData.ModelState.IsValid;
   string? ErrorFor(string key) => ViewData.ModelState.ContainsKey(key) && ViewData.ModelState[key]?.Errors.Count > 0
     ? ViewData.ModelState[key]!.Errors[0].ErrorMessage
@@ -41,9 +41,9 @@
     <form action="/Admin/Questionnaires/Create" accept-charset="UTF-8" method="post">
       <div class="govuk-form-group">
         <h1 class="govuk-label-wrapper">
-          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the name of your form?</label>
+          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the title of your questionnaire?</label>
         </h1>
-        <div class="govuk-hint" id="forms-name-input-name-hint">The form name will be shown at the top of each page of the form. Use a name
+        <div class="govuk-hint" id="forms-name-input-name-hint">The questionnaire name will be shown at the top of each page of the form. Use a name
           that describes what the form will help people to do. For example ‘Apply for a
           juggling licence’.
         </div>

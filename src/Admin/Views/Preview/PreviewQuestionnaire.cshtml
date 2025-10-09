@@ -1,0 +1,87 @@
+﻿@model QuestionnaireViewModel?
+
+@{
+  ViewData["Title"] = "Create a new questionnaire";
+  var hasErrors = Model?.CreateQuestionnaire != null && !ViewData.ModelState.IsValid;
+  string? ErrorFor(string key) => ViewData.ModelState.ContainsKey(key) && ViewData.ModelState[key]?.Errors.Count > 0
+    ? ViewData.ModelState[key]!.Errors[0].ErrorMessage
+    : null;
+
+  var hasTitleError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Title)) != null;
+  var hasDescError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Description)) != null;
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="/groups/9R6te7wT">Back to Care Leavers</a>
+}
+
+<section class="dfe-page-grey" id="main-content-header">
+  <div class="govuk-width-container" id="main-header-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Check your care leaver support</h1>
+      </div>
+    </div>
+  </div>
+</section>
+
+@if (hasErrors)
+{
+  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+    <h2 class="govuk-error-summary__title" id="error-summary-title">
+      There is a problem
+    </h2>
+    <div class="govuk-error-summary__body">
+      <ul class="govuk-list govuk-error-summary__list">
+        @foreach (var kvp in ViewData.ModelState.Where(ms => ms.Value!.Errors.Count > 0))
+        {
+          var fieldName = kvp.Key;
+          var message = kvp.Value!.Errors[0].ErrorMessage;
+          // The href should link to the input id for accessibility
+          <li><a href="#@fieldName">@message</a></li>
+        }
+      </ul>
+    </div>
+  </div>
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="/Admin/Questionnaires/Create" accept-charset="UTF-8" method="post">
+      <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset" aria-describedby="signIn-hint">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h1 class="govuk-fieldset__heading">
+              How do you want to sign in?
+            </h1>
+          </legend>
+          <div id="signIn-hint" class="govuk-hint">
+            You’ll need an account to prove your identity and complete your Self Assessment
+          </div>
+          <div class="govuk-radios" data-module="govuk-radios">
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="signIn" name="signIn" type="radio" value="government-gateway" aria-describedby="signIn-item-hint">
+              <label class="govuk-label govuk-radios__label" for="signIn">
+                Sign in with Government Gateway
+              </label>
+              <div id="signIn-item-hint" class="govuk-hint govuk-radios__hint">
+                You’ll have a user ID if you’ve registered for Self Assessment or filed a tax return online before
+              </div>
+            </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="signIn-2" name="signIn" type="radio" value="govuk-one-login" aria-describedby="signIn-2-item-hint">
+              <label class="govuk-label govuk-radios__label" for="signIn-2">
+                Sign in with GOV.UK One Login
+              </label>
+              <div id="signIn-2-item-hint" class="govuk-hint govuk-radios__hint">
+                If you don’t have a GOV.UK One Login, you can create one
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
+    </form>
+  </div>
+</div>

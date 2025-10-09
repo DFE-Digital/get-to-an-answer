@@ -6,6 +6,7 @@ using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers;
 
@@ -113,5 +114,43 @@ public class QuestionController(CheckerDbContext db) : Controller
         
         // Logic to delete a question
         return Ok("Question deleted.");
+    }
+    
+    [HttpDelete("questionnaires/{questionnaireId}/questions/{id}/move-down")]
+    public async Task<IActionResult> MoveQuestionDownOne(int questionnaireId, int id)
+    {
+        return await MoveQuestionByOne(questionnaireId, id, +1);
+    }
+    
+    [HttpDelete("questionnaires/{questionnaireId}/questions/{id}/move-up")]
+    public async Task<IActionResult> MoveQuestionUpOne(int questionnaireId, int id)
+    {
+        return await MoveQuestionByOne(questionnaireId, id, -1);
+    }
+    
+    private async Task<IActionResult> MoveQuestionByOne(int questionnaireId, int id, int direction)
+    {
+        var tenantId = User.FindFirstValue("tid")!; // Tenant ID
+
+        // Load the target item
+        var current = await db.Questions
+            .FirstOrDefaultAsync(x => x.Id == id && x.TenantId == tenantId);
+
+        if (current == null) return NotFound();
+
+        // Find the next item in order within the same scope
+        var next = await db.Questions
+            .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == current.Order + direction && x.TenantId == tenantId);
+
+        // If already last, nothing to do
+        if (next == null) return NoContent();
+
+        // Swap orders
+        (current.Order, next.Order) = (next.Order, current.Order);
+
+        await db.SaveChangesAsync();
+        
+        // Logic to delete a question
+        return Ok();
     }
 }

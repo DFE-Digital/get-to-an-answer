@@ -34,9 +34,9 @@ public class AnswerEntity
     
     public float Score { get; set; }
     
-    public DestinationType DestinationType { get; set; }
+    public DestinationType? DestinationType { get; set; }
     
-    public string Destination { get; set; }
+    public string? Destination { get; set; }
     
     public DateTime CreatedAt { get; set; }
     

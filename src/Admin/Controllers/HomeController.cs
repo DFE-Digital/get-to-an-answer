@@ -10,22 +10,15 @@ using Common.Domain.Request.Update;
 namespace Admin.Controllers;
 
 
-public class HomeController : Controller
+public class HomeController(ILogger<HomeController> logger, IApiClient apiClient) : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-    private readonly IApiClient _apiClient;
-
-    public HomeController(ILogger<HomeController> logger, IApiClient apiClient)
-    {
-        _logger = logger;
-        _apiClient = apiClient;
-    }
+    private readonly ILogger<HomeController> _logger = logger;
 
     public async Task<IActionResult> Index()
     {
         return View("Index", new QuestionnaireViewModel
         {
-            Questionnaires = await _apiClient.GetQuestionnairesAsync()
+            Questionnaires = await apiClient.GetQuestionnairesAsync()
         });
     }
 
@@ -46,22 +39,22 @@ public class HomeController : Controller
             }); // return errors to the same page
         }
         
-        var questionnaire = await _apiClient.CreateQuestionnaireAsync(request);
+        var questionnaire = await apiClient.CreateQuestionnaireAsync(request);
 
         if (questionnaire == null)
         {
             return BadRequest();
         }
         
-        return RedirectToPagePermanent("QuestionnaireEditPage", new { questionnaireId = questionnaire.Id });
+        return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId = questionnaire.Id });
     }
 
     [HttpGet("Admin/Questionnaires/{questionnaireId}/Edit")]
-    public async Task<IActionResult> QuestionnaireEditPage(int questionnaireId)
+    public async Task<IActionResult> QuestionnaireTrackingPage(int questionnaireId)
     {
-        return View("EditQuestionnaire", new QuestionnaireViewModel
+        return View("TrackQuestionnaire", new QuestionnaireViewModel
         {
-            Questionnaire = await _apiClient.GetQuestionnaireAsync(questionnaireId)
+            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId)
         });
     }
 
@@ -70,7 +63,7 @@ public class HomeController : Controller
     {
         return View("ManageQuestions", new QuestionnaireViewModel
         {
-            Questions = await _apiClient.GetQuestionsAsync(questionnaireId)
+            Questions = await apiClient.GetQuestionsAsync(questionnaireId)
         });
     }
 
