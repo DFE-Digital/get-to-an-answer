@@ -99,7 +99,7 @@ public class QuestionController(CheckerDbContext db) : Controller
     {
         var tenantId = User.FindFirstValue("tid"); // Tenant ID
 
-        var questionnaireEntity = db.Questionnaires.FirstOrDefault(e => e.Id == questionnaireId && tenantId != null && e.InvitedUsers.Contains(tenantId));
+        var questionnaireEntity = db.Questionnaires.FirstOrDefault(e => e.Id == questionnaireId && tenantId != null && e.Contributors.Contains(tenantId));
         
         
         var questions = db.Questions

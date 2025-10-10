@@ -8,6 +8,7 @@ using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers;
 
@@ -28,7 +29,7 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
             TenantId = tenantId,
             Title = request.Title,
             Description = request.Description,
-            InvitedUsers = [email],
+            Contributors = [email],
             CreatedAt = DateTime.UtcNow
         };
         
@@ -155,5 +156,30 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         
         // Logic to delete a questionnaire
         return Ok("Questionnaire deleted.");
+    }
+    
+    [HttpPut("questionnaires/{id}/contributors")]
+    public async Task<IActionResult> AddQuestionnaireContributor(int id)
+    {
+        // Extract user and tenant from claims
+        var tenantId = User.FindFirstValue("tid");
+        var email = User.FindFirstValue(ClaimTypes.Email)!;// Tenant ID
+        
+        if (tenantId == null)
+            return Unauthorized();
+        
+        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => x.Id == id && x.TenantId == tenantId);
+        
+        if (questionnaire == null) 
+            return NotFound();
+
+        if (!questionnaire.Contributors.Contains(email))
+        {
+            questionnaire.Contributors.Add(email);
+        
+            await db.SaveChangesAsync();
+        }
+        
+        return Ok("Question updated.");
     }
 }

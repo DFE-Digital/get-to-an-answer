@@ -114,12 +114,33 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         
         return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId });
     }
+    
+    [HttpGet("admin/questionnaires/{questionnaireId}/invite-request")]
+    public async Task<IActionResult> QuestionnaireInviteRequest(int questionnaireId)
+    {
+        return View("QuestionnaireContributorInvitation", new QuestionnaireViewModel
+        {
+            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId)
+        });
+    }
+    
+    [HttpPost("admin/questionnaires/{questionnaireId}/invite-response")]
+    public async Task<IActionResult> QuestionnaireInvite(int questionnaireId, [FromForm(Name = "Accepted")] bool accepted)
+    {
+        if (accepted)
+        {
+            await apiClient.AddSelfToQuestionnaireContributorAsync(questionnaireId);
+        }
+        
+        return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId, accepted });
+    }
 
     [HttpGet("admin/questionnaires/{questionnaireId}/Track")]
-    public async Task<IActionResult> QuestionnaireTrackingPage(int questionnaireId)
+    public async Task<IActionResult> QuestionnaireTrackingPage(int questionnaireId, bool accepted = false)
     {
         return View("TrackQuestionnaire", new QuestionnaireViewModel
         {
+            InviteAccepted = accepted,
             Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId)
         });
     }

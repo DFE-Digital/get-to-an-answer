@@ -29,6 +29,7 @@ public class AnswerController(CheckerDbContext db) : Controller
             QuestionId = request.QuestionId,
             Content = request.Content,
             Description = request.Description,
+            Score = request.Score,
             Destination = request.Destination,
             DestinationQuestionId = request.DestinationQuestionId,
             DestinationType = request.DestinationType,

@@ -34,6 +34,7 @@ public interface IApiClient
     
     Task<QuestionDto?> GetInitialQuestion(int questionnaireId);
     Task<DestinationDto?> GetNextState(int questionnaireId, GetNextStateRequest request);
+    Task<string?> AddSelfToQuestionnaireContributorAsync(int questionnaireId);
 }
 
 public class ApiClient : IApiClient
@@ -209,4 +210,12 @@ public class ApiClient : IApiClient
 
         return await response.Content.ReadFromJsonAsync<DestinationDto>();
     }
+
+    public async Task<string?> AddSelfToQuestionnaireContributorAsync(int questionnaireId)
+    {
+        var response = await _httpClient.PostAsync($"questionnaires/{questionnaireId}/contributors", null);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string>();
+    } 
 }

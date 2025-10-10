@@ -1,0 +1,23 @@
+﻿@model QuestionnaireViewModel
+
+@{
+  ViewData["Title"] = "Delete the questionnaire";
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="/">Back to all questionnaires</a>
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds-from-desktop">
+    <h1 class="govuk-heading-l">You have been invited to contribute to a questionnaire.</h1>
+    <p class="govuk-body">By accepting you'll now be able to view, publish, delete, etc. this questionnaire.</p>
+    <form action="/admin/questionnaires/@Model.Questionnaire?.Id/invite-response" method="post" novalidate>
+      <div class="govuk-button-group">
+        <button class="govuk-button govuk-button--primary" type="submit" name="Accepted" value="true">Accept</button>
+        <a class="govuk-button govuk-button--secondary" href="/">Reject</a>
+      </div>
+    </form>
+  </div>
+</div>

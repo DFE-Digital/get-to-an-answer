@@ -25,7 +25,7 @@ public class QuestionnaireEntity
     /**
      * List of authenticated government users invited by the owner/members
      */
-    public List<string> InvitedUsers { get; set; } = new();
+    public List<string> Contributors { get; set; } = new();
 
     [Required]
     [MaxLength(500)]
