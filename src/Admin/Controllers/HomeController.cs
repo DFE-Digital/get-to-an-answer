@@ -23,13 +23,13 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
 
-    [HttpGet("Admin/Questionnaires/Create")]
+    [HttpGet("admin/questionnaires/Create")]
     public IActionResult QuestionnaireCreationPage(CreateQuestionnaireRequestDto request)
     {
         return View("CreateQuestionnaire", new QuestionnaireViewModel());
     }
 
-    [HttpPost("Admin/Questionnaires/Create")]
+    [HttpPost("admin/questionnaires/Create")]
     public async Task<IActionResult> PerformQuestionnaireCreation(CreateQuestionnaireRequestDto request)
     {
         if (!ModelState.IsValid)
@@ -50,7 +50,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId = questionnaire.Id });
     }
     
-    [HttpPost("Admin/Questionnaires/{questionnaireId}/Questions/Create")]
+    [HttpPost("admin/questionnaires/{questionnaireId}/questions/Create")]
     public async Task<IActionResult> PerformQuestionnaireCreation(int questionnaireId, CreateQuestionRequestDto request)
     {
         if (!ModelState.IsValid)
@@ -73,7 +73,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         return RedirectToAction(nameof(QuestionPage), new { questionId = question.Id });
     }
     
-    [HttpGet("Admin/Questionnaires/{questionnaireId}/Publish/Confirm")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/Publish/Confirm")]
     public async Task<IActionResult> ConfirmQuestionnairePublish(int questionnaireId)
     {
         return View("PublishQuestionnaireConfirmation", new QuestionnaireViewModel
@@ -82,7 +82,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
     
-    [HttpPost("Admin/Questionnaires/{questionnaireId}/Publish")]
+    [HttpPost("admin/questionnaires/{questionnaireId}/Publish")]
     public async Task<IActionResult> PublishQuestionnaire(int questionnaireId)
     {
         await apiClient.UpdateQuestionStatusAsync(questionnaireId, new UpdateQuestionStatusRequestDto
@@ -94,7 +94,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId });
     }
     
-    [HttpGet("Admin/Questionnaires/{questionnaireId}/Delete/Confirm")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/Delete/Confirm")]
     public async Task<IActionResult> ConfirmQuestionnaireDelete(int questionnaireId)
     {
         return View("DeleteQuestionnaireConfirmation", new QuestionnaireViewModel
@@ -103,7 +103,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
     
-    [HttpPost("Admin/Questionnaires/{questionnaireId}/Delete")]
+    [HttpPost("admin/questionnaires/{questionnaireId}/Delete")]
     public async Task<IActionResult> DeleteQuestionnaire(int questionnaireId)
     {
         await apiClient.UpdateQuestionStatusAsync(questionnaireId, new UpdateQuestionStatusRequestDto
@@ -115,7 +115,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId });
     }
 
-    [HttpGet("Admin/Questionnaires/{questionnaireId}/Track")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/Track")]
     public async Task<IActionResult> QuestionnaireTrackingPage(int questionnaireId)
     {
         return View("TrackQuestionnaire", new QuestionnaireViewModel
@@ -124,7 +124,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
 
-    [HttpGet("Admin/Questionnaires/{questionnaireId}/Edit")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/Edit")]
     public async Task<IActionResult> QuestionnaireEditPage(int questionnaireId)
     {
         var questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId);
@@ -143,7 +143,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
     
-    [HttpPost("Admin/Questionnaires/{questionnaireId}/Edit")]
+    [HttpPost("admin/questionnaires/{questionnaireId}/Edit")]
     public async Task<IActionResult> SaveQuestionnaire(int questionnaireId, UpdateQuestionnaireRequestDto request)
     {
         await apiClient.UpdateQuestionnaireAsync(questionnaireId, request);
@@ -151,7 +151,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId });
     }
 
-    [HttpGet("Admin/Questionnaires/{questionnaireId}/Questions")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/questions")]
     public async Task<IActionResult> QuestionManagementPage(int questionnaireId)
     {
         return View("ManageQuestions", new QuestionnaireViewModel
@@ -161,7 +161,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
 
-    [HttpGet("Admin/Questionnaires/{questionnaireId}/Questions/Create")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/questions/Create")]
     public async Task<IActionResult> QuestionCreationPage(int questionnaireId)
     {
         return View("AddQuestion", new QuestionnaireViewModel
@@ -170,7 +170,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
 
-    [HttpGet("Admin/Questions/{questionId}/Edit")]
+    [HttpGet("admin/questions/{questionId}/Edit")]
     public async Task<IActionResult> QuestionPage(int questionId)
     {
         var question = await apiClient.GetQuestionAsync(questionId);
@@ -193,7 +193,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
     
-    [HttpPost("Admin/Questions/{questionId}/Edit")]
+    [HttpPost("admin/questions/{questionId}/Edit")]
     public async Task<IActionResult> SaveQuestion(int questionId, UpdateQuestionRequestDto request)
     {
         await apiClient.UpdateQuestionAsync(questionId, request);
@@ -201,7 +201,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         return RedirectToAction(nameof(QuestionManagementPage), new { questionnaireId = request.QuestionnaireId });
     }
 
-    [HttpGet("Admin/Questionnaires/{questionnaireId}/Questions/{questionId}/Answers/Edit")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/questions/{questionId}/Answers/Edit")]
     public async Task<IActionResult> AddAnswersPage(int questionnaireId, int questionId, bool addEmptyAnswerOption = false)
     {
         return View("AddAnswers", new QuestionnaireViewModel
@@ -215,7 +215,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
 
-    [HttpPost("Admin/Questionnaires/{questionnaireId}/Questions/{questionId}/Answers/Edit")]
+    [HttpPost("admin/questionnaires/{questionnaireId}/questions/{questionId}/Answers/Edit")]
     public async Task<IActionResult> SaveAnswers(int questionnaireId, int questionId, 
         [FromForm(Name = "Answers")] List<UpdateAnswerRequestDto> requests, 
         [FromForm(Name = "AddEmptyAnswerOption")] bool addEmptyAnswerOption)

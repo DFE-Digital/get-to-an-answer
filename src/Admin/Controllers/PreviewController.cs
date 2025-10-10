@@ -9,11 +9,12 @@ namespace Admin.Controllers;
 
 public class PreviewController(ILogger<HomeController> logger, IApiClient apiClient) : Controller
 {
-    [HttpGet("Admin/Questionnaires/{questionnaireId}/Initial/Preview")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/Initial/Preview")]
     public async Task<IActionResult> GetInitialQuestionPage(int questionnaireId)
     {
         return View("PreviewQuestionnaire", new QuestionnaireViewModel
         {
+            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId),
             NextStateRequest = new GetNextStateRequest(),
             Destination = new DestinationDto
             {
@@ -23,7 +24,7 @@ public class PreviewController(ILogger<HomeController> logger, IApiClient apiCli
         });
     }
     
-    [HttpPost("Admin/Questionnaires/{questionnaireId}/Next/Preview")]
+    [HttpPost("admin/questionnaires/{questionnaireId}/Next/Preview")]
     public async Task<IActionResult> GetNextStatePage(int questionnaireId, GetNextStateRequest request, 
         [FromForm(Name = "Scores")] Dictionary<int, float> scores)
     {
@@ -42,6 +43,7 @@ public class PreviewController(ILogger<HomeController> logger, IApiClient apiCli
         
         return View("PreviewQuestionnaire", new QuestionnaireViewModel
         {
+            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId),
             NextStateRequest = new GetNextStateRequest(),
             Destination = destination
         });

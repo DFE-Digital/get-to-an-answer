@@ -15,7 +15,7 @@
 
 @section BeforeContent 
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/Admin/Questionnaires/@Model?.QuestionnaireId/Track">Back to Care Leavers Questionnaire</a>
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model?.QuestionnaireId/Track">Back to Care Leavers Questionnaire</a>
 }
 
 @if (hasErrors)
@@ -45,7 +45,7 @@
          <span class="govuk-visually-hidden"> - </span>
          Add question
       </h1>
-      <form action="/Admin/Questions/@Model?.UpdateQuestion?.Id/Edit" accept-charset="UTF-8" method="post">
+      <form action="/admin/questions/@Model?.UpdateQuestion?.Id/Edit" accept-charset="UTF-8" method="post">
          <input type="hidden" name="QuestionnaireId" value="@Model?.UpdateQuestion?.QuestionnaireId" autocomplete="off">
          <input type="hidden" name="Id" value="@Model?.UpdateQuestion?.Id" autocomplete="off">
          <div class="govuk-form-group">
@@ -95,7 +95,7 @@
                <h2 class="govuk-summary-card__title">Answers</h2>
                <ul class="govuk-summary-card__actions">
                   <li class="govuk-summary-card__action">
-                     <a class="govuk-link" href="/Admin/Questionnaires/@Model?.QuestionnaireId/Questions/@Model?.UpdateQuestion?.Id/Answers/Edit">Edit</a>
+                     <a class="govuk-link" href="/admin/questionnaires/@Model?.QuestionnaireId/questions/@Model?.UpdateQuestion?.Id/Answers/Edit">Edit</a>
                   </li>
                </ul>
             </div>

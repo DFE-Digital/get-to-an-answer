@@ -7,7 +7,7 @@
 
 @section BeforeContent 
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/Admin/Questionnaires/@Model.QuestionnaireId/Track">Back to Care Leavers Questionnaire</a>
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.QuestionnaireId/Track">Back to Care Leavers Questionnaire</a>
 }
 
 <div class="govuk-grid-row">
@@ -21,8 +21,8 @@
       <dd class="govuk-!-margin-0"><strong class="govuk-tag govuk-tag--yellow">Draft</strong></dd>
     </dl>
     <div class="govuk-button-group">
-      <a class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" href="/Admin/Questionnaires/@Model.QuestionnaireId/Questions/Create" data-govuk-button-init="">Add a question</a>
-      <a class="govuk-link" href="/Admin/Questionnaires/@Model.QuestionnaireId/Initial/Preview">Preview this questionnaire</a>
+      <a class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" href="/admin/questionnaires/@Model.QuestionnaireId/questions/Create" data-govuk-button-init="">Add a question</a>
+      <a class="govuk-link" href="/admin/questionnaires/@Model.QuestionnaireId/Initial/Preview">Preview this questionnaire</a>
     </div>
     <h2 class="govuk-heading-m govuk-!-margin-top-7 govuk-!-margin-bottom-0">Your questions</h2>
     <div class="app-page-list">
@@ -47,10 +47,10 @@
               <dd class="govuk-summary-list__actions govuk-summary-list__actions-m">
                 <ul class="govuk-summary-list__actions-list">
                   <li class="govuk-summary-list__actions-list-item">
-                    <a class="govuk-link" href="/Admin/Questions/@question.Id/Edit">Edit</a>
+                    <a class="govuk-link" href="/admin/questions/@question.Id/Edit">Edit</a>
                   </li>
                   <li class="govuk-summary-list__actions-list-item">
-                    <a class="govuk-link" href="/Admin/Questions/@question.Id/Switch?order=@(question.Id +1)">Move Down</a>
+                    <a class="govuk-link" href="/admin/questions/@question.Id/Switch?order=@(question.Id +1)">Move Down</a>
                   </li>
                 </ul>
               </dd>
