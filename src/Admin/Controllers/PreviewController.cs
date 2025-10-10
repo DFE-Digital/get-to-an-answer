@@ -31,6 +31,10 @@ public class PreviewController(ILogger<HomeController> logger, IApiClient apiCli
         if (request.SelectedAnswerIds.Count > 1)
         {
             request.SelectedAnswerId = scores.OrderByDescending(kv => kv.Value).First().Key;
+        } 
+        else if (request.SelectedAnswerIds.Count == 1)
+        {
+            request.SelectedAnswerId = request.SelectedAnswerIds.First();
         }
         
         var destination = await apiClient.GetNextState(questionnaireId, request);
