@@ -9,6 +9,15 @@ namespace Admin.Controllers;
 
 public class PreviewController(ILogger<HomeController> logger, IApiClient apiClient) : Controller
 {
+    [HttpGet("admin/questionnaires/{questionnaireId}/Start/Preview")]
+    public async Task<IActionResult> GetStartPage(int questionnaireId)
+    {
+        return View("PreviewQuestionnaireStart", new QuestionnaireViewModel
+        {
+            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId),
+        });
+    }
+    
     [HttpGet("admin/questionnaires/{questionnaireId}/Initial/Preview")]
     public async Task<IActionResult> GetInitialQuestionPage(int questionnaireId)
     {

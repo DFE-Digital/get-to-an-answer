@@ -8,6 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="HtmlSanitizer" Version="9.0.886" />
+        <PackageReference Include="Markdig" Version="0.42.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
         <PackageReference Include="Microsoft.Identity.Web" Version="3.14.1" />
         <PackageReference Include="Microsoft.Identity.Web.UI" Version="3.14.1" />

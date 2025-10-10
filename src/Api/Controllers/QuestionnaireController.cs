@@ -20,6 +20,7 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
     {
         var userId = User.FindFirstValue("oid")!;   // Azure AD Object ID
         var tenantId = User.FindFirstValue("tid")!; // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
         
         var entity = new QuestionnaireEntity
         {
@@ -27,6 +28,7 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
             TenantId = tenantId,
             Title = request.Title,
             Description = request.Description,
+            InvitedUsers = [email],
             CreatedAt = DateTime.UtcNow
         };
         
