@@ -16,15 +16,15 @@ namespace Api.Controllers;
 public class AnswerController(CheckerDbContext db) : Controller
 {
     [HttpPost("answers")]
-    public IActionResult CreateAnswer(CreateAnswerRequestDto request)
+    public async Task<IActionResult> CreateAnswer(CreateAnswerRequestDto request)
     {
-        var userId = User.FindFirstValue("oid")!;   // Azure AD Object ID
-        var tenantId = User.FindFirstValue("tid")!; // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        
+        if (!await db.HasAccessToEntity<QuestionEntity>(email, request.QuestionId))
+            return Unauthorized();
 
         var entity = new AnswerEntity
         {
-            OwnerId = userId,
-            TenantId = tenantId,
             QuestionnaireId = request.QuestionnaireId,
             QuestionId = request.QuestionId,
             Content = request.Content,
@@ -38,7 +38,7 @@ public class AnswerController(CheckerDbContext db) : Controller
         
         db.Answers.Add(entity);
         
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         return Ok(new AnswerDto
         {
@@ -55,50 +55,49 @@ public class AnswerController(CheckerDbContext db) : Controller
     }
     
     [HttpGet("answers/{id}")]
-    public IActionResult GetAnswer(int id)
+    public async Task<IActionResult> GetAnswer(int id)
     {
         // Extract user and tenant from claims
-        var userId = User.FindFirstValue("oid");   // Azure AD Object ID
-        var tenantId = User.FindFirstValue("tid"); // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        
+        if (!await db.HasAccessToEntity<AnswerEntity>(email, id))
+            return Unauthorized();
 
         // Example: check ownership in your persistence layer
         var answer = db.Answers
-            .FirstOrDefault(q => q.Id == id && q.TenantId == tenantId);
+            .FirstOrDefault(q => q.Id == id);
 
         if (answer == null)
             return NotFound();
-
-        if (answer.OwnerId != userId)
-            return Forbid();
         
         return Ok(answer);
     }
     
     [HttpGet("questions/{questionId}/answers")]
-    public IActionResult GetAnswers(int questionId)
+    public async Task<IActionResult> GetAnswers(int questionId)
     {
-        var tenantId = User.FindFirstValue("tid"); // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        
+        if (!await db.HasAccessToEntity<QuestionEntity>(email, questionId))
+            return Unauthorized();
 
         var answers = db.Answers
-            .Where(q => q.QuestionId == questionId && q.TenantId == tenantId);
+            .Where(q => q.QuestionId == questionId);
         
         return Ok(answers.ToList());
     }
 
     [HttpPut("answers/{id}")]
-    public IActionResult UpdateAnswer(int id, UpdateAnswerRequestDto request)
+    public async Task<IActionResult> UpdateAnswer(int id, UpdateAnswerRequestDto request)
     {
-        // Extract user and tenant from claims
-        var userId = User.FindFirstValue("oid");   // Azure AD Object ID
-        var tenantId = User.FindFirstValue("tid"); // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
         
-        if (tenantId == null)
+        if (!await db.HasAccessToEntity<AnswerEntity>(email, id))
             return Unauthorized();
         
         var answer = new AnswerEntity
         {
             Id = id,
-            TenantId = tenantId,
         };
 
         db.Answers.Attach(answer);
@@ -119,28 +118,29 @@ public class AnswerController(CheckerDbContext db) : Controller
         db.Entry(answer).Property(s => s.Score).IsModified = true;
         db.Entry(answer).Property(s => s.UpdatedAt).IsModified = true;
         
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         // Logic to update a answer, answer, or branching logic
         return Ok("Answer updated.");
     }
 
     [HttpDelete("answers/{id}")]
-    public IActionResult DeleteAnswer(int id)
+    public async Task<IActionResult> DeleteAnswer(int id)
     {
-        // Extract user and tenant from claims
-        var tenantId = User.FindFirstValue("tid")!; // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        
+        if (!await db.HasAccessToEntity<AnswerEntity>(email, id))
+            return Unauthorized();
         
         var answer = new AnswerEntity
         {
             Id = id,
-            TenantId = tenantId,
         };
 
         db.Answers.Attach(answer);
         db.Answers.Remove(answer);
         
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         // Logic to delete a answer
         return Ok("Answer deleted.");

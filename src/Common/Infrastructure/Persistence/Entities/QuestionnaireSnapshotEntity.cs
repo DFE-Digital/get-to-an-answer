@@ -11,16 +11,6 @@ public class QuestionnaireSnapshotEntity
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     
-    /**
-     * Maps to tid claim
-     */
-    public string TenantId { get; set; }   
-    
-    /**
-     * Maps to Oid claim
-     */
-    public string OwnerId { get; set; }
-    
     public QuestionnaireEntity Snapshot { get; set; }
     
     public DateTime CreatedAt { get; set; }

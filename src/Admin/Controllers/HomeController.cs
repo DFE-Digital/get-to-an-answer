@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Common.Enum;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Admin.Controllers;
 
-
+[Controller]
+[Authorize]
 public class HomeController(ILogger<HomeController> logger, IApiClient apiClient) : Controller
 {
     private readonly ILogger<HomeController> _logger = logger;

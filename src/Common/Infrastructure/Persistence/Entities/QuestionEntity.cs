@@ -13,16 +13,6 @@ public class QuestionEntity
     
     public int QuestionnaireId { get; set; }
 
-    /**
-     * Maps to tid claim
-     */
-    public string TenantId { get; set; }   
-    
-    /**
-     * Maps to Oid claim
-     */
-    public string OwnerId { get; set; }
-
     [Required]
     public int Order { get; set; }
 

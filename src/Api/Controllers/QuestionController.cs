@@ -18,28 +18,27 @@ namespace Api.Controllers;
 public class QuestionController(CheckerDbContext db) : Controller
 {
     [HttpPost("questions")]
-    public IActionResult CreateQuestion(CreateQuestionRequestDto request)
+    public async Task<IActionResult> CreateQuestion(CreateQuestionRequestDto request)
     {
-        var userId = User.FindFirstValue("oid")!;   // Azure AD Object ID
-        var tenantId = User.FindFirstValue("tid")!; // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        
+        if (!await db.HasAccessToEntity<QuestionEntity>(email, request.QuestionnaireId))
+            return Unauthorized();
 
         var entity = new QuestionEntity
         {
-            OwnerId = userId,
-            TenantId = tenantId,
             QuestionnaireId = request.QuestionnaireId,
             Content = request.Content,
             Description = request.Description,
             Type = request.Type,
             Order = db.Questions.Count(x => x.QuestionnaireId == request.QuestionnaireId
-                                            && x.Status != EntityStatus.Deleted
-                                            && x.TenantId == tenantId) + 1,
+                                            && x.Status != EntityStatus.Deleted) + 1,
             CreatedAt = DateTime.UtcNow
         };
         
         db.Questions.Add(entity);
         
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         return Ok(new QuestionDto
         {
@@ -54,24 +53,21 @@ public class QuestionController(CheckerDbContext db) : Controller
     }
     
     [HttpGet("questions/{id}")]
-    public IActionResult GetQuestion(int id)
+    public async Task<IActionResult> GetQuestion(int id)
     {
-        // Extract user and tenant from claims
-        var userId = User.FindFirstValue("oid");   // Azure AD Object ID
-        var tenantId = User.FindFirstValue("tid"); // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        
+        if (!await db.HasAccessToEntity<QuestionEntity>(email, id))
+            return Unauthorized();
 
         // Example: check ownership in your persistence layer
         var question = db.Questions
             .Include(q => q.Answers)
             .FirstOrDefault(q => q.Id == id 
-                                 && q.TenantId == tenantId
                                  && q.Status != EntityStatus.Deleted);
 
         if (question == null)
             return NotFound();
-
-        if (question.OwnerId != userId)
-            return Forbid();
         
         // Logic to create a question
         return Ok(new QuestionDto
@@ -93,37 +89,35 @@ public class QuestionController(CheckerDbContext db) : Controller
             Type = question.Type
         });
     }
-    
-    [HttpGet("questionnaires/{questionnaireId}/questions")]
-    public IActionResult GetQuestions(int questionnaireId)
-    {
-        var tenantId = User.FindFirstValue("tid"); // Tenant ID
 
-        var questionnaireEntity = db.Questionnaires.FirstOrDefault(e => e.Id == questionnaireId && tenantId != null && e.Contributors.Contains(tenantId));
+    
+
+    [HttpGet("questionnaires/{questionnaireId}/questions")]
+    public async Task<IActionResult> GetQuestions(int questionnaireId)
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
         
+        if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, questionnaireId))
+            return Unauthorized();
         
         var questions = db.Questions
-            .Where(q => q.QuestionnaireId == questionnaireId 
-                        && q.TenantId == tenantId
+            .Where(q => q.QuestionnaireId == questionnaireId
                         && q.Status != EntityStatus.Deleted);
         
         return Ok(questions);
     }
 
     [HttpPut("questions/{id}")]
-    public IActionResult UpdateQuestion(int id, UpdateQuestionRequestDto request)
+    public async Task<IActionResult> UpdateQuestion(int id, UpdateQuestionRequestDto request)
     {
-        // Extract user and tenant from claims
-        var userId = User.FindFirstValue("oid");   // Azure AD Object ID
-        var tenantId = User.FindFirstValue("tid"); // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
         
-        if (tenantId == null)
+        if (!await db.HasAccessToEntity<QuestionEntity>(email, id))
             return Unauthorized();
         
         var question = new QuestionEntity
         {
-            Id = id,
-            TenantId = tenantId,
+            Id = id
         };
 
         db.Questions.Attach(question);
@@ -138,25 +132,23 @@ public class QuestionController(CheckerDbContext db) : Controller
         db.Entry(question).Property(s => s.Type).IsModified = true;
         db.Entry(question).Property(s => s.UpdatedAt).IsModified = true;
         
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         // Logic to update a question, answer, or branching logic
         return Ok("Question updated.");
     }
     
     [HttpPut("questions/{id}/status")]
-    public IActionResult UpdateQuestionStatus(int id, UpdateQuestionStatusRequestDto request)
+    public async Task<IActionResult> UpdateQuestionStatus(int id, UpdateQuestionStatusRequestDto request)
     {
-        // Extract user and tenant from claims
-        var tenantId = User.FindFirstValue("tid"); // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
         
-        if (tenantId == null)
+        if (!await db.HasAccessToEntity<QuestionEntity>(email, id))
             return Unauthorized();
         
         var question = new QuestionEntity
         {
-            Id = id,
-            TenantId = tenantId,
+            Id = id
         };
 
         db.Questions.Attach(question);
@@ -166,15 +158,15 @@ public class QuestionController(CheckerDbContext db) : Controller
         
         db.Entry(question).Property(s => s.Status).IsModified = true;
         
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         return Ok("Question updated.");
     }
 
     [HttpDelete("questions/{id}")]
-    public IActionResult DeleteQuestion(int id)
+    public async Task<IActionResult> DeleteQuestion(int id)
     {
-        return UpdateQuestionStatus(id, new UpdateQuestionStatusRequestDto
+        return await UpdateQuestionStatus(id, new UpdateQuestionStatusRequestDto
         {
             Id = id,
             Status = EntityStatus.Deleted
@@ -195,19 +187,22 @@ public class QuestionController(CheckerDbContext db) : Controller
     
     private async Task<IActionResult> MoveQuestionByOne(int questionnaireId, int id, int direction)
     {
-        var tenantId = User.FindFirstValue("tid")!; // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        
+        if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, questionnaireId))
+            return Unauthorized();
 
         // Load the target item
         var current = await db.Questions
-            .FirstOrDefaultAsync(x => x.Id == id && x.TenantId == tenantId);
+            .FirstOrDefaultAsync(x => x.Id == id
+                && x.QuestionnaireId == questionnaireId);
 
         if (current == null) return NotFound();
 
         // Find the next item in order within the same scope
         var next = await db.Questions
             .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId 
-                                      && x.Order == current.Order + direction 
-                                      && x.TenantId == tenantId
+                                      && x.Order == current.Order + direction
                                       && x.Status != EntityStatus.Deleted);
 
         // If already last, nothing to do

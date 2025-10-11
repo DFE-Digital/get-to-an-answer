@@ -15,16 +15,6 @@ public class AnswerEntity
      * Shorthand name for this answer.
      */
     public string? RefName { get; set; }
-    
-    /**
-     * Maps to tid claim
-     */
-    public string TenantId { get; set; }   
-    
-    /**
-     * Maps to Oid claim
-     */
-    public string OwnerId { get; set; }
 
     [Required]
     [MaxLength(250)]

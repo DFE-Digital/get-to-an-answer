@@ -19,14 +19,10 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
     [Authorize]
     public async Task<IActionResult> CreateQuestionnaire(CreateQuestionnaireRequestDto request)
     {
-        var userId = User.FindFirstValue("oid")!;   // Azure AD Object ID
-        var tenantId = User.FindFirstValue("tid")!; // Tenant ID
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
         var entity = new QuestionnaireEntity
         {
-            OwnerId = userId,
-            TenantId = tenantId,
             Title = request.Title,
             Description = request.Description,
             Contributors = [email],
@@ -48,52 +44,47 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
     }
     
     [HttpGet("questionnaires/{id}")]
-    public IActionResult GetQuestionnaire(int id)
+    public async Task<IActionResult> GetQuestionnaire(int id)
     {
-        // Extract user and tenant from claims
-        var userId = User.FindFirstValue("oid");   // Azure AD Object ID
-        var tenantId = User.FindFirstValue("tid"); // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        
+        if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, id))
+            return Unauthorized();
 
         // Example: check ownership in your persistence layer
         var questionnaire = db.Questionnaires
-            .FirstOrDefault(q => q.Id == id && q.TenantId == tenantId
+            .FirstOrDefault(q => q.Id == id
                                             && q.Status != EntityStatus.Deleted);
 
         if (questionnaire == null)
             return NotFound();
-
-        if (questionnaire.OwnerId != userId)
-            return Forbid();
         
         return Ok(questionnaire);
     }
     
     [HttpGet("questionnaires")]
-    public IActionResult GetQuestionnaires()
+    public async Task<IActionResult> GetQuestionnaires()
     {
-        var tenantId = User.FindFirstValue("tid"); // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
 
         var questionnaires = db.Questionnaires
-            .Where(q => q.TenantId == tenantId
+            .Where(q => q.Contributors.Contains(email)
                         && q.Status != EntityStatus.Deleted);
         
         return Ok(questionnaires);
     }
 
     [HttpPut("questionnaires/{id}")]
-    public IActionResult UpdateQuestionnaire(int id, UpdateQuestionnaireRequestDto request)
+    public async Task<IActionResult> UpdateQuestionnaire(int id, UpdateQuestionnaireRequestDto request)
     {
-        // Extract user and tenant from claims
-        var userId = User.FindFirstValue("oid");   // Azure AD Object ID
-        var tenantId = User.FindFirstValue("tid"); // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
         
-        if (tenantId == null)
+        if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, id))
             return Unauthorized();
         
         var questionnaire = new QuestionnaireEntity
         {
             Id = id,
-            TenantId = tenantId,
         };
 
         db.Questionnaires.Attach(questionnaire);
@@ -106,24 +97,22 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         db.Entry(questionnaire).Property(s => s.Description).IsModified = true;
         db.Entry(questionnaire).Property(s => s.UpdatedAt).IsModified = true;
         
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         return Ok("Questionnaire updated.");
     }
     
     [HttpPut("questionnaires/{id}/status")]
-    public IActionResult UpdateQuestionnaireStatus(int id, UpdateQuestionnaireStatusRequestDto request)
+    public async Task<IActionResult> UpdateQuestionnaireStatus(int id, UpdateQuestionnaireStatusRequestDto request)
     {
-        // Extract user and tenant from claims
-        var tenantId = User.FindFirstValue("tid"); // Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
         
-        if (tenantId == null)
+        if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, id))
             return Unauthorized();
         
         var question = new QuestionEntity
         {
             Id = id,
-            TenantId = tenantId,
         };
 
         db.Questions.Attach(question);
@@ -133,42 +122,27 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         
         db.Entry(question).Property(s => s.Status).IsModified = true;
         
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         return Ok("Question updated.");
     }
 
     [HttpDelete("questionnaires/{id}")]
-    public IActionResult DeleteQuestionnaire(int id)
+    public async Task<IActionResult> DeleteQuestionnaire(int id)
     {
-        var tenantId = User.FindFirstValue("tid")!; // Tenant ID
-        
-        var questionnaire = new QuestionnaireEntity
+        return Ok(await UpdateQuestionnaireStatus(id, new UpdateQuestionnaireStatusRequestDto
         {
             Id = id,
-            TenantId = tenantId,
-        };
-
-        db.Questionnaires.Attach(questionnaire);
-        db.Questionnaires.Remove(questionnaire);
-        
-        db.SaveChanges();
-        
-        // Logic to delete a questionnaire
-        return Ok("Questionnaire deleted.");
+            Status = EntityStatus.Deleted
+        }));
     }
     
     [HttpPut("questionnaires/{id}/contributors")]
     public async Task<IActionResult> AddQuestionnaireContributor(int id)
     {
-        // Extract user and tenant from claims
-        var tenantId = User.FindFirstValue("tid");
-        var email = User.FindFirstValue(ClaimTypes.Email)!;// Tenant ID
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
         
-        if (tenantId == null)
-            return Unauthorized();
-        
-        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => x.Id == id && x.TenantId == tenantId);
+        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => x.Id == id);
         
         if (questionnaire == null) 
             return NotFound();

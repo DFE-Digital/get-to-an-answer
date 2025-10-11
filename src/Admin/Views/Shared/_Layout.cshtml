@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using System.Security.Claims
 @using Admin.Configuration
 
 @inject IWebHostEnvironment WebHostEnvironment
@@ -9,6 +10,8 @@
     {
         languageCode = "en";
     }
+
+    ViewBag.FullName = User.FindFirst(ClaimTypes.Name)?.Value;
 }
 
 <!DOCTYPE html>
@@ -73,7 +76,7 @@
                         <a class="govuk-service-navigation__link" aria-current="true" href="https://www.forms.service.gov.uk/support">Support</a>
                     </li>
                     <li class="govuk-service-navigation__item app-service-navigation__item--featured">
-                        <span class="govuk-service-navigation__text">Junior Owolabi</span>
+                        <span class="govuk-service-navigation__text">@ViewBag.FullName</span>
                     </li>
                     <li class="govuk-service-navigation__item">
                         <a class="govuk-service-navigation__link" aria-current="true" href="/sign-out">Sign out</a>

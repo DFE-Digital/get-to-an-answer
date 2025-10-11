@@ -13,16 +13,6 @@ public class QuestionnaireEntity
     public int Id { get; set; }
     
     /**
-     * Maps to tid claim
-     */
-    public string TenantId { get; set; }   
-    
-    /**
-     * Maps to Oid claim
-     */
-    public string OwnerId { get; set; }
-    
-    /**
      * List of authenticated government users invited by the owner/members
      */
     public List<string> Contributors { get; set; } = new();

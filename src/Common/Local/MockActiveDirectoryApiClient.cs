@@ -36,6 +36,8 @@ public static class MockActiveDirectoryApiClient
 public sealed class MockAzureAdOptions
 {
     public string AuthenticationType { get; set; } = "MockAzureAD";
+    public string? GivenName { get; set; } = "Dev";
+    public string? SurName { get; set; } = "User";
     public string? Name { get; set; } = "Dev User";
     public string? Email { get; set; } = "dev.user@example.test";
     public string? ObjectId { get; set; } = "11111111-2222-3333-4444-555555555555";
@@ -67,6 +69,8 @@ internal sealed class MockAuthenticationHandler : AuthenticationHandler<Authenti
 
         var claims = new List<Claim>
         {
+            new(ClaimTypes.GivenName, o.GivenName ?? "Dev"),
+            new(ClaimTypes.Surname, o.SurName ?? "User"),
             new(ClaimTypes.Name, o.Name ?? "Dev User"),
             new(ClaimTypes.Email, o.Email ?? "dev.user@example.test"),
             new("tid", "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"),

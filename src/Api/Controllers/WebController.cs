@@ -21,7 +21,7 @@ public class WebController(CheckerDbContext db) : Controller
         
         var initialQuestion = await db.Questions
             .Include(x => x.Answers)
-            .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == 1 && x.TenantId == tenantId);
+            .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == 1);
         
         if (initialQuestion == null)
             return BadRequest();
@@ -53,8 +53,7 @@ public class WebController(CheckerDbContext db) : Controller
 
         var selectedAnswerId = request.SelectedAnswerId;
         
-        var answer = await db.Answers.FirstOrDefaultAsync(x => x.Id == selectedAnswerId 
-                                                                  && x.TenantId == tenantId);
+        var answer = await db.Answers.FirstOrDefaultAsync(x => x.Id == selectedAnswerId);
         
         if (answer == null)
             return BadRequest();
@@ -63,14 +62,13 @@ public class WebController(CheckerDbContext db) : Controller
         {
             return await GetDestinationQuestion(x => 
                     x.QuestionnaireId == questionnaireId && 
-                    x.Order == request.CurrentQuestionOrder+1 && 
-                    x.TenantId == tenantId);
+                    x.Order == request.CurrentQuestionOrder+1);
         }
 
         if (answer.DestinationType == DestinationType.Question)
         {
             return await GetDestinationQuestion(x =>
-                x.Id == answer.DestinationQuestionId && x.TenantId == tenantId);
+                x.Id == answer.DestinationQuestionId);
         }
 
         return Ok(new DestinationDto
