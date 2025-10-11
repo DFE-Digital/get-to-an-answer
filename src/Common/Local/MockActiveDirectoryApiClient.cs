@@ -12,12 +12,18 @@ using System.Text.Json;
 using System.Text.Unicode;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.TokenCacheProviders;
+using Microsoft.Identity.Web.TokenCacheProviders.InMemory;
 
 namespace Common.Local;
 
@@ -71,7 +77,7 @@ internal sealed class MockAuthenticationHandler : AuthenticationHandler<Authenti
             new("preferred_username", o.PreferredUsername ?? o.Email ?? "dev.user@example.test"),
         };
 
-        foreach (var role in o.Roles ?? Array.Empty<string>())
+        foreach (var role in o.Roles)
         {
             if (!string.IsNullOrWhiteSpace(role))
                 claims.Add(new(ClaimTypes.Role, role));
@@ -123,21 +129,23 @@ public static class MockAzureAdExtensions
             opts.Roles = new[] { "Admin" };
         };
         
-        services.Configure(configure ?? (_ => { }));
+        services.Configure(configure);
 
         services
             .AddAuthentication(options =>
             {
+                options.DefaultScheme = MockScheme;
                 options.DefaultAuthenticateScheme = MockScheme;
                 options.DefaultChallengeScheme = MockScheme;
                 options.DefaultSignInScheme = MockCookieScheme;
             })
-            .AddScheme<AuthenticationSchemeOptions, MockAuthenticationHandler>(MockScheme, _ => { })
-            .AddCookie(MockCookieScheme, options =>
-            {
-                options.LoginPath = "/dev/login";
-                options.AccessDeniedPath = "/dev/denied";
-            });
+            .AddScheme<AuthenticationSchemeOptions, MockAuthenticationHandler>(MockScheme, _ => { });
+        
+        services.AddSingleton<ITokenAcquisition, MockTokenAcquisition>();
+        
+        services.AddMemoryCache();
+        services.AddHttpContextAccessor();
+        services.AddSingleton<IMsalTokenCacheProvider, MsalMemoryTokenCacheProvider>();
 
         services.AddAuthorization(options =>
         {
@@ -158,7 +166,7 @@ public static class MockAzureAdExtensions
             opts.Roles = new[] { "Api.Access", "Admin" };
         };
         
-        services.Configure(configure ?? (_ => { }));
+        services.Configure(configure);
 
         services
             .AddAuthentication(options =>
@@ -235,4 +243,53 @@ public static class MockAzureAdExtensions
         
         return builder;
     }
+}
+
+public sealed class MockTokenAcquisition : ITokenAcquisition
+{
+    private static readonly AuthenticationResult MockAuthenticationResult = new(
+        accessToken: "mock-user-access-token",
+        isExtendedLifeTimeToken: false,
+        uniqueId: "mock-unique-id",
+        expiresOn: DateTimeOffset.UtcNow.AddMinutes(5),
+        extendedExpiresOn: DateTimeOffset.UtcNow.AddMinutes(5),
+        tenantId: "mock-tenant-id",
+        account: null,
+        idToken: "mock-id-token",
+        scopes: ["user.read", "profile"],
+        correlationId: Guid.NewGuid(),
+        tokenType: "Bearer",
+        authenticationResultMetadata: null,
+        claimsPrincipal: null,
+        spaAuthCode: null,
+        additionalResponseParameters: null);
+
+    public Task<string> GetAccessTokenForUserAsync(IEnumerable<string> scopes, string? authenticationScheme, string? tenantId = null,
+        string? userFlow = null, ClaimsPrincipal? user = null, TokenAcquisitionOptions? tokenAcquisitionOptions = null)
+        => Task.FromResult("mock-user-access-token");
+
+    public Task<AuthenticationResult> GetAuthenticationResultForUserAsync(IEnumerable<string> scopes,
+        string? authenticationScheme, string? tenantId = null,
+        string? userFlow = null, ClaimsPrincipal? user = null, TokenAcquisitionOptions? tokenAcquisitionOptions = null)
+        => Task.FromResult(MockAuthenticationResult);
+
+    public Task<string> GetAccessTokenForAppAsync(string scope, string? authenticationScheme, string? tenant = null,
+        TokenAcquisitionOptions? tokenAcquisitionOptions = null)
+        => Task.FromResult("mock-app-access-token");
+
+    public Task<AuthenticationResult> GetAuthenticationResultForAppAsync(string scope, string? authenticationScheme, string? tenant = null,
+        TokenAcquisitionOptions? tokenAcquisitionOptions = null)
+        => Task.FromResult(MockAuthenticationResult);
+
+    public void ReplyForbiddenWithWwwAuthenticateHeader(IEnumerable<string> scopes, MsalUiRequiredException msalServiceException,
+        string? authenticationScheme, HttpResponse? httpResponse = null)
+    { }
+
+    public string GetEffectiveAuthenticationScheme(string? authenticationScheme)
+        => "MockScheme";
+
+    public Task ReplyForbiddenWithWwwAuthenticateHeaderAsync(
+        IEnumerable<string> scopes, 
+        MsalUiRequiredException msalServiceException,
+        HttpResponse? httpResponse = null) => Task.CompletedTask;
 }

@@ -11,7 +11,7 @@ public class ConfigViewModel
     
     public static string ContentType { get; } = "configuration";
     
-    public string ServiceName { get; set; } = "Checker";
+    public string ServiceName { get; set; } = "GetToAnAnswer";
 
     public BannerPhase Phase { get; set; } = BannerPhase.Beta;
 
