@@ -1,0 +1,29 @@
+﻿@model Admin.Models.QuestionnaireViewModel
+
+@{
+    ViewData["Title"] = "Compare questionnaires";
+}
+
+<h1 class="govuk-heading-l">Compare questionnaires</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+        <h2 class="govuk-heading-s">Original</h2>
+        <pre class="json-view"><code>@Html.Raw(Model.OldHtml)</code></pre>
+    </div>
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+        <h2 class="govuk-heading-s">Updated</h2>
+        <pre class="json-view"><code>@Html.Raw(Model.NewHtml)</code></pre>
+    </div>
+</div>
+
+<style>
+/* Keep JSON formatting */
+.json-view { white-space: pre; line-height: 1.4; tab-size: 2; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+/* Accessible highlights: color + border/text decoration */
+.diff-added   { background-color: #e6f4ea; border-left: 3px solid #00703c; }
+.diff-removed { background-color: #fbe9e7; border-left: 3px solid #d4351c; text-decoration: line-through; }
+.diff-modified{ background-color: #fff7e6; border-left: 3px solid #ffbf47; }
+</style>

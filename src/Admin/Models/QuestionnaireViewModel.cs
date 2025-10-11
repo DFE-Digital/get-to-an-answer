@@ -33,4 +33,7 @@ public class QuestionnaireViewModel : ConfigViewModel
     public bool AddEmptyAnswerOption { get; set; }
     
     public bool InviteAccepted { get; set; }
+    
+    public string OldHtml { get; init; } = "";
+    public string NewHtml { get; init; } = "";
 }

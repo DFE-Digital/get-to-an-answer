@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Admin.Client;
 using Admin.Models;
+using Common.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
@@ -120,7 +121,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     {
         return View("QuestionnaireContributorInvitation", new QuestionnaireViewModel
         {
-            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId)
+            Questionnaire = new QuestionnaireDto { Id = questionnaireId }
         });
     }
     
