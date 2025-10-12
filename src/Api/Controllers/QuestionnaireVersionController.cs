@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Common.Domain;
 using Common.Domain.Request.Update;
 using Common.Enum;
@@ -31,9 +33,10 @@ public class QuestionnaireVersionController(CheckerDbContext db) : ControllerBas
         if (questionnaire == null)
             return NotFound();
         
-        var json = System.Text.Json.JsonSerializer.Serialize(questionnaire, new System.Text.Json.JsonSerializerOptions
+        var json = JsonSerializer.Serialize(questionnaire, new JsonSerializerOptions
         {
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = { new JsonStringEnumConverter() }
         });
         
         return Ok(new QuestionnaireVersionDto

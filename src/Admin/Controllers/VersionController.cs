@@ -22,10 +22,11 @@ public class VersionController(IApiClient apiClient) : Controller
         if (currentVersion == null || otherVersion == null)
             return NotFound();
 
-        var (otherHtml, currentHtml) = VersionDiffRenderer.RenderCompare(otherVersion?.ToJson(), currentVersion.ToJson());
+        var (otherHtml, currentHtml) = VersionDiffRenderer.RenderCompare(otherVersion.QuestionnaireJson, currentVersion.QuestionnaireJson);
 
         var vm = new QuestionnaireViewModel
         {
+            QuestionnaireId = questionnaireId,
             CurrentVersionHtml = currentHtml,
             CurrentVersion = currentVersion.Version,
             OtherVersionHtml = otherHtml,
@@ -33,13 +34,5 @@ public class VersionController(IApiClient apiClient) : Controller
             QuestionnaireVersions = await apiClient.GetQuestionnaireVersionsAsync(questionnaireId)
         };
         return View("QuestionnaireDiff", vm);
-    }
-}
-
-public static class QuestionnaireDtoExtensions
-{
-    public static string ToJson(this QuestionnaireDto questionnaire)
-    {
-        return JsonSerializer.Serialize(questionnaire);
     }
 }

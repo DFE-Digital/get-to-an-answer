@@ -1,7 +1,7 @@
 ﻿@model Admin.Models.QuestionnaireViewModel
 
 @{
-    ViewData["Title"] = "Compare questionnaires";
+    ViewData["Title"] = "Compare questionnaire versions";
 }
 
 <style>
@@ -26,7 +26,7 @@
     <ul class="app-subnav__section">
       @foreach (var version in Model.QuestionnaireVersions)
       {
-        <li class="app-subnav__section-item @(version.Version == Model.CurrentVersion ? "app-subnav__section-item--current" : "")">
+        <li class="app-subnav__section-item @(version.Version == Model.OtherVersion ? "app-subnav__section-item--current" : "")">
           <a class="app-subnav__link govuk-link govuk-link--no-visited-state govuk-link--no-underline" href="/admin/questionnaires/@version.QuestionnaireId/versions/@version.Version/compare">
             @($"{version.CreatedAt:yyyy-MM-dd HH:mm:ss}")
           </a>
@@ -36,19 +36,10 @@
     </nav>
       </div>
       <div class="app-split-pane__content">
-        <nav class="govuk-breadcrumbs app-breadcrumbs" aria-label="Breadcrumb">
-      <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-          <a class="govuk-breadcrumbs__link" href="/">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-          <a class="govuk-breadcrumbs__link" href="/components">Components</a>
-        </li>
-      </ol>
-    </nav>
+        
 
     <main id="main-content" class="app-content" role="main">
-      <h1 class="govuk-heading-l">Compare questionnaires</h1>
+      <h1 class="govuk-heading-l">Compare questionnaire versions</h1>
 
       <div class="govuk-grid-row">
         <div class="govuk-summary-card">

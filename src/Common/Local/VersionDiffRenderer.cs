@@ -107,8 +107,50 @@ public static class VersionDiffRenderer
     {
         var sb = new System.Text.StringBuilder();
         Render("$", node, 0, sb, changes);
-        return sb.ToString();
 
+        // Collapse runs of unchanged lines (4 or more) into a single "..." line.
+        var text = sb.ToString();
+        var lines = text.Replace("\r\n", "\n").Split('\n');
+        var result = new System.Text.StringBuilder(lines.Length * 4);
+        int i = 0;
+        while (i < lines.Length)
+        {
+            // Determine if a line contains a highlighted span (changed) -> do not treat as unchanged.
+            bool LineHasChange(string line) =>
+                line.Contains("diff-added", StringComparison.Ordinal) ||
+                line.Contains("diff-removed", StringComparison.Ordinal) ||
+                line.Contains("diff-modified", StringComparison.Ordinal);
+
+            // Collect a run of unchanged lines
+            int start = i;
+            while (i < lines.Length && !LineHasChange(lines[i]))
+            {
+                i++;
+            }
+            int runLen = i - start;
+
+            if (runLen >= 4)
+            {
+                // Keep one context line at the start and end of the run if desired.
+                // Requirement only asks to replace with "...", so emit a single ellipsis line.
+                result.AppendLine("<span style=\"color: grey\">... Hid unchanged lines ...</span>");
+            }
+            else
+            {
+                for (int k = start; k < start + runLen; k++)
+                    result.AppendLine(lines[k]);
+            }
+
+            // Now emit changed line (if any) and continue
+            if (i < lines.Length)
+            {
+                result.AppendLine(lines[i]);
+                i++;
+            }
+        }
+
+        return result.ToString();
+        
         static void Render(string path, JsonNode? n, int indent, System.Text.StringBuilder sb, ChangeMap changes)
     {
         string Ind(int i) => new string(' ', i * 2);
