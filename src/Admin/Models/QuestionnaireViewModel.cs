@@ -9,6 +9,11 @@ public class QuestionnaireViewModel : ConfigViewModel
 {
     public List<QuestionnaireDto>? Questionnaires { get; set; }
     public QuestionnaireDto? Questionnaire { get; set; }
+    public ContentDto? Content { get; set; }
+    
+    public CreateContentRequestDto? CreateContent { get; set; }
+    
+    public UpdateContentRequestDto? UpdateContent { get; set; }
     
     public CreateQuestionnaireRequestDto? CreateQuestionnaire { get; set; }
     

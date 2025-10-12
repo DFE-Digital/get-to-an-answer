@@ -301,4 +301,120 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+    
+    [HttpPost("admin/questionnaires/{questionnaireId}/content/Create")]
+    public async Task<IActionResult> PerformContentCreation(int questionnaireId, CreateContentRequestDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View("CreateContent", new QuestionnaireViewModel
+            {
+                CreateContent = request
+            });
+        }
+
+        request.QuestionnaireId = questionnaireId;
+
+        var content = await apiClient.CreateContentAsync(request);
+
+        if (content == null)
+        {
+            return BadRequest();
+        }
+
+        return RedirectToAction(nameof(ContentPage), new { contentId = content.Id });
+    }
+
+    [HttpGet("admin/contents/{contentId}/edit")]
+    public async Task<IActionResult> ContentPage(int contentId)
+    {
+        var content = await apiClient.GetContentAsync(contentId);
+
+        if (content == null)
+            return NotFound();
+
+        return View("EditContent", new QuestionnaireViewModel
+        {
+            QuestionnaireId = content.QuestionnaireId,
+            UpdateContent = new UpdateContentRequestDto
+            {
+                Id = content.Id,
+                Title = content.Title,
+                Content = content.Content,
+            }
+        });
+    }
+
+    [HttpPost("admin/contents/{contentId}/edit")]
+    public async Task<IActionResult> SaveContent(int contentId, UpdateContentRequestDto request)
+    {
+        await apiClient.UpdateContentAsync(contentId, request);
+
+        return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId = request.QuestionnaireId });
+    }
+
+    [HttpGet("admin/questionnaires/{questionnaireId}/content/Create")]
+    public async Task<IActionResult> ContentCreationPage(int questionnaireId)
+    {
+        return View("CreateContent", new QuestionnaireViewModel
+        {
+            QuestionnaireId = questionnaireId
+        });
+    }
+    
+    [HttpGet("admin/questions/{questionId}/delete/confirm")]
+    public async Task<IActionResult> ConfirmQuestionDelete(int questionId)
+    {
+        var question = await apiClient.GetQuestionAsync(questionId);
+
+        if (question == null)
+            return NotFound();
+
+        return View("DeleteQuestionConfirmation", new QuestionnaireViewModel
+        {
+            Question = question,
+            QuestionnaireId = question.QuestionnaireId
+        });
+    }
+
+    [HttpPost("admin/questions/{questionId}/delete")]
+    public async Task<IActionResult> DeleteQuestion(int questionId)
+    {
+        var question = await apiClient.GetQuestionAsync(questionId);
+
+        if (question == null)
+            return NotFound();
+
+        await apiClient.DeleteQuestionAsync(questionId);
+
+        return RedirectToAction(nameof(QuestionManagementPage), new { questionnaireId = question.QuestionnaireId });
+    }
+    
+    [HttpGet("admin/contents/{contentId}/delete/confirm")]
+    public async Task<IActionResult> ConfirmContentDelete(int questionId)
+    {
+        var content = await apiClient.GetContentAsync(questionId);
+
+        if (content == null)
+            return NotFound();
+
+        return View("DeleteContentConfirmation", new QuestionnaireViewModel
+        {
+            Content = content,
+            QuestionnaireId = content.QuestionnaireId
+        });
+    }
+
+    [HttpPost("admin/contents/{contentId}/delete")]
+    public async Task<IActionResult> DeleteContent(int contentId)
+    {
+        var question = await apiClient.GetQuestionAsync(contentId);
+
+        if (question == null)
+            return NotFound();
+
+        await apiClient.DeleteQuestionAsync(contentId);
+
+        return RedirectToAction(nameof(QuestionManagementPage), new { questionnaireId = question.QuestionnaireId });
+    }
 }

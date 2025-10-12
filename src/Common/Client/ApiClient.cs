@@ -44,6 +44,14 @@ public interface IApiClient
     Task<QuestionnaireVersionDto?> GetQuestionnaireVersionAsync(int questionnaireId, int versionNumber);
     Task<QuestionnaireVersionDto?> GetLatestQuestionnaireVersion(int questionnaireId);
     
+    // === For Content ===
+    
+    Task<ContentDto?> CreateContentAsync(CreateContentRequestDto request);
+    Task<string?> UpdateContentAsync(int questionnaireId, UpdateContentRequestDto request);
+    Task<string?> DeleteContentAsync(int contentId);
+    Task<ContentDto?> GetContentAsync(int contentId);
+    Task<List<ContentDto>> GetContentsAsync(int questionnaireId);
+    
     // === For Service Users ===
     
     Task<QuestionDto?> GetInitialQuestion(int questionnaireId);
@@ -248,6 +256,46 @@ public class ApiClient : IApiClient
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<QuestionnaireVersionDto?>();
+    }
+
+    public async Task<ContentDto?> CreateContentAsync(CreateContentRequestDto request)
+    {
+        var response = await _httpClient.PostAsJsonAsync($"contents", request);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<ContentDto?>();
+    }
+
+    public async Task<string?> UpdateContentAsync(int id, UpdateContentRequestDto request)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"contents/{id}", request);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string?>();
+    }
+
+    public async Task<string?> DeleteContentAsync(int contentId)
+    {
+        var response = await _httpClient.DeleteAsync($"contents/{contentId}");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string?>();
+    }
+
+    public async Task<ContentDto?> GetContentAsync(int contentId)
+    {
+        var response = await _httpClient.GetAsync($"contents/{contentId}");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<ContentDto?>();
+    }
+
+    public async Task<List<ContentDto>> GetContentsAsync(int questionnaireId)
+    {
+        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireId}/contents");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<List<ContentDto>>() ?? new ();
     }
 
     public async Task<QuestionDto?> GetInitialQuestion(int questionnaireId)

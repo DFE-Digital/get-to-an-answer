@@ -10,6 +10,7 @@ public class CheckerDbContext(DbContextOptions<CheckerDbContext> options) : DbCo
     public DbSet<AnswerEntity> Answers { get; set; }
     public DbSet<QuestionnaireEntity> Questionnaires { get; set; }
     public DbSet<QuestionnaireVersionEntity> QuestionnaireVersions { get; set; }
+    public DbSet<ContentEntity> Contents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -77,6 +78,16 @@ public static class CheckerDbContextExtensions
                 .Where(q => q.Id == id)
                 .Select(q => db.Questionnaires
                     .Where(qq => qq.Id == q.QuestionnaireId)
+                    .SelectMany(qq => qq.Contributors)
+                    .Any(e => e == email))
+                .FirstOrDefaultAsync();
+        }
+
+        if (typeof(TEntityType) == typeof(ContentEntity))
+        {
+            return await db.Contents
+                .Select(q => db.Questionnaires
+                    .Where(qq => qq.Id == id)
                     .SelectMany(qq => qq.Contributors)
                     .Any(e => e == email))
                 .FirstOrDefaultAsync();
