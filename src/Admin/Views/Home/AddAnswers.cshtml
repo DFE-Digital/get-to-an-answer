@@ -125,7 +125,7 @@
                            </div>
                         </div>
                         <button type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary app-select-options__button" 
-                                data-module="govuk-button" data-prevent-double-click="true" name="remove" value="0" data-govuk-button-init="">Remove</button>
+                                data-module="govuk-button" data-prevent-double-click="true" name="RemoveAnswerOption" value="@answer.Id" data-govuk-button-init="">Remove</button>
                      </li>
                   }
                }
@@ -135,8 +135,8 @@
                   var index = Model.AddEmptyAnswerOption ? Model.Answers?.Count : 0;
                   
                   <li class="app-select-options__list-item">
-                     <input type="hidden" name="QuestionnaireId" value="@Model.QuestionnaireId" autocomplete="off">
-                     <input type="hidden" name="QuestionId" value="@Model.QuestionId" autocomplete="off">
+                     <input type="hidden" name="Answers[@index].QuestionnaireId" value="@Model.QuestionnaireId" autocomplete="off">
+                     <input type="hidden" name="Answers[@index].QuestionId" value="@Model.QuestionId" autocomplete="off">
                      <div class="govuk-form-group" classes="app-select-options__form-group">
                         <label for="forms-selections-settings-form-selection-options-name-field-0" class="govuk-label">Option @(index+1)</label>
                         <input id="forms-selections-settings-form-selection-options-name-field-0" class="govuk-input govuk-input--width-20" type="text"

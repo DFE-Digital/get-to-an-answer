@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using Admin.Client;
 using Admin.Models;
+using Common.Client;
 using Common.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Common.Domain.Request.Create;
@@ -186,7 +186,8 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
             {
                 Id = questionnaireId,
                 Title = questionnaire.Title, 
-                Description = questionnaire.Description
+                Description = questionnaire.Description,
+                Slug = questionnaire.Slug
             }
         });
     }
@@ -251,7 +252,10 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpGet("admin/questionnaires/{questionnaireId}/questions/{questionId}/answers/edit")]
-    public async Task<IActionResult> AddAnswersPage(int questionnaireId, int questionId, bool addEmptyAnswerOption = false)
+    public async Task<IActionResult> AddAnswersPage(
+        int questionnaireId, 
+        int questionId, 
+        bool addEmptyAnswerOption = false)
     {
         return View("AddAnswers", new QuestionnaireViewModel
         {
@@ -267,10 +271,16 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     [HttpPost("admin/questionnaires/{questionnaireId}/questions/{questionId}/answers/edit")]
     public async Task<IActionResult> SaveAnswers(int questionnaireId, int questionId, 
         [FromForm(Name = "Answers")] List<UpdateAnswerRequestDto> requests, 
-        [FromForm(Name = "AddEmptyAnswerOption")] bool addEmptyAnswerOption)
+        [FromForm(Name = "AddEmptyAnswerOption")] bool addEmptyAnswerOption,
+        [FromForm(Name = "RemoveAnswerOption")] int removeAnswerOption)
     {
         await Task.WhenAll(requests.Select<UpdateAnswerRequestDto, Task>(req =>
         {
+            if (req.Id == removeAnswerOption)
+            {
+                return apiClient.DeleteAnswerAsync(removeAnswerOption);
+            }
+            
             if (req.Id is { } id)
             {
                 return apiClient.UpdateAnswerAsync(id, req);
@@ -282,6 +292,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
                 Description = req.Description,
                 Destination = req.Destination,
                 DestinationType = req.DestinationType,
+                DestinationQuestionId = req.DestinationQuestionId,
                 QuestionId = questionId,
                 QuestionnaireId = req.QuestionnaireId,
                 Score = req.Score,

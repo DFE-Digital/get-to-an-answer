@@ -9,6 +9,7 @@
 
   var hasTitleError = Model?.UpdateQuestionnaire != null && ErrorFor(nameof(Model.UpdateQuestionnaire.Title)) != null;
   var hasDescError = Model?.UpdateQuestionnaire != null && ErrorFor(nameof(Model.UpdateQuestionnaire.Description)) != null;
+  var hasSlugError = Model?.UpdateQuestionnaire != null && ErrorFor(nameof(Model.UpdateQuestionnaire.Slug)) != null;
 }
 
 @section BeforeContent
@@ -59,6 +60,21 @@
                type="text"
                name="Title"
                value="@(Model?.UpdateQuestionnaire?.Title ?? "")">
+      </div>
+      <div class="govuk-form-group">
+        <label for="pages-question-input-hint-text-field" class="govuk-label">Slug (optional)</label>
+        <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description of what the questionnaire is about.</div>
+        @if (hasDescError)
+        {
+          <p class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.UpdateQuestionnaire.Slug))
+          </p>
+        }
+        <input id="forms-name-input-name-field" class="govuk-input @(hasSlugError ? "govuk-input--error" : "")"
+               aria-describedby="forms-name-input-name-hint"
+               type="text"
+               name="Slug"
+               value="@(Model?.UpdateQuestionnaire?.Slug ?? "")">
       </div>
       <div class="govuk-form-group">
         <label for="pages-question-input-hint-text-field" class="govuk-label">Hint text (optional)</label>

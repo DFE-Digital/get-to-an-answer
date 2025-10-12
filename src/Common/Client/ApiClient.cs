@@ -7,13 +7,14 @@ using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Admin.Client;
+namespace Common.Client;
 
 public interface IApiClient
 {
     // === For Questionnaires ===
     
     Task<QuestionnaireDto?> GetQuestionnaireAsync(int questionnaireId);
+    Task<QuestionnaireInfoDto?> GetQuestionnaireInfoAsync(string questionnaireSlug);
     Task<List<QuestionnaireDto>> GetQuestionnairesAsync();
     Task<QuestionnaireDto?> CreateQuestionnaireAsync(CreateQuestionnaireRequestDto request);
     Task<string?> UpdateQuestionnaireAsync(int questionnaireId, UpdateQuestionnaireRequestDto request);
@@ -81,6 +82,14 @@ public class ApiClient : IApiClient
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<QuestionnaireDto>();
+    }
+    
+    public async Task<QuestionnaireInfoDto?> GetQuestionnaireInfoAsync(string questionnaireSlug)
+    {
+        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireSlug}/info");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<QuestionnaireInfoDto>();
     }
 
     public async Task<List<QuestionnaireDto>> GetQuestionnairesAsync()
