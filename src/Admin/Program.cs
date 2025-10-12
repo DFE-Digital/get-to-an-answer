@@ -1,6 +1,5 @@
-using Admin.Client;
-using Admin.Configuration;
 using Common.Client;
+using Common.Configuration;
 using Common.Local;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;

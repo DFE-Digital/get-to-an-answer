@@ -1,0 +1,141 @@
+﻿@using Common.Custom
+@using Common.Enum
+@model QuestionnaireViewModel
+
+@{
+  ViewData["Title"] = "Create a new questionnaire";
+  var hasErrors = Model.NextStateRequest != null && !ViewData.ModelState.IsValid;
+  string? ErrorFor(string key) => ViewData.ModelState.ContainsKey(key) && ViewData.ModelState[key]?.Errors.Count > 0
+    ? ViewData.ModelState[key]!.Errors[0].ErrorMessage
+    : null;
+
+  //var hasTitleError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Title)) != null;
+  //var hasDescError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Description)) != null;
+}
+
+@section BeforeContainer
+{
+  <section class="dfe-page-grey" id="main-content-header">
+    <div class="govuk-width-container" id="main-header-container">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+          <h1 class="govuk-heading-xl">@Model.Questionnaire?.Title</h1>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+
+
+@if (hasErrors)
+{
+  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+    <h2 class="govuk-error-summary__title" id="error-summary-title">
+      There is a problem
+    </h2>
+    <div class="govuk-error-summary__body">
+      <ul class="govuk-list govuk-error-summary__list">
+        @foreach (var kvp in ViewData.ModelState.Where(ms => ms.Value!.Errors.Count > 0))
+        {
+          var fieldName = kvp.Key;
+          var message = kvp.Value!.Errors[0].ErrorMessage;
+          // The href should link to the input id for accessibility
+          <li><a href="#@fieldName">@message</a></li>
+        }
+      </ul>
+    </div>
+  </div>
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    @if (Model.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
+    {
+      <form action="/questionnaires/@Model.Questionnaire?.Slug" accept-charset="UTF-8" method="post">
+        <input type="hidden" name="CurrentQuestionId" value="@Model.Destination.Question.Id" autocomplete="off">
+        <input type="hidden" name="CurrentQuestionOrder" value="@Model.Destination.Question.Order" autocomplete="off">
+        <div class="govuk-form-group">
+          <fieldset class="govuk-fieldset" aria-describedby="signIn-hint">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+              <h1 class="govuk-fieldset__heading">
+                @Model.Destination.Question.Content
+              </h1>
+            </legend>
+            @if (Model.Destination.Question.Description != null)
+            {
+              <div id="signIn-hint" class="govuk-hint">
+                @(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Question.Description)))
+              </div>
+            }
+            @if (Model.Destination.Question.Type == QuestionType.SingleSelect) 
+            { 
+              <div class="govuk-radios" data-module="govuk-radios">
+                @foreach (var answer in Model.Destination.Question.Answers)
+                {
+                  <div class="govuk-radios__item">
+                    <input type="hidden" name="Scores.@answer.Id" value="@answer.Score" autocomplete="off">
+                    <input class="govuk-radios__input" id="signIn" name="SelectedAnswerId" type="radio" value="@answer.Id" aria-describedby="signIn-item-hint">
+                    <label class="govuk-label govuk-radios__label" for="signIn">
+                      @answer.Content
+                    </label>
+                    @if (answer.Description != null)
+                    {
+                      <div id="signIn-item-hint" class="govuk-hint govuk-radios__hint">
+                        @(Html.Raw(GovUkMarkdown.ToGovUkHtml(answer.Description)))
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+            else if (Model.Destination.Question.Type == QuestionType.MultiSelect)
+            {
+              <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                @foreach (var answer in Model.Destination.Question.Answers)
+                {
+                  <div class="govuk-checkboxes__item">
+                    <input type="hidden" name="Scores.@answer.Id" value="@answer.Score" autocomplete="off">
+                    <input class="govuk-checkboxes__input" id="nationality" name="SelectedAnswerIds" type="checkbox" value="@answer.Id" aria-describedby="nationality-item-hint">
+                    <label class="govuk-label govuk-checkboxes__label" for="nationality">
+                      @answer.Content
+                    </label>
+                    @if (answer.Description != null)
+                    {
+                      <div id="nationality-item-hint" class="govuk-hint govuk-checkboxes__hint">
+                        @answer.Description
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+            else if (Model.Destination.Question.Type == QuestionType.DropdownSelect)
+            {
+              <div class="govuk-form-group">
+                <label class="govuk-label" for="sort">
+                  Sort by
+                </label>
+                <select class="govuk-select" id="sort" name="SelectedAnswerId">
+                  @foreach (var answer in Model.Destination.Question.Answers)
+                  {
+                    <option value="@answer.Id">@answer.Content</option>
+                  }
+                </select>
+                @foreach (var answer in Model.Destination.Question.Answers)
+                {
+                  <input type="hidden" name="Scores.@answer.Id" value="@answer.Score" autocomplete="off">
+                }
+              </div>
+            }
+          </fieldset>
+        </div>
+        <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
+      </form>
+    }
+    else if (Model.Destination?.Type == DestinationType.InternalPage)
+    {
+      <p>@Model.Destination.Content</p>
+    }
+  </div>
+</div>

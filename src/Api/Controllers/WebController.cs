@@ -1,10 +1,13 @@
 using System.Linq.Expressions;
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,13 +15,47 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("/")]
+[AllowAnonymous]
 public class WebController(CheckerDbContext db) : Controller
 {
+    [HttpGet("questionnaires/{questionnaireSlug}/info")]
+    public async Task<IActionResult> GetQuestionnaireInfo(string questionnaireSlug)
+    {
+        var questionnaireVersionJson =  await db.QuestionnaireVersions
+            .Where(qv => db.Questionnaires
+                .Any(q => q.Id == qv.QuestionnaireId && q.Slug == questionnaireSlug))
+            .OrderByDescending(qv => qv.Version)
+            .Select(qv => qv.QuestionnaireJson)
+            .FirstOrDefaultAsync();
+        // Not published version exists
+        if (questionnaireVersionJson == null)
+            return BadRequest();
+        
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            AllowTrailingCommas = true,
+        };
+        options.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false));
+        
+        var questionnaire = JsonSerializer.Deserialize<QuestionnaireEntity>(questionnaireVersionJson, options);
+        
+        if (questionnaire == null)
+            return BadRequest();
+        
+        return Ok(new QuestionnaireInfoDto
+        {
+            Id = questionnaire.Id,
+            Title = questionnaire.Title,
+            Description = questionnaire.Description,
+            Slug = questionnaire.Slug,
+        });
+    }
+    
     [HttpGet("questionnaires/{questionnaireId}/initial")]
     public async Task<IActionResult> GetInitialQuestion(int questionnaireId)
     {
-        var tenantId = User.FindFirstValue("tid")!; // Tenant ID
-        
         var initialQuestion = await db.Questions
             .Include(x => x.Answers)
             .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == 1);
@@ -49,8 +86,6 @@ public class WebController(CheckerDbContext db) : Controller
     [HttpPost("questionnaires/{questionnaireId}/next")]
     public async Task<IActionResult> GetNextState(int questionnaireId, GetNextStateRequest request)
     {
-        var tenantId = User.FindFirstValue("tid")!; // Tenant ID
-
         var selectedAnswerId = request.SelectedAnswerId;
         
         var answer = await db.Answers.FirstOrDefaultAsync(x => x.Id == selectedAnswerId);

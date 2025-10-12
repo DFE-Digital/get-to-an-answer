@@ -1,4 +1,4 @@
-namespace Admin.Configuration;
+namespace Common.Configuration;
 
 public static class SiteConfiguration
 {

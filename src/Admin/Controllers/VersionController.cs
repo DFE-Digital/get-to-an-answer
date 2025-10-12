@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Admin.Client;
+using Common.Client;
 using Common.Domain;
 
 namespace Admin.Controllers;

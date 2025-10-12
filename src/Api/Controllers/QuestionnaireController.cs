@@ -93,10 +93,12 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         
         questionnaire.Title = request.Title;
         questionnaire.Status = EntityStatus.Draft;
+        questionnaire.Slug = request.Slug;
         questionnaire.Description = request.Description;
         questionnaire.UpdatedAt = DateTime.UtcNow;
         
         db.Entry(questionnaire).Property(s => s.Title).IsModified = true;
+        db.Entry(questionnaire).Property(s => s.Slug).IsModified = true;
         db.Entry(questionnaire).Property(s => s.Status).IsModified = true;
         db.Entry(questionnaire).Property(s => s.Description).IsModified = true;
         db.Entry(questionnaire).Property(s => s.UpdatedAt).IsModified = true;

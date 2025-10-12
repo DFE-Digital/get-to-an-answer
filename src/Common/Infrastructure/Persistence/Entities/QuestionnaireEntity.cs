@@ -17,6 +17,12 @@ public class QuestionnaireEntity
      */
     public List<string> Contributors { get; set; } = new();
 
+    /**
+     * Service user url path reference to the questionnaire
+     */
+    [MaxLength(500)]
+    public string? Slug { get; set; }
+
     [Required]
     [MaxLength(500)]
     public string Title { get; set; }
