@@ -40,6 +40,8 @@ public class AnswerController(CheckerDbContext db) : Controller
         
         await db.SaveChangesAsync();
         
+        await db.ResetQuestionnaireToDraft(request.QuestionnaireId);
+        
         return Ok(new AnswerDto
         {
             Id = entity.Id,
@@ -95,12 +97,10 @@ public class AnswerController(CheckerDbContext db) : Controller
         if (!await db.HasAccessToEntity<AnswerEntity>(email, id))
             return Unauthorized();
         
-        var answer = new AnswerEntity
-        {
-            Id = id,
-        };
-
-        db.Answers.Attach(answer);
+        var answer = db.Answers.FirstOrDefault(q => q.Id == id);
+        
+        if (answer == null)
+            return NotFound();
         
         answer.Content = request.Content;
         answer.Description = request.Description;
@@ -110,17 +110,10 @@ public class AnswerController(CheckerDbContext db) : Controller
         answer.Score = request.Score;
         answer.UpdatedAt = DateTime.UtcNow;
         
-        db.Entry(answer).Property(s => s.Content).IsModified = true;
-        db.Entry(answer).Property(s => s.Description).IsModified = true;
-        db.Entry(answer).Property(s => s.Destination).IsModified = true;
-        db.Entry(answer).Property(s => s.DestinationType).IsModified = true;
-        db.Entry(answer).Property(s => s.DestinationQuestionId).IsModified = true;
-        db.Entry(answer).Property(s => s.Score).IsModified = true;
-        db.Entry(answer).Property(s => s.UpdatedAt).IsModified = true;
-        
         await db.SaveChangesAsync();
         
-        // Logic to update a answer, answer, or branching logic
+        await db.ResetQuestionnaireToDraft(answer.QuestionnaireId);
+        
         return Ok("Answer updated.");
     }
 

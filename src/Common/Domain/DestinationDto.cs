@@ -1,13 +1,12 @@
 using Common.Domain;
 using Common.Enum;
 
-namespace Common.Domain
+namespace Common.Domain;
+
+public class DestinationDto
 {
-    public class DestinationDto
-    {
-        public DestinationType? Type { get; set; }
+    public DestinationType? Type { get; set; }
         
-        public string? Content { get; set; } // Markdown
-        public QuestionDto? Question { get; set; }
-    }
+    public string? Content { get; set; } // Markdown
+    public QuestionDto? Question { get; set; }
 }

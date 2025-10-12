@@ -86,7 +86,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     [HttpPost("admin/questionnaires/{questionnaireId}/Publish")]
     public async Task<IActionResult> PublishQuestionnaire(int questionnaireId)
     {
-        await apiClient.UpdateQuestionStatusAsync(questionnaireId, new UpdateQuestionStatusRequestDto
+        await apiClient.UpdateQuestionnaireStatusAsync(questionnaireId, new UpdateQuestionnaireStatusRequestDto
         {
             Id = questionnaireId,
             Status = EntityStatus.Published
@@ -136,7 +136,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId, accepted });
     }
 
-    [HttpGet("admin/questionnaires/{questionnaireId}/Track")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/track")]
     public async Task<IActionResult> QuestionnaireTrackingPage(int questionnaireId, bool accepted = false)
     {
         return View("TrackQuestionnaire", new QuestionnaireViewModel
@@ -179,7 +179,8 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         return View("ManageQuestions", new QuestionnaireViewModel
         {
             QuestionnaireId = questionnaireId,
-            Questions = await apiClient.GetQuestionsAsync(questionnaireId)
+            Questions = await apiClient.GetQuestionsAsync(questionnaireId),
+            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId)
         });
     }
 

@@ -6,18 +6,18 @@
 
 @section BeforeContent 
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.QuestionnaireId/Track">Back to Care Leavers Questionnaire</a>
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.QuestionnaireId/track">Back to Care Leavers Questionnaire</a>
 }
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
-      <span class="govuk-caption-l">Care Leavers Questionnaire</span><span class="govuk-visually-hidden"> - </span>
+      <span class="govuk-caption-l">@Model.Questionnaire?.Title</span><span class="govuk-visually-hidden"> - </span>
       Add and edit your questions
     </h1>
     <dl class="govuk-!-margin-bottom-7">
       <dt class="govuk-visually-hidden">Status</dt>
-      <dd class="govuk-!-margin-0"><strong class="govuk-tag govuk-tag--yellow">Draft</strong></dd>
+      <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model.Questionnaire?.Status">@Model.Questionnaire?.Status</strong></dd>
     </dl>
     <div class="govuk-button-group">
       <a class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" href="/admin/questionnaires/@Model.QuestionnaireId/questions/Create" data-govuk-button-init="">Add a question</a>
@@ -48,9 +48,18 @@
                   <li class="govuk-summary-list__actions-list-item">
                     <a class="govuk-link" href="/admin/questions/@question.Id/edit">Edit</a>
                   </li>
-                  <li class="govuk-summary-list__actions-list-item">
-                    <a class="govuk-link" href="/admin/questions/@question.Id/Switch?order=@(question.Id +1)">Move Down</a>
-                  </li>
+                  @if (question.Order > 1)
+                  {
+                    <li class="govuk-summary-list__actions-list-item">
+                      <a class="govuk-link" href="/admin/questions/@question.Id/reorder/@(question.Order - 1)">Move Up</a>
+                    </li>
+                  }
+                  @if (question.Order < questions.Count-1)
+                  {
+                    <li class="govuk-summary-list__actions-list-item">
+                      <a class="govuk-link" href="/admin/questions/@question.Id/reorder/@(question.Order + 1)">Move Down</a>
+                    </li>
+                  }
                 </ul>
               </dd>
             </div>

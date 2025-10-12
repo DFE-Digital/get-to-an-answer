@@ -55,10 +55,10 @@
       @foreach (var questionnaire in questionnaires)
       {
         <tr class="govuk-table__row">
-          <td class="govuk-table__cell"><a class="govuk-link" href="/admin/questionnaires/@questionnaire.Id/Track">@questionnaire.Title</a></td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/admin/questionnaires/@questionnaire.Id/track">@questionnaire.Title</a></td>
           <td class="govuk-table__cell">@ViewBag.FullName</td>
           <td class="govuk-table__cell govuk-table__cell--numeric">
-            <div class="app-form-states"><strong class="govuk-tag govuk-tag--yellow">@questionnaire.Status</strong>
+            <div class="app-form-states"><strong class="govuk-tag" data-status="@questionnaire.Status">@questionnaire.Status</strong>
             </div>
           </td>
         </tr>

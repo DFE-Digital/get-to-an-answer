@@ -39,7 +39,7 @@
     </h1>
     <dl class="govuk-!-margin-bottom-7">
       <dt class="govuk-visually-hidden">Status</dt>
-      <dd class="govuk-!-margin-0"><strong class="govuk-tag govuk-tag--yellow">Draft</strong>
+      <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model.Questionnaire?.Status">@Model.Questionnaire?.Status</strong>
       </dd>
     </dl>
     <p class="govuk-!-margin-bottom-9">
@@ -96,7 +96,7 @@
       <a class="govuk-button govuk-button--warning" data-module="govuk-button" href="/admin/questionnaires/@Model.Questionnaire?.Id/Delete/Confirm" data-govuk-button-init="">Delete questionnaire</a>
     </div>
     <p>
-      <a class="govuk-link" href="/admin/questionnaires/@Model.Questionnaire?.Id/Start/Preview" target="_blank">View questionnaire versions</a>
+      <a class="govuk-link" href="/admin/questionnaires/@Model.Questionnaire?.Id/versions/@(Model.Questionnaire?.Version -1)/compare">View questionnaire versions</a>
     </p>
   </div>
 </div>

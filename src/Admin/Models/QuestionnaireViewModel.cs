@@ -34,6 +34,9 @@ public class QuestionnaireViewModel : ConfigViewModel
     
     public bool InviteAccepted { get; set; }
     
-    public string OldHtml { get; init; } = "";
-    public string NewHtml { get; init; } = "";
+    public string OtherVersionHtml { get; init; } = "";
+    public int OtherVersion { get; init; }
+    public string CurrentVersionHtml { get; init; } = "";
+    public int CurrentVersion { get; init; }
+    public List<QuestionnaireVersionDto> QuestionnaireVersions { get; set; } = new();
 }

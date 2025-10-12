@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Common.Enum;
 
 namespace Common.Infrastructure.Persistence.Entities;
@@ -36,6 +37,8 @@ public class AnswerEntity
 
     // Foreign key
     public int QuestionId { get; set; }
+    
+    [JsonIgnore]
     public QuestionEntity? Question { get; set; }
     
     public int QuestionnaireId { get; set; }

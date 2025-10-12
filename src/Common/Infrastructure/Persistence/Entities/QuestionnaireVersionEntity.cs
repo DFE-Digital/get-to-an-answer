@@ -4,14 +4,17 @@ using Common.Enum;
 
 namespace Common.Infrastructure.Persistence.Entities;
 
-[Table("Questionnaires")]
-public class QuestionnaireSnapshotEntity
+[Table("QuestionnaireVersions")]
+public class QuestionnaireVersionEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     
-    public QuestionnaireEntity Snapshot { get; set; }
+    public int QuestionnaireId { get; set; }
+    public required string QuestionnaireJson { get; set; }
+    
+    public int Version { get; set; }
     
     public DateTime CreatedAt { get; set; }
 }

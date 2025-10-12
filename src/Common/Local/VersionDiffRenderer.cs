@@ -6,8 +6,11 @@ namespace Common.Local;
 
 public static class VersionDiffRenderer
 {
-    public static (string OldHtml, string NewHtml) RenderCompare(string oldJson, string newJson)
+    public static (string OldHtml, string NewHtml) RenderCompare(string? oldJson, string? newJson)
     {
+        if (oldJson == null || newJson == null) 
+            return (string.Empty, string.Empty);
+        
         var oldNode = JsonNode.Parse(oldJson);
         var newNode = JsonNode.Parse(newJson);
 

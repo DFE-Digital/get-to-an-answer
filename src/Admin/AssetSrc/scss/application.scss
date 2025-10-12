@@ -710,3 +710,173 @@ html
   color: #505a5f
 }
 
+.app-main-wrapper {
+  padding-top: govuk-spacing(3);
+  padding-bottom: govuk-spacing(4);
+
+  @include govuk-media-query($from: tablet) {
+    padding-top: govuk-spacing(6);
+    padding-bottom: govuk-spacing(8);
+  }
+}
+
+.app-subnav {
+  // Since the back to top link is outside the flow of the document we need to create a space for it.
+  // This number is magic and was determined by manually judging the visual spacing.
+  margin-bottom: 100px;
+  padding-right: govuk-spacing(3);
+  @include govuk-font(16);
+}
+
+.app-subnav__section {
+  margin: 0 0 govuk-spacing(4);
+  padding: 0;
+  list-style-type: none;
+}
+
+.app-subnav__link {
+  padding: 2px 0;
+}
+
+.app-subnav__section-item {
+  margin-bottom: govuk-spacing(1);
+  padding-top: govuk-spacing(1);
+  padding-bottom: govuk-spacing(1);
+}
+
+.app-subnav__section-item--current {
+  $_current-indicator-width: 4px;
+  margin-left: -(govuk-spacing(2) + $_current-indicator-width);
+  padding-left: govuk-spacing(2);
+  border-left: $_current-indicator-width solid govuk-colour("blue");
+  background-color: govuk-colour("white");
+}
+
+.app-subnav__section-item--current .app-subnav__link {
+  font-weight: bold;
+}
+
+.app-subnav__section--nested {
+  margin-top: govuk-spacing(2);
+  margin-bottom: 0;
+  padding-left: govuk-spacing(4);
+}
+
+.app-subnav__section--nested .app-subnav__section-item::before {
+  content: "—";
+  margin-left: -(govuk-spacing(4));
+  color: govuk-colour("dark-grey");
+}
+
+.app-subnav__section--nested .app-subnav__link {
+  padding-left: 0;
+  font-weight: normal;
+}
+
+.app-subnav__theme {
+  @include govuk-font-size($size: 19);
+  @include govuk-typography-weight-regular;
+  margin: 0;
+  padding: govuk-spacing(2) govuk-spacing(3) govuk-spacing(2) 0;
+  color: govuk-colour("dark-grey");
+
+  // Avoid padding on the first heading so its baseline is close
+  // enough to the breadcrumbs' baseline that they look aligned
+  &:first-of-type {
+    padding-top: 0;
+  }
+}
+
+$toc-width: 260px;
+$toc-width-tablet: 210px;
+
+.app-split-pane {
+  @include govuk-media-query($from: tablet) {
+    display: flex;
+    position: relative;
+    min-height: 0;
+    overflow: inherit;
+  }
+
+  @include govuk-media-query(1160px) {
+    width: 100%;
+  }
+}
+
+.app-split-pane__nav {
+  @include govuk-media-query($until: tablet) {
+    display: none;
+  }
+
+  @include govuk-media-query($from: tablet) {
+    width: $toc-width-tablet;
+    flex: 0 0 auto;
+  }
+
+  @include govuk-media-query($from: desktop) {
+    width: $toc-width;
+  }
+}
+
+.app-split-pane__content {
+  @include govuk-media-query($from: tablet) {
+    display: flex;
+    min-width: 0;
+
+    padding-left: govuk-spacing(6);
+    flex: 1 1 100%;
+    flex-direction: column;
+  }
+}
+
+.app-back-to-top {
+  margin-top: govuk-spacing(4);
+  margin-bottom: govuk-spacing(6);
+}
+
+@include govuk-media-query($from: tablet) {
+  .app-back-to-top {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin-top: auto;
+    margin-bottom: govuk-spacing(8);
+  }
+
+  .govuk-frontend-supported .app-back-to-top--fixed {
+    position: fixed;
+    top: calc(100% - #{govuk-spacing(8)});
+    bottom: auto;
+    left: auto;
+  }
+
+  .govuk-frontend-supported .app-back-to-top--hidden .app-back-to-top__link {
+    @include govuk-visually-hidden-focusable;
+  }
+}
+
+.app-back-to-top__icon {
+  display: inline-block;
+  width: 0.8em;
+  height: 1em;
+  margin-top: -(govuk-spacing(1));
+  margin-right: govuk-spacing(2);
+  vertical-align: middle;
+}
+
+.govuk-tag[data-status="Draft"] {
+  @extend .govuk-tag--yellow;
+}
+
+.govuk-tag[data-status="Published"] {
+  @extend .govuk-tag--green;
+}
+
+.govuk-tag[data-status="Deleted"] {
+  @extend .govuk-tag--red;
+}
+
+.govuk-tag[data-status="Archived"] {
+  @extend .govuk-tag--grey;
+}
+

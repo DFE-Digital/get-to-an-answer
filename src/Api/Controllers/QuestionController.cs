@@ -40,6 +40,8 @@ public class QuestionController(CheckerDbContext db) : Controller
         
         await db.SaveChangesAsync();
         
+        await db.ResetQuestionnaireToDraft(request.QuestionnaireId);
+        
         return Ok(new QuestionDto
         {
             Id = entity.Id,
@@ -90,8 +92,6 @@ public class QuestionController(CheckerDbContext db) : Controller
         });
     }
 
-    
-
     [HttpGet("questionnaires/{questionnaireId}/questions")]
     public async Task<IActionResult> GetQuestions(int questionnaireId)
     {
@@ -115,26 +115,20 @@ public class QuestionController(CheckerDbContext db) : Controller
         if (!await db.HasAccessToEntity<QuestionEntity>(email, id))
             return Unauthorized();
         
-        var question = new QuestionEntity
-        {
-            Id = id
-        };
-
-        db.Questions.Attach(question);
+        var question = db.Questions.FirstOrDefault(q => q.Id == id);
+        
+        if (question == null)
+            return NotFound();
         
         question.Content = request.Content;
         question.Description = request.Description;
         question.Type = request.Type;
         question.UpdatedAt = DateTime.UtcNow;
         
-        db.Entry(question).Property(s => s.Content).IsModified = true;
-        db.Entry(question).Property(s => s.Description).IsModified = true;
-        db.Entry(question).Property(s => s.Type).IsModified = true;
-        db.Entry(question).Property(s => s.UpdatedAt).IsModified = true;
-        
         await db.SaveChangesAsync();
         
-        // Logic to update a question, answer, or branching logic
+        await db.ResetQuestionnaireToDraft(question.QuestionnaireId);
+        
         return Ok("Question updated.");
     }
     
@@ -146,19 +140,17 @@ public class QuestionController(CheckerDbContext db) : Controller
         if (!await db.HasAccessToEntity<QuestionEntity>(email, id))
             return Unauthorized();
         
-        var question = new QuestionEntity
-        {
-            Id = id
-        };
-
-        db.Questions.Attach(question);
+        var question = db.Questions.FirstOrDefault(q => q.Id == id);
+        
+        if (question == null)
+            return NotFound();
         
         question.Status = request.Status;
         question.UpdatedAt = DateTime.UtcNow;
         
-        db.Entry(question).Property(s => s.Status).IsModified = true;
-        
         await db.SaveChangesAsync();
+        
+        await db.ResetQuestionnaireToDraft(question.QuestionnaireId);
         
         return Ok("Question updated.");
     }
@@ -216,7 +208,8 @@ public class QuestionController(CheckerDbContext db) : Controller
 
         await db.SaveChangesAsync();
         
-        // Logic to delete a question
+        await db.ResetQuestionnaireToDraft(questionnaireId);
+        
         return Ok();
     }
 }

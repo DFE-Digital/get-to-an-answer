@@ -1,5 +1,6 @@
 using Common.Enum;
 using Common.Infrastructure.Persistence.Entities;
+using Common.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace Common.Infrastructure.Persistence;
@@ -9,17 +10,39 @@ public class CheckerDbContext(DbContextOptions<CheckerDbContext> options) : DbCo
     public DbSet<QuestionEntity> Questions { get; set; }
     public DbSet<AnswerEntity> Answers { get; set; }
     public DbSet<QuestionnaireEntity> Questionnaires { get; set; }
-    public DbSet<QuestionnaireEntity> QuestionnaireHistory { get; set; }
+    public DbSet<QuestionnaireVersionEntity> QuestionnaireVersions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Optional: add global query filters for multi-tenancy
-        // modelBuilder.Entity<QuestionEntity>()
-        //     .HasQueryFilter(q => q.TenantId == _currentTenantId);
+        /*modelBuilder.Entity<QuestionnaireVersionEntity>(b =>
+        {
+            b.ToTable("QuestionnaireVersions");
+
+            var propertyBuilder = b.Property(e => e.Questionnaire);
+            propertyBuilder.HasColumnType("nvarchar(max)");
+
+            // Optional JSON validity check (SQL Server)
+            b.ToTable(t => t.HasCheckConstraint(
+                "CK_QuestionnaireVersions_Questionnaire_IsJson",
+                "ISJSON([Questionnaire]) > 0"));
+        });*/
         
+        modelBuilder.Entity<AnswerEntity>()
+            .HasOne(a => a.Question)
+            .WithMany(q => q.Answers)
+            .HasForeignKey(a => a.QuestionId)
+            .HasPrincipalKey(q => q.Id); 
         
+        modelBuilder.Entity<QuestionEntity>()
+            .HasOne(a => a.Questionnaire)
+            .WithMany(q => q.Questions)
+            .HasForeignKey(a => a.QuestionnaireId)
+            .HasPrincipalKey(q => q.Id);
+        
+        modelBuilder.Entity<QuestionnaireVersionEntity>()
+            .HasKey(q => new { q.QuestionnaireId, q.Version });
     }
 }
 
@@ -61,5 +84,18 @@ public static class CheckerDbContextExtensions
         }
         
         return false;
+    }
+
+    public static async Task ResetQuestionnaireToDraft(this CheckerDbContext db, int questionnaireId)
+    {
+        var questionnaire = db.Questionnaires.FirstOrDefault(q => q.Id == questionnaireId);
+        
+        if (questionnaire == null)
+            return;
+        
+        questionnaire.Status = EntityStatus.Draft;
+        questionnaire.UpdatedAt = DateTime.UtcNow;
+        
+        await db.SaveChangesAsync();
     }
 }

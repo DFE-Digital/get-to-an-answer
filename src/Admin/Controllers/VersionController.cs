@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Admin.Client;
+using Common.Domain;
 
 namespace Admin.Controllers;
 
@@ -11,27 +12,34 @@ using Microsoft.AspNetCore.Mvc;
 [Authorize]
 public class VersionController(IApiClient apiClient) : Controller
 {
-    [HttpGet("admin/questionnaires/{leftId}/compare/{rightId}")]
-    public async Task<IActionResult> Compare(int leftId, int rightId)
+    [HttpGet("admin/questionnaires/{questionnaireId}/versions/{versionNumber}/compare")]
+    public async Task<IActionResult> Compare(int questionnaireId, int versionNumber)
     {
         // Replace these with calls to your data source
-        var oldJson = await GetQuestionnaireJsonAsync(leftId);
-        var newJson = await GetQuestionnaireJsonAsync(rightId);
+        var currentVersion = await apiClient.GetLatestQuestionnaireVersion(questionnaireId);
+        var otherVersion = await apiClient.GetQuestionnaireVersionAsync(questionnaireId, versionNumber);
+        
+        if (currentVersion == null || otherVersion == null)
+            return NotFound();
 
-        var (oldHtml, newHtml) = VersionDiffRenderer.RenderCompare(oldJson, newJson);
+        var (otherHtml, currentHtml) = VersionDiffRenderer.RenderCompare(otherVersion?.ToJson(), currentVersion.ToJson());
 
         var vm = new QuestionnaireViewModel
         {
-            OldHtml = oldHtml,
-            NewHtml = newHtml
+            CurrentVersionHtml = currentHtml,
+            CurrentVersion = currentVersion.Version,
+            OtherVersionHtml = otherHtml,
+            OtherVersion = versionNumber,
+            QuestionnaireVersions = await apiClient.GetQuestionnaireVersionsAsync(questionnaireId)
         };
         return View("QuestionnaireDiff", vm);
     }
+}
 
-    private async Task<string> GetQuestionnaireJsonAsync(int id)
+public static class QuestionnaireDtoExtensions
+{
+    public static string ToJson(this QuestionnaireDto questionnaire)
     {
-        var questionnaire = await apiClient.GetQuestionnaireAsync(id);
-        
         return JsonSerializer.Serialize(questionnaire);
     }
 }

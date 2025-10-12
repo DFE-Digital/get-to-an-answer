@@ -6,7 +6,7 @@
 
 @section BeforeContent
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.Questionnaire?.Id/Track">Back to questionnaire '@Model.Questionnaire?.Title'</a>
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.Questionnaire?.Id/track">Back to questionnaire '@Model.Questionnaire?.Title'</a>
 }
 
 <div class="govuk-grid-row">
@@ -16,7 +16,7 @@
     <form action="/admin/questionnaires/@Model.Questionnaire?.Id/Delete" method="post" novalidate>
       <div class="govuk-button-group">
         <button class="govuk-button govuk-button--warning" type="submit">Yes</button>
-        <a class="govuk-button govuk-button--secondary" href="/admin/questionnaires/@Model.Questionnaire?.Id/Track">Cancel</a>
+        <a class="govuk-button govuk-button--secondary" href="/admin/questionnaires/@Model.Questionnaire?.Id/track">Cancel</a>
       </div>
     </form>
   </div>

@@ -99,32 +99,72 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         
         await db.SaveChangesAsync();
         
+        await db.ResetQuestionnaireToDraft(id);
+        
         return Ok("Questionnaire updated.");
     }
-    
+
     [HttpPut("questionnaires/{id}/status")]
     public async Task<IActionResult> UpdateQuestionnaireStatus(int id, UpdateQuestionnaireStatusRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
-        
+
         if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, id))
             return Unauthorized();
-        
-        var question = new QuestionEntity
+
+        var questionnaire = new QuestionnaireEntity
         {
             Id = id,
         };
 
-        db.Questions.Attach(question);
+        db.Questionnaires.Attach(questionnaire);
+
+        var versionNumber = 1;
+
+        questionnaire.Status = request.Status;
+        if (request.Status == EntityStatus.Published) {
+            versionNumber = questionnaire.Version++;
+        }
+
+        questionnaire.UpdatedAt = DateTime.UtcNow;
         
-        question.Status = request.Status;
-        question.UpdatedAt = DateTime.UtcNow;
-        
-        db.Entry(question).Property(s => s.Status).IsModified = true;
+        db.Entry(questionnaire).Property(s => s.Status).IsModified = true;
+        db.Entry(questionnaire).Property(s => s.UpdatedAt).IsModified = true;
         
         await db.SaveChangesAsync();
+
+        if (request.Status == EntityStatus.Published)
+        {
+            await StoreQuestionnaireVersion(id, versionNumber);
+        }
         
         return Ok("Question updated.");
+    }
+
+    private async Task StoreQuestionnaireVersion(int id, int versionNumber)
+    {
+        var questionnaire = await db.Questionnaires
+            .AsNoTracking()
+            .Include(q => q.Questions)
+                .ThenInclude(qq => qq.Answers)
+            .FirstAsync(q => q.Id == id);
+        
+        var json = System.Text.Json.JsonSerializer.Serialize(questionnaire, new System.Text.Json.JsonSerializerOptions
+        {
+            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+        });
+        
+        var snapshot = new QuestionnaireVersionEntity
+        {
+            QuestionnaireId = questionnaire.Id,
+            Version = versionNumber,
+            QuestionnaireJson = json,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        db.QuestionnaireVersions.Add(snapshot);
+        
+        await db.SaveChangesAsync();
     }
 
     [HttpDelete("questionnaires/{id}")]
@@ -152,6 +192,8 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
             questionnaire.Contributors.Add(email);
         
             await db.SaveChangesAsync();
+        
+            await db.ResetQuestionnaireToDraft(id);
         }
         
         return Ok("Question updated.");

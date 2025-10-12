@@ -15,4 +15,8 @@ public class QuestionnaireDto
     public DateTime UpdatedAt { get; set; }
     
     public EntityStatus Status { get; set; } = EntityStatus.Draft;
+    
+    public int Version { get; set; }
+
+    public List<QuestionDto> Questions { get; set; } = new();
 }
