@@ -14,6 +14,8 @@ public class QuestionnaireViewModel : ConfigViewModel
     
     public UpdateQuestionnaireRequestDto? UpdateQuestionnaire { get; set; }
     
+    public CloneQuestionnaireRequestDto? CloneQuestionnaire { get; set; }
+    
     public CreateQuestionRequestDto? CreateQuestion { get; set; }
     
     public UpdateQuestionRequestDto? UpdateQuestion { get; set; }

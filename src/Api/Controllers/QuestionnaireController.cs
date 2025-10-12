@@ -141,11 +141,11 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
     [HttpDelete("questionnaires/{id}")]
     public async Task<IActionResult> DeleteQuestionnaire(int id)
     {
-        return Ok(await UpdateQuestionnaireStatus(id, new UpdateQuestionnaireStatusRequestDto
+        return await UpdateQuestionnaireStatus(id, new UpdateQuestionnaireStatusRequestDto
         {
             Id = id,
             Status = EntityStatus.Deleted
-        }));
+        });
     }
     
     [HttpPut("questionnaires/{id}/contributors")]
@@ -163,11 +163,97 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
             questionnaire.Contributors.Add(email);
         
             await db.SaveChangesAsync();
-        
-            await db.ResetQuestionnaireToDraft(id);
         }
         
         return Ok("Question updated.");
+    }
+
+    [HttpPost("questionnaires/{id}/clones")]
+    public async Task<IActionResult> CloneQuestionnaire(int id, CloneQuestionnaireRequestDto request)
+    {
+        var questionnaire = await db.Questionnaires
+            .AsNoTracking()
+            .Where(q => q.Id == id)
+            .Include(q => q.Questions)
+            .ThenInclude(qq => qq.Answers)
+            .FirstOrDefaultAsync();
+
+        if (questionnaire == null)
+            return NotFound();
+
+        var cloneQuestionnaire = new QuestionnaireEntity
+        {
+            Title = request.Title,
+            Description = request.Description,
+            Status = EntityStatus.Draft,
+            Contributors = questionnaire.Contributors,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        db.Questionnaires.Add(cloneQuestionnaire);
+        
+        await db.SaveChangesAsync();
+        
+        var cloneQuestionnaireId = cloneQuestionnaire.Id;
+        
+        var cloneQuestions = new Dictionary<int, QuestionEntity>();
+        var orderAnswers = new Dictionary<int, ICollection<AnswerEntity>>();
+        
+        foreach (var question in questionnaire.Questions)
+        {
+            var cloneQuestion = new QuestionEntity
+            {
+                QuestionnaireId = cloneQuestionnaireId,
+                Content = question.Content,
+                Description = question.Description,
+                Type = question.Type,
+                Order = question.Order,
+                Status = EntityStatus.Draft,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            };
+                
+            cloneQuestions.Add(question.Order, cloneQuestion);
+            
+            orderAnswers.Add(question.Id, question.Answers);
+        }
+        
+        await db.Questions.AddRangeAsync(cloneQuestions.Values);
+        
+        await db.SaveChangesAsync();
+
+        var cloneAnswers = new List<AnswerEntity>();
+            
+        foreach (var (questionOrder, answers) in orderAnswers)
+        {
+            var cloneQuestionId = cloneQuestions[questionOrder].Id;
+            
+            foreach (var answer in answers)
+            {
+                var cloneAnswer = new AnswerEntity
+                {
+                    QuestionId = cloneQuestionId,
+                    QuestionnaireId = cloneQuestionnaireId,
+                    Content = answer.Content,
+                    Description = answer.Description,
+                    Destination = answer.Destination,
+                    DestinationQuestionId = answer.DestinationQuestionId,
+                    DestinationType = answer.DestinationType,
+                    Score = answer.Score,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                };
+                
+                cloneAnswers.Add(cloneAnswer);
+            }
+        }
+        
+        await db.Answers.AddRangeAsync(cloneAnswers);
+        
+        await db.SaveChangesAsync();
+        
+        return Ok(cloneQuestionnaire);
     }
 
     private async Task StoreQuestionnaireVersion(int id, int versionNumber)

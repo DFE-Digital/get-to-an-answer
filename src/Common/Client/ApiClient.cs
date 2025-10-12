@@ -18,6 +18,7 @@ public interface IApiClient
     Task<QuestionnaireDto?> CreateQuestionnaireAsync(CreateQuestionnaireRequestDto request);
     Task<string?> UpdateQuestionnaireAsync(int questionnaireId, UpdateQuestionnaireRequestDto request);
     Task<string?> UpdateQuestionnaireStatusAsync(int questionnaireId, UpdateQuestionnaireStatusRequestDto request);
+    Task<QuestionnaireDto?> CloneQuestionnaireAsync(int questionnaireId, CloneQuestionnaireRequestDto request);
     Task<string?> DeleteQuestionnaireAsync(int questionnaireId);
     
     // === For Questions ===
@@ -115,6 +116,14 @@ public class ApiClient : IApiClient
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<string>();
+    }
+
+    public async Task<QuestionnaireDto?> CloneQuestionnaireAsync(int questionnaireId, CloneQuestionnaireRequestDto request)
+    {
+        var response = await _httpClient.PostAsJsonAsync($"questionnaires/{questionnaireId}/clones", request);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<QuestionnaireDto>();
     }
 
     public async Task<string?> DeleteQuestionnaireAsync(int questionnaireId)

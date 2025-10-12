@@ -15,10 +15,9 @@
           Important
         </h2></div>
       <div class="govuk-notification-banner__content">
-        <h3 class="govuk-notification-banner__heading">This is your team</h3>
+        <h3 class="govuk-notification-banner__heading">This is Get To An Answer</h3>
       
-        <p>You can create questionnaire in this team and test them, but only admin can make them live.</p>
-        <a class="govuk-link" href="/groups/9R6te7wT/request_upgrade">Find out how to make questionnaires live</a>
+        <p>You can create questionnaires that guide service users to a relevant answer.</p>
 
       </div>
     </div>
@@ -26,8 +25,8 @@
 </div>
 
 <h1 class="govuk-heading-l">
-  <span class="govuk-caption-l">Your team</span><span class="govuk-visually-hidden"> - </span>
-  Care Leavers
+  <span class="govuk-caption-l">Your Account</span><span class="govuk-visually-hidden"> - </span>
+  @User.FindFirst(ClaimTypes.Name)?.Value
 </h1>
 
 <a class="govuk-button govuk-button--start" data-module="govuk-button" draggable="false" role="button"

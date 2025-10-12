@@ -107,13 +107,9 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     [HttpPost("admin/questionnaires/{questionnaireId}/Delete")]
     public async Task<IActionResult> DeleteQuestionnaire(int questionnaireId)
     {
-        await apiClient.UpdateQuestionStatusAsync(questionnaireId, new UpdateQuestionStatusRequestDto
-        {
-            Id = questionnaireId,
-            Status = EntityStatus.Deleted
-        });
+        await apiClient.DeleteQuestionnaireAsync(questionnaireId);
         
-        return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId });
+        return RedirectToAction(nameof(Index));
     }
     
     [HttpGet("admin/questionnaires/{questionnaireId}/invite-request")]
@@ -144,6 +140,36 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
             InviteAccepted = accepted,
             Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId)
         });
+    }
+    
+    [HttpGet("admin/questionnaires/{questionnaireId}/clone")]
+    public async Task<IActionResult> QuestionnaireClonePage(int questionnaireId)
+    {
+        var questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId);
+        
+        if (questionnaire == null)
+            return NotFound();
+        
+        return View("CloneQuestionnaire", new QuestionnaireViewModel
+        {
+            CloneQuestionnaire = new CloneQuestionnaireRequestDto
+            {
+                OriginalQuestionnaireId = questionnaireId,
+                Title = questionnaire.Title, 
+                Description = questionnaire.Description
+            }
+        });
+    }
+    
+    [HttpPost("admin/questionnaires/{questionnaireId}/clone")]
+    public async Task<IActionResult> CloneQuestionnaire(int questionnaireId, CloneQuestionnaireRequestDto request)
+    {
+        var cloneQuestionnaire = await apiClient.CloneQuestionnaireAsync(questionnaireId, request);
+        
+        if (cloneQuestionnaire == null)
+            return BadRequest();
+        
+        return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId = cloneQuestionnaire.Id });
     }
 
     [HttpGet("admin/questionnaires/{questionnaireId}/edit")]
