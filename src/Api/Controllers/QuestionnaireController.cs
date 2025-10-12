@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Api.Infrastructure.Persistence;
 using Common.Domain;
 using Common.Domain.Request.Create;
@@ -90,16 +92,16 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         db.Questionnaires.Attach(questionnaire);
         
         questionnaire.Title = request.Title;
+        questionnaire.Status = EntityStatus.Draft;
         questionnaire.Description = request.Description;
         questionnaire.UpdatedAt = DateTime.UtcNow;
         
         db.Entry(questionnaire).Property(s => s.Title).IsModified = true;
+        db.Entry(questionnaire).Property(s => s.Status).IsModified = true;
         db.Entry(questionnaire).Property(s => s.Description).IsModified = true;
         db.Entry(questionnaire).Property(s => s.UpdatedAt).IsModified = true;
         
         await db.SaveChangesAsync();
-        
-        await db.ResetQuestionnaireToDraft(id);
         
         return Ok("Questionnaire updated.");
     }
@@ -112,24 +114,19 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, id))
             return Unauthorized();
 
-        var questionnaire = new QuestionnaireEntity
-        {
-            Id = id,
-        };
+        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => x.Id == id);
 
-        db.Questionnaires.Attach(questionnaire);
-
+        if (questionnaire == null) 
+            return NotFound();
+        
         var versionNumber = 1;
 
         questionnaire.Status = request.Status;
         if (request.Status == EntityStatus.Published) {
-            versionNumber = questionnaire.Version++;
+            versionNumber = ++questionnaire.Version;
         }
 
         questionnaire.UpdatedAt = DateTime.UtcNow;
-        
-        db.Entry(questionnaire).Property(s => s.Status).IsModified = true;
-        db.Entry(questionnaire).Property(s => s.UpdatedAt).IsModified = true;
         
         await db.SaveChangesAsync();
 
@@ -139,32 +136,6 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         }
         
         return Ok("Question updated.");
-    }
-
-    private async Task StoreQuestionnaireVersion(int id, int versionNumber)
-    {
-        var questionnaire = await db.Questionnaires
-            .AsNoTracking()
-            .Include(q => q.Questions)
-                .ThenInclude(qq => qq.Answers)
-            .FirstAsync(q => q.Id == id);
-        
-        var json = System.Text.Json.JsonSerializer.Serialize(questionnaire, new System.Text.Json.JsonSerializerOptions
-        {
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-        });
-        
-        var snapshot = new QuestionnaireVersionEntity
-        {
-            QuestionnaireId = questionnaire.Id,
-            Version = versionNumber,
-            QuestionnaireJson = json,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        db.QuestionnaireVersions.Add(snapshot);
-        
-        await db.SaveChangesAsync();
     }
 
     [HttpDelete("questionnaires/{id}")]
@@ -197,5 +168,32 @@ public class QuestionnaireController(CheckerDbContext db) : ControllerBase
         }
         
         return Ok("Question updated.");
+    }
+
+    private async Task StoreQuestionnaireVersion(int id, int versionNumber)
+    {
+        var questionnaire = await db.Questionnaires
+            .AsNoTracking()
+            .Include(q => q.Questions)
+            .ThenInclude(qq => qq.Answers)
+            .FirstAsync(q => q.Id == id);
+        
+        var json = JsonSerializer.Serialize(questionnaire, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = { new JsonStringEnumConverter() }
+        });
+        
+        var snapshot = new QuestionnaireVersionEntity
+        {
+            QuestionnaireId = questionnaire.Id,
+            Version = versionNumber,
+            QuestionnaireJson = json,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        db.QuestionnaireVersions.Add(snapshot);
+        
+        await db.SaveChangesAsync();
     }
 }

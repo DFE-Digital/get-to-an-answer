@@ -1,6 +1,5 @@
 using Common.Enum;
 using Common.Infrastructure.Persistence.Entities;
-using Common.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace Common.Infrastructure.Persistence;
@@ -88,7 +87,7 @@ public static class CheckerDbContextExtensions
 
     public static async Task ResetQuestionnaireToDraft(this CheckerDbContext db, int questionnaireId)
     {
-        var questionnaire = db.Questionnaires.FirstOrDefault(q => q.Id == questionnaireId);
+        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(q => q.Id == questionnaireId);
         
         if (questionnaire == null)
             return;

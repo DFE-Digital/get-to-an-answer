@@ -40,8 +40,8 @@ public interface IApiClient
     // === For Questionnaire Versions ===
     
     Task<List<QuestionnaireVersionDto>> GetQuestionnaireVersionsAsync(int questionnaireId);
-    Task<QuestionnaireDto?> GetQuestionnaireVersionAsync(int questionnaireId, int versionNumber);
-    Task<QuestionnaireDto?> GetLatestQuestionnaireVersion(int questionnaireId);
+    Task<QuestionnaireVersionDto?> GetQuestionnaireVersionAsync(int questionnaireId, int versionNumber);
+    Task<QuestionnaireVersionDto?> GetLatestQuestionnaireVersion(int questionnaireId);
     
     // === For Service Users ===
     
@@ -225,20 +225,20 @@ public class ApiClient : IApiClient
         return await response.Content.ReadFromJsonAsync<List<QuestionnaireVersionDto>>() ?? new ();
     }
 
-    public async Task<QuestionnaireDto?> GetQuestionnaireVersionAsync(int questionnaireId, int versionNumber)
+    public async Task<QuestionnaireVersionDto?> GetQuestionnaireVersionAsync(int questionnaireId, int versionNumber)
     {
         var response = await _httpClient.GetAsync($"questionnaires/{questionnaireId}/versions/{versionNumber}");
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<QuestionnaireDto?>();
+        return await response.Content.ReadFromJsonAsync<QuestionnaireVersionDto?>();
     }
 
-    public async Task<QuestionnaireDto?> GetLatestQuestionnaireVersion(int questionnaireId)
+    public async Task<QuestionnaireVersionDto?> GetLatestQuestionnaireVersion(int questionnaireId)
     {
         var response = await _httpClient.GetAsync($"questionnaires/{questionnaireId}/versions/current");
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<QuestionnaireDto?>();
+        return await response.Content.ReadFromJsonAsync<QuestionnaireVersionDto?>();
     }
 
     public async Task<QuestionDto?> GetInitialQuestion(int questionnaireId)
