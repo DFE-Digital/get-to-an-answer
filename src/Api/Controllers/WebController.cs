@@ -106,6 +106,12 @@ public class WebController(CheckerDbContext db) : Controller
                 x.Id == answer.DestinationQuestionId);
         }
 
+        if (answer.DestinationType == DestinationType.InternalPage)
+        {
+            return await GetDestinationContent(x =>
+                x.Id == answer.DestinationContentId);
+        }
+
         return Ok(new DestinationDto
         {
             Type = answer.DestinationType,
@@ -142,6 +148,22 @@ public class WebController(CheckerDbContext db) : Controller
                 Status = questionEntity.Status,
                 Type = questionEntity.Type,
             }
+        });
+    }
+    
+    private async Task<IActionResult> GetDestinationContent(Expression<Func<ContentEntity,bool>> destination)
+    {
+        var questionEntity = await db.Contents.Where(destination)
+            .FirstOrDefaultAsync();
+            
+        if (questionEntity == null)
+            return BadRequest();
+
+        return Ok(new DestinationDto
+        {
+            Type = DestinationType.InternalPage,
+            Content = questionEntity.Content,
+            Title = questionEntity.Title,
         });
     }
 }

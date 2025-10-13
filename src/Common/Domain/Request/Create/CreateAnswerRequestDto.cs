@@ -17,4 +17,6 @@ public class CreateAnswerRequestDto
     public string? Destination { get; set; }
     
     public int? DestinationQuestionId { get; set; }
+    
+    public int? DestinationContentId { get; set; }
 } 

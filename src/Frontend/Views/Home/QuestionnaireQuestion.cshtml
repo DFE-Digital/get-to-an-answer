@@ -19,7 +19,17 @@
     <div class="govuk-width-container" id="main-header-container">
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-          <h1 class="govuk-heading-xl">@Model.Questionnaire?.Title</h1>
+          <h1 class="govuk-heading-xl">
+            
+            @if (Model.Destination?.Type == DestinationType.InternalPage)
+            {
+              @Model.Destination.Title
+            }
+            else 
+            {
+              @Model.Questionnaire?.Title
+            }
+          </h1>
         </div>
       </div>
     </div>
@@ -135,7 +145,7 @@
     }
     else if (Model.Destination?.Type == DestinationType.InternalPage)
     {
-      <p>@Model.Destination.Content</p>
+      <p>@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</p>
     }
   </div>
 </div>

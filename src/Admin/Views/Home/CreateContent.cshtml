@@ -38,14 +38,13 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <form action="/admin/questionnaires/Create" accept-charset="UTF-8" method="post">
+    <form action="/admin/questionnaires/@Model?.Questionnaire?.Id/content/create" accept-charset="UTF-8" method="post">
       <div class="govuk-form-group">
         <h1 class="govuk-label-wrapper">
           <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the title of your content?</label>
         </h1>
-        <div class="govuk-hint" id="forms-name-input-name-hint">The questionnaire name will be shown at the top of each page of the form. Use a name
-          that describes what the form will help people to do. For example ‘Apply for a
-          juggling licence’.
+        <div class="govuk-hint" id="forms-name-input-name-hint">
+          The questionnaire name will be shown at the top of each page of the form.
         </div>
         @if (hasTitleError)
         {
@@ -71,7 +70,7 @@
         }
         <textarea class="govuk-textarea @(hasDescError ? "govuk-textarea--error" : "")"
               id="Description"
-              name="Description"
+              name="Content"
               rows="5">@(Model?.CreateContent?.Content ?? "")</textarea>
       </div>
       <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>

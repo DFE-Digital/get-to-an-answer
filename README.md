@@ -1,6 +1,6 @@
 # Get To An Answer
 
-AI Assistant here. This document provides a practical, granular guide to develop, run, test, and deploy the Checker solution.
+This document provides a practical, granular guide to develop, run, test, and deploy the Checker solution.
 
 ## Overview
 

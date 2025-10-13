@@ -79,7 +79,8 @@
 
                                           var first = questions.FirstOrDefault();
 
-                                          var selectedQuestion = questions.FirstOrDefault(q => q?.Id == answer.DestinationQuestionId, first);
+                                          var selectedQuestion = questions.FirstOrDefault(q => 
+                                             q?.Id == answer.DestinationQuestionId, first);
                                        }
 
                                        @foreach (var question in questions)
@@ -109,6 +110,41 @@
                                     </label>
                                     <input class="govuk-input govuk-!-width-one-third" id="target-link-@i" 
                                            value="@answer.Destination" name="Answers[@i].Destination" type="url" autocomplete="url">
+                                 </div>
+                              </div>
+                              <div class="govuk-radios__item">
+                                 <input class="govuk-radios__input" id="c-answer-@i" name="Answers[@i].DestinationType" 
+                                        type="radio" value="InternalPage" data-aria-controls="conditional-c-answer-@i"
+                                        @(answer.DestinationType == DestinationType.InternalPage ? "checked" : "")>
+                                 <label class="govuk-label govuk-radios__label" for="c-answer-@i">
+                                    Internal Page
+                                 </label>
+                              </div>
+                              <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-c-answer-@i">
+                                 <div class="govuk-form-group">
+                                    <label class="govuk-label" for="target-question-@i">
+                                       Select a page
+                                    </label>
+                                    <select class="govuk-select" id="target-question-@i" name="Answers[@i].DestinationContentId">
+                                       @{
+                                          var contents = Model?.Contents ?? [];
+
+                                          var defaultContent = contents.FirstOrDefault();
+
+                                          var selectedContent = contents.FirstOrDefault(q => 
+                                             q?.Id == answer.DestinationContentId, defaultContent);
+                                       }
+
+                                       @foreach (var content in contents)
+                                       {
+                                          var selected = selectedContent?.Id == content.Id;
+
+                                          var content1 = content;
+                                          <option value="@content.Id" selected="@selected">
+                                             @content1.Title
+                                          </option>
+                                       }
+                                    </select>
                                  </div>
                               </div>
                               <div class="govuk-radios__item">
@@ -176,6 +212,25 @@
                                     @foreach (var question in Model?.Questions ?? [])
                                     {
                                        <option value="@question.Id">@question.Content</option>
+                                    }
+                                 </select>
+                              </div>
+                           </div>
+                           <div class="govuk-radios__item">
+                              <input class="govuk-radios__input" id="c-answer-@index" name="Answers[@index].DestinationType" type="radio" value="InternalPage" data-aria-controls="conditional-c-answer-@index">
+                              <label class="govuk-label govuk-radios__label" for="c-answer-@index">
+                                 Internal Page
+                              </label>
+                           </div>
+                           <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-c-answer-@index">
+                              <div class="govuk-form-group">
+                                 <label class="govuk-label" for="target-question">
+                                    Select a page
+                                 </label>
+                                 <select class="govuk-select" id="target-question" name="Answers[@index].DestinationContentId">
+                                    @foreach (var content in Model?.Contents ?? [])
+                                    {
+                                       <option value="@content.Id">@content.Title</option>
                                     }
                                  </select>
                               </div>

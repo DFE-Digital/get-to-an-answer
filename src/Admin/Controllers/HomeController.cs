@@ -263,6 +263,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
             QuestionnaireId = questionnaireId,
             QuestionId = questionId,
             Answers = await apiClient.GetAnswersAsync(questionId),
+            Contents = await apiClient.GetContentsAsync(questionnaireId),   
             Questions = (await apiClient.GetQuestionsAsync(questionnaireId))
                 .Where(q => q.Id != questionId).ToList()
         });
@@ -293,6 +294,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
                 Destination = req.Destination,
                 DestinationType = req.DestinationType,
                 DestinationQuestionId = req.DestinationQuestionId,
+                DestinationContentId = req.DestinationContentId,
                 QuestionId = questionId,
                 QuestionnaireId = req.QuestionnaireId,
                 Score = req.Score,
@@ -313,7 +315,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
     
-    [HttpPost("admin/questionnaires/{questionnaireId}/content/Create")]
+    [HttpPost("admin/questionnaires/{questionnaireId}/content/create")]
     public async Task<IActionResult> PerformContentCreation(int questionnaireId, CreateContentRequestDto request)
     {
         if (!ModelState.IsValid)
@@ -350,6 +352,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
             UpdateContent = new UpdateContentRequestDto
             {
                 Id = content.Id,
+                QuestionnaireId = content.QuestionnaireId,
                 Title = content.Title,
                 Content = content.Content,
             }
@@ -361,15 +364,25 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     {
         await apiClient.UpdateContentAsync(contentId, request);
 
-        return RedirectToAction(nameof(QuestionnaireTrackingPage), new { questionnaireId = request.QuestionnaireId });
+        return RedirectToAction(nameof(ManageContentPage), new { questionnaireId = request.QuestionnaireId });
     }
 
-    [HttpGet("admin/questionnaires/{questionnaireId}/content/Create")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/contents")]
+    public async Task<IActionResult> ManageContentPage(int questionnaireId)
+    {
+        return View("ManageContent", new QuestionnaireViewModel
+        {
+            Contents = await apiClient.GetContentsAsync(questionnaireId),
+            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId)
+        });
+    }
+
+    [HttpGet("admin/questionnaires/{questionnaireId}/content/create")]
     public async Task<IActionResult> ContentCreationPage(int questionnaireId)
     {
         return View("CreateContent", new QuestionnaireViewModel
         {
-            QuestionnaireId = questionnaireId
+            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId)
         });
     }
     

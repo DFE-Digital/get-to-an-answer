@@ -32,6 +32,7 @@ public class AnswerController(CheckerDbContext db) : Controller
             Score = request.Score,
             Destination = request.Destination,
             DestinationQuestionId = request.DestinationQuestionId,
+            DestinationContentId = request.DestinationContentId,
             DestinationType = request.DestinationType,
             CreatedAt = DateTime.UtcNow
         };
@@ -50,6 +51,7 @@ public class AnswerController(CheckerDbContext db) : Controller
             Destination = entity.Destination,
             DestinationType = entity.DestinationType,
             DestinationQuestionId = request.DestinationQuestionId,
+            DestinationContentId = request.DestinationContentId,
             QuestionId = entity.QuestionId,
             QuestionnaireId = entity.QuestionnaireId,
             Score = entity.Score,
@@ -107,6 +109,7 @@ public class AnswerController(CheckerDbContext db) : Controller
         answer.Destination = request.Destination;
         answer.DestinationType = request.DestinationType;
         answer.DestinationQuestionId = request.DestinationQuestionId;
+        answer.DestinationContentId = request.DestinationContentId;
         answer.Score = request.Score;
         answer.UpdatedAt = DateTime.UtcNow;
         
