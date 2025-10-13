@@ -16,7 +16,7 @@ namespace Api.Controllers;
 [ApiController]
 [Route("/")]
 [AllowAnonymous]
-public class WebController(CheckerDbContext db) : Controller
+public class WebController(GetToAnAnswerDbContext db) : Controller
 {
     [HttpGet("questionnaires/{questionnaireSlug}/info")]
     public async Task<IActionResult> GetQuestionnaireInfo(string questionnaireSlug)

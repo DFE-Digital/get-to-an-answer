@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.Controllers;
 
 [ApiController]
-public class QuestionnaireController(CheckerDbContext db) : ControllerBase
+public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
 {
     [HttpPost("questionnaires")]
     [Authorize]

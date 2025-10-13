@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Common.Infrastructure.Persistence;
 
-public class CheckerDbContext(DbContextOptions<CheckerDbContext> options) : DbContext(options)
+public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> options) : DbContext(options)
 {
     public DbSet<QuestionEntity> Questions { get; set; }
     public DbSet<AnswerEntity> Answers { get; set; }
@@ -48,7 +48,7 @@ public class CheckerDbContext(DbContextOptions<CheckerDbContext> options) : DbCo
 
 public static class CheckerDbContextExtensions
 {
-    public static async Task<bool> HasAccessToEntity<TEntityType>(this CheckerDbContext db, string email, int id)
+    public static async Task<bool> HasAccessToEntity<TEntityType>(this GetToAnAnswerDbContext db, string email, int id)
     {
         if (typeof(TEntityType) == typeof(QuestionEntity))
         {
@@ -97,7 +97,7 @@ public static class CheckerDbContextExtensions
         return false;
     }
 
-    public static async Task ResetQuestionnaireToDraft(this CheckerDbContext db, int questionnaireId)
+    public static async Task ResetQuestionnaireToDraft(this GetToAnAnswerDbContext db, int questionnaireId)
     {
         var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(q => q.Id == questionnaireId);
         

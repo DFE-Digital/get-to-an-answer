@@ -44,4 +44,7 @@ public class AnswerEntity
     public QuestionEntity? Question { get; set; }
     
     public int QuestionnaireId { get; set; }
+    
+    [MaxLength(100)]
+    public string? SyncId { get; set; }
 }

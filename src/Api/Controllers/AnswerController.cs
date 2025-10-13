@@ -13,7 +13,7 @@ namespace Api.Controllers;
 [ApiController]
 [Route("/")]
 [Authorize]
-public class AnswerController(CheckerDbContext db) : Controller
+public class AnswerController(GetToAnAnswerDbContext db) : Controller
 {
     [HttpPost("answers")]
     public async Task<IActionResult> CreateAnswer(CreateAnswerRequestDto request)

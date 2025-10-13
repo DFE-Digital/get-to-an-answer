@@ -2,8 +2,13 @@ using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Api.Services;
 using Common.Infrastructure.Persistence;
 using Common.Local;
+using Contentful.AspNetCore.MiddleWare;
+using Contentful.Core;
+using Contentful.Core.Configuration;
+using Contentful.Core.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
@@ -13,14 +18,22 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    //.ConfigureLogging(Environment.GetEnvironmentVariable("ApplicationInsights__ConnectionString"))
+    .CreateBootstrapLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<CheckerDbContext>(options =>
+builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-    
 
 builder.Services.AddControllers(); // Enables controller support
 builder.Services.AddEndpointsApiExplorer(); // For Swagger
@@ -42,14 +55,7 @@ else
 {
     builder.Services
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd")/*,
-            configureJwtBearerOptions: options =>
-            {
-                // Optionally set Audience explicitly if not in config
-                var audience = builder.Configuration["AzureAd:Audience"];
-                if (!string.IsNullOrEmpty(audience))
-                    options.TokenValidationParameters.ValidAudience = audience;
-            }*/);
+        .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 }
 
 // Add services to the container.
@@ -89,7 +95,7 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<CheckerDbContext>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<GetToAnAnswerDbContext>();
     dbContext.Database.EnsureCreated();
 
     // Optional: increase timeout for long migrations
@@ -104,6 +110,37 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.Run();
+try
+{
+    
+    #region Contentful Setup
 
-public record TokenRequest(string? Sub, string? Name, List<string>? Roles, List<string>? Scopes);
+    var contentfulSection = builder.Configuration.GetSection("Contentful");
+    builder.Services.AddSingleton(sp =>
+    {
+        var httpClient = new HttpClient();
+        var options = new ContentfulOptions
+        {
+            DeliveryApiKey = contentfulSection["DeliveryApiKey"],
+            PreviewApiKey = contentfulSection["PreviewApiKey"],
+            SpaceId = contentfulSection["SpaceId"],
+            Environment = contentfulSection["EnvironmentId"],
+            UsePreviewApi = bool.TryParse(contentfulSection["UsePreview"], out var usePreview) && usePreview
+        };
+        return new ContentfulClient(httpClient, options);
+    });
+    // Register service
+    builder.Services.AddScoped<IContentfulSyncService, ContentfulSyncServiceImpl>();
+
+    #endregion
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Host terminated unexpectedly");
+}
+finally
+{
+    await Log.CloseAndFlushAsync();
+}

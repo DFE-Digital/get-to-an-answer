@@ -40,5 +40,8 @@ public class QuestionnaireEntity
 
     // Navigation properties
     public ICollection<QuestionEntity> Questions { get; set; } = new List<QuestionEntity>();
+    
+    [MaxLength(100)]
+    public string? SyncId { get; set; }
 }
 

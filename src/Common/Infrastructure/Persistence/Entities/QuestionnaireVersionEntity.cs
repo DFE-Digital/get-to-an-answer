@@ -17,5 +17,8 @@ public class QuestionnaireVersionEntity
     public int Version { get; set; }
     
     public DateTime CreatedAt { get; set; }
+    
+    [MaxLength(100)]
+    public string? SyncId { get; set; }
 }
 

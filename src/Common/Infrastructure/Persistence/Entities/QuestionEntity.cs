@@ -38,6 +38,9 @@ public class QuestionEntity
     [JsonIgnore]
     public QuestionnaireEntity? Questionnaire { get; set; }
     
+    [MaxLength(100)]
+    public string? SyncId { get; set; }
+    
     // TODO: Add fields for:
     // Custom continue button text
     // Custom error message from user error

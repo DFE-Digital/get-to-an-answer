@@ -15,7 +15,7 @@ namespace Api.Controllers;
 [ApiController]
 [Route("/")]
 [Authorize]
-public class QuestionController(CheckerDbContext db) : Controller
+public class QuestionController(GetToAnAnswerDbContext db) : Controller
 {
     [HttpPost("questions")]
     public async Task<IActionResult> CreateQuestion(CreateQuestionRequestDto request)

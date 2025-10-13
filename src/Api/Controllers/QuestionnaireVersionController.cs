@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.Controllers;
 
 [ApiController]
-public class QuestionnaireVersionController(CheckerDbContext db) : ControllerBase
+public class QuestionnaireVersionController(GetToAnAnswerDbContext db) : ControllerBase
 {
     
     [HttpGet("questionnaires/{questionnaireId}/versions/current")]

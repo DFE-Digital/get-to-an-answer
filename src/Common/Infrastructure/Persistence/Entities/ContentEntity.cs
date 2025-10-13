@@ -30,4 +30,7 @@ public class ContentEntity
     public DateTime CreatedAt { get; set; }
     
     public DateTime UpdatedAt { get; set; }
+    
+    [MaxLength(100)]
+    public string? SyncId { get; set; }
 }
