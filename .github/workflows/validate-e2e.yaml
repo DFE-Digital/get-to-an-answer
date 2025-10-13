@@ -1,0 +1,73 @@
+name: Validate - E2E Tests
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'src/e2e/gtaa.e2etests/**'
+      - '.github/workflows/validate-apps.yaml'
+      - '.github/workflows/validate-e2e.yaml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'src/e2e/gtaa.e2etests/**'
+      - '.github/workflows/validate-apps.yaml'
+      - '.github/workflows/validate-e2e.yaml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Run Playwright Tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+                
+      - name: Lowercase the repo name and username
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
+      - name: Build Web Docker Image
+        id: build
+        working-directory: ./src
+        run: docker build . -t care-leavers-web:e2e -f web/CareLeavers.Web/Dockerfile
+        
+      - name: Run E2E Docker Image
+        id: run
+        if: steps.build.outcome == 'success'
+        working-directory: ./src
+        env:
+          CONTENTFUL_DELIVERY_API_KEY: ${{ secrets.CONTENTFUL_DELIVERY_API_KEY }}
+          CONTENTFUL_PREVIEW_API_KEY: ${{ secrets.CONTENTFUL_PREVIEW_API_KEY }}
+          CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+        run: docker compose -f infrastructure/docker/docker-compose-ci.yml up -d
+
+      - name: Install dependencies
+        working-directory: ./src/e2e/CareLeavers.E2ETests
+        run: yarn install
+
+      - name: Install Playwright Browsers
+        working-directory: ./src/e2e/CareLeavers.E2ETests
+        run: yarn playwright install --with-deps
+
+      - name: Run Playwright Tests
+        if: steps.run.outcome == 'success'
+        working-directory: ./src/e2e/CareLeavers.E2ETests
+        run: yarn playwright test -c playwright-ci.config.ts
+
+      - name: Upload Playwright Test Report
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: ./src/e2e/CareLeavers.E2ETests/playwright-report/
+          if-no-files-found: ignore
+          
+      - name: Upload Screenshots on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-screenshots
+          path: ./src/e2e/CareLeavers.E2ETests/test-results/screenshots/
