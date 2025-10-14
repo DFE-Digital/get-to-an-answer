@@ -65,6 +65,27 @@ builder.Services.AddOpenApi();
 //builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 //builder.Services.AddProblemDetails();
 
+#region Contentful Setup
+
+var contentfulSection = builder.Configuration.GetSection("Contentful");
+builder.Services.AddSingleton(sp =>
+{
+    var httpClient = new HttpClient();
+    var options = new ContentfulOptions
+    {
+        DeliveryApiKey = contentfulSection["DeliveryApiKey"],
+        PreviewApiKey = contentfulSection["PreviewApiKey"],
+        SpaceId = contentfulSection["SpaceId"],
+        Environment = contentfulSection["EnvironmentId"],
+        UsePreviewApi = bool.TryParse(contentfulSection["UsePreview"], out var usePreview) && usePreview
+    };
+    return new ContentfulClient(httpClient, options);
+});
+// Register service
+builder.Services.AddScoped<IContentfulSyncService, ContentfulSyncServiceImpl>();
+
+#endregion
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -110,32 +131,11 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-try
-{
-    
-    #region Contentful Setup
-
-    var contentfulSection = builder.Configuration.GetSection("Contentful");
-    builder.Services.AddSingleton(sp =>
-    {
-        var httpClient = new HttpClient();
-        var options = new ContentfulOptions
-        {
-            DeliveryApiKey = contentfulSection["DeliveryApiKey"],
-            PreviewApiKey = contentfulSection["PreviewApiKey"],
-            SpaceId = contentfulSection["SpaceId"],
-            Environment = contentfulSection["EnvironmentId"],
-            UsePreviewApi = bool.TryParse(contentfulSection["UsePreview"], out var usePreview) && usePreview
-        };
-        return new ContentfulClient(httpClient, options);
-    });
-    // Register service
-    builder.Services.AddScoped<IContentfulSyncService, ContentfulSyncServiceImpl>();
-
-    #endregion
+/*try
+{*/
 
     app.Run();
-}
+/*}
 catch (Exception ex)
 {
     Log.Fatal(ex, "Host terminated unexpectedly");
@@ -143,4 +143,4 @@ catch (Exception ex)
 finally
 {
     await Log.CloseAndFlushAsync();
-}
+}*/

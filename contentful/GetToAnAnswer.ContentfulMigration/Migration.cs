@@ -1,4 +1,4 @@
-namespace CareLeavers.ContentfulMigration;
+namespace GetToAnAnswer.ContentfulMigration;
 
 public class Migration
 {

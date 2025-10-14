@@ -4,3 +4,84 @@ GET {{Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+POST {{Api_HostAddress}}/api/webhooks/contentful
+Accept: application/json
+X-Contentful-Topic: test.publish
+
+{
+  "metadata" : {
+    "tags" : [ ],
+    "concepts" : [ ]
+  },
+  "sys" : {
+    "space" : {
+      "sys" : {
+        "type" : "Link",
+        "linkType" : "Space",
+        "id" : "soeq1djvguyd"
+      }
+    },
+    "id" : "7oSD9ofQAupkUhFUVOY7AX",
+    "type" : "Entry",
+    "createdAt" : "2025-10-13T23:51:14.065Z",
+    "updatedAt" : "2025-10-14T00:16:07.538Z",
+    "environment" : {
+      "sys" : {
+        "id" : "master",
+        "type" : "Link",
+        "linkType" : "Environment"
+      }
+    },
+    "publishedVersion" : 41,
+    "publishedAt" : "2025-10-14T00:15:46.315Z",
+    "firstPublishedAt" : "2025-10-13T23:54:02.175Z",
+    "createdBy" : {
+      "sys" : {
+        "type" : "Link",
+        "linkType" : "User",
+        "id" : "33BxMkTxOGdIh9Vgs6AVNi"
+      }
+    },
+    "updatedBy" : {
+      "sys" : {
+        "type" : "Link",
+        "linkType" : "User",
+        "id" : "33BxMkTxOGdIh9Vgs6AVNi"
+      }
+    },
+    "publishedCounter" : 18,
+    "version" : 43,
+    "publishedBy" : {
+      "sys" : {
+        "type" : "Link",
+        "linkType" : "User",
+        "id" : "33BxMkTxOGdIh9Vgs6AVNi"
+      }
+    },
+    "fieldStatus" : {
+      "*" : {
+        "en-US" : "changed"
+      }
+    },
+    "automationTags" : [ ],
+    "contentType" : {
+      "sys" : {
+        "type" : "Link",
+        "linkType" : "ContentType",
+        "id" : "questionnaire"
+      }
+    },
+    "urn" : "crn:contentful:::content:spaces/soeq1djvguyd/environments/master/entries/7oSD9ofQAupkUhFUVOY7AX"
+  },
+  "fields" : {
+    "title" : {
+      "en-US" : "this is a test questionnaire"
+    },
+    "version" : {
+      "en-US" : 0
+    }
+  }
+}
+
+###

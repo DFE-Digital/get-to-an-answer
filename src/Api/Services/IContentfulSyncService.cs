@@ -58,11 +58,11 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
 
         switch (topic)
         {
-            case string t when t.EndsWith(".publish"):
-            case string t2 when t2.EndsWith(".auto_save"):
+            case { } t when t.EndsWith(".publish"):
+            case { } t2 when t2.EndsWith(".auto_save"):
                 await UpsertEntry(contentType, contentfulId, root, ct);
                 break;
-            case string t when t.EndsWith(".unpublish") || t.EndsWith(".delete"):
+            case { } t when t.EndsWith(".unpublish") || t.EndsWith(".delete"):
                 await DeleteEntry(contentType, contentfulId, root, ct);
                 break;
         }

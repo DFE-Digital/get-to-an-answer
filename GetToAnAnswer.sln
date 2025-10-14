@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin", "src\Admin\Admin.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend", "src\Frontend\Frontend.csproj", "{A19300FF-3A6B-4033-B313-32D550D26E61}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetToAnAnswer.ContentfulMigration", "contentful\GetToAnAnswer.ContentfulMigration\GetToAnAnswer.ContentfulMigration.csproj", "{865B0232-F902-41A4-9EB5-5BB289297D05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{A19300FF-3A6B-4033-B313-32D550D26E61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A19300FF-3A6B-4033-B313-32D550D26E61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A19300FF-3A6B-4033-B313-32D550D26E61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{865B0232-F902-41A4-9EB5-5BB289297D05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{865B0232-F902-41A4-9EB5-5BB289297D05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{865B0232-F902-41A4-9EB5-5BB289297D05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{865B0232-F902-41A4-9EB5-5BB289297D05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -19,7 +19,7 @@ public class ContentfulWebhookController(IConfiguration config, IContentfulSyncS
         using var reader = new StreamReader(Request.Body);
         var body = await reader.ReadToEndAsync(ct);
 
-        var signatureHeader = Request.Headers["x-contentful-signature"].FirstOrDefault();
+        /*var signatureHeader = Request.Headers["x-contentful-signature"].FirstOrDefault();
         if (!string.IsNullOrEmpty(secret) && !string.IsNullOrEmpty(signatureHeader))
         {
             using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret));
@@ -27,7 +27,7 @@ public class ContentfulWebhookController(IConfiguration config, IContentfulSyncS
             var expected = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
             if (!string.Equals(expected, signatureHeader, StringComparison.OrdinalIgnoreCase))
                 return Unauthorized();
-        }
+        }*/
 
         var eventType = Request.Headers["X-Contentful-Topic"].FirstOrDefault() ?? "";
         // Examples:

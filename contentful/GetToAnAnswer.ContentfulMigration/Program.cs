@@ -6,6 +6,7 @@ using Contentful.Core.Configuration;
 using Contentful.Core.Errors;
 using Contentful.Core.Models;
 using Contentful.Core.Search;
+using GetToAnAnswer.ContentfulMigration;
 using Microsoft.Extensions.Configuration;
 
 var configBuilder = new ConfigurationBuilder()
@@ -54,10 +55,17 @@ catch (ContentfulException)
         [
             new Field
             {
+                Id = "name",
+                Name = "Name",
+                Type = "Symbol",
+                Required = true
+            },
+            new Field
+            {
                 Id = "migrations",
                 Name = "Migrations",
                 Type = "Object"
-            }
+            },
         ]
     });
     
@@ -89,8 +97,8 @@ if (!existingMigrationTrackers.Any())
         SystemProperties = new SystemProperties(),
         Fields = new
         {
-            name = "Migration Tracker - DO NOT DELETE", 
-            migrations = new List<Migration>()
+            name = new Dictionary<string, object?> { ["en-US"] = "Migration Tracker - DO NOT DELETE" },
+            migrations = new Dictionary<string, object?> { ["en-US"] = new List<Migration>() }
         }
     };
     
