@@ -27,8 +27,10 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         {
             Title = request.Title,
             Description = request.Description,
+            Slug = request.Slug,
             Contributors = [email],
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
         };
         
         db.Questionnaires.Add(entity);
