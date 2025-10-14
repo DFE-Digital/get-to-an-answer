@@ -59,7 +59,7 @@ module.exports = function (migration) {
     content.createField('questionnaire').name('Questionnaire').type('Link').linkType('Entry')
         .validations([{ linkContentType: ['questionnaire'] }]).required(true);
     content.createField('title').name('Title').type('Symbol').required(true);
-    content.createField('content').name('Content Body').type('RichText'); // or 'Text' if you prefer
+    content.createField('content').name('Content Body').type('Text'); // or 'Text' if you prefer
     
      // Optional: indexes/uniqueness hints (apply manually if needed)
     // - questionnaire.slug unique per space

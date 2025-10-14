@@ -210,6 +210,7 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
                 else
                 {
                     existing.SyncId = contentfulId ?? existing.SyncId;
+                    existing.Content = content;
                     existing.Description = S("description");
                     existing.Score = Nf("score");
                     existing.DestinationType = destinationType;
@@ -253,6 +254,7 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
                 else
                 {
                     existing.SyncId = contentfulId ?? existing.SyncId;
+                    existing.Title = title;
                     existing.Content = body;
                     existing.UpdatedAt = D("updatedAtUtc") ?? DateTime.UtcNow;
                     db.Contents.Update(existing);
