@@ -118,9 +118,7 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
                             status == EntityStatus.Published => 1,
                         _ => 0
                     };
-                    existing.Status = status != EntityStatus.Published && 
-                                      status != EntityStatus.Draft ? 
-                        ParseStatus(S("status")) : existing.Status;
+                    existing.Status = status ?? ParseStatus(S("status"));
                     existing.Contributors = GetStringArray(fields, "contributors");
                     existing.Slug = slug ?? existing.Slug;
                     existing.UpdatedAt = DateTime.UtcNow;
