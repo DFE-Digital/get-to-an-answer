@@ -60,15 +60,21 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
         {
             case { } t when t.EndsWith(".publish"):
             case { } t2 when t2.EndsWith(".auto_save"):
-                await UpsertEntry(contentType, contentfulId, root, ct);
+            case { } t3 when t3.EndsWith(".unpublish"):
+                await UpsertEntry(contentType, topic switch
+                {
+                    var top when top.EndsWith(".publish") => EntityStatus.Published, // This is the first switch expression arm
+                    var top when top.EndsWith(".unpublish") => EntityStatus.Draft,
+                    _ => null,
+                }, contentfulId, root, ct);
                 break;
-            case { } t when t.EndsWith(".unpublish") || t.EndsWith(".delete"):
+            case { } t when t.EndsWith(".delete"):
                 await DeleteEntry(contentType, contentfulId, root, ct);
                 break;
         }
     }
 
-    private async Task UpsertEntry(string? contentType, string? contentfulId, JsonElement entry, CancellationToken ct)
+    private async Task UpsertEntry(string? contentType, EntityStatus? status, string? contentfulId, JsonElement entry, CancellationToken ct)
     {
         if (!entry.TryGetProperty("fields", out var fields)) return;
 
@@ -94,11 +100,9 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
                         Title = S("title") ?? "",
                         Slug = slug,
                         Description = S("description"),
-                        Status = ParseStatus(S("status")),
-                        Version = Ni("version"),
                         Contributors = GetStringArray(fields, "contributors"),
-                        CreatedAt = D("createdAtUtc") ?? DateTime.UtcNow,
-                        UpdatedAt = D("updatedAtUtc") ?? DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
                     };
                     db.Questionnaires.Add(entity);
                 }
@@ -107,11 +111,19 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
                     existing.SyncId = contentfulId ?? existing.SyncId;
                     existing.Title = S("title") ?? existing.Title;
                     existing.Description = S("description");
-                    existing.Status = ParseStatus(S("status"));
-                    existing.Version = Ni("version") == 0 ? existing.Version : Ni("version");
+                    existing.Version += status switch
+                    {
+                        _ when 
+                            existing.Status == EntityStatus.Draft && 
+                            status == EntityStatus.Published => 1,
+                        _ => 0
+                    };
+                    existing.Status = status != EntityStatus.Published && 
+                                      status != EntityStatus.Draft ? 
+                        ParseStatus(S("status")) : existing.Status;
                     existing.Contributors = GetStringArray(fields, "contributors");
                     existing.Slug = slug ?? existing.Slug;
-                    existing.UpdatedAt = D("updatedAtUtc") ?? DateTime.UtcNow;
+                    existing.UpdatedAt = DateTime.UtcNow;
 
                     db.Questionnaires.Update(existing);
                 }
