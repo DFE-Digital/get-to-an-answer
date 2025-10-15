@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
-                
+
       - name: Lowercase the repo name and username
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
@@ -47,16 +47,18 @@ jobs:
         run: yarn playwright test
 
       - name: Upload Playwright Test Report
-        if: always() 
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: ./src/e2e/gtaa.e2etests/playwright-report/
           if-no-files-found: ignore
-          
+
       - name: Upload Screenshots on Failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-screenshots
           path: ./src/e2e/gtaa.e2etests/test-results/screenshots/
+          
+          
