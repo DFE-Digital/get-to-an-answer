@@ -60,9 +60,25 @@ module.exports = function (migration) {
         .validations([{ linkContentType: ['questionnaire'] }]).required(true);
     content.createField('title').name('Title').type('Symbol').required(true);
     content.createField('content').name('Content Body').type('Text'); // or 'Text' if you prefer
-    
-     // Optional: indexes/uniqueness hints (apply manually if needed)
-    // - questionnaire.slug unique per space
-    // - question order unique within questionnaire (enforce in app)
-    // - answers per question (enforce in app)
+
+    // Get To An Answer (embeddable iframe block)
+    const getToAnAnswer = migration.createContentType('getToAnAnswer')
+        .name('Get To An Answer')
+        .displayField('title')
+        .description('Embeddable iframe that points to an external URL or renders a questionnaire runner');
+
+    // Basic metadata
+    getToAnAnswer.createField('title').name('Title').type('Symbol').required(true);
+
+    getToAnAnswer.createField('questionnaireSlug').name('External link').type('Symbol').validations([
+        { regexp: { pattern: '^(https?:\\/\\/).+', flags: null }, message: 'Must be an absolute http(s) URL' }
+    ]);
+    getToAnAnswer.createField('questionnaire').name('Questionnaire').type('Link').linkType('Entry')
+        .validations([{ linkContentType: ['questionnaire'] }]);
+
+    // Editor UI suggestions
+    getToAnAnswer.changeEditorInterface('questionnaireSlug', 'singleLine');
+    getToAnAnswer.changeEditorInterface('questionnaire', 'entryLinkEditor', { bulkEditing: false });
+
+    // Note: To embed in Rich Text, allow this content type as an entry block/inline in the Rich Text field settings.
 };
