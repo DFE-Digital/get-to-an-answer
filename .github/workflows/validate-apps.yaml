@@ -26,13 +26,21 @@ jobs:
           cmd: install
           dir: .
 
+      - name: Install Frontend dependencies
+        working-directory: ./src/Frontend
+        run: yarn install
+
       - name: Run Frontend Gulp Dev
         working-directory: ./src/Frontend
-        run: gulp dev
+        run: yarn gulp dev
+
+      - name: Install Admin dependencies
+        working-directory: ./src/Admin
+        run: yarn install
 
       - name: Run Admin Gulp Dev
         working-directory: ./src/Admin
-        run: gulp dev
+        run: yarn gulp dev
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
