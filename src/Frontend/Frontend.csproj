@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="AssetSrc\" />
+      <Folder Include="AssetSrc\scss\" />
     </ItemGroup>
 
 </Project>
