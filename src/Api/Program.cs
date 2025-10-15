@@ -1,4 +1,24 @@
+using System.Diagnostics.CodeAnalysis;
+using Common.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web;
+
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+builder.Services.AddControllers()
+    .AddDataAnnotationsLocalization();
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -11,31 +31,38 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+    
+app.MapControllers();
 
-app.UseHttpsRedirection();
-
-var summaries = new[]
+using (var scope = app.Services.CreateScope())
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    var dbContext = scope.ServiceProvider.GetRequiredService<GetToAnAnswerDbContext>();
+    await dbContext.Database.EnsureCreatedAsync();
 
-app.MapGet("/weatherforecast", () =>
+    // Optional: increase timeout for long migrations
+    dbContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
+    
+    // Check pending migrations (optional logging/short-circuit)
+    var pending = await dbContext.Database.GetPendingMigrationsAsync();
+    if (pending.Any())
     {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
+        // log pending
+        await dbContext.Database.MigrateAsync();
+    }
+}
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+//app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+[ExcludeFromCodeCoverage]
+public partial class Program
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    protected Program() { }
 }
