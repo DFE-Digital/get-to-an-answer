@@ -26,13 +26,13 @@ jobs:
           cmd: install
           dir: .
 
-      - name: Run Frontend Gulp Dev
-        working-directory: ./src/Frontend
-        run: gulp dev
+#      - name: Run Frontend Gulp Dev
+#        working-directory: ./src/Frontend
+#        run: gulp dev
 
-      - name: Run Admin Gulp Dev
-        working-directory: ./src/Admin
-        run: gulp dev
+#      - name: Run Admin Gulp Dev
+#        working-directory: ./src/Admin
+#        run: gulp dev
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
