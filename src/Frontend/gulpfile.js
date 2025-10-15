@@ -50,7 +50,7 @@ gulp.task("sass", function () {
 });
 
 gulp.task("images", function() {
-    return gulp.src(paths.src + '/assets/**/*', {encoding:false})
+    return gulp.src(paths.src + '/assets/**/*', {encoding:false, allowEmpty: true})
         .pipe(gulp.dest(paths.dist + 'assets'));
 })
 
