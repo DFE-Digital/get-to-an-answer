@@ -1,0 +1,19 @@
+﻿services:
+  frontend:
+    image: frontend
+    build:
+      context: .
+      dockerfile: src/Frontend/Dockerfile
+
+  admin:
+    image: admin
+    build:
+      context: .
+      dockerfile: src/Admin/Dockerfile
+
+  api-1:
+    image: api-1
+    build:
+      context: .
+      dockerfile: src/Api/Dockerfile
+
