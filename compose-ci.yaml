@@ -8,9 +8,17 @@ services:
       - sqlserver
     environment:
       - ConnectionStrings__DefaultConnection=${DEFAULT_CONNECTION_STRING}
-    volumes:
-      - ./wait-for-sqlserver.sh:/wait-for-sqlserver.sh
-    entrypoint: ["/bin/sh", "-c", "/wait-for-sqlserver.sh sqlserver:1433 dotnet Api.dll"]
+    #Waits for SQL Server to be available before starting the application
+    entrypoint:
+      - sh
+      - -c
+      - |
+        until nc -z sqlserver 1433; do
+          echo 'SQL Server is unavailable - sleeping';
+          sleep 2;
+        done;
+        echo 'SQL Server is up - executing command';
+        dotnet Api.dll
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -20,7 +28,7 @@ services:
     ports:
       - "1433:1433"
     healthcheck:
-      test: [ "CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${SQLSERVER_SA_PASSWORD}", "-Q", "SELECT 1" ]
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${SQLSERVER_SA_PASSWORD}", "-Q", "SELECT 1"]
       interval: 10s
       timeout: 5s
       retries: 5
