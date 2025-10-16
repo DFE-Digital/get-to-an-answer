@@ -8,3 +8,8 @@ riderModule.iml
 .idea/
 *.sln.DotSettings
 *.DotSettings.user
+.env
+
+**/*.DotSettings
+**/*.DotSettings.user
+

@@ -20,4 +20,6 @@ RUN dotnet publish "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:Use
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+# Install netcat for wait-for-sqlserver.sh
+RUN apt-get update && apt-get install -y netcat
 ENTRYPOINT ["dotnet", "Api.dll"]
