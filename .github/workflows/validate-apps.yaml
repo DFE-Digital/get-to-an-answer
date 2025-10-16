@@ -26,6 +26,7 @@ jobs:
           cmd: install
           dir: .
 
+      # Temporarily disabled these until work starts on the new frontend and admin projects
 #      - name: Run Frontend Gulp Dev
 #        working-directory: ./src/Frontend
 #        run: gulp dev
