@@ -4,7 +4,7 @@ const apiBase = {
     testDir: './src/tests/api',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: process.env.APP_URL || 'https://www.ebay.co.uk/',
+        baseURL: process.env.API_URL || 'https://www.ebay.co.uk/',
     },
 } as const;
 
@@ -12,7 +12,7 @@ const feBase = {
     testDir: './src/tests/fe',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: process.env.APP_URL || 'https://www.google.co.uk/',
+        baseURL: process.env.FE_URL || 'https://www.google.co.uk/',
     },
 } as const;
 
@@ -20,7 +20,7 @@ const adminBase = {
     testDir: './src/tests/admin',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: process.env.APP_URL || 'https://www.github.com/',
+        baseURL: process.env.ADMIN_URL || 'https://www.github.com/',
     },
 } as const;
 
@@ -31,6 +31,7 @@ export default defineConfig({
     expect: {
         timeout: 5000,
     },
+    
     fullyParallel: true,
     retries: 1,
     workers: 4,
