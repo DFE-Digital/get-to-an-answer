@@ -27,12 +27,12 @@ const adminBase = {
 export default defineConfig({
     testDir: './src/tests',
     testMatch: '**/*.spec.ts',
-    timeout: 20 * 1000, // 10 seconds
+    timeout: 20 * 1000,
     expect: {
-        timeout: 5000, // 5 seconds
+        timeout: 5000,
     },
     fullyParallel: true,
-    //retries: 1,
+    retries: 1,
     workers: 4,
     reporter: [['list'], ['html', {open: 'never'}]],
     use: {
