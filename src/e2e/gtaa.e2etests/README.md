@@ -1,61 +1,15 @@
-# Playwright E2E Testing Framework
-
-This repository contains an End-to-End (E2E) automation framework built with Playwright and TypeScript. The framework supports cross-browser testing on all major browsers (Chromium, Firefox, WebKit) and mobile emulation for devices like Pixel 8 and iPhone 16. It is designed for scalability, maintainability, and ease of use.
-
-## Features
-
-- **Page Object Model (POM)** for maintainable test design.
-- **Parallel test execution** for faster feedback.
-- **Tracing, screenshots, and video recording** for debugging.
-- **Configurable retries and timeouts**.
-- **Detailed HTML reports**.
-- **Cross-browser support** (Chromium, Firefox, WebKit).
-- **Mobile device testing**.
-
-## Project Structure
-
-playwright-e2e-framework/
-|
-├── src/
-│   ├── pages/                # Page Object Models
-│   │   └── example.page.ts
-│   ├── tests/                # Test files
-│   │   └── example.spec.ts
-│   ├── helpers/              # Utility functions
-│   │   └── utilities.ts
-│   ├── tasks/                # Reusable task-based functions
-│       └── performAction.ts
-|
-├── playwright.config.ts      # Playwright configuration file
-├── tsconfig.json             # TypeScript configuration
-├── package.json              # Node.js dependencies
-├── .eslintrc.json            # ESLint configuration
-├── .prettierrc               # Prettier configuration
-├── .gitignore                # Files to ignore in version control
-
-
-
-## Getting Started
-
-### Prerequisites
-
-- **Node.js** (LTS version recommended)
-- **yarn** package manager
 
 ### Installation
 
 1. Clone the repository:
 
-    git clone <repository-url>
-    cd playwright-e2e-framework
-
-2. Install dependencies:
+2. Install dependencies at gtaa.e2etests:
 
     yarn install
 
 3. Install Playwright browsers:
 
-    npx playwright install
+    yarn playwright install
 
 ## Running Tests
 
