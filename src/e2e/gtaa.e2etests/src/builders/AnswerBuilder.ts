@@ -16,8 +16,8 @@ export class AnswerBuilder {
         this._content = `Default answer content - ${timestamp}`;
         this._description = `Default answer description - ${timestamp}`;
         this._destination = `Default answer destination - ${timestamp}`;
-        this._destinationType = AnswerDestinationType.QUESTION;
-        this._weight = 0.0;
+        this._destinationType = AnswerDestinationType.QUESTION; //set to default
+        this._weight = 0.0; //set to default
         this._answerPrefix = 'Default answer prefix';
     }
 

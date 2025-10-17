@@ -13,7 +13,7 @@ export class QuestionBuilder {
         this._questionnaireId = questionnaireId;
         this._content = `Default question content - ${timestamp}`;
         this._description = `Default question description - ${timestamp}`;
-        this._type = QuestionType.SINGLE;
+        this._type = QuestionType.SINGLE; //set to default
         this._prefix = 'Default question prefix';
     }
 
