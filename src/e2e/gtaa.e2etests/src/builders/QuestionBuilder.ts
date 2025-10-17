@@ -27,10 +27,10 @@ export class QuestionBuilder {
 
     build(): QuestionModel {
         return {
-            QuestionnaireId: this._questionnaireId,
-            Content: this._content,
-            Description: this._description,
-            Type: this._type,
+            questionnaireId: this._questionnaireId,
+            content: this._content,
+            description: this._description,
+            type: this._type,
         };
     }
 }

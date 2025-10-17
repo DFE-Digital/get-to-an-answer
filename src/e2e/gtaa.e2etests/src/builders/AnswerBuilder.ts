@@ -39,12 +39,12 @@ export class AnswerBuilder {
 
     build(): AnswerModel {
         return {
-            QuestionId: this._questionId,
-            Content: this._content,
-            Description: this._description,
-            Destination: this._destination,
-            DestinationType: this._destinationType,
-            Weight: this._weight
+            questionId: this._questionId,
+            content: this._content,
+            description: this._description,
+            destination: this._destination,
+            destinationType: this._destinationType,
+            weight: this._weight
         };
     }
 }

@@ -41,9 +41,9 @@ export class QuestionnaireBuilder {
 
     build(): QuestionnaireModel {
         return {
-            Title: this._title,
-            Description: this._description,
-            Slug: this._slug
+            title: this._title,
+            description: this._description,
+            slug: this._slug
         };
     }
 }
