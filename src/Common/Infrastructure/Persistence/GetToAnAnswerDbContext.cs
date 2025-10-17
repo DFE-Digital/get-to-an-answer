@@ -10,15 +10,47 @@ public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> opt
     //public DbSet<AnswerEntity> Answers { get; set; }
     public DbSet<QuestionnaireEntity> Questionnaires { get; set; }
     
-    //public DbSet<QuestionnaireVersionEntity> QuestionnaireVersions { get; set; }
+    public DbSet<QuestionnaireVersionEntity> QuestionnaireVersions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
-        modelBuilder.Entity<QuestionnaireEntity>()
-            .Property(e => e.Id)
-            .HasColumnType("uniqueidentifier")
-            .HasDefaultValueSql("NEWSEQUENTIALID()");
     }
+    
+    public EntityAccess HasAccessToEntity<TEntityType>(string email, Guid id)
+    {
+        if (typeof(TEntityType) == typeof(QuestionnaireEntity))
+        {
+            var access = Questionnaires
+                .Where(qq => qq.Id == id && qq.Status != EntityStatus.Deleted)
+                .Select(qq => new { IsContributor = qq.Contributors.Contains(email) })
+                .FirstOrDefault();
+
+            return access is null
+                ? EntityAccess.NotFound
+                : (access.IsContributor ? EntityAccess.Allow : EntityAccess.Deny);
+        }
+        
+        return EntityAccess.Deny;
+    }
+
+    public async Task ResetQuestionnaireToDraft(Guid questionnaireId)
+    {
+        var questionnaire = await Questionnaires.FirstOrDefaultAsync(q => q.Id == questionnaireId);
+        
+        if (questionnaire == null)
+            return;
+        
+        questionnaire.Status = EntityStatus.Draft;
+        questionnaire.UpdatedAt = DateTime.UtcNow;
+        
+        await SaveChangesAsync();
+    }
+}
+
+public enum EntityAccess
+{
+    Allow,
+    Deny,
+    NotFound
 }

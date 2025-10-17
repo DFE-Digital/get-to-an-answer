@@ -3,6 +3,7 @@ using Common.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,17 +39,6 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<GetToAnAnswerDbContext>();
     await dbContext.Database.EnsureCreatedAsync();
-
-    // Optional: increase timeout for long migrations
-    dbContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
-    
-    // Check pending migrations (optional logging/short-circuit)
-    var pending = await dbContext.Database.GetPendingMigrationsAsync();
-    if (pending.Any())
-    {
-        // log pending
-        await dbContext.Database.MigrateAsync();
-    }
 }
 
 if (!app.Environment.IsDevelopment())

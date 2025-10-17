@@ -1,25 +1,33 @@
 using System.Security.Claims;
 using System.Text;
-using System.Text.Encodings.Web;
+using Common.Infrastructure.Persistence;
 using Integration.Tests.Fake;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
+// ... existing code ...
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-// ... existing code ...
+// Add Testcontainers namespaces
+using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Configurations;
+using DotNet.Testcontainers.Containers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Configuration;
+using Testcontainers.MsSql;
 using ApiProgram = Program;
 
 namespace Integration.Tests.Fixture;
 
-public class ApiFixture : WebApplicationFactory<ApiProgram>
+public class ApiFixture : WebApplicationFactory<ApiProgram>, IAsyncLifetime
 {
+    private IServiceProvider _sp;
+
     private WireMockAadServer? _aad;
+    
+    private readonly MsSqlContainer _msSqlContainer = new MsSqlBuilder().Build();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -44,7 +52,23 @@ public class ApiFixture : WebApplicationFactory<ApiProgram>
 
         builder.ConfigureServices(services =>
         {
-            // If your app pre-registers JwtBearerOptions, ensure authority is set to our mock
+            // Removes the AddDbContext<GetToAnAnswerDbContext> in the Api program.cs
+            var providers = services
+                .Where(d => 
+                    d.ServiceType == typeof(IDbContextOptionsConfiguration<GetToAnAnswerDbContext>))
+                .ToList();
+            foreach (var p in providers)
+            {
+                services.Remove(p);
+            }
+            // ... existing code ...
+            // Replace SQLite with SQL Server using Testcontainers connection string
+            services.AddDbContext<GetToAnAnswerDbContext>(o =>
+            {
+                o.UseSqlServer(_msSqlContainer.GetConnectionString());
+                o.EnableSensitiveDataLogging();
+            });
+            
             const string secret = "local-test-signing-key-32bytes-minimum!";
 
             services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, o =>
@@ -75,6 +99,13 @@ public class ApiFixture : WebApplicationFactory<ApiProgram>
                         if (aud != "test-audience")
                         {
                             context.Fail("invalid audience");
+                            return Task.CompletedTask;
+                        }
+                        
+                        var issuer = principal.FindFirst("iss")?.Value;
+                        if (issuer != "http://dfe-issuer")
+                        {
+                            context.Fail("forbidden access");
                             return Task.CompletedTask;
                         }
 
@@ -110,4 +141,44 @@ public class ApiFixture : WebApplicationFactory<ApiProgram>
         base.Dispose(disposing);
         _aad?.Dispose();
     }
+
+    public Task InitializeAsync()
+    {
+        return _msSqlContainer.StartAsync();
+    }
+
+    public new Task DisposeAsync()
+    {
+        return _msSqlContainer.DisposeAsync().AsTask();
+    }
+
+
+    // Start/stop MSSQL container for the test lifecycle
+    /*public async Task InitializeAsync()
+    {
+        _sqlContainer = new TestcontainersBuilder<MsSqlTestcontainer>()
+            .WithDatabase(new MsSqlTestcontainerConfiguration
+            {
+                Password = "yourStrong(!)Password"
+            })
+            .WithCleanUp(true)
+            .Build();
+
+        await _sqlContainer.StartAsync();
+
+        _connectionString = _sqlContainer.ConnectionString;
+
+        // Ensure schema exists before tests run
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<GetToAnAnswerDbContext>();
+        await db.Database.EnsureCreatedAsync();
+    }
+
+    public new async Task DisposeAsync()
+    {
+        if (_sqlContainer is not null)
+        {
+            await _sqlContainer.DisposeAsync();
+        }
+    }*/
 }

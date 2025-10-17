@@ -2,38 +2,24 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Common.Domain;
+using Common.Domain.Request.Create;
+using FluentAssertions;
 using Integration.Tests.Fake;
 using Integration.Tests.Fixture;
+using Integration.Tests.Util;
 
 namespace Integration.Tests.Questionnaire;
 
-public class QuestionnaireCreationTests(ApiFixture factory) : IClassFixture<ApiFixture>
+public class QuestionnaireTests(ApiFixture factory) : IClassFixture<ApiFixture>
 {
-    private readonly HttpClient _client = factory.CreateClient();
-    private readonly JsonSerializerOptions _json = new(JsonSerializerDefaults.Web);
-
-    private static HttpRequestMessage CreatePost(object payload, string? bearerToken = null)
+    internal readonly HttpClient _client = factory.CreateClient();
+    
+    private static void AssertNoSensitiveUserData(string responseBody)
     {
-        bearerToken ??= JwtTestTokenGenerator.ValidJwtToken;
-        
-        var req = new HttpRequestMessage(HttpMethod.Post, "/api/questionnaires")
-        {
-            Content = new StringContent(JsonSerializer.Serialize(payload, new JsonSerializerOptions(JsonSerializerDefaults.Web)), Encoding.UTF8, "application/json")
-        };
-        if (!string.IsNullOrEmpty(bearerToken))
-        {
-            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
-        }
-        return req;
-    }
-
-    private static void AssertNoSensitiveUserData(JsonElement root)
-    {
-        // Ensure no userId or other sensitive fields are present
-        Assert.False(root.TryGetProperty("userId", out _));
-        Assert.False(root.TryGetProperty("userEmail", out _));
-        Assert.False(root.TryGetProperty("userName", out _));
-        // Adjust with any additional sensitive fields your DTO might exclude
+        // Ensure no sensitive fields are present
+        responseBody.Should().NotContain("createdBy");
+        responseBody.Should().NotContain("contributors");
     }
 
     [Fact]
@@ -41,21 +27,18 @@ public class QuestionnaireCreationTests(ApiFixture factory) : IClassFixture<ApiF
     {
         var payload = new { title = "My Questionnaire" };
 
-        using var req = CreatePost(payload, JwtTestTokenGenerator.ValidJwtToken);
-        using var res = await _client.SendAsync(req);
+        using var res = await this.CreatePost(payload, JwtTestTokenGenerator.ValidJwtToken);
 
         Assert.Equal(HttpStatusCode.Created, res.StatusCode);
 
-        var json = JsonDocument.Parse(await res.Content.ReadAsStringAsync());
-        var root = json.RootElement;
+        var responseBody = await res.Content.ReadAsStringAsync();
+        var dto = responseBody.Deserialize<QuestionnaireDto>()!;
 
-        Assert.True(root.TryGetProperty("id", out var idProp));
-        Assert.False(string.IsNullOrWhiteSpace(idProp.GetString()), "id should be auto-generated");
+        dto.Id.Should().NotBeEmpty(because: "id should be auto-generated");
+        dto.Title.Should().Be("My Questionnaire");
+        dto.CreatedAt.Should().NotBe(default);
 
-        Assert.Equal("My Questionnaire", root.GetProperty("title").GetString());
-        Assert.True(root.TryGetProperty("createdAt", out _));
-
-        AssertNoSensitiveUserData(root);
+        AssertNoSensitiveUserData(responseBody);
     }
 
     [Fact]
@@ -67,15 +50,15 @@ public class QuestionnaireCreationTests(ApiFixture factory) : IClassFixture<ApiF
             description = "D1"
         };
 
-        using var req = CreatePost(payload);
-        using var res = await _client.SendAsync(req);
+        using var res = await this.CreatePost(payload);
 
         Assert.Equal(HttpStatusCode.Created, res.StatusCode);
 
-        var root = JsonDocument.Parse(await res.Content.ReadAsStringAsync()).RootElement;
-        Assert.Equal("T1", root.GetProperty("title").GetString());
-        Assert.Equal("D1", root.GetProperty("description").GetString());
-        AssertNoSensitiveUserData(root);
+        var responseBody = await res.Content.ReadAsStringAsync();
+        var dto = responseBody.Deserialize<QuestionnaireDto>()!;
+        dto.Title.Should().Be("T1");
+        dto.Description.Should().Be("D1");
+        AssertNoSensitiveUserData(responseBody);
     }
 
     [Fact]
@@ -88,16 +71,16 @@ public class QuestionnaireCreationTests(ApiFixture factory) : IClassFixture<ApiF
             description = "Desc"
         };
 
-        using var req = CreatePost(payload);
-        using var res = await _client.SendAsync(req);
+        using var res = await this.CreatePost(payload);
 
         Assert.Equal(HttpStatusCode.Created, res.StatusCode);
 
-        var root = JsonDocument.Parse(await res.Content.ReadAsStringAsync()).RootElement;
-        Assert.Equal("With Slug", root.GetProperty("title").GetString());
-        Assert.Equal("with-slug", root.GetProperty("slug").GetString());
-        Assert.Equal("Desc", root.GetProperty("description").GetString());
-        AssertNoSensitiveUserData(root);
+        var responseBody = await res.Content.ReadAsStringAsync();
+        var dto = responseBody.Deserialize<QuestionnaireDto>()!;
+        dto.Title.Should().Be("With Slug");
+        dto.Slug.Should().Be("with-slug");
+        dto.Description.Should().Be("Desc");
+        AssertNoSensitiveUserData(responseBody);
     }
 
     [Fact]
@@ -105,19 +88,21 @@ public class QuestionnaireCreationTests(ApiFixture factory) : IClassFixture<ApiF
     {
         var payload = new { title = "Duplicate Title" };
 
-        using var req1 = CreatePost(payload);
-        using var res1 = await _client.SendAsync(req1);
+        using var res1 = await this.CreatePost(payload);
         Assert.Equal(HttpStatusCode.Created, res1.StatusCode);
-        var id1 = JsonDocument.Parse(await res1.Content.ReadAsStringAsync()).RootElement.GetProperty("id").GetString();
+        
+        var res1Body = await res1.Content.ReadAsStringAsync();
+        var dto1 = res1Body.Deserialize<QuestionnaireDto>()!;
 
-        using var req2 = CreatePost(payload);
-        using var res2 = await _client.SendAsync(req2);
+        using var res2 = await this.CreatePost(payload);
         Assert.Equal(HttpStatusCode.Created, res2.StatusCode);
-        var id2 = JsonDocument.Parse(await res2.Content.ReadAsStringAsync()).RootElement.GetProperty("id").GetString();
+        
+        var res2Body = await res2.Content.ReadAsStringAsync();
+        var dto2 = res2Body.Deserialize<QuestionnaireDto>()!;
 
-        Assert.False(string.IsNullOrWhiteSpace(id1));
-        Assert.False(string.IsNullOrWhiteSpace(id2));
-        Assert.NotEqual(id1, id2);
+        dto1.Id.Should().NotBeEmpty();
+        dto2.Id.Should().NotBeEmpty();
+        dto2.Id.Should().NotBe(dto1.Id);
     }
 
     [Fact]
@@ -129,14 +114,13 @@ public class QuestionnaireCreationTests(ApiFixture factory) : IClassFixture<ApiF
             description = "Some description"
         };
 
-        using var req = CreatePost(payload);
-        using var res = await _client.SendAsync(req);
+        using var res = await this.CreatePost(payload);
 
         Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
 
         var text = await res.Content.ReadAsStringAsync();
-        Assert.Contains("title", text, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("CreatedBy", text, StringComparison.OrdinalIgnoreCase);
+        text.Should().Contain("title");
+        text.Should().NotContain("CreatedBy");
     }
 
     [Fact]
@@ -144,13 +128,12 @@ public class QuestionnaireCreationTests(ApiFixture factory) : IClassFixture<ApiF
     {
         var payload = new { title = "Any" };
 
-        using var req = CreatePost(payload, JwtTestTokenGenerator.InvalidAudJwtToken);
-        using var res = await _client.SendAsync(req);
+        using var res = await this.CreatePost(payload, JwtTestTokenGenerator.InvalidAudJwtToken);
 
         Assert.Equal(HttpStatusCode.Unauthorized, res.StatusCode);
 
         var text = await res.Content.ReadAsStringAsync();
-        Assert.DoesNotContain("CreatedBy", text, StringComparison.OrdinalIgnoreCase);
+        text.Should().NotContain("CreatedBy");
     }
 
     [Fact]
@@ -158,65 +141,55 @@ public class QuestionnaireCreationTests(ApiFixture factory) : IClassFixture<ApiF
     {
         var payload = new { title = "Any" };
 
-        using var req = CreatePost(payload, bearerToken: JwtTestTokenGenerator.ExpiredJwtToken);
-        using var res = await _client.SendAsync(req);
+        using var res = await this.CreatePost(payload, bearerToken: JwtTestTokenGenerator.ExpiredJwtToken);
 
         Assert.Equal(HttpStatusCode.Unauthorized, res.StatusCode);
 
         var text = await res.Content.ReadAsStringAsync();
-        Assert.DoesNotContain("userId", text, StringComparison.OrdinalIgnoreCase);
+        text.Should().NotContain("userId");
     }
 
     [Fact]
     public async Task Post_NotAuthorized_For_Specific_Resource_Returns_403_Or_401_No_Creation()
     {
-        // Adjust endpoint or headers to simulate authenticated but unauthorized user
         var payload = new { title = "Any" };
 
-        using var req = CreatePost(payload, JwtTestTokenGenerator.UnauthorizedJwtToken);
-        using var res = await _client.SendAsync(req);
+        using var res = await this.CreatePost(payload, JwtTestTokenGenerator.NonDfeJwtToken);
 
         Assert.Contains(res.StatusCode, new[] { HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden });
 
         var text = await res.Content.ReadAsStringAsync();
-        Assert.DoesNotContain("userId", text, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("exists", text, StringComparison.OrdinalIgnoreCase); // avoid leaking existence
+        text.Should().NotContain("userId");
+        text.Should().NotContain("exists");
     }
 
     [Fact]
     public async Task Create_Invalid_Payload_Field_Types_Returns400_No_Leak()
     {
-        // e.g., title as number, description as object
         var payload = new
         {
             title = 12345,
             description = new { inner = "value" }
         };
 
-        using var req = CreatePost(payload);
-        using var res = await _client.SendAsync(req);
+        using var res = await this.CreatePost(payload);
 
         Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
 
         var text = await res.Content.ReadAsStringAsync();
-        Assert.DoesNotContain("userId", text, StringComparison.OrdinalIgnoreCase);
+        text.Should().NotContain("userId");
     }
-
-    // Title business rules - adjust expected outcomes per confirmed rules
 
     [Theory]
     [InlineData("   ", false, "only whitespace")]
     [InlineData("😀✨💥", true, "emojis allowed?")]
     [InlineData("\t\r\n", false, "control characters")]
     [InlineData("A", true, "lower length")]
-    //[InlineData(RandomData, true, "min boundary example")]
-    //[InlineData(RandomData2, false, "exceeds max?")]
     public async Task Title_Business_Rules(string title, bool expectedSuccess, string _case)
     {
         var payload = new { title };
 
-        using var req = CreatePost(payload);
-        using var res = await _client.SendAsync(req);
+        using var res = await this.CreatePost(payload);
 
         if (expectedSuccess)
         {
@@ -226,24 +199,20 @@ public class QuestionnaireCreationTests(ApiFixture factory) : IClassFixture<ApiF
         {
             Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
             var text = await res.Content.ReadAsStringAsync();
-            Assert.Contains("title", text, StringComparison.OrdinalIgnoreCase);
+            text.Should().Contain("title");
         }
     }
 
-    // Description business rules - adjust expected outcomes per confirmed rules
     [Theory]
     [InlineData("   ", true, "description may allow whitespace?")]
     [InlineData("😀✨💥", true, "emojis")]
     [InlineData("\t\r\n", true, "control chars?")]
     [InlineData("A", true, "min")]
-    //[InlineData("".PadLeft(1024, 'D'), true, "upper limit within range?")]
-    //[InlineData("".PadLeft(100_000, 'X'), false, "exceeds max?")]
     public async Task Description_Business_Rules(string description, bool expectedSuccess, string _case)
     {
         var payload = new { title = "Valid Title", description };
 
-        using var req = CreatePost(payload);
-        using var res = await _client.SendAsync(req);
+        using var res = await this.CreatePost(payload);
 
         if (expectedSuccess)
         {
@@ -253,7 +222,748 @@ public class QuestionnaireCreationTests(ApiFixture factory) : IClassFixture<ApiF
         {
             Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
             var text = await res.Content.ReadAsStringAsync();
-            Assert.Contains("description", text, StringComparison.OrdinalIgnoreCase);
+            text.Should().Contain("description");
         }
     }
+    
+    // === Tests for the Get questionnaires endpoint ===
+
+    [Fact(DisplayName = "Get all questionnaires for me returns 200 and only my accessible items")]
+    public async Task Get_All_For_Current_User_Only()
+    {
+        // Seed: create two questionnaires for current user
+        using (var res = await this.CreatePost(new { title = "Q1", description = "D1" }, JwtTestTokenGenerator.ValidJwtToken)) 
+        { Assert.Equal(HttpStatusCode.Created, res.StatusCode); }
+        using (var res = await this.CreatePost(new { title = "Q2" }, JwtTestTokenGenerator.ValidJwtToken))
+        { Assert.Equal(HttpStatusCode.Created, res.StatusCode); }
+
+        // Seed: create a questionnaire as a different user (unauthorised for current user)
+        using (var res = await this.CreatePost(new { title = "OtherUser-NotVisible" }, JwtTestTokenGenerator.UnauthorizedJwtToken))
+        { Assert.Equal(HttpStatusCode.Created, res.StatusCode); }
+
+        // Act
+        using var getRes = await this.CreateGet(JwtTestTokenGenerator.ValidJwtToken);
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, getRes.StatusCode);
+
+        var responseBody = await getRes.Content.ReadAsStringAsync();
+        var questionnaires = responseBody.Deserialize<List<QuestionnaireDto>>();
+
+        Assert.NotNull(questionnaires);
+        
+        Assert.Equal(2, questionnaires.Count);
+
+        foreach (var q in questionnaires)
+        {
+            Assert.NotEqual("OtherUser-NotVisible", q.Title); // shouldn't include others
+        }
+    }
+
+    [Fact(DisplayName = "Invalid JWT returns 401 and no data leakage")]
+    public async Task Invalid_Jwt()
+    {
+        using var res = await this.CreateGet(JwtTestTokenGenerator.InvalidAudJwtToken);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, res.StatusCode);
+
+        var text = await res.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("createdBy", text);
+        Assert.DoesNotContain("contributors", text);
+    }
+
+    [Fact(DisplayName = "Expired JWT returns 401 and no data leakage")]
+    public async Task Expired_Jwt()
+    {
+        using var res = await this.CreateGet(JwtTestTokenGenerator.ExpiredJwtToken);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, res.StatusCode);
+
+        var text = await res.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("createdBy", text);
+        Assert.DoesNotContain("contributors", text);
+    }
+
+    [Fact(DisplayName = "Get returns empty list when none exist for user")]
+    public async Task Get_Empty_When_None_Exist()
+    {
+        // Use a token that has no created questionnaires
+        using var res = await this.CreateGet(JwtTestTokenGenerator.NewUserJwtToken);
+
+        Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+
+        var responseBody = await res.Content.ReadAsStringAsync();
+        var list = responseBody.Deserialize<List<QuestionnaireDto>>();
+        
+        list.Should().NotBeNull();
+        list.Should().BeEmpty();
+    }
+    
+    // === Tests for the Get specific questionnaire endpoint ===
+    
+    private async Task<HttpResponseMessage> CreateCreateGet(string id, string? bearerToken = null)
+    {
+        bearerToken ??= JwtTestTokenGenerator.ValidJwtToken;
+
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/api/questionnaires/{id}");
+        if (!string.IsNullOrWhiteSpace(bearerToken))
+        {
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+        }
+        return await _client.SendAsync(req);
+    }
+
+    private static string ExtractId(string json)
+        => JsonDocument.Parse(json).RootElement.GetProperty("id").GetString()!;
+
+    // Scenario: Retrieve an existing questionnaire
+    [Fact(DisplayName = "GET /questionnaires/{id} returns 200 with DTO and system-managed fields; no sensitive user data")]
+    public async Task Get_By_Id_Succeeds_With_Dto_And_No_Sensitive_Data()
+    {
+        // Arrange: create a questionnaire as current user
+        var createPayload = new { title = "My Q", description = "Desc" };
+        using (var postRes = await this.CreatePost(createPayload, JwtTestTokenGenerator.ValidJwtToken))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            var id = ExtractId(await postRes.Content.ReadAsStringAsync());
+
+            // Act
+            using var getRes = await CreateCreateGet(id, JwtTestTokenGenerator.ValidJwtToken);
+            
+            // Assert
+            getRes.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var responseBody = await getRes.Content.ReadAsStringAsync();
+            var questionnaire = responseBody.Deserialize<QuestionnaireDto>();
+
+            questionnaire.Should().NotBeNull();
+            
+            questionnaire.Id.ToString().Should().Be(id);
+            questionnaire.Title.Should().Be("My Q");
+            questionnaire.Description.Should().Be("Desc");
+
+            questionnaire.CreatedAt.Should().NotBe(default);
+            questionnaire.UpdatedAt.Should().NotBe(default);
+            
+            // No sensitive user data
+            AssertNoSensitiveUserData(responseBody);
+        }
+    }
+
+    // Scenario: Access to questionnaire not permitted
+    [Fact(DisplayName = "GET /questionnaires/{id} unauthorized user gets 401/403 without existence leak")]
+    public async Task Get_By_Id_Unauthorized_User_Fails_Without_Leak()
+    {
+        // Arrange: create as authorized user
+        var createPayload = new { title = "Private Q" };
+        using (var postRes = await this.CreatePost(createPayload, JwtTestTokenGenerator.ValidJwtToken))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            var id = ExtractId(await postRes.Content.ReadAsStringAsync());
+
+            // Act: fetch as a different/unauthorized user
+            using var res = await CreateCreateGet(id, JwtTestTokenGenerator.UnauthorizedJwtToken);
+            
+            // Assert: either 401 or 403 and no existence-sensitive details
+            new[] { HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden }.Should().Contain(res.StatusCode);
+
+            var text = await res.Content.ReadAsStringAsync();
+            
+            AssertNoSensitiveUserData(text);
+        }
+    }
+
+    // Scenario: Questionnaire does not exist or is deleted
+    [Fact(DisplayName = "GET missing/deleted questionnaire returns 404 Not Found")]
+    public async Task Get_By_Id_Missing_Or_Deleted_Returns_404()
+    {
+        // Arrange: random id that won't exist
+        var missingId = Guid.NewGuid().ToString("N");
+
+        // Act
+        using var res = await CreateCreateGet(missingId, JwtTestTokenGenerator.ValidJwtToken);
+        
+        // Assert
+        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        var text = await res.Content.ReadAsStringAsync();
+        text.Should().NotContain("userId");
+        text.Should().NotContain("contributors");
+    }
+
+    // Scenario: Get the specific questionnaire you created or were invited to contribute
+    [Fact(DisplayName = "GET /questionnaires/{id} returns only the requested questionnaire with expected fields")]
+    public async Task Get_By_Id_Returns_Correct_Fields_Only()
+    {
+        // Arrange: create two questionnaires as current user; we will fetch only one
+        string idToFetch;
+        {
+            using var res1 = await this.CreatePost(new { title = "Q1", description = "D1" }, JwtTestTokenGenerator.ValidJwtToken);
+            res1.StatusCode.Should().Be(HttpStatusCode.Created);
+            idToFetch = ExtractId(await res1.Content.ReadAsStringAsync());
+        }
+        {
+            using var res2 = await this.CreatePost(new { title = "Q2", description = "D2" }, JwtTestTokenGenerator.ValidJwtToken);
+            res2.StatusCode.Should().Be(HttpStatusCode.Created);
+        }
+
+        // Act
+        using var res = await CreateCreateGet(idToFetch, JwtTestTokenGenerator.ValidJwtToken);
+        
+        // Assert
+        res.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseBody = await res.Content.ReadAsStringAsync();
+        var questionnaire = responseBody.Deserialize<QuestionnaireDto>();
+
+        questionnaire.Should().NotBeNull();
+        
+        questionnaire.Id.ToString().Should().Be(idToFetch);
+        questionnaire.Title.Should().Be("Q1");
+        questionnaire.Description.Should().Be("D1");
+
+        AssertNoSensitiveUserData(responseBody);
+    }
+
+    // Scenario: Error when expired JWT bearer token
+    [Fact(DisplayName = "GET with expired JWT returns 401 and no sensitive data")]
+    public async Task Get_By_Id_Expired_Token_Returns_401_No_Leak()
+    {
+        // Arrange: create a questionnaire to target
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "Any" }, JwtTestTokenGenerator.ValidJwtToken))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act
+        using var res = await CreateCreateGet(id, JwtTestTokenGenerator.ExpiredJwtToken);
+        
+        // Assert
+        res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        var responseBody = await res.Content.ReadAsStringAsync();
+        
+        AssertNoSensitiveUserData(responseBody);
+    }
+
+    // Scenario: Error when invalid JWT bearer token
+    [Fact(DisplayName = "GET with invalid JWT returns 401 and no sensitive data")]
+    public async Task Get_By_Id_Invalid_Token_Returns_401_No_Leak()
+    {
+        // Arrange: create a questionnaire to target
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "Any" }, JwtTestTokenGenerator.ValidJwtToken))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act
+        using var res = await CreateCreateGet(id, JwtTestTokenGenerator.InvalidAudJwtToken);
+        
+        // Assert
+        res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        var text = await res.Content.ReadAsStringAsync();
+        
+        AssertNoSensitiveUserData(text);
+    }
+
+    // Scenario: Error when invalid questionnaire id is passed
+    [Theory(DisplayName = "GET with invalid questionnaire id returns 400 Bad Request")]
+    [InlineData("not-a-guid")]
+    [InlineData("123")]
+    public async Task Get_By_Id_Invalid_Id_Returns_400(string invalidId)
+    {
+        using var res = await CreateCreateGet(invalidId, JwtTestTokenGenerator.ValidJwtToken);
+
+        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var text = await res.Content.ReadAsStringAsync();
+        text.Should().NotBeNullOrWhiteSpace();
+    }
+    
+    // === Tests for the Update questionnaire endpoint ===
+
+    // ... existing code ...
+
+    // === Tests for the Update questionnaire endpoint ===
+
+    
+
+    // Scenario: Update a questionnaire with only the Title
+    [Fact]
+    public async Task Update_Title_Only_NoContent_And_Description_Unchanged()
+    {
+        // Arrange
+        string id;
+        const string originalDesc = "Original desc";
+        using (var postRes = await this.CreatePost(new { title = "T0", description = originalDesc }))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act
+        using var res = await this.CreatePut(id, new { title = "T1" });
+        
+        // Assert 204, then GET to verify
+        res.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        var questionnaire = await this.CreateGetById<QuestionnaireDto>(id);
+        questionnaire.Title.Should().Be("T1");
+        questionnaire.Description.Should().Be(originalDesc);
+        questionnaire.CreatedAt.Should().NotBe(default);
+        questionnaire.UpdatedAt.Should().NotBe(default);
+    }
+
+    // Scenario: Update a questionnaire with missing Title
+    [Fact]
+    public async Task Update_Missing_Title_BadRequest_NoContent_Not_Used()
+    {
+        // Arrange
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "T0", description = "D0" }))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act
+        using var res = await this.CreatePut(id, new { /* missing title */ });
+
+        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var text = await res.Content.ReadAsStringAsync();
+        text.Should().Contain("title");
+        text.Should().NotContain("userId");
+        text.Should().NotContain("userEmail");
+
+        // Verify nothing changed
+        var questionnaire = await this.CreateGetById<QuestionnaireDto>(id);
+        questionnaire.Title.Should().Be("T0");
+        questionnaire.Description.Should().Be("D0");
+    }
+
+    // Scenario: Update with Title and Description
+    [Fact]
+    public async Task Update_Title_And_Description_NoContent_Then_Get()
+    {
+        // Arrange
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "T0", description = "D0" }))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act
+        using var res = await this.CreatePut(id, new { title = "T1", description = "D1" });
+
+        res.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        var questionnaire = await this.CreateGetById<QuestionnaireDto>(id);
+        questionnaire.Title.Should().Be("T1");
+        questionnaire.Description.Should().Be("D1");
+    }
+
+    // Scenario: Update with Title, Slug and Description
+    [Fact]
+    public async Task Update_Title_Slug_Description_NoContent_Then_Get()
+    {
+        // Arrange
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "T0", description = "D0" }))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act
+        using var res = await this.CreatePut(id, new { title = "T2", slug = "t2-slug", description = "D2" });
+
+        res.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        var questionnaire = await this.CreateGetById<QuestionnaireDto>(id);
+        questionnaire.Title.Should().Be("T2");
+        questionnaire.Slug.Should().Be("t2-slug");
+        questionnaire.Description.Should().Be("D2");
+    }
+
+    // Scenario: Error when invalid JWT bearer token (unauthorized access)
+    [Fact]
+    public async Task Update_Invalid_JWT_401_No_Changes()
+    {
+        // Arrange
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "Seed", description = "D0" }, JwtTestTokenGenerator.ValidJwtToken))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act
+        using var res = await this.CreatePut(id, new { title = "Changed" }, JwtTestTokenGenerator.InvalidAudJwtToken);
+
+        res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        var text = await res.Content.ReadAsStringAsync();
+
+        // Verify unchanged
+        var questionnaire = await this.CreateGetById<QuestionnaireDto>(id, JwtTestTokenGenerator.ValidJwtToken);
+        questionnaire.Title.Should().Be("Seed");
+        questionnaire.Description.Should().Be("D0");
+    }
+
+    // Scenario: Error when expired JWT bearer token (unauthorized access)
+    [Fact]
+    public async Task Update_Expired_JWT_401_No_Changes()
+    {
+        // Arrange
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "Seed", description = "D0" }, JwtTestTokenGenerator.ValidJwtToken))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act
+        using var res = await this.CreatePut(id, new { title = "Changed" }, JwtTestTokenGenerator.ExpiredJwtToken);
+
+        res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        // Verify unchanged
+        var questionnaire = await this.CreateGetById<QuestionnaireDto>(id, JwtTestTokenGenerator.ValidJwtToken);
+        questionnaire.Title.Should().Be("Seed");
+        questionnaire.Description.Should().Be("D0");
+    }
+
+    // Scenario: Questionnaire not found
+    [Fact]
+    public async Task Update_NotFound_NoContent_Not_Returned()
+    {
+        var missingId = Guid.NewGuid().ToString("N");
+
+        using var res = await this.CreatePut(missingId, new { title = "T1" });
+
+        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    // Scenario: Access to questionnaire not permitted
+    [Fact]
+    public async Task Update_Forbidden_No_Changes()
+    {
+        // Arrange: create as authorized user
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "Private Q", description = "D0" }, JwtTestTokenGenerator.ValidJwtToken))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act as unauthorized user
+        using var res = await this.CreatePut(id, new { title = "Hack" }, JwtTestTokenGenerator.UnauthorizedJwtToken);
+
+        new[] { HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden }.Should().Contain(res.StatusCode);
+
+        // Verify unchanged with authorized token
+        var questionnaire = await this.CreateGetById<QuestionnaireDto>(id, JwtTestTokenGenerator.ValidJwtToken);
+        questionnaire.Title.Should().Be("Private Q");
+        questionnaire.Description.Should().Be("D0");
+    }
+
+    // Scenario: Error when invalid questionnaire id is passed
+    [Theory]
+    [InlineData("not-a-guid")]
+    [InlineData("123")]
+    public async Task Update_Invalid_Id_400_No_Changes(string invalidId)
+    {
+        using var res = await this.CreatePut(invalidId, new { title = "T1" });
+
+        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var text = await res.Content.ReadAsStringAsync();
+        text.Should().NotBeNullOrWhiteSpace();
+    }
+
+    // Scenario: Update with invalid payload data e.g. description as Boolean
+    [Fact]
+    public async Task Update_Invalid_Payload_400_No_Changes()
+    {
+        // Arrange
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "Seed", description = "D0" }))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act: invalid type
+        using var res = await this.CreatePut(id, new { title = "T1", description = true });
+
+        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        // Verify unchanged
+        var questionnaire = await this.CreateGetById<QuestionnaireDto>(id);
+        questionnaire.Title.Should().Be("Seed");
+        questionnaire.Description.Should().Be("D0");
+    }
+
+    // Scenario: Update a questionnaire with a matching Title to an existing questionnaire
+    [Fact]
+    public async Task Update_With_Duplicate_Title_Still_Distinct_Ids()
+    {
+        // Seed two questionnaires
+        string id1, id2;
+        using (var r1 = await this.CreatePost(new { title = "A", description = "D1" }))
+        {
+            r1.StatusCode.Should().Be(HttpStatusCode.Created);
+            id1 = ExtractId(await r1.Content.ReadAsStringAsync());
+        }
+        using (var r2 = await this.CreatePost(new { title = "B", description = "D2" }))
+        {
+            r2.StatusCode.Should().Be(HttpStatusCode.Created);
+            id2 = ExtractId(await r2.Content.ReadAsStringAsync());
+        }
+
+        // Act: update second to duplicate title of first
+        using var res = await this.CreatePut(id2, new { title = "A" });
+
+        res.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        // Verify via GETs: different IDs remain, titles reflect update
+        var q1 = await this.CreateGetById<QuestionnaireDto>(id1);
+        var q2 = await this.CreateGetById<QuestionnaireDto>(id2);
+
+        q1.Id.Should().Be(id1);
+        q2.Id.Should().Be(id2);
+        q2.Title.Should().Be("A");
+    }
+    
+    // === Tests for the Delete questionnaire endpoint ===
+
+    [Fact]
+    public async Task Delete_Existing_Questionnaire_Succeeds_And_Is_SoftDeleted()
+    {
+        // Arrange: create then ensure appears in GET list
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "ToDelete", description = "D0" }))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act: delete
+        using var delRes = await this.CreateDelete(id);
+
+        // Assert 200 OK or 204 NoContent
+        new[] { HttpStatusCode.OK, HttpStatusCode.NoContent }.Should().Contain(delRes.StatusCode);
+
+        // Verify via GET by id -> 404 (soft-deleted not retrievable)
+        using (var getRes = await this.CreateGetById(id, JwtTestTokenGenerator.ValidJwtToken))
+        {
+            getRes.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
+        // Verify it no longer appears in list
+        using (var listReq = new HttpRequestMessage(HttpMethod.Get, "/api/questionnaires"))
+        {
+            listReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", JwtTestTokenGenerator.ValidJwtToken);
+            using var listRes = await _client.SendAsync(listReq);
+            listRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            var body = await listRes.Content.ReadAsStringAsync();
+            body.Should().NotContain(id);
+        }
+    }
+
+    [Fact]
+    public async Task Delete_NotAuthorized_Questionnaire_Returns_Forbidden_Or_NotFound_No_Leak_No_Deletion()
+    {
+        // Arrange: create as authorized user
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "Private Q", description = "D0" }, JwtTestTokenGenerator.ValidJwtToken))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act: delete as unauthorized user
+        using var res = await this.CreateDelete(id, JwtTestTokenGenerator.UnauthorizedJwtToken);
+
+        new[] { HttpStatusCode.Forbidden, HttpStatusCode.NotFound }.Should().Contain(res.StatusCode);
+        var text = await res.Content.ReadAsStringAsync();
+        text.Should().NotContain("contributors");
+        text.Should().NotContain("createdBy");
+
+        // Verify still retrievable by owner
+        using var getRes = await this.CreateGetById(id, JwtTestTokenGenerator.ValidJwtToken);
+        getRes.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task Delete_Missing_Questionnaire_Returns_404()
+    {
+        var missingId = Guid.NewGuid().ToString("N");
+
+        using var res = await this.CreateDelete(missingId);
+
+        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        var text = await res.Content.ReadAsStringAsync();
+        text.Should().NotBeNullOrWhiteSpace();
+        text.Should().NotContain("userId");
+        text.Should().NotContain("contributors");
+    }
+
+    [Fact]
+    public async Task Delete_Invalid_JWT_Returns_Unauthorized_No_Deletion()
+    {
+        // Arrange
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "Seed", description = "D0" }, JwtTestTokenGenerator.ValidJwtToken))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act
+        using var res = await this.CreateDelete(id, JwtTestTokenGenerator.InvalidAudJwtToken);
+
+        new[] { HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden, HttpStatusCode.BadRequest, HttpStatusCode.NotFound }.Should().Contain(res.StatusCode);
+        
+        // Verify still retrievable with valid token
+        using var getRes = await this.CreateGetById(id, JwtTestTokenGenerator.ValidJwtToken);
+        getRes.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task Delete_Expired_JWT_Returns_Unauthorized_No_Deletion()
+    {
+        // Arrange
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "Seed", description = "D0" }, JwtTestTokenGenerator.ValidJwtToken))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+
+        // Act
+        using var res = await this.CreateDelete(id, JwtTestTokenGenerator.ExpiredJwtToken);
+
+        new[] { HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden, HttpStatusCode.BadRequest, HttpStatusCode.NotFound }.Should().Contain(res.StatusCode);
+        var text = await res.Content.ReadAsStringAsync();
+
+        // Verify still retrievable with valid token
+        using var getRes = await this.CreateGetById(id, JwtTestTokenGenerator.ValidJwtToken);
+        getRes.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task Delete_Already_Deleted_Returns_NotFound_Or_Conflict_No_Duplication()
+    {
+        // Arrange: create and delete
+        string id;
+        using (var postRes = await this.CreatePost(new { title = "SoftDelete", description = "D0" }))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
+        using (var firstRes = await this.CreateDelete(id))
+        {
+            new[] { HttpStatusCode.OK, HttpStatusCode.NoContent }.Should().Contain(firstRes.StatusCode);
+        }
+
+        // Act: delete again
+        using var res = await this.CreateDelete(id);
+
+        new[]
+        {
+            HttpStatusCode.NotFound, HttpStatusCode.BadRequest, HttpStatusCode.Forbidden, HttpStatusCode.Conflict
+        }.Should().Contain(res.StatusCode);
+    }
+
 }
+
+public static class QuestionnaireTestsExtensions
+{
+    public static async Task<HttpResponseMessage> CreatePost(this QuestionnaireTests tests, object payload, string? bearerToken = null)
+    {
+        bearerToken ??= JwtTestTokenGenerator.ValidJwtToken;
+        
+        var req = new HttpRequestMessage(HttpMethod.Post, "/api/questionnaires")
+        {
+            Content = new StringContent(JsonSerializer.Serialize(payload, new JsonSerializerOptions(JsonSerializerDefaults.Web)), Encoding.UTF8, "application/json")
+        };
+        if (!string.IsNullOrEmpty(bearerToken))
+        {
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+        }
+        return await tests._client.SendAsync(req);
+    }
+    
+    public static async Task<TGetToAnAnswerDto> CreatePost<TGetToAnAnswerDto>(this QuestionnaireTests tests, object payload, string? bearerToken = null)
+    {
+        var res = await tests.CreatePost(payload, bearerToken);
+        var responseBody = await res.Content.ReadAsStringAsync();
+        return responseBody.Deserialize<TGetToAnAnswerDto>()!;
+    }
+    
+    public static async Task<HttpResponseMessage> CreateGet(this QuestionnaireTests tests, string? bearerToken = null)
+    {
+        bearerToken ??= JwtTestTokenGenerator.ValidJwtToken;
+
+        var req = new HttpRequestMessage(HttpMethod.Get, "/api/questionnaires");
+        if (!string.IsNullOrEmpty(bearerToken))
+        {
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+        }
+        return await tests._client.SendAsync(req);
+    }
+    
+    public static async Task<TGetToAnAnswerDto> CreateGet<TGetToAnAnswerDto>(this QuestionnaireTests tests, string? bearerToken = null)
+    {
+        var res = await tests.CreateGet(bearerToken);
+        var responseBody = await res.Content.ReadAsStringAsync();
+        return responseBody.Deserialize<TGetToAnAnswerDto>()!;
+    }
+    
+    public static async Task<HttpResponseMessage> CreateGetById(this QuestionnaireTests tests, string id, string? bearerToken = null)
+    {
+        bearerToken ??= JwtTestTokenGenerator.ValidJwtToken;
+
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/api/questionnaires/{id}");
+        if (!string.IsNullOrEmpty(bearerToken))
+        {
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+        }
+        return await tests._client.SendAsync(req);
+    }
+    
+    public static async Task<TGetToAnAnswerDto> CreateGetById<TGetToAnAnswerDto>(this QuestionnaireTests tests, string id, string? bearerToken = null)
+    {
+        var res = await tests.CreateGetById(id, bearerToken);
+        var responseBody = await res.Content.ReadAsStringAsync();
+        return responseBody.Deserialize<TGetToAnAnswerDto>()!;
+    }
+    
+    public static async Task<HttpResponseMessage> CreatePut(this QuestionnaireTests tests, string id, object payload, string? bearerToken = null)
+    {
+        bearerToken ??= JwtTestTokenGenerator.ValidJwtToken;
+
+        var req = new HttpRequestMessage(HttpMethod.Put, $"/api/questionnaires/{id}")
+        {
+            Content = new StringContent(JsonSerializer.Serialize(payload, new JsonSerializerOptions(JsonSerializerDefaults.Web)), Encoding.UTF8, "application/json")
+        };
+        if (!string.IsNullOrEmpty(bearerToken))
+        {
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+        }
+        return await tests._client.SendAsync(req);
+    }
+    
+    public static async Task<HttpResponseMessage> CreateDelete(this QuestionnaireTests tests, string id, string? bearerToken = null)
+    {
+        bearerToken ??= JwtTestTokenGenerator.ValidJwtToken;
+
+        var req = new HttpRequestMessage(HttpMethod.Delete, $"/api/questionnaires/{id}");
+        if (!string.IsNullOrEmpty(bearerToken))
+        {
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+        }
+        return await tests._client.SendAsync(req);
+    }
+}
+
