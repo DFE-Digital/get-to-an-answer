@@ -18,7 +18,7 @@ export async function createQuestionnaire(
     const response = await request.post('/questionnaires', {data: payload});
 
     if (!response.ok()) {
-        throw new Error(`Failed to create questionnaire: ${response.status()}`);
+        throw new Error(`❌ Failed to create questionnaire: ${response.status()}`);
     }
     return await response.json();
 }
@@ -30,7 +30,7 @@ export async function getQuestionnaire(
     const response = await request.get(`/questionnaires/${questionnaireId}`);
 
     if (!response.ok()) {
-        throw new Error(`Failed to fetch required questionnaire: ${response.status()}`);
+        throw new Error(`❌ Failed to fetch required questionnaire: ${response.status()}`);
     }
     return await response.json();
 }

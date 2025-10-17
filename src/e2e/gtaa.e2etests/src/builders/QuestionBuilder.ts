@@ -14,7 +14,7 @@ export class QuestionBuilder {
         this._content = `Default question content - ${timestamp}`;
         this._description = `Default question description - ${timestamp}`;
         this._type = QuestionType.SINGLE;
-        this._prefix = 'Default prefix';
+        this._prefix = 'Default question prefix';
     }
 
     withContent(content?: string) {

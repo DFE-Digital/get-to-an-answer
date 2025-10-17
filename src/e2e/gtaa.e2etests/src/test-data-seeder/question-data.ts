@@ -20,7 +20,7 @@ export async function createQuestion(
     const res = await request.post('/questions', {data: payload});
 
     if (!res.ok()) {
-        throw new Error(`Failed to create question: ${res.status()}`);
+        throw new Error(`❌ Failed to create question: ${res.status()}`);
     }
 
     return await res.json();
@@ -33,7 +33,7 @@ export async function getQuestion(
     const response = await request.get(`/questions/${questionId}`);
 
     if (!response.ok()) {
-        throw new Error(`Failed to fetch required question: ${response.status()}`);
+        throw new Error(`❌ Failed to fetch required question: ${response.status()}`);
     }
 
     return await response.json();

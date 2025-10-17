@@ -1,39 +1,61 @@
-import type {AnswerModel, DestinationType} from '../models/api-models';
+import type {AnswerModel} from '../models/api-models';
+import {AnswerDestinationType} from '../constants/test-data-constants';
 
 export class AnswerBuilder {
     private _questionId: string;
-    private _content = 'Default answer content';
-    private _description = 'Default answer description';
-    private _destination = 'Default answer destination';
-    private _destinationType: DestinationType = 'question';
-    private _weight: number = 0.0;
+    private _content: string;
+    private _description: string;
+    private _destination: string;
+    private _destinationType: AnswerDestinationType;
+    private _weight: number;
+    private _answerPrefix: string
 
     constructor(questionId: string) {
+        const timestamp = Date.now();
         this._questionId = questionId;
+        this._content = `Default answer content - ${timestamp}`;
+        this._description = `Default answer description - ${timestamp}`;
+        this._destination = `Default answer destination - ${timestamp}`;
+        this._destinationType = AnswerDestinationType.QUESTION;
+        this._weight = 0.0;
+        this._answerPrefix = 'Default answer prefix';
+    }
+
+    withContent(content?: string) {
+        if (content !== undefined)
+            this._content = content;
+        return this;
+    }
+
+    withContentPrefix(prefix?: string) {
+        if (prefix && prefix.trim().length > 0)
+            this._content = `${prefix} - ${this._content}`;
+        else
+            this._content = `${this._answerPrefix} - ${this._content}`;
+        return this;
     }
     
-    withContent(content: string) {
-        this._content = content;
+    withDescription(description?: string) {
+        if (description !== undefined)
+            this._description = description;
         return this;
     }
 
-    withDescription(description: string) {
-        this._description = description;
+    withDestination(destination?: string) {
+        if (destination !== undefined)
+            this._destination = destination;
         return this;
     }
 
-    withDestination(destination: string) {
-        this._destination = destination;
+    withDestinationType(destinationType?: AnswerDestinationType) {
+        if (destinationType !== undefined)
+            this._destinationType = destinationType;
         return this;
     }
 
-    withDestinationType(destinationType: DestinationType) {
-        this._destinationType = destinationType;
-        return this;
-    }
-
-    withWeight(weight: number) {
-        this._weight = weight;
+    withWeight(weight?: number) {
+        if (weight !== undefined)
+            this._weight = weight;
         return this;
     }
 

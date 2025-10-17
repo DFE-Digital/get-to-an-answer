@@ -11,7 +11,7 @@ export class QuestionnaireBuilder {
         this._title = `Default questionnaire title - ${timestamp}`;
         this._description = `Default questionnaire description - ${timestamp}`;
         this._slug = `Default questionnaire slug - ${timestamp}`;
-        this._prefix = 'Default prefix';
+        this._prefix = 'Default questionnaire prefix';
     }
 
     withTitlePrefix(prefix?: string) {

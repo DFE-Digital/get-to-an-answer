@@ -12,9 +12,9 @@ test.describe('POST Create questionnaire api request', () => {
 
         // --- Schema-level checks ---
         expect(questionnairePostResponse).toHaveProperty('id');
-        expect(questionnairePostResponse).toHaveProperty('Title');
-        expect(questionnairePostResponse).toHaveProperty('Description');
-        expect(questionnairePostResponse).toHaveProperty('Slug');
+        expect(questionnairePostResponse).toHaveProperty('title');
+        expect(questionnairePostResponse).toHaveProperty('description');
+        expect(questionnairePostResponse).toHaveProperty('slug');
 
         // --- Type sanity checks ---
         expect(typeof questionnairePostResponse.id).toBe('string');
