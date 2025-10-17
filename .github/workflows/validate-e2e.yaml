@@ -31,6 +31,9 @@ jobs:
 #        id: build
 #        working-directory: ./src
 #        run: docker build . -t care-leavers-web:e2e -f web/CareLeavers.Web/Dockerfile
+      - name: Make wait-for-sqlserver.sh executable
+        run: chmod +x src/Infrastructure/wait-for-sqlserver.sh
+
       - name: Run E2E Docker Image
         id: run
         working-directory: ./src
