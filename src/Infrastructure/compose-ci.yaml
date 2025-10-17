@@ -1,24 +1,16 @@
 services:
-  api-1:
-    image: api-1
+  web-api:
+    image: web-api
     build:
-      context: .
+      context: ../..
       dockerfile: src/Api/Dockerfile
     depends_on:
       - sqlserver
     environment:
       - ConnectionStrings__DefaultConnection=${DEFAULT_CONNECTION_STRING}
-    #Waits for SQL Server to be available before starting the application
-    entrypoint:
-      - sh
-      - -c
-      - |
-        until nc -z sqlserver 1433; do
-          echo 'SQL Server is unavailable - sleeping';
-          sleep 2;
-        done;
-        echo 'SQL Server is up - executing command';
-        dotnet Api.dll
+    volumes:
+      - ./wait-for-sqlserver.sh:/wait-for-sqlserver.sh
+    entrypoint: ["/wait-for-sqlserver.sh"]
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
