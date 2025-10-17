@@ -9,7 +9,7 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=${DEFAULT_CONNECTION_STRING}
     volumes:
-      - ./wait-for-sqlserver.sh
+      - ./wait-for-sqlserver.sh:/wait-for-sqlserver.sh
     entrypoint: ["/wait-for-sqlserver.sh"]
 
   sqlserver:
