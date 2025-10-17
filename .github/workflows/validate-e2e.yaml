@@ -31,12 +31,6 @@ jobs:
 #        id: build
 #        working-directory: ./src
 #        run: docker build . -t care-leavers-web:e2e -f web/CareLeavers.Web/Dockerfile
-      - name: Install sqlcmd
-        run: |
-          sudo apt-get update
-          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 mssql-tools18
-          echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
-          export PATH="$PATH:/opt/mssql-tools18/bin"
 
       - name: Make wait-for-sqlserver.sh executable
         run: chmod +x src/Infrastructure/wait-for-sqlserver.sh
@@ -49,14 +43,6 @@ jobs:
           SQLSERVER_SA_PASSWORD: ${{ secrets.SQLSERVER_SA_PASSWORD }}
         run: docker compose -f Infrastructure/compose-ci.yaml up -d
         
-      - name: Make list-dbo-tables.sh executable
-        run: chmod +x src/Infrastructure/list-dbo-tables.sh
-        
-      - name: List tables in dbo schema
-        run: src/Infrastructure/list-dbo-tables.sh
-        env:
-          DEFAULT_CONNECTION_STRING: ${{ secrets.DEFAULT_CONNECTION_STRING }}
-
         # When Frontend work is underway, uncomment the following steps to run E2E tests
 #      - name: Install dependencies
 #        working-directory: ./src/e2e/CareLeavers.E2ETests

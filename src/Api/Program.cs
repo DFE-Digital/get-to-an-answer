@@ -39,6 +39,18 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<GetToAnAnswerDbContext>();
     await dbContext.Database.EnsureCreatedAsync();
+
+    // Output all tables in dbo schema
+    var conn = dbContext.Database.GetDbConnection();
+    await conn.OpenAsync();
+    using var cmd = conn.CreateCommand();
+    cmd.CommandText = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo';";
+    using var reader = await cmd.ExecuteReaderAsync();
+    Console.WriteLine("Tables in dbo schema:");
+    while (await reader.ReadAsync())
+    {
+        Console.WriteLine(reader.GetString(0));
+    }
 }
 
 if (!app.Environment.IsDevelopment())
