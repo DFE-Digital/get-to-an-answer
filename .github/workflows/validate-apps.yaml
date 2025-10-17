@@ -1,4 +1,4 @@
-name: Validate - Web
+name: Validate - Apps
 
 on:
   workflow_call:
@@ -26,11 +26,11 @@ jobs:
           cmd: install
           dir: .
 
-      # Temporarily disabled these until work starts on the new frontend and admin projects
+# Temporarily disabled these until work starts on the new frontend and admin projects
 #      - name: Run Frontend Gulp Dev
 #        working-directory: ./src/Frontend
 #        run: gulp dev
-
+#
 #      - name: Run Admin Gulp Dev
 #        working-directory: ./src/Admin
 #        run: gulp dev
@@ -38,10 +38,8 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
-          cache: true
-          cache-dependency-path: |
-            src/**/packages.lock.json
+          dotnet-version: 9.0.x
+#          cache: true
 
       - name: Restore dependencies
         working-directory: .
