@@ -1,9 +1,12 @@
+// Define prefixes to categorize questionnaire topics
+export enum QuestionnairePrefix {
+    SERVICE_ELIGIBILITY = 'Service eligibility questionnaire',
+}
+
 // Define prefixes to categorize question topics
 export enum QuestionPrefix {
     AGE = 'Age',
     GENDER = 'Gender',
-    INTEREST = 'Interest',
-    FEEDBACK = 'Feedback'
 }
 
 // Define question types

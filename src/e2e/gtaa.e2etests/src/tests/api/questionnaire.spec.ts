@@ -1,6 +1,10 @@
 import {test, expect} from '@playwright/test';
-test.describe('POST Create questionnaire api tests', () => {
-    test('Validate POST questionnaire', async ({page, request}) => {
-        console.log("Running api tests.........");
+import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
+
+test.describe('POST Create questionnaire api request', () => {
+    test('Validate POST create new questionnaire', async ({page, request}) => {
+        
+        const questionnairePostResponse = await createQuestionnaire(request);
+        
     });
 });
