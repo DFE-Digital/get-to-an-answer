@@ -156,52 +156,68 @@ public static class JwtTestTokenGenerator
     private const string Secret = "local-test-signing-key-32bytes-minimum!";
     public static readonly string ValidJwtToken = JwtTestTokenGenerator.Create(
         subject: "user_mock",
-        issuer: "http://test-issuer",
+        issuer: "http://dfe-issuer",
         audience: "test-audience",
         expiresIn: TimeSpan.FromHours(1),
         algorithm: "HS256", //with hmacSecret for signed tokens
         hmacSecret: Secret
     );
     
-    // C#
     public static readonly string ExpiredJwtToken = JwtTestTokenGenerator.Create(
         subject: "user_mock",
-        issuer: "http://test-issuer",
+        issuer: "http://dfe-issuer",
         audience: "test-audience",
         expiresAtUtc: DateTimeOffset.UtcNow.AddHours(-1),
         algorithm: "HS256",
         hmacSecret: Secret
     );
     
-    // C#
     public static readonly string InvalidAudJwtToken = JwtTestTokenGenerator.Create(
         subject: "user_mock",
-        issuer: "http://test-issuer",
+        issuer: "http://dfe-issuer",
         audience: "wrong-audience",
         expiresIn: TimeSpan.FromHours(1),
         algorithm: "HS256",
         hmacSecret: Secret
     );
     
-    // C#
     public static readonly string UnauthorizedJwtToken = JwtTestTokenGenerator.Create(
-        subject: "",
-        issuer: "",
-        audience: "",
+        subject: "unauthorized_user",
+        issuer: "http://dfe-issuer",
+        audience: "test-audience",
         expiresIn: TimeSpan.FromHours(1),
         algorithm: "HS256",
         roles: Array.Empty<string>(), // omit roles
         hmacSecret: Secret
     );
     
-    // C#
+    public static readonly string NonDfeJwtToken = JwtTestTokenGenerator.Create(
+        subject: "unauthorized_user",
+        issuer: "http://non-dfe-issuer",
+        audience: "test-audience",
+        expiresIn: TimeSpan.FromHours(1),
+        algorithm: "HS256",
+        roles: Array.Empty<string>(), // omit roles
+        hmacSecret: Secret
+    );
+    
     public static readonly string QuotaWarnJwtToken = JwtTestTokenGenerator.Create(
         subject: "user_quota",
-        issuer: "http://test-issuer",
+        issuer: "http://dfe-issuer",
         audience: "test-audience",
         expiresIn: TimeSpan.FromHours(1),
         algorithm: "HS256",
         customClaims: new Dictionary<string, object> { ["test_warn"] = "over_quota" },
+        hmacSecret: Secret
+    );
+    
+    public static readonly string NewUserJwtToken = JwtTestTokenGenerator.Create(
+        subject: "new_user" + Guid.NewGuid(),
+        issuer: "http://dfe-issuer",
+        audience: "test-audience",
+        expiresIn: TimeSpan.FromHours(1),
+        algorithm: "HS256",
+        roles: Array.Empty<string>(), // omit roles
         hmacSecret: Secret
     );
 }
