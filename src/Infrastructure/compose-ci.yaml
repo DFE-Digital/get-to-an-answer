@@ -7,7 +7,8 @@ services:
     depends_on:
       - sqlserver
     environment:
-      - ConnectionStrings__DefaultConnection=${DEFAULT_CONNECTION_STRING}
+      - DEFAULT_CONNECTION_STRING=${DEFAULT_CONNECTION_STRING}
+      - SQLSERVER_SA_PASSWORD=${SQLSERVER_SA_PASSWORD}
     volumes:
       - ./wait-for-sqlserver.sh:/wait-for-sqlserver.sh
     entrypoint: ["/wait-for-sqlserver.sh"]
