@@ -4,7 +4,7 @@ This project uses Docker Compose to run end-to-end (E2E) tests in a consistent e
 
 ## Prerequisites
 - Docker and Docker Compose installed
-- Copy `.env.example` to `.env` and update it with valid connection strings and secrets
+- Copy `.env.example` to `.env` in the `Infrastructure` folder and update it with valid connection strings and secrets
 - The API and test projects built (if required by your workflow)
 
 ## Running E2E Tests
