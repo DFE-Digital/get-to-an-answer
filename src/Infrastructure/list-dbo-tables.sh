@@ -18,6 +18,5 @@ fi
 # Query to list tables in dbo schema
 query="SET NOCOUNT ON; SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo';"
 
-# Run sqlcmd
-sqlcmd -S "$server" -d "$db" -U "$user" -P "$password" -Q "$query"
-
+# Run sqlcmd with full path
+/opt/mssql-tools18/bin/sqlcmd -S "$server" -d "$db" -U "$user" -P "$password" -Q "$query"
