@@ -31,6 +31,13 @@ jobs:
 #        id: build
 #        working-directory: ./src
 #        run: docker build . -t care-leavers-web:e2e -f web/CareLeavers.Web/Dockerfile
+      - name: Install sqlcmd
+        run: |
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 mssql-tools18
+          echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
+          export PATH="$PATH:/opt/mssql-tools18/bin"
+
       - name: Make wait-for-sqlserver.sh executable
         run: chmod +x src/Infrastructure/wait-for-sqlserver.sh
 
