@@ -20,9 +20,11 @@ RUN dotnet publish "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:Use
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-# Install sqlcmd for healthcheck and netcat for wait script
+# Switch to root to install packages, then back to app user
+USER root
 RUN apt-get update && \
     ACCEPT_EULA=Y apt-get install -y msodbcsql18 mssql-tools18 netcat && \
     echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> /etc/bash.bashrc && \
     export PATH="$PATH:/opt/mssql-tools18/bin"
+USER $APP_UID
 ENTRYPOINT ["dotnet", "Api.dll"]
