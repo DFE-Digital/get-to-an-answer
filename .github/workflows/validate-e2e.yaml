@@ -43,6 +43,9 @@ jobs:
           SQLSERVER_SA_PASSWORD: ${{ secrets.SQLSERVER_SA_PASSWORD }}
         run: docker compose -f Infrastructure/compose-ci.yaml up -d
         
+      - name: Show web-api container logs
+        run: docker compose -f Infrastructure/compose-ci.yaml logs web-api
+        working-directory: ./src
         # When Frontend work is underway, uncomment the following steps to run E2E tests
 #      - name: Install dependencies
 #        working-directory: ./src/e2e/CareLeavers.E2ETests
