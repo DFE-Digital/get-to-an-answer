@@ -19,27 +19,24 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: Run Playwright Tests
+    environment: Test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
-                
       - name: Lowercase the repo name and username
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
-
 #      - name: Build Web Docker Image
 #        id: build
 #        working-directory: ./src
 #        run: docker build . -t care-leavers-web:e2e -f web/CareLeavers.Web/Dockerfile
-        
       - name: Run E2E Docker Image
         id: run
-        if: steps.build.outcome == 'success'
         working-directory: ./src
         env:
-            DEFAULT_CONNECTION_STRING: ${{ secrets.DEFAULT_CONNECTION_STRING }}
-            SQLSERVER_SA_PASSWORD: ${{ secrets.SQLSERVER_SA_PASSWORD }}  
+          DEFAULT_CONNECTION_STRING: ${{ secrets.DEFAULT_CONNECTION_STRING }}
+          SQLSERVER_SA_PASSWORD: ${{ secrets.SQLSERVER_SA_PASSWORD }}
         run: docker compose -f Infrastructure/compose-ci.yaml up -d
 
         # When Frontend work is underway, uncomment the following steps to run E2E tests
