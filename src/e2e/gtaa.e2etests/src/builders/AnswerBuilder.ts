@@ -2,10 +2,10 @@ import type {AnswerModel, DestinationType} from '../models/api-models';
 
 export class AnswerBuilder {
     private _questionId: string;
-    private _content = 'Default';
-    private _description = 'Default';
-    private _destination = 'Default';
-    private _destinationType: DestinationType = 'page';
+    private _content = 'Default answer content';
+    private _description = 'Default answer description';
+    private _destination = 'Default answer destination';
+    private _destinationType: DestinationType = 'question';
     private _weight: number = 0.0;
 
     constructor(questionId: string) {
