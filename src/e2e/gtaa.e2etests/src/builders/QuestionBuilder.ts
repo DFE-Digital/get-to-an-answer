@@ -1,27 +1,45 @@
-import type {QuestionModel, QuestionType} from '../models/api-models';
+import type {QuestionModel} from '../models/api-models';
+import {QuestionType} from '../constants/test-data-constants'
 
 export class QuestionBuilder {
     private _questionnaireId: string;
-    private _content = 'Default question';
-    private _description = 'Default description';
-    private _type: QuestionType = 'single';
+    private _content: string
+    private _description: string
+    private _type: QuestionType
+    private _prefix: string
 
     constructor(questionnaireId: string) {
+        const timestamp = Date.now();
         this._questionnaireId = questionnaireId;
+        this._content = `Default question content - ${timestamp}`;
+        this._description = `Default question description - ${timestamp}`;
+        this._type = QuestionType.SINGLE;
+        this._prefix = 'Default prefix';
     }
-    
-    withContent(content: string) {
-        this._content = content;
+
+    withContent(content?: string) {
+        if (content !== undefined)
+            this._content = content;
         return this;
     }
 
-    withDescription(description: string) {
-        this._description = description;
+    withContentPrefix(prefix?: string) {
+        if (prefix && prefix.trim().length > 0)
+            this._content = `${prefix} - ${this._content}`;
+        else
+            this._content = `${this._prefix} - ${this._content}`;
         return this;
     }
 
-    withType(questionType: QuestionType) {
-        this._type = questionType;
+    withDescription(description?: string) {
+        if (description !== undefined)
+            this._description = description;
+        return this;
+    }
+
+    withType(questionType?: QuestionType) {
+        if (questionType !== undefined)
+            this._type = questionType;
         return this;
     }
 

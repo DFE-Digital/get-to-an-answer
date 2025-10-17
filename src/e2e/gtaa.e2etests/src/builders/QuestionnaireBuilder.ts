@@ -1,10 +1,11 @@
 import type {QuestionnaireModel} from '../models/api-models';
 
 export class QuestionnaireBuilder {
+    private _prefix:string;
     private _title: string;
     private _description: string;
     private _slug: string;
-    private _prefix:string;
+    
     constructor() {
         const timestamp = Date.now();
         this._title = `Default questionnaire title - ${timestamp}`;

@@ -1,5 +1,4 @@
-export type QuestionType = 'single' | 'multiple';
-export type DestinationType = 'page' | 'question' | 'external';
+import {QuestionType, AnswerDestinationType} from '../constants/test-data-constants'
 
 export interface QuestionnaireModel {
     title:string;
@@ -19,6 +18,6 @@ export interface AnswerModel {
     content: string;
     description: string;
     destination: string;
-    destinationType: DestinationType;
+    destinationType: AnswerDestinationType;
     weight: number;
 }
