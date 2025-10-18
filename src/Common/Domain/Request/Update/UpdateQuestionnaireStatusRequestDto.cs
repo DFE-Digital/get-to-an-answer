@@ -4,11 +4,11 @@ using Common.Enum;
 
 namespace Common.Domain.Request.Update;
 
-public class UpdateQuestionStatusRequestDto
+public class UpdateQuestionnaireStatusRequestDto
 {
-    [Required(ErrorMessage = "Enter a question id")]   
+    [Required(ErrorMessage = "Enter a questionnaire id")]   
     public Guid Id { get; set; }
     
-    [Required(ErrorMessage = "Enter a question status")]
+    [Required(ErrorMessage = "Enter a questionnaire status")]
     public required EntityStatus Status { get; set; }
 }
