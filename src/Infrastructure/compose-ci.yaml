@@ -11,17 +11,6 @@ services:
       - SQLSERVER_SA_PASSWORD=${SQLSERVER_SA_PASSWORD}
     ports:
       - 8080:8080
-#    command: >
-#      /bin/sh -c '
-#        host="${SQLSERVER_HOST:-sqlserver}";
-#        port="${SQLSERVER_PORT:-1433}";
-#        until /opt/mssql-tools/bin/sqlcmd -S "$host,$port" -U sa -P "$SQLSERVER_SA_PASSWORD" -Q "SELECT 1" > /dev/:e2enull 2>&1; do
-#          echo "Waiting for SQL Server at $host:$port...";
-#          sleep 3;
-#        done;
-#        echo "SQL Server is up - starting app.";
-#        dotnet Api.dll
-#      '
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
