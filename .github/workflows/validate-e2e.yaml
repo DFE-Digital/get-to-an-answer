@@ -38,10 +38,10 @@ jobs:
       - name: Run E2E Docker Image
         id: run
         working-directory: ./src
-        run: |
-          echo "DEFAULT_CONNECTION_STRING=${{ secrets.DEFAULT_CONNECTION_STRING }}" > .env
-          echo "SQLSERVER_SA_PASSWORD=${{ secrets.SQLSERVER_SA_PASSWORD }}" >> .env
-          docker compose -f Infrastructure/compose-ci.yaml up -d
+        with:
+          DEFAULT_CONNECTION_STRING: ${{ secrets.DEFAULT_CONNECTION_STRING }}
+          SQLSERVER_SA_PASSWORD: ${{ secrets.SQLSERVER_SA_PASSWORD }}
+        run: docker compose -f Infrastructure/compose-ci.yaml up -d
         
       - name: Show web-api container logs
         run: docker compose -f Infrastructure/compose-ci.yaml logs web-api
