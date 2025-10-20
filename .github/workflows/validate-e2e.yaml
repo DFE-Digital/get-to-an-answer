@@ -39,9 +39,8 @@ jobs:
         id: run
         working-directory: ./src
         run: |
-          echo "DEFAULT_CONNECTION_STRING=${{ secrets.DEFAULT_CONNECTION_STRING }}"
-          export DEFAULT_CONNECTION_STRING="${{ secrets.DEFAULT_CONNECTION_STRING }}"
-          export SQLSERVER_SA_PASSWORD="${{ secrets.SQLSERVER_SA_PASSWORD }}"
+          echo "DEFAULT_CONNECTION_STRING=${{ secrets.DEFAULT_CONNECTION_STRING }}" > .env
+          echo "SQLSERVER_SA_PASSWORD=${{ secrets.SQLSERVER_SA_PASSWORD }}" >> .env
           docker compose -f Infrastructure/compose-ci.yaml up -d
         
       - name: Show web-api container logs
