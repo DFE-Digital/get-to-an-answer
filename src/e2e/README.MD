@@ -6,9 +6,10 @@ This project uses Docker Compose to run end-to-end (E2E) tests in a consistent e
 - Docker and Docker Compose installed
 - Copy `.env.example` to `.env` in the `Infrastructure` folder and update it with valid connection strings and secrets
 - The API and test projects built (if required by your workflow)
-- **If any updates are made to the `.env` file, please update the `.env.example` file accordingly.**
+- **If any updates are made to the `.env` file, please update the `.env.example` file accordingly.**\
+- If the SQL Server "service name" is changed in `compose-ci.yaml`, ensure to update the "Server" field in the connection strings within the `.env` file and also secrets in Github Actions workflows.
 
-## Running E2E Tests
+## Running E2E Tests (to be confirmed)
 
 1. **Start the test environment:**
    ```sh
