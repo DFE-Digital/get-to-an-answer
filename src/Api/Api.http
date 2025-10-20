@@ -2,9 +2,11 @@
 
 POST {{Api_HostAddress}}/api/questionnaires
 Accept: application/json
+Content-Type: application/json
 
 {
     "title": "London Survey",
+    "slug": "",
     "description": "Description of London Survey"
 }
 

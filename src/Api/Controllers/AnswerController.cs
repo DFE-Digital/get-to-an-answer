@@ -192,6 +192,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
         return NoContent();
     }
 
+    [ApiExplorerSettings(IgnoreApi = true)]
     private static AnswerDto EntityToDto(AnswerEntity entity)
     {
         return new AnswerDto

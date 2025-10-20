@@ -1,45 +1,56 @@
 import {test, expect} from '@playwright/test';
 import {createQuestionnaire, getQuestionnaire} from "../../test-data-seeder/questionnaire-data";
+import { GUID_REGEX } from "../../constants/test-data-constants";
 
 test.describe('POST Create questionnaire api request', () => {
     test('Validate POST create new questionnaire', async ({request}) => {
 
-        const {questionnairePostResponse, payload} = await createQuestionnaire(request);
+        const {
+            questionnairePostResponse, 
+            questionnaire, 
+            payload
+        } = await createQuestionnaire(request);
 
         // --- HTTP-level checks ---
         expect(questionnairePostResponse.ok()).toBeTruthy();
         expect(questionnairePostResponse.status()).toBe(201);
 
         // --- Schema-level checks ---
-        expect(questionnairePostResponse).toHaveProperty('id');
-        expect(questionnairePostResponse).toHaveProperty(payload.title);
-        expect(questionnairePostResponse).toHaveProperty(payload.description);
-        expect(questionnairePostResponse).toHaveProperty(payload.slug);
+        expect(questionnaire).toHaveProperty('id');
+        expect(questionnaire).toHaveProperty('title');
+        expect(questionnaire).toHaveProperty('description');
+        expect(questionnaire).toHaveProperty('slug');
 
         // --- Type sanity checks ---
-        expect(typeof questionnairePostResponse.id).toBe('string');
-        expect(typeof questionnairePostResponse.title).toBe('string');
-        expect(typeof questionnairePostResponse.description).toBe('string');
-        expect(typeof questionnairePostResponse.slug).toBe('string');
+        expect(typeof questionnaire.id).toBe('string');
+        expect(typeof questionnaire.title).toBe('string');
+        expect(typeof questionnaire.description).toBe('string');
+        expect(typeof questionnaire.slug).toBe('string');
 
         // --- Basic content sanity ---
-        expect(questionnairePostResponse.title.trim().length).toBeGreaterThan(0);
-        expect(questionnairePostResponse.description.trim().length).toBeGreaterThan(0);
+        expect(questionnaire.title.trim().length).toBeGreaterThan(0);
+        expect(questionnaire.description.trim().length).toBeGreaterThan(0);
+
+        // --- I/O checks ---
+        expect(questionnaire.id).toMatch(GUID_REGEX);
+        expect(questionnaire.title).toBe(payload.title);
+        expect(questionnaire.description).toBe(payload.description);
+        expect(questionnaire.slug).toBe(payload.slug);
     });
 });
 
 test.describe('GET questionnaire api tests', () => {
     test('Validate GET questionnaire', async ({request}) => {
-        const {questionnairePostResponse, payload} = await createQuestionnaire(request);
-        const questionnaireId = await questionnairePostResponse.id;
+        const {questionnaire, payload} = await createQuestionnaire(request);
+        const questionnaireId = await questionnaire.id;
         
         const questionnaireGetResponse = await getQuestionnaire(request, questionnaireId);
 
         //Schema checks
-        expect(questionnaireGetResponse).toHaveProperty('id');
-        expect(questionnaireGetResponse).toHaveProperty(payload.title);
-        expect(questionnaireGetResponse).toHaveProperty(payload.description);
-        expect(questionnaireGetResponse).toHaveProperty(payload.slug);
+        expect(questionnaireGetResponse.id).toMatch(GUID_REGEX);
+        expect(questionnaireGetResponse).toHaveProperty('title');
+        expect(questionnaireGetResponse).toHaveProperty('description');
+        expect(questionnaireGetResponse).toHaveProperty('slug');
         
         //Type sanity checks
         expect(typeof questionnaireGetResponse.title).toBe('string');

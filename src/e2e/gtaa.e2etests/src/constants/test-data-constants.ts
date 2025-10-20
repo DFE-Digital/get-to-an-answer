@@ -21,3 +21,5 @@ export enum AnswerDestinationType {
     PAGE = 'page',
     EXTERNAL = 'external'
 }
+
+export const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

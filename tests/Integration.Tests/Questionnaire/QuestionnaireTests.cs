@@ -738,7 +738,7 @@ public class QuestionnaireTests(ApiFixture factory) :
     }
     
     #endregion
-    
+
     // === Tests for the Delete questionnaire endpoint ===
     
     #region Delete Questionnaire Endpoint Tests
@@ -1199,6 +1199,95 @@ public class QuestionnaireTests(ApiFixture factory) :
             ans.Should().HaveCount(2);
             ans.Should().OnlyContain(a => a.QuestionnaireId == questionnaireId && a.QuestionId == oq.Id);
         }
+    }
+
+    #endregion
+    
+    // === Tests for the invite questionnaire contributor endpoint ===
+    
+    #region Invite Contributor Endpoint Tests
+
+    [Fact(DisplayName = "Invite contributor returns NoContent when successful")]
+    public async Task Invite_Contributor_Returns_NoContent_When_Successful()
+    {
+        // Arrange: create questionnaire
+        string id;
+        using (var createRes = await Create(new { title = "Team Q" }))
+        {
+            createRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await createRes.Content.ReadAsStringAsync());
+        }
+
+        // Act: invite contributor
+        using var res = await Update( 
+            routePrefixOverride: $"/api/questionnaires/{id}/contributors",
+            bearerToken: JwtTestTokenGenerator.UnauthorizedJwtToken);
+
+        // Assert
+        res.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+
+    [Fact(DisplayName = "Invite to non-existent questionnaire returns NotFound")]
+    public async Task Invite_NonExistent_Returns_NotFound()
+    {
+        var missingId = Guid.NewGuid().ToString("N");
+
+        using var res = await Update( 
+            routePrefixOverride: $"/api/questionnaires/{missingId}/contributors");
+
+        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        var text = await res.Content.ReadAsStringAsync();
+        text.Should().NotContain("userId");
+    }
+
+    [Fact(DisplayName = "Invite with expired JWT returns Unauthorized")]
+    public async Task Invite_Expired_JWT_Returns_Unauthorized()
+    {
+        // Arrange: create questionnaire
+        string id;
+        using (var createRes = await Create(new { title = "Team Q" }))
+        {
+            createRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await createRes.Content.ReadAsStringAsync());
+        }
+
+        // Act with expired token
+        using var res = await Update(
+            routePrefixOverride: $"/api/questionnaires/{id}/contributors",
+            bearerToken: JwtTestTokenGenerator.ExpiredJwtToken);
+
+        res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        var text = await res.Content.ReadAsStringAsync();
+        AssertNoSensitiveUserData(text);
+    }
+
+    [Fact(DisplayName = "Duplicate contributor invitation returns Conflict")]
+    public async Task Invite_Duplicate_Returns_Conflict()
+    {
+        // Arrange: create questionnaire
+        string id;
+        using (var createRes = await Create(new { title = "Team Q" }))
+        {
+            createRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await createRes.Content.ReadAsStringAsync());
+        }
+
+        // First invitation
+        using (var res1 = await Update(
+                   routePrefixOverride: $"/api/questionnaires/{id}/contributors", 
+                   bearerToken: JwtTestTokenGenerator.UnauthorizedJwtToken))
+        {
+            res1.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        }
+
+        // Act: duplicate invitation
+        using var res2 = await Update(
+            routePrefixOverride: $"/api/questionnaires/{id}/contributors", 
+            bearerToken: JwtTestTokenGenerator.UnauthorizedJwtToken);
+
+        res2.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        var text = await res2.Content.ReadAsStringAsync();
+        AssertNoSensitiveUserData(text);
     }
 
     #endregion

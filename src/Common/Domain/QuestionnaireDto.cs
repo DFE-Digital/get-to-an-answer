@@ -2,6 +2,17 @@ using Common.Enum;
 
 namespace Common.Domain;
 
+public class QuestionnaireInfoDto
+{
+    public Guid Id { get; set; }
+    
+    public required string Title { get; set; }
+    
+    public string? Slug { get; set; }
+    
+    public string? Description { get; set; }
+}
+
 public class QuestionnaireDto
 {
     public Guid Id { get; set; }
