@@ -20,5 +20,5 @@ public class QuestionnaireDto
     
     public int Version { get; set; }
 
-    //public List<QuestionDto> Questions { get; set; } = new();
+    public List<QuestionDto> Questions { get; set; } = new();
 }
