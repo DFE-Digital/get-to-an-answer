@@ -21,7 +21,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-COPY wait-for-sqlserver.sh /wait-for-sqlserver.sh
-RUN chmod +x /wait-for-sqlserver.sh
-
 ENTRYPOINT ["dotnet", "Api.dll"]
