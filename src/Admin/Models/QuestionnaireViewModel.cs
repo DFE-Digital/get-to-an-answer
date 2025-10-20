@@ -35,8 +35,8 @@ public class QuestionnaireViewModel : ConfigViewModel
     
     public GetNextStateRequest? NextStateRequest { get; set; }
     public DestinationDto? Destination { get; set; }
-    public int? QuestionnaireId { get; set; }
-    public int? QuestionId { get; set; }
+    public Guid? QuestionnaireId { get; set; }
+    public Guid? QuestionId { get; set; }
     
     public bool AddEmptyAnswerOption { get; set; }
     

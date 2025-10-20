@@ -16,7 +16,7 @@ public class QuestionnaireVersionController(GetToAnAnswerDbContext db) : Control
 {
     
     [HttpGet("questionnaires/{questionnaireId}/versions/current")]
-    public async Task<IActionResult> GetLatestQuestionnaireVersion(int questionnaireId)
+    public async Task<IActionResult> GetLatestQuestionnaireVersion(Guid questionnaireId)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -50,7 +50,7 @@ public class QuestionnaireVersionController(GetToAnAnswerDbContext db) : Control
     }
     
     [HttpGet("questionnaires/{questionnaireId}/versions/{versionNumber}")]
-    public async Task<IActionResult> GetQuestionnaireVersion(int questionnaireId, int versionNumber)
+    public async Task<IActionResult> GetQuestionnaireVersion(Guid questionnaireId, int versionNumber)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -75,7 +75,7 @@ public class QuestionnaireVersionController(GetToAnAnswerDbContext db) : Control
     }
     
     [HttpGet("questionnaires/{questionnaireId}/versions")]
-    public async Task<IActionResult> GetQuestionnaireVersions(int questionnaireId)
+    public async Task<IActionResult> GetQuestionnaireVersions(Guid questionnaireId)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         

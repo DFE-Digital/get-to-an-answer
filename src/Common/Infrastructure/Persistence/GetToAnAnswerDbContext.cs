@@ -48,7 +48,7 @@ public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> opt
 
 public static class CheckerDbContextExtensions
 {
-    public static async Task<bool> HasAccessToEntity<TEntityType>(this GetToAnAnswerDbContext db, string email, int id)
+    public static async Task<bool> HasAccessToEntity<TEntityType>(this GetToAnAnswerDbContext db, string email, Guid id)
     {
         if (typeof(TEntityType) == typeof(QuestionEntity))
         {
@@ -97,7 +97,7 @@ public static class CheckerDbContextExtensions
         return false;
     }
 
-    public static async Task ResetQuestionnaireToDraft(this GetToAnAnswerDbContext db, int questionnaireId)
+    public static async Task ResetQuestionnaireToDraft(this GetToAnAnswerDbContext db, Guid questionnaireId)
     {
         var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(q => q.Id == questionnaireId);
         

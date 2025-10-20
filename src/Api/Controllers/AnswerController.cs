@@ -30,7 +30,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
             Content = request.Content,
             Description = request.Description,
             Score = request.Score,
-            Destination = request.Destination,
+            DestinationUrl = request.DestinationUrl,
             DestinationQuestionId = request.DestinationQuestionId,
             DestinationContentId = request.DestinationContentId,
             DestinationType = request.DestinationType,
@@ -48,7 +48,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
             Id = entity.Id,
             Content = entity.Content,
             Description = entity.Description,
-            Destination = entity.Destination,
+            DestinationUrl = entity.DestinationUrl,
             DestinationType = entity.DestinationType,
             DestinationQuestionId = request.DestinationQuestionId,
             DestinationContentId = request.DestinationContentId,
@@ -59,7 +59,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
     }
     
     [HttpGet("answers/{id}")]
-    public async Task<IActionResult> GetAnswer(int id)
+    public async Task<IActionResult> GetAnswer(Guid id)
     {
         // Extract user and tenant from claims
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -78,7 +78,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
     }
     
     [HttpGet("questions/{questionId}/answers")]
-    public async Task<IActionResult> GetAnswers(int questionId)
+    public async Task<IActionResult> GetAnswers(Guid questionId)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -92,7 +92,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
     }
 
     [HttpPut("answers/{id}")]
-    public async Task<IActionResult> UpdateAnswer(int id, UpdateAnswerRequestDto request)
+    public async Task<IActionResult> UpdateAnswer(Guid id, UpdateAnswerRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -106,7 +106,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
         
         answer.Content = request.Content;
         answer.Description = request.Description;
-        answer.Destination = request.Destination;
+        answer.DestinationUrl = request.DestinationUrl;
         answer.DestinationType = request.DestinationType;
         answer.DestinationQuestionId = request.DestinationQuestionId;
         answer.DestinationContentId = request.DestinationContentId;
@@ -121,7 +121,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
     }
 
     [HttpDelete("answers/{id}")]
-    public async Task<IActionResult> DeleteAnswer(int id)
+    public async Task<IActionResult> DeleteAnswer(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         

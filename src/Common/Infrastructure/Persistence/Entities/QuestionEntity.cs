@@ -10,7 +10,7 @@ public class QuestionEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     [Required]
     public int Order { get; set; }
@@ -33,7 +33,7 @@ public class QuestionEntity
     // Navigation properties
     public ICollection<AnswerEntity> Answers { get; set; } = new List<AnswerEntity>();
     
-    public int QuestionnaireId { get; set; }
+    public Guid QuestionnaireId { get; set; }
     
     [JsonIgnore]
     public QuestionnaireEntity? Questionnaire { get; set; }

@@ -199,7 +199,7 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
                         Description = S("description"),
                         Score = Nf("score"),
                         DestinationType = destinationType,
-                        Destination = S("destination"),
+                        DestinationUrl = S("destination"),
                         DestinationQuestionId = destQuestionId,
                         DestinationContentId = destContentId,
                         CreatedAt = D("createdAtUtc") ?? DateTime.UtcNow,
@@ -214,7 +214,7 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
                     existing.Description = S("description");
                     existing.Score = Nf("score");
                     existing.DestinationType = destinationType;
-                    existing.Destination = S("destination");
+                    existing.DestinationUrl = S("destination");
                     existing.DestinationQuestionId = destQuestionId;
                     existing.DestinationContentId = destContentId;
                     existing.UpdatedAt = D("updatedAtUtc") ?? DateTime.UtcNow;
@@ -456,7 +456,7 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
         return list;
     }
 
-    private static async Task<int?> ResolveLinkedLocalIdByContentful(JsonElement fields, string linkField, GetToAnAnswerDbContext db, CancellationToken ct)
+    private static async Task<Guid?> ResolveLinkedLocalIdByContentful(JsonElement fields, string linkField, GetToAnAnswerDbContext db, CancellationToken ct)
     {
         if (!fields.TryGetProperty(linkField, out var n)) return null;
 
@@ -472,15 +472,15 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
 
             // Probe each table that could be linked
             // questionnaire
-            var qn = await db.Questionnaires.Where(x => x.SyncId == id).Select(x => (int?)x.Id).FirstOrDefaultAsync(ct);
+            var qn = await db.Questionnaires.Where(x => x.SyncId == id).Select(x => (Guid?)x.Id).FirstOrDefaultAsync(ct);
             if (qn != null) return qn;
 
             // question
-            var qu = await db.Questions.Where(x => x.SyncId == id).Select(x => (int?)x.Id).FirstOrDefaultAsync(ct);
+            var qu = await db.Questions.Where(x => x.SyncId == id).Select(x => (Guid?)x.Id).FirstOrDefaultAsync(ct);
             if (qu != null) return qu;
 
             // content
-            var cn = await db.Contents.Where(x => x.SyncId == id).Select(x => (int?)x.Id).FirstOrDefaultAsync(ct);
+            var cn = await db.Contents.Where(x => x.SyncId == id).Select(x => (Guid?)x.Id).FirstOrDefaultAsync(ct);
             if (cn != null) return cn;
         }
 

@@ -5,6 +5,6 @@ namespace Common.Domain.Request.Update;
 
 public class UpdateQuestionStatusRequestDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public required EntityStatus Status { get; set; }
 } 

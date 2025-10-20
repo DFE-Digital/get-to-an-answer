@@ -43,7 +43,7 @@ public class HomeController(IApiClient apiClient, ILogger<HomeController> logger
     
     [HttpPost("/questionnaires/{questionnaireSlug}")]
     public async Task<IActionResult> GetNextStatePage(string questionnaireSlug, GetNextStateRequest request, 
-        [FromForm(Name = "Scores")] Dictionary<int, float> scores)
+        [FromForm(Name = "Scores")] Dictionary<Guid, float> scores)
     {
         var questionnaire = await apiClient.GetQuestionnaireInfoAsync(questionnaireSlug);
         

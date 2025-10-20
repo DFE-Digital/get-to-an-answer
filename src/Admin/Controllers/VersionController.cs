@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 public class VersionController(IApiClient apiClient) : Controller
 {
     [HttpGet("admin/questionnaires/{questionnaireId}/versions/{versionNumber}/compare")]
-    public async Task<IActionResult> Compare(int questionnaireId, int versionNumber)
+    public async Task<IActionResult> Compare(Guid questionnaireId, int versionNumber)
     {
         // Replace these with calls to your data source
         var currentVersion = await apiClient.GetLatestQuestionnaireVersion(questionnaireId);

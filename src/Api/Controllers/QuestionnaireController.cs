@@ -48,7 +48,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     }
     
     [HttpGet("questionnaires/{id}")]
-    public async Task<IActionResult> GetQuestionnaire(int id)
+    public async Task<IActionResult> GetQuestionnaire(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -79,7 +79,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     }
 
     [HttpPut("questionnaires/{id}")]
-    public async Task<IActionResult> UpdateQuestionnaire(int id, UpdateQuestionnaireRequestDto request)
+    public async Task<IActionResult> UpdateQuestionnaire(Guid id, UpdateQuestionnaireRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -111,7 +111,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     }
 
     [HttpPut("questionnaires/{id}/status")]
-    public async Task<IActionResult> UpdateQuestionnaireStatus(int id, UpdateQuestionnaireStatusRequestDto request)
+    public async Task<IActionResult> UpdateQuestionnaireStatus(Guid id, UpdateQuestionnaireStatusRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
 
@@ -143,7 +143,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     }
 
     [HttpDelete("questionnaires/{id}")]
-    public async Task<IActionResult> DeleteQuestionnaire(int id)
+    public async Task<IActionResult> DeleteQuestionnaire(Guid id)
     {
         return await UpdateQuestionnaireStatus(id, new UpdateQuestionnaireStatusRequestDto
         {
@@ -153,7 +153,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     }
     
     [HttpPut("questionnaires/{id}/contributors")]
-    public async Task<IActionResult> AddQuestionnaireContributor(int id)
+    public async Task<IActionResult> AddQuestionnaireContributor(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -173,7 +173,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     }
 
     [HttpPost("questionnaires/{id}/clones")]
-    public async Task<IActionResult> CloneQuestionnaire(int id, CloneQuestionnaireRequestDto request)
+    public async Task<IActionResult> CloneQuestionnaire(Guid id, CloneQuestionnaireRequestDto request)
     {
         var questionnaire = await db.Questionnaires
             .AsNoTracking()
@@ -220,7 +220,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
                 
             cloneQuestions.Add(question.Order, cloneQuestion);
             
-            orderAnswers.Add(question.Id, question.Answers);
+            orderAnswers.Add(question.Order, question.Answers);
         }
         
         await db.Questions.AddRangeAsync(cloneQuestions.Values);
@@ -241,7 +241,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
                     QuestionnaireId = cloneQuestionnaireId,
                     Content = answer.Content,
                     Description = answer.Description,
-                    Destination = answer.Destination,
+                    DestinationUrl = answer.DestinationUrl,
                     DestinationQuestionId = answer.DestinationQuestionId,
                     DestinationType = answer.DestinationType,
                     Score = answer.Score,
@@ -260,7 +260,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         return Ok(cloneQuestionnaire);
     }
 
-    private async Task StoreQuestionnaireVersion(int id, int versionNumber)
+    private async Task StoreQuestionnaireVersion(Guid id, int versionNumber)
     {
         var questionnaire = await db.Questionnaires
             .AsNoTracking()

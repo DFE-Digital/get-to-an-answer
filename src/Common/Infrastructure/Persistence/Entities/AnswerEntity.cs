@@ -10,7 +10,7 @@ public class AnswerEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
     /*
      * Shorthand name for this answer.
@@ -27,23 +27,24 @@ public class AnswerEntity
     
     public DestinationType? DestinationType { get; set; }
     
-    public string? Destination { get; set; }
+    [MaxLength(250)]
+    public string? DestinationUrl { get; set; }
     
-    public int? DestinationQuestionId { get; set; }
+    public Guid? DestinationQuestionId { get; set; }
     
-    public int? DestinationContentId { get; set; }
+    public Guid? DestinationContentId { get; set; }
     
     public DateTime CreatedAt { get; set; }
     
     public DateTime UpdatedAt { get; set; }
 
     // Foreign key
-    public int QuestionId { get; set; }
+    public Guid QuestionId { get; set; }
     
     [JsonIgnore]
     public QuestionEntity? Question { get; set; }
     
-    public int QuestionnaireId { get; set; }
+    public Guid QuestionnaireId { get; set; }
     
     [MaxLength(100)]
     public string? SyncId { get; set; }

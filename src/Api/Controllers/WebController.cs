@@ -54,7 +54,7 @@ public class WebController(GetToAnAnswerDbContext db) : Controller
     }
     
     [HttpGet("questionnaires/{questionnaireId}/initial")]
-    public async Task<IActionResult> GetInitialQuestion(int questionnaireId)
+    public async Task<IActionResult> GetInitialQuestion(Guid questionnaireId)
     {
         var initialQuestion = await db.Questions
             .Include(x => x.Answers)
@@ -84,7 +84,7 @@ public class WebController(GetToAnAnswerDbContext db) : Controller
     }
 
     [HttpPost("questionnaires/{questionnaireId}/next")]
-    public async Task<IActionResult> GetNextState(int questionnaireId, GetNextStateRequest request)
+    public async Task<IActionResult> GetNextState(Guid questionnaireId, GetNextStateRequest request)
     {
         var selectedAnswerId = request.SelectedAnswerId;
         
@@ -115,7 +115,7 @@ public class WebController(GetToAnAnswerDbContext db) : Controller
         return Ok(new DestinationDto
         {
             Type = answer.DestinationType,
-            Content = answer.Destination
+            Content = answer.DestinationUrl
         });
     }
 

@@ -10,7 +10,7 @@ public class QuestionnaireEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
     /**
      * List of authenticated government users invited by the owner/members

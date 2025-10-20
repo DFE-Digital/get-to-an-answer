@@ -2,11 +2,11 @@ namespace Common.Domain.Frontend;
 
 public class GetNextStateRequest
 {
-    public int CurrentQuestionId { get; set; }
+    public Guid CurrentQuestionId { get; set; }
     
     public int CurrentQuestionOrder { get; set; }
 
-    public int SelectedAnswerId { get; set; }
+    public Guid SelectedAnswerId { get; set; }
 
-    public List<int> SelectedAnswerIds { get; set; } = new();
+    public List<Guid> SelectedAnswerIds { get; set; } = new();
 }

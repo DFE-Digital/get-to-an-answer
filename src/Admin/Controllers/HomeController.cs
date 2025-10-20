@@ -52,7 +52,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpPost("admin/questionnaires/{questionnaireId}/questions/Create")]
-    public async Task<IActionResult> PerformQuestionnaireCreation(int questionnaireId, CreateQuestionRequestDto request)
+    public async Task<IActionResult> PerformQuestionnaireCreation(Guid questionnaireId, CreateQuestionRequestDto request)
     {
         if (!ModelState.IsValid)
         {
@@ -75,7 +75,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpGet("admin/questionnaires/{questionnaireId}/Publish/Confirm")]
-    public async Task<IActionResult> ConfirmQuestionnairePublish(int questionnaireId)
+    public async Task<IActionResult> ConfirmQuestionnairePublish(Guid questionnaireId)
     {
         return View("PublishQuestionnaireConfirmation", new QuestionnaireViewModel
         {
@@ -84,7 +84,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpPost("admin/questionnaires/{questionnaireId}/Publish")]
-    public async Task<IActionResult> PublishQuestionnaire(int questionnaireId)
+    public async Task<IActionResult> PublishQuestionnaire(Guid questionnaireId)
     {
         await apiClient.UpdateQuestionnaireStatusAsync(questionnaireId, new UpdateQuestionnaireStatusRequestDto
         {
@@ -96,7 +96,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpGet("admin/questionnaires/{questionnaireId}/Delete/Confirm")]
-    public async Task<IActionResult> ConfirmQuestionnaireDelete(int questionnaireId)
+    public async Task<IActionResult> ConfirmQuestionnaireDelete(Guid questionnaireId)
     {
         return View("DeleteQuestionnaireConfirmation", new QuestionnaireViewModel
         {
@@ -105,7 +105,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpPost("admin/questionnaires/{questionnaireId}/Delete")]
-    public async Task<IActionResult> DeleteQuestionnaire(int questionnaireId)
+    public async Task<IActionResult> DeleteQuestionnaire(Guid questionnaireId)
     {
         await apiClient.DeleteQuestionnaireAsync(questionnaireId);
         
@@ -113,7 +113,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpGet("admin/questionnaires/{questionnaireId}/invite-request")]
-    public async Task<IActionResult> QuestionnaireInviteRequest(int questionnaireId)
+    public async Task<IActionResult> QuestionnaireInviteRequest(Guid questionnaireId)
     {
         return View("QuestionnaireContributorInvitation", new QuestionnaireViewModel
         {
@@ -122,7 +122,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpPost("admin/questionnaires/{questionnaireId}/invite-response")]
-    public async Task<IActionResult> QuestionnaireInvite(int questionnaireId, [FromForm(Name = "Accepted")] bool accepted)
+    public async Task<IActionResult> QuestionnaireInvite(Guid questionnaireId, [FromForm(Name = "Accepted")] bool accepted)
     {
         if (accepted)
         {
@@ -133,7 +133,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpGet("admin/questionnaires/{questionnaireId}/track")]
-    public async Task<IActionResult> QuestionnaireTrackingPage(int questionnaireId, bool accepted = false)
+    public async Task<IActionResult> QuestionnaireTrackingPage(Guid questionnaireId, bool accepted = false)
     {
         return View("TrackQuestionnaire", new QuestionnaireViewModel
         {
@@ -143,7 +143,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpGet("admin/questionnaires/{questionnaireId}/clone")]
-    public async Task<IActionResult> QuestionnaireClonePage(int questionnaireId)
+    public async Task<IActionResult> QuestionnaireClonePage(Guid questionnaireId)
     {
         var questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId);
         
@@ -162,7 +162,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpPost("admin/questionnaires/{questionnaireId}/clone")]
-    public async Task<IActionResult> CloneQuestionnaire(int questionnaireId, CloneQuestionnaireRequestDto request)
+    public async Task<IActionResult> CloneQuestionnaire(Guid questionnaireId, CloneQuestionnaireRequestDto request)
     {
         var cloneQuestionnaire = await apiClient.CloneQuestionnaireAsync(questionnaireId, request);
         
@@ -173,7 +173,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpGet("admin/questionnaires/{questionnaireId}/edit")]
-    public async Task<IActionResult> QuestionnaireEditPage(int questionnaireId)
+    public async Task<IActionResult> QuestionnaireEditPage(Guid questionnaireId)
     {
         var questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId);
         
@@ -193,7 +193,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpPost("admin/questionnaires/{questionnaireId}/edit")]
-    public async Task<IActionResult> SaveQuestionnaire(int questionnaireId, UpdateQuestionnaireRequestDto request)
+    public async Task<IActionResult> SaveQuestionnaire(Guid questionnaireId, UpdateQuestionnaireRequestDto request)
     {
         await apiClient.UpdateQuestionnaireAsync(questionnaireId, request);
         
@@ -201,7 +201,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpGet("admin/questionnaires/{questionnaireId}/questions")]
-    public async Task<IActionResult> QuestionManagementPage(int questionnaireId)
+    public async Task<IActionResult> QuestionManagementPage(Guid questionnaireId)
     {
         return View("ManageQuestions", new QuestionnaireViewModel
         {
@@ -212,7 +212,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpGet("admin/questionnaires/{questionnaireId}/questions/Create")]
-    public async Task<IActionResult> QuestionCreationPage(int questionnaireId)
+    public async Task<IActionResult> QuestionCreationPage(Guid questionnaireId)
     {
         return View("AddQuestion", new QuestionnaireViewModel
         {
@@ -221,7 +221,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpGet("admin/questions/{questionId}/edit")]
-    public async Task<IActionResult> QuestionPage(int questionId)
+    public async Task<IActionResult> QuestionPage(Guid questionId)
     {
         var question = await apiClient.GetQuestionAsync(questionId);
         
@@ -244,7 +244,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpPost("admin/questions/{questionId}/edit")]
-    public async Task<IActionResult> SaveQuestion(int questionId, UpdateQuestionRequestDto request)
+    public async Task<IActionResult> SaveQuestion(Guid questionId, UpdateQuestionRequestDto request)
     {
         await apiClient.UpdateQuestionAsync(questionId, request);
         
@@ -253,8 +253,8 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
 
     [HttpGet("admin/questionnaires/{questionnaireId}/questions/{questionId}/answers/edit")]
     public async Task<IActionResult> AddAnswersPage(
-        int questionnaireId, 
-        int questionId, 
+        Guid questionnaireId, 
+        Guid questionId, 
         bool addEmptyAnswerOption = false)
     {
         return View("AddAnswers", new QuestionnaireViewModel
@@ -270,10 +270,10 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpPost("admin/questionnaires/{questionnaireId}/questions/{questionId}/answers/edit")]
-    public async Task<IActionResult> SaveAnswers(int questionnaireId, int questionId, 
+    public async Task<IActionResult> SaveAnswers(Guid questionnaireId, Guid questionId, 
         [FromForm(Name = "Answers")] List<UpdateAnswerRequestDto> requests, 
         [FromForm(Name = "AddEmptyAnswerOption")] bool addEmptyAnswerOption,
-        [FromForm(Name = "RemoveAnswerOption")] int removeAnswerOption)
+        [FromForm(Name = "RemoveAnswerOption")] Guid removeAnswerOption)
     {
         await Task.WhenAll(requests.Select<UpdateAnswerRequestDto, Task>(req =>
         {
@@ -291,7 +291,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
             {
                 Content = req.Content,
                 Description = req.Description,
-                Destination = req.Destination,
+                DestinationUrl = req.DestinationUrl,
                 DestinationType = req.DestinationType,
                 DestinationQuestionId = req.DestinationQuestionId,
                 DestinationContentId = req.DestinationContentId,
@@ -316,7 +316,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpPost("admin/questionnaires/{questionnaireId}/content/create")]
-    public async Task<IActionResult> PerformContentCreation(int questionnaireId, CreateContentRequestDto request)
+    public async Task<IActionResult> PerformContentCreation(Guid questionnaireId, CreateContentRequestDto request)
     {
         if (!ModelState.IsValid)
         {
@@ -339,7 +339,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpGet("admin/contents/{contentId}/edit")]
-    public async Task<IActionResult> ContentPage(int contentId)
+    public async Task<IActionResult> ContentPage(Guid contentId)
     {
         var content = await apiClient.GetContentAsync(contentId);
 
@@ -360,7 +360,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpPost("admin/contents/{contentId}/edit")]
-    public async Task<IActionResult> SaveContent(int contentId, UpdateContentRequestDto request)
+    public async Task<IActionResult> SaveContent(Guid contentId, UpdateContentRequestDto request)
     {
         await apiClient.UpdateContentAsync(contentId, request);
 
@@ -368,7 +368,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpGet("admin/questionnaires/{questionnaireId}/contents")]
-    public async Task<IActionResult> ManageContentPage(int questionnaireId)
+    public async Task<IActionResult> ManageContentPage(Guid questionnaireId)
     {
         return View("ManageContent", new QuestionnaireViewModel
         {
@@ -378,7 +378,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpGet("admin/questionnaires/{questionnaireId}/content/create")]
-    public async Task<IActionResult> ContentCreationPage(int questionnaireId)
+    public async Task<IActionResult> ContentCreationPage(Guid questionnaireId)
     {
         return View("CreateContent", new QuestionnaireViewModel
         {
@@ -387,7 +387,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpGet("admin/questions/{questionId}/delete/confirm")]
-    public async Task<IActionResult> ConfirmQuestionDelete(int questionId)
+    public async Task<IActionResult> ConfirmQuestionDelete(Guid questionId)
     {
         var question = await apiClient.GetQuestionAsync(questionId);
 
@@ -402,7 +402,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpPost("admin/questions/{questionId}/delete")]
-    public async Task<IActionResult> DeleteQuestion(int questionId)
+    public async Task<IActionResult> DeleteQuestion(Guid questionId)
     {
         var question = await apiClient.GetQuestionAsync(questionId);
 
@@ -415,7 +415,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpGet("admin/contents/{contentId}/delete/confirm")]
-    public async Task<IActionResult> ConfirmContentDelete(int questionId)
+    public async Task<IActionResult> ConfirmContentDelete(Guid questionId)
     {
         var content = await apiClient.GetContentAsync(questionId);
 
@@ -430,7 +430,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
 
     [HttpPost("admin/contents/{contentId}/delete")]
-    public async Task<IActionResult> DeleteContent(int contentId)
+    public async Task<IActionResult> DeleteContent(Guid contentId)
     {
         var question = await apiClient.GetQuestionAsync(contentId);
 

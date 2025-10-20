@@ -48,7 +48,7 @@ public class ContentController(GetToAnAnswerDbContext db) : Controller
     }
     
     [HttpGet("contents/{id}")]
-    public async Task<IActionResult> GetContent(int id)
+    public async Task<IActionResult> GetContent(Guid id)
     {
         // Extract user and tenant from claims
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -67,7 +67,7 @@ public class ContentController(GetToAnAnswerDbContext db) : Controller
     }
     
     [HttpGet("questionnaires/{questionnaireId}/contents")]
-    public async Task<IActionResult> GetContents(int questionnaireId)
+    public async Task<IActionResult> GetContents(Guid questionnaireId)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -81,7 +81,7 @@ public class ContentController(GetToAnAnswerDbContext db) : Controller
     }
 
     [HttpPut("contents/{id}")]
-    public async Task<IActionResult> UpdateContent(int id, UpdateContentRequestDto request)
+    public async Task<IActionResult> UpdateContent(Guid id, UpdateContentRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -105,7 +105,7 @@ public class ContentController(GetToAnAnswerDbContext db) : Controller
     }
 
     [HttpDelete("contents/{id}")]
-    public async Task<IActionResult> DeleteContent(int id)
+    public async Task<IActionResult> DeleteContent(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         

@@ -5,8 +5,8 @@ namespace Common.Domain.Request.Create;
 
 public class CreateAnswerRequestDto
 {
-    public required int QuestionnaireId { get; set; }
-    public required int QuestionId { get; set; }
+    public required Guid QuestionnaireId { get; set; }
+    public required Guid QuestionId { get; set; }
     public required string Content { get; set; }
     public string? Description { get; set; }
     
@@ -14,9 +14,9 @@ public class CreateAnswerRequestDto
     
     public DestinationType? DestinationType { get; set; }
     
-    public string? Destination { get; set; }
+    public string? DestinationUrl { get; set; }
     
-    public int? DestinationQuestionId { get; set; }
+    public Guid? DestinationQuestionId { get; set; }
     
-    public int? DestinationContentId { get; set; }
+    public Guid? DestinationContentId { get; set; }
 } 

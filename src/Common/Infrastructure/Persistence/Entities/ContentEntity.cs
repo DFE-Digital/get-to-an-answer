@@ -10,9 +10,9 @@ public class ContentEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
-    public int QuestionnaireId { get; set; }
+    public Guid QuestionnaireId { get; set; }
     
     /*
      * Shorthand name for this content.

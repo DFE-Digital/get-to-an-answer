@@ -10,7 +10,7 @@ namespace Admin.Controllers;
 public class PreviewController(ILogger<HomeController> logger, IApiClient apiClient) : Controller
 {
     [HttpGet("admin/questionnaires/{questionnaireId}/Start/Preview")]
-    public async Task<IActionResult> GetStartPage(int questionnaireId)
+    public async Task<IActionResult> GetStartPage(Guid questionnaireId)
     {
         return View("PreviewQuestionnaireStart", new QuestionnaireViewModel
         {
@@ -19,7 +19,7 @@ public class PreviewController(ILogger<HomeController> logger, IApiClient apiCli
     }
     
     [HttpGet("admin/questionnaires/{questionnaireId}/Initial/Preview")]
-    public async Task<IActionResult> GetInitialQuestionPage(int questionnaireId)
+    public async Task<IActionResult> GetInitialQuestionPage(Guid questionnaireId)
     {
         return View("PreviewQuestionnaire", new QuestionnaireViewModel
         {
@@ -34,8 +34,8 @@ public class PreviewController(ILogger<HomeController> logger, IApiClient apiCli
     }
     
     [HttpPost("admin/questionnaires/{questionnaireId}/Next/Preview")]
-    public async Task<IActionResult> GetNextStatePage(int questionnaireId, GetNextStateRequest request, 
-        [FromForm(Name = "Scores")] Dictionary<int, float> scores)
+    public async Task<IActionResult> GetNextStatePage(Guid questionnaireId, GetNextStateRequest request, 
+        [FromForm(Name = "Scores")] Dictionary<Guid, float> scores)
     {
         if (request.SelectedAnswerIds.Count > 1)
         {

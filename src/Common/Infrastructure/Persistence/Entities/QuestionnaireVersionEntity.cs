@@ -9,9 +9,9 @@ public class QuestionnaireVersionEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
-    public int QuestionnaireId { get; set; }
+    public Guid QuestionnaireId { get; set; }
     public required string QuestionnaireJson { get; set; }
     
     public int Version { get; set; }

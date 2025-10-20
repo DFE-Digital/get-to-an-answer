@@ -55,7 +55,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
     }
     
     [HttpGet("questions/{id}")]
-    public async Task<IActionResult> GetQuestion(int id)
+    public async Task<IActionResult> GetQuestion(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -93,7 +93,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
     }
 
     [HttpGet("questionnaires/{questionnaireId}/questions")]
-    public async Task<IActionResult> GetQuestions(int questionnaireId)
+    public async Task<IActionResult> GetQuestions(Guid questionnaireId)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -108,7 +108,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
     }
 
     [HttpPut("questions/{id}")]
-    public async Task<IActionResult> UpdateQuestion(int id, UpdateQuestionRequestDto request)
+    public async Task<IActionResult> UpdateQuestion(Guid id, UpdateQuestionRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -133,7 +133,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
     }
     
     [HttpPut("questions/{id}/status")]
-    public async Task<IActionResult> UpdateQuestionStatus(int id, UpdateQuestionStatusRequestDto request)
+    public async Task<IActionResult> UpdateQuestionStatus(Guid id, UpdateQuestionStatusRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -156,7 +156,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
     }
 
     [HttpDelete("questions/{id}")]
-    public async Task<IActionResult> DeleteQuestion(int id)
+    public async Task<IActionResult> DeleteQuestion(Guid id)
     {
         return await UpdateQuestionStatus(id, new UpdateQuestionStatusRequestDto
         {
@@ -166,18 +166,18 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
     }
     
     [HttpDelete("questionnaires/{questionnaireId}/questions/{id}/move-down")]
-    public async Task<IActionResult> MoveQuestionDownOne(int questionnaireId, int id)
+    public async Task<IActionResult> MoveQuestionDownOne(Guid questionnaireId, Guid id)
     {
         return await MoveQuestionByOne(questionnaireId, id, +1);
     }
     
     [HttpDelete("questionnaires/{questionnaireId}/questions/{id}/move-up")]
-    public async Task<IActionResult> MoveQuestionUpOne(int questionnaireId, int id)
+    public async Task<IActionResult> MoveQuestionUpOne(Guid questionnaireId, Guid id)
     {
         return await MoveQuestionByOne(questionnaireId, id, -1);
     }
     
-    private async Task<IActionResult> MoveQuestionByOne(int questionnaireId, int id, int direction)
+    private async Task<IActionResult> MoveQuestionByOne(Guid questionnaireId, Guid id, int direction)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         

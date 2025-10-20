@@ -6,7 +6,7 @@ namespace Common.Domain.Request.Create;
 
 public class CloneQuestionnaireRequestDto
 {
-    public int OriginalQuestionnaireId { get; set; }
+    public Guid OriginalQuestionnaireId { get; set; }
     
     [Required(ErrorMessage = "Enter a questionnaire title")]
     [MaxLength(250, ErrorMessage = "Questionnaire title must be 250 characters or fewer")]

@@ -4,7 +4,7 @@ namespace Common.Domain;
 
 public class QuestionnaireDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
     public string Title { get; set; }
     
@@ -25,7 +25,7 @@ public class QuestionnaireDto
 
 public class QuestionnaireInfoDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
     public string Title { get; set; }
     

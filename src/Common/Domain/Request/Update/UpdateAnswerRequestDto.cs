@@ -5,8 +5,8 @@ namespace Common.Domain.Request.Update;
 
 public class UpdateAnswerRequestDto
 {
-    public int? Id { get; set; }
-    public required int QuestionnaireId { get; set; }
+    public Guid? Id { get; set; }
+    public required Guid QuestionnaireId { get; set; }
     public required string Content { get; set; }
     public string? Description { get; set; }
     
@@ -14,9 +14,9 @@ public class UpdateAnswerRequestDto
     
     public DestinationType? DestinationType { get; set; }
     
-    public string? Destination { get; set; }
+    public string? DestinationUrl { get; set; }
     
-    public int? DestinationQuestionId { get; set; }
+    public Guid? DestinationQuestionId { get; set; }
     
-    public int? DestinationContentId { get; set; }
+    public Guid? DestinationContentId { get; set; }
 } 

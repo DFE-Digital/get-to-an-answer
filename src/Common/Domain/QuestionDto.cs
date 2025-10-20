@@ -5,8 +5,8 @@ namespace Common.Domain;
 
 public class QuestionDto
 {
-    public int Id { get; set; }
-    public int QuestionnaireId { get; set; }
+    public Guid Id { get; set; }
+    public Guid QuestionnaireId { get; set; }
     public int Order { get; set; }
     public string Content { get; set; }
     public string? Description { get; set; }
