@@ -1,0 +1,26 @@
+services:
+  web-api:
+    image: web-api:e2e
+    build:
+      context: ../..
+      dockerfile: src/Api/Dockerfile
+    depends_on:
+      - sqlserver
+    environment:
+      - ConnectionStrings__DefaultConnection=${DEFAULT_CONNECTION_STRING}
+      - SQLSERVER_SA_PASSWORD=${SQLSERVER_SA_PASSWORD}
+    ports:
+      - 8080:8080
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SQLSERVER_SA_PASSWORD}
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${SQLSERVER_SA_PASSWORD}", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

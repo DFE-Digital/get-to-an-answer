@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using Common.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,8 @@ using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
-{
+{ 
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
