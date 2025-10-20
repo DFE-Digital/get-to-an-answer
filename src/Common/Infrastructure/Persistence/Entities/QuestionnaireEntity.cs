@@ -41,5 +41,5 @@ public class QuestionnaireEntity
     public string CreatedBy { get; set; }
 
     // Child entities
-    //public ICollection<QuestionEntity> Questions { get; set; } = new List<QuestionEntity>();
+    public ICollection<QuestionEntity> Questions { get; set; } = new List<QuestionEntity>();
 }

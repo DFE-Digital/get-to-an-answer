@@ -6,8 +6,8 @@ namespace Common.Infrastructure.Persistence;
 
 public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> options) : DbContext(options)
 {
-    //public DbSet<QuestionEntity> Questions { get; set; }
-    //public DbSet<AnswerEntity> Answers { get; set; }
+    public DbSet<QuestionEntity> Questions { get; set; }
+    public DbSet<AnswerEntity> Answers { get; set; }
     public DbSet<QuestionnaireEntity> Questionnaires { get; set; }
     
     public DbSet<QuestionnaireVersionEntity> QuestionnaireVersions { get; set; }
@@ -24,6 +24,34 @@ public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> opt
             var access = Questionnaires
                 .Where(qq => qq.Id == id && qq.Status != EntityStatus.Deleted)
                 .Select(qq => new { IsContributor = qq.Contributors.Contains(email) })
+                .FirstOrDefault();
+
+            return access is null
+                ? EntityAccess.NotFound
+                : (access.IsContributor ? EntityAccess.Allow : EntityAccess.Deny);
+        }
+
+        if (typeof(TEntityType) == typeof(QuestionEntity))
+        {
+            var access = Questions
+                .Where(q => q.Id == id && !q.IsDeleted)
+                .Select(q => Questionnaires
+                    .Where(qq => qq.Id == q.QuestionnaireId)
+                    .Select(qq => new { IsContributor = qq.Contributors.Contains(email) }).FirstOrDefault())
+                .FirstOrDefault();
+
+            return access is null
+                ? EntityAccess.NotFound
+                : (access.IsContributor ? EntityAccess.Allow : EntityAccess.Deny);
+        }
+        
+        if (typeof(TEntityType) == typeof(AnswerEntity))
+        {
+            var access = Answers
+                .Where(q => q.Id == id && !q.IsDeleted)
+                .Select(q => Questionnaires
+                    .Where(qq => qq.Id == q.QuestionnaireId)
+                    .Select(qq => new { IsContributor = qq.Contributors.Contains(email) }).FirstOrDefault())
                 .FirstOrDefault();
 
             return access is null
