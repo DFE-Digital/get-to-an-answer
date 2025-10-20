@@ -27,10 +27,12 @@ jobs:
           node-version: '18'
       - name: Lowercase the repo name and username
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
-#      - name: Build Web Docker Image
+
+#      Might need a separate docker build step for images to utilise tagging
+#      - name: Build Api Docker Docker Image
 #        id: build
 #        working-directory: ./src
-#        run: docker build . -t care-leavers-web:e2e -f web/CareLeavers.Web/Dockerfile
+#        run: docker build . -t gtaa-web-api:e2e -f Api/Dockerfile
 
       - name: Run E2E Docker Image
         id: run
@@ -38,10 +40,7 @@ jobs:
         env:
           DEFAULT_CONNECTION_STRING: ${{ secrets.DEFAULT_CONNECTION_STRING }}
           SQLSERVER_SA_PASSWORD: ${{ secrets.SQLSERVER_SA_PASSWORD }}
-        run: |
-          docker compose -f Infrastructure/compose-ci.yaml up -d
-          sleep 30
-          docker compose -f Infrastructure/compose-ci.yaml logs --tail=100 --follow
+        run: docker compose -f Infrastructure/compose-ci.yaml up -d
         
       - name: Show all container logs
         run: docker compose -f Infrastructure/compose-ci.yaml logs 
