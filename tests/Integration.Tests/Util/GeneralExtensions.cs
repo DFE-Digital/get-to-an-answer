@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Common.Enum;
 
 namespace Integration.Tests.Util;
 
@@ -25,4 +26,7 @@ public static class GeneralExtensions
         }
         return true;
     }
+    
+    public static IList<QuestionType> ToList<TEnum>(int repeatCount) where TEnum : struct, Enum
+        => Enumerable.Repeat(Enum.GetValues<TEnum>(), repeatCount).SelectMany(x => x).Cast<QuestionType>().ToList();
 }
