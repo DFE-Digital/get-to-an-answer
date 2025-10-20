@@ -16,4 +16,3 @@
     build:
       context: .
       dockerfile: src/Api/Dockerfile
-
