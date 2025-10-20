@@ -8,6 +8,8 @@ export async function createMultipleAnswers(
     useDifferentDestinations?: boolean
 ) {
     const createdAnswers = [];
+    const createdPayloads = [];
+    
     const destinationType = AnswerDestinationType.PAGE;
     const destination = '/default-destination'
     const weight = 0.0;
@@ -27,20 +29,21 @@ export async function createMultipleAnswers(
             .withWeight(weight)
             .build();
 
-        const res = await request.post('/answers', {data: payload});
+        const response = await request.post('/answers', {data: payload});
 
-        if (!res.ok()) {
-            throw new Error(`❌ Failed to create answer ${i}: ${res.status()}`);
+        if (!response.ok()) {
+            throw new Error(`❌ Failed to create answer ${i}: ${response.status()}`);
         }
 
-        const body = await res.json();
+        const body = await response.json();
         createdAnswers.push(body);
+        createdPayloads.push(payload);
     }
 
     console.log(
         `✅ Created ${numberOfAnswers} ${useDifferentDestinations ? 'different' : 'same'} outcomes for question ${questionId}`
     );
-    return createdAnswers;
+    return {createdAnswers, createdPayloads};
 }
 
 export async function createSingleAnswer(
@@ -62,15 +65,15 @@ export async function createSingleAnswer(
         .withWeight(weight)
         .build();
 
-    const res = await request.post('/answers', {data: payload});
+    const response = await request.post('/answers', {data: payload});
 
-    if (!res.ok()) {
-        throw new Error(`❌ Failed to create answer: ${res.status()}`);
+    if (!response.ok()) {
+        throw new Error(`❌ Failed to create answer: ${response.status()}`);
     }
 
-    const body = await res.json();
+    const answerPostResponse = await response.json();
     console.log(
         `✅ Created 1 answer → destination "${destination}" for question ${questionId}`
     );
-    return body;
+    return {answerPostResponse, payload};
 }

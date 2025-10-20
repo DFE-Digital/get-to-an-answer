@@ -17,13 +17,14 @@ export async function createQuestion(
         .withType(type)
         .build();
     
-    const res = await request.post('/questions', {data: payload});
+    const response = await request.post('/questions', {data: payload});
 
-    if (!res.ok()) {
-        throw new Error(`❌ Failed to create question: ${res.status()}`);
+    if (!response.ok()) {
+        throw new Error(`❌ Failed to create question: ${response.status()}`);
     }
 
-    return await res.json();
+    const questionPostResponse = await response.json();
+    return {questionPostResponse, payload}
 }
 
 export async function getQuestion(

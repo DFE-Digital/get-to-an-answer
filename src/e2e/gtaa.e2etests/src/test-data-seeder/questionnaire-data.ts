@@ -6,7 +6,6 @@ export async function createQuestionnaire(
     title?: string,
     description?: string,
     slug?: string
-    
 ) {
     const payload = new QuestionnaireBuilder()
         .withTitle(title)
@@ -20,7 +19,8 @@ export async function createQuestionnaire(
     if (!response.ok()) {
         throw new Error(`❌ Failed to create questionnaire: ${response.status()}`);
     }
-    return await response.json();
+    const questionnairePostResponse = await response.json();
+    return {questionnairePostResponse, payload}
 }
 
 export async function getQuestionnaire(

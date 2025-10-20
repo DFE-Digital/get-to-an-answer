@@ -6,20 +6,20 @@ import {QuestionType} from '../../constants/test-data-constants';
 test.describe('POST Create question api request', () => {
     test('Validate POST create new question', async ({page, request}) => {
 
-        const questionnairePostResponse = await createQuestionnaire(request);
+        const {questionnairePostResponse} = await createQuestionnaire(request);
         const questionnaireId = await questionnairePostResponse.id;
 
-        const questionPostResponse = await createQuestion(request, questionnaireId)
+        const {questionPostResponse, payload} = await createQuestion(request, questionnaireId)
 
         // --- HTTP-level checks ---
         expect(questionPostResponse.ok()).toBeTruthy();
         expect(questionPostResponse.status()).toBe(201);
 
         // --- Schema-level checks ---
-        expect(questionPostResponse).toHaveProperty('questionnaireId');
-        expect(questionPostResponse).toHaveProperty('content');
-        expect(questionPostResponse).toHaveProperty('description');
-        expect(questionPostResponse).toHaveProperty('type');
+        expect(questionPostResponse).toHaveProperty(payload.questionnaireId);
+        expect(questionPostResponse).toHaveProperty(payload.content);
+        expect(questionPostResponse).toHaveProperty(payload.description);
+        expect(questionPostResponse).toHaveProperty(payload.type);
 
         // --- Type sanity checks ---
         expect(typeof questionPostResponse.questionnaireId).toBe(Number);
@@ -31,7 +31,5 @@ test.describe('POST Create question api request', () => {
         expect(questionPostResponse.content.trim().length).toBeGreaterThan(0);
         expect(questionPostResponse.description.trim().length).toBeGreaterThan(0);
         expect(questionPostResponse.type.trim().length).toBeGreaterThan(0);
-
-        //delete test data logic
     });
 });
