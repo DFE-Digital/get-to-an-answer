@@ -37,8 +37,9 @@ jobs:
 
       - name: Run E2E Docker Image
         id: run
+        working-directory: ./src
         run: |
-          export ConnectionStrings__DefaultConnection="${{ secrets.DEFAULT_CONNECTION_STRING }}"
+          export DEFAULT_CONNECTION_STRING="${{ secrets.DEFAULT_CONNECTION_STRING }}"
           export SQLSERVER_SA_PASSWORD="${{ secrets.SQLSERVER_SA_PASSWORD }}"
           docker compose -f Infrastructure/compose-ci.yaml up -d
         
