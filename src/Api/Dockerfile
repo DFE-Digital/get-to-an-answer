@@ -20,15 +20,8 @@ RUN dotnet publish "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:Use
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-# Switch to root to install packages, then back to app user
-USER root
-RUN apt-get update && \
-    apt-get install -y curl gnupg && \
-    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/debian/12/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
-    apt-get update && \
-    ACCEPT_EULA=Y apt-get install -y msodbcsql18 mssql-tools18 netcat-openbsd && \
-    echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> /etc/bash.bashrc && \
-    export PATH="$PATH:/opt/mssql-tools18/bin"
-USER $APP_UID
+
+COPY wait-for-sqlserver.sh /wait-for-sqlserver.sh
+RUN chmod +x /wait-for-sqlserver.sh
+
 ENTRYPOINT ["dotnet", "Api.dll"]
