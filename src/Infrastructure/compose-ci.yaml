@@ -24,3 +24,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  playwright-tests:
+    build:
+      context: ../e2e/gtaa.e2etests
+      dockerfile: Dockerfile
+    depends_on:
+      - web-api
+    environment:
+      - API_URL=http://web-api:8080
+    volumes:
+      - ../e2e/gtaa.e2etests/test-results/screenshots:/tests/test-results/screenshots
+    command: ["yarn", "playwright", "test", "-c", "playwright.config.ts"]
