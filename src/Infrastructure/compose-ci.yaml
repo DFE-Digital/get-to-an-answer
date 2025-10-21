@@ -9,6 +9,11 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=${DEFAULT_CONNECTION_STRING}
       - SQLSERVER_SA_PASSWORD=${SQLSERVER_SA_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - AzureAd__ClientId=${AZURE_AD_CLIENT_ID}
+      - AzureAd__TenantId=${AZURE_AD_TENANT_ID}
+      - AzureAd__Instance=${AZURE_AD_INSTANCE}
+      - AzureAd__Domain=${AZURE_AD_DOMAIN}
     ports:
       - 8080:8080
 
@@ -35,4 +40,4 @@ services:
       - API_URL=http://web-api:8080
     volumes:
       - ../e2e/gtaa.e2etests/test-results/screenshots:/tests/test-results/screenshots
-    command: ["yarn", "playwright", "test", "-c", "playwright.config.ts"]
+    command: ["yarn", "playwright", "test", "src/tests/api", "-c", "playwright.config.ts"]
