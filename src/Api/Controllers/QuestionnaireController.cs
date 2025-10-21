@@ -145,7 +145,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     [HttpPut("questionnaires/{id}/publish")]
     public async Task<IActionResult> PublishQuestionnaire(Guid id)
     {
-        return await UpdateQuestionnaireStatus(id, new UpdateQuestionnaireStatusRequestDto
+        return await UpdateQuestionnaireStatus(id, new PublishQuestionnaireRequestDto
         {
             Id = id,
             Status = EntityStatus.Published
@@ -165,7 +165,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
             .ExecuteUpdateAsync(s => s
                 .SetProperty(b => b.IsDeleted, true));
         
-        return await UpdateQuestionnaireStatus(id, new UpdateQuestionnaireStatusRequestDto
+        return await UpdateQuestionnaireStatus(id, new PublishQuestionnaireRequestDto
         {
             Id = id,
             Status = EntityStatus.Deleted
@@ -187,6 +187,10 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
             questionnaire.Contributors.Add(email);
         
             await db.SaveChangesAsync();
+        }
+        else
+        {
+            return Conflict();       
         }
         
         return NoContent();
@@ -291,6 +295,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
             EntityToDto(cloneQuestionnaire));
     }
 
+    [ApiExplorerSettings(IgnoreApi = true)]
     private async Task StoreQuestionnaireVersion(Guid id, int versionNumber)
     {
         var questionnaire = await db.Questionnaires
@@ -318,7 +323,8 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         await db.SaveChangesAsync();
     }
     
-    public async Task<IActionResult> UpdateQuestionnaireStatus(Guid id, UpdateQuestionnaireStatusRequestDto request)
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> UpdateQuestionnaireStatus(Guid id, PublishQuestionnaireRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -354,6 +360,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         return NoContent();
     }
     
+    [ApiExplorerSettings(IgnoreApi = true)]
     private QuestionnaireDto EntityToDto(QuestionnaireEntity entity)
     {
         return new QuestionnaireDto

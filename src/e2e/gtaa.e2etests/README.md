@@ -5,29 +5,29 @@
 
 2. Install dependencies at gtaa.e2etests:
 
-    yarn install
+`yarn install`
 
 3. Install Playwright browsers:
 
-    yarn playwright install
+`yarn playwright install`
 
 ## Running Tests
 
 ### Run All Tests
 
-yarn playwright test
+`yarn playwright test`
 
 ### Run a Specific Test
 
-yarn playwright test src/tests/example.spec.ts
+`yarn playwright test src/tests/example.spec.ts`
 
 ### Run Tests in a Specific Browser
 
-yarn playwright test --project=Chromium
+`yarn playwright test --project=Chromium`
 
 ### Run Tests in Debug Mode
 
-yarn playwright test --debug
+`yarn playwright test --debug`
 
 ### Reporting and Debugging
 
@@ -35,7 +35,7 @@ yarn playwright test --debug
 
 After running tests, generate and view an HTML report:
 
-yarn playwright show-report
+`yarn playwright show-report`
 
 ### Screenshots and Videos
 

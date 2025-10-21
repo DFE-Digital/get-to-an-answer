@@ -206,6 +206,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
         return await MoveQuestionByOne(questionnaireId, id, -1);
     }
     
+    [ApiExplorerSettings(IgnoreApi = true)]
     private async Task<IActionResult> MoveQuestionByOne(Guid questionnaireId, Guid id, int direction)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;

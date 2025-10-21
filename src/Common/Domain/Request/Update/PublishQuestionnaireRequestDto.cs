@@ -4,7 +4,7 @@ using Common.Enum;
 
 namespace Common.Domain.Request.Update;
 
-public class UpdateQuestionnaireStatusRequestDto
+public class PublishQuestionnaireRequestDto
 {
     [Required(ErrorMessage = "Enter a questionnaire id")]   
     public Guid Id { get; set; }

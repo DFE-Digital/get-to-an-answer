@@ -32,7 +32,6 @@
         <PackageReference Include="FluentAssertions" />
         <PackageReference Include="Bogus"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     </ItemGroup>
 
     <ItemGroup>

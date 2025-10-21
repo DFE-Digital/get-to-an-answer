@@ -23,8 +23,6 @@ namespace Integration.Tests.Fixture;
 
 public class ApiFixture : WebApplicationFactory<ApiProgram>, IAsyncLifetime
 {
-    private IServiceProvider _sp;
-
     private WireMockAadServer? _aad;
     
     private readonly MsSqlContainer _msSqlContainer = new MsSqlBuilder().Build();
@@ -48,6 +46,9 @@ public class ApiFixture : WebApplicationFactory<ApiProgram>, IAsyncLifetime
                 ["AzureAd:RequireHttpsMetadata"] = "false"
             };
             config.AddInMemoryCollection(dict!);
+            
+            var env = "LocalTest";
+            config.AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: false);
         });
 
         builder.ConfigureServices(services =>
@@ -62,7 +63,6 @@ public class ApiFixture : WebApplicationFactory<ApiProgram>, IAsyncLifetime
                 services.Remove(p);
             }
             // ... existing code ...
-            // Replace SQLite with SQL Server using Testcontainers connection string
             services.AddDbContext<GetToAnAnswerDbContext>(o =>
             {
                 o.UseSqlServer(_msSqlContainer.GetConnectionString());
@@ -128,6 +128,8 @@ public class ApiFixture : WebApplicationFactory<ApiProgram>, IAsyncLifetime
                 opts.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             });
         });
+                
+        builder.UseEnvironment("LocalTest");
     }
 
     protected override IHost CreateHost(IHostBuilder builder)

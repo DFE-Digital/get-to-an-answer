@@ -2,26 +2,28 @@ import {test, expect} from '@playwright/test';
 import {createQuestionnaire} from '../../test-data-seeder/questionnaire-data';
 import {createQuestion} from '../../test-data-seeder/question-data';
 import {createSingleAnswer} from '../../test-data-seeder/answer-data';
-import {QuestionType, QuestionPrefix, AnswerDestinationType} from '../../constants/test-data-constants';
+import {QuestionType, QuestionPrefix, AnswerDestinationType, GUID_REGEX} from '../../constants/test-data-constants';
 
 test.describe('POST answers api tests', () => {
     test('POST an answer for a single question', async ({request}) => {
 
-        const {questionnairePostResponse} = await createQuestionnaire(request);
-        const questionnaireId = await questionnairePostResponse.id;
+        const {questionnaire} = await createQuestionnaire(request);
+        const questionnaireId = await questionnaire.id;
 
         const {questionPostResponse} = await createQuestion(request, questionnaireId)
         const qId = await questionPostResponse.id;
 
         const {answerPostResponse, payload} = await createSingleAnswer(
             request,
-            qId,
-            undefined,
-            undefined,
-            'Option 1',
-            0.0,
-            AnswerDestinationType.PAGE,
-            '/page-destination-url'
+            {
+                questionId: qId,
+                content: undefined,
+                description: undefined,
+                answerPrefix: 'Option 1',
+                weight: 0.0,
+                destinationType: AnswerDestinationType.PAGE,
+                destination: '/page-destination-url'
+            }
         );
 
         // --- HTTP-level checks ---
@@ -29,15 +31,15 @@ test.describe('POST answers api tests', () => {
         expect(answerPostResponse.status()).toBe(201);
 
         // --- Schema-level checks ---
-        expect(answerPostResponse).toHaveProperty(payload.questionId);
-        expect(answerPostResponse).toHaveProperty(payload.content);
-        expect(answerPostResponse).toHaveProperty(payload.description);
-        expect(answerPostResponse).toHaveProperty(payload.destination);
-        expect(answerPostResponse).toHaveProperty(payload.destinationType);
-        expect(answerPostResponse).toHaveProperty((payload.weight).toString());
+        expect(answerPostResponse).toHaveProperty('questionId');
+        expect(answerPostResponse).toHaveProperty('content');
+        expect(answerPostResponse).toHaveProperty('description');
+        expect(answerPostResponse).toHaveProperty('destination');
+        expect(answerPostResponse).toHaveProperty('destinationType');
+        expect(answerPostResponse).toHaveProperty('weight');
 
         // --- Type sanity checks ---
-        expect(typeof questionPostResponse.questionnaireId).toBe(Number);
+        expect(typeof questionPostResponse.questionnaireId).toMatch(GUID_REGEX);
         expect(typeof questionPostResponse.content).toBe('string');
         expect(typeof questionPostResponse.description).toBe('string');
         expect(typeof questionPostResponse.type).toBe(QuestionType);
