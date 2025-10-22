@@ -47,17 +47,18 @@ resource "azurerm_subnet" "gettoananswer_main_subnet" {
 
   service_endpoints = ["Microsoft.Sql", "Microsoft.Storage"]
 
-  network_security_group_id = azurerm_network_security_group.gettoananswer-nsg.id
-
   delegation {
     name = "asp-delegation"
     service_delegation {
       name = "Microsoft.Web/serverFarms"
       actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action"
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+        "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"
       ]
     }
   }
+  
+  
 }
 
 resource "azurerm_subnet_network_security_group_association" "default" {
