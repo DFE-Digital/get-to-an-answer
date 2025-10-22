@@ -10,17 +10,33 @@ resource "azurerm_network_security_group" "gettoananswer-nsg" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
 
+  # Compliant: no inbound from Internet; add only specific allows if required (e.g., from corporate IPs/VNet)
   security_rule {
-    name                       = "defaultSecurityrule"
-    priority                   = 100
+    name                       = "Allow-HTTPS-From-VNet"
+    priority                   = 200
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "*" # All source ports
-    destination_port_range     = "*" # "5432" 
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+    destination_port_ranges    = ["443"]
+    source_port_range          = "*"
   }
+
+  # Optional: allow internal communication within VNet on any port (adjust if needed)
+  security_rule {
+    name                       = "Allow-Internal-VNet"
+    priority                   = 210
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+  }
+
+  # No rule exposing management ports (22/3389/etc.) to Internet
 }
 
 resource "azurerm_subnet" "gettoananswer_main_subnet" {
