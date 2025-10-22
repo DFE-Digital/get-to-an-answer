@@ -1,18 +1,30 @@
 ﻿services:
-  frontend:
-    image: frontend
+  gettoananswer-frontend:
+    image: gettoananswer-frontend
+    depends_on:
+      - gettoananswer-api
     build:
-      context: .
-      dockerfile: src/Frontend/Dockerfile
+      context: ..
+      dockerfile: Frontend/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ApiSettings__BaseUrl=http://gettoananswer-api:8080
 
-  admin:
-    image: admin
+  gettoananswer-admin:
+    image: gettoananswer-admin
+    depends_on:
+      - gettoananswer-api
     build:
-      context: .
-      dockerfile: src/Admin/Dockerfile
+      context: ..
+      dockerfile: Admin/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ApiSettings__BaseUrl=http://gettoananswer-api:8080
 
-  api-1:
-    image: api-1
+  gettoananswer-api:
+    image: gettoananswer-api
     build:
-      context: .
-      dockerfile: src/Api/Dockerfile
+      context: ..
+      dockerfile: Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development

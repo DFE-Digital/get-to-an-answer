@@ -1,0 +1,7 @@
+env                = "Test"
+product            = "Get-To-An-Answer"
+prefix             = "s263t01"
+location           = "uksouth"
+api_image_name      = "gettoananswer-api:latest"
+admin_image_name    = "gettoananswer-admin:latest"
+frontend_image_name = "gettoananswer-frontend:latest"

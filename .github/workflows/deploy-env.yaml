@@ -12,33 +12,24 @@ on:
         type: choice
         description: 'Environment to deploy to'
         required: true
-        default: 'Test'
+        default: 'Development'
         options:
-          - 'Test'
-          - 'Staging'
-          - 'Production'
-      clear-cache:
-        type: choice
-        description: 'Clear the cache?'
-        required: true
-        default: 'False'
-        options:
-          - 'True'
-          - 'False'
+          - Development
+          - Test
 
 run-name: ${{ github.event_name == 'push' && 'Build & Deploy to Test' || format('Deploy to {0}', github.event_name == 'release' && 'Production' || github.event.inputs.environment) }}
 
 jobs:
-  validate_web:
+  validate_apps:
     if: github.event_name == 'push' || github.event_name == 'release'
     name: Validate Web
-    uses: ./.github/workflows/validate-web.yaml
+    uses: ./.github/workflows/validate-apps.yaml
 
   tag_release:
     if: github.event_name == 'push'
     name: Create New Tag
     runs-on: ubuntu-latest
-    needs: [ validate_web ]
+    needs: [ validate_apps ]
     outputs:
       new_tag: ${{ steps.tag_version.outputs.new_tag }}
     steps:
@@ -55,8 +46,8 @@ jobs:
   package:
     name: 'Package Apps in Docker'
     runs-on: ubuntu-latest
-    needs: [ validate_web, tag_release ]
-    if: always() && (needs.tag_release.result == 'success' || (github.event_name == 'release' && needs.validate_web.result == 'success') || github.event_name == 'workflow_dispatch')
+    needs: [ validate_apps, tag_release ]
+    if: always() && (needs.tag_release.result == 'success' || (github.event_name == 'release' && needs.validate_apps.result == 'success') || github.event_name == 'workflow_dispatch')
     defaults:
       run:
         working-directory: ./src
@@ -70,7 +61,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Lowercase the repo name and username
-        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+        run: echo "REPO=$(basename "$GITHUB_REPOSITORY" | tr -d '-')" >>${GITHUB_ENV}
 
       - name: Set Docker image tag
         id: set_tag
@@ -127,7 +118,8 @@ jobs:
       ARM_SUBSCRIPTION_ID: "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
       ARM_TENANT_ID: "${{ secrets.AZURE_TENANT_ID }}"
       ARM_CLIENT_SECRET: "${{ secrets.AZURE_CLIENT_SECRET }}"
-    
+      TF_VAR_sql_admin_username: ${{ secrets.SQL_ADMIN_USERNAME }}
+      TF_VAR_sql_admin_password: ${{ secrets.SQL_ADMIN_PASSWORD }}
     steps:
       - name: Set dynamic variables
         id: vars
@@ -138,15 +130,6 @@ jobs:
 
           if [[ "${{ github.event_name }}" == "release" ]]; then
             BODY="${{ github.event.release.body }}"
-            CACHE_VALUE=$(echo "$BODY" | grep 'clear-cache:' | awk -F': ' '{print $2}' | tr -d '[:space:]')
-            echo "clear_cache=${CACHE_VALUE:-False}" >> $GITHUB_OUTPUT
-            echo "Clear Cache: ${CACHE_VALUE:-False}"
-          elif [[ "${{ github.event_name }}" == "push" ]]; then
-            echo "clear_cache=False" >> $GITHUB_OUTPUT
-            echo "Clear Cache: False"
-          else
-            echo "clear_cache=${{ github.event.inputs.clear-cache }}" >> $GITHUB_OUTPUT
-            echo "Clear Cache: ${{ github.event.inputs.clear-cache }}"
           fi
 
       - uses: actions/checkout@v4
@@ -169,51 +152,31 @@ jobs:
       - name: Create TF State dependencies
         uses: azure/cli@v2
         env:
-          ENVIRONMENT_PREFIX: ${{ vars.ENVIRONMENT_PREFIX }}
+          ENVIRONMENT_PREFIX: 
           CIP_ENVIRONMENT: ${{ vars.CIP_ENVIRONMENT }}
         with:
           azcliversion: latest
           inlineScript: |
-            az group create --name s186${ENVIRONMENT_PREFIX}-cl-tfstate --location westeurope --output none --tags "Environment=${CIP_ENVIRONMENT}" "Product=Design Operations" "Service=Newly onboarded" "Service offering=Design operations"
-            az storage account create --name s186${ENVIRONMENT_PREFIX}cltfstate --resource-group s186${ENVIRONMENT_PREFIX}-cl-tfstate --location westeurope --sku Standard_LRS
-            az storage container create --name tfstate --account-name s186${ENVIRONMENT_PREFIX}cltfstate
+            az group create --name s263${ENVIRONMENT_PREFIX}-cl-tfstate --location westeurope --output none --tags "Environment=${CIP_ENVIRONMENT}" "Product=Get-To-An-Answer" "Service=Newly onboarded" "Service offering=Get-To-An-Answer"
+            az storage account create --name s263${ENVIRONMENT_PREFIX}cltfstate --resource-group s263${ENVIRONMENT_PREFIX}-cl-tfstate --location westeurope --sku Standard_LRS
+            az storage container create --name tfstate --account-name s263${ENVIRONMENT_PREFIX}cltfstate
 
       - name: 'Terraform Init'
         id: terraform_init
         working-directory: ./src/infrastructure/terraform
         env:
-          ENVIRONMENT_PREFIX: ${{ vars.ENVIRONMENT_PREFIX }}
-        run: terraform init -backend-config="resource_group_name=s186${ENVIRONMENT_PREFIX}-cl-tfstate" -backend-config="storage_account_name=s186${ENVIRONMENT_PREFIX}cltfstate" -backend-config="container_name=tfstate" -backend-config="key=terraform.tfstate"
+          ENVIRONMENT_PREFIX: 
+        run: terraform init
 
       - name: 'Terraform Plan'
         id: terraform_plan
         working-directory: ./src/infrastructure/terraform
-        run: terraform plan -out plan.plan
-        env:
-          TF_VAR_aspnetcore_environment: ${{ env.ENV_NAME }}
-          TF_VAR_environment_prefix: ${{ vars.ENVIRONMENT_PREFIX }}
-          TF_VAR_cip_environment: ${{ vars.CIP_ENVIRONMENT }}
-          TF_VAR_contentful_delivery_api_key: ${{ secrets.CONTENTFUL_DELIVERY_API_KEY }}
-          TF_VAR_contentful_preview_api_key: ${{ secrets.CONTENTFUL_PREVIEW_API_KEY }}
-          TF_VAR_contentful_management_api_key: ${{ secrets.CONTENTFUL_MANAGEMENT_TOKEN }}
-          TF_VAR_contentful_space_id: ${{ secrets.CONTENTFUL_SPACE_ID }}
-          TF_VAR_contentful_environment: ${{ vars.CONTENTFUL_ENVIRONMENT }}
-          TF_VAR_contentful_use_preview_api: ${{ vars.CONTENTFUL_PREVIEW }}
-          TF_VAR_caching_type: ${{ vars.CACHING_TYPE }}
-          TF_VAR_scripts_clarity: ${{ vars.SCRIPTS_CLARITY }}
-          TF_VAR_custom_domain: ${{ vars.CUSTOM_DOMAIN }}
-          TF_VAR_azure_translation_document_endpoint: ${{ vars.AZURE_TRANSLATION_DOCUMENT_ENDPOINT }}
-          TF_VAR_azure_translation_access_key: ${{ secrets.AZURE_TRANSLATION_ACCESS_KEY }}
-          TF_VAR_azure_frontdoor_scale: ${{ vars.AZURE_FRONTDOOR_SCALE }}
-          TF_VAR_pdf_generation_api_key: ${{ secrets.PDF_GENERATION_API_KEY }}
-          TF_VAR_pdf_generation_use_sandbox: ${{ vars.PDF_GENERATION_USE_SANDBOX }}
-          TF_VAR_rebrand: ${{ vars.REBRAND }}
-          TF_VAR_support_alert_email: ${{ secrets.SUPPORT_ALERT_EMAIL }}
+        run: terraform plan -var-file=${{ github.event.inputs.environment }}.tfvars -out=tfplan
 
       - name: 'Terraform Apply'
         id: terraform_apply
         working-directory: ./src/infrastructure/terraform
-        run: terraform apply plan.plan
+        run: terraform apply -auto-approve tfplan
 
       - name: Lowercase the repo name and username
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
@@ -222,48 +185,40 @@ jobs:
         id: deploy-admin
         uses: azure/webapps-deploy@v3
         with:
-          app-name: s186${{ vars.ENVIRONMENT_PREFIX }}-cl-admin-app-service
+          app-name: s263-app-admin
           slot-name: 'staging'
           images: 'ghcr.io/${{ env.REPO }}-admin:${{ needs.package.outputs.image_tag }}'
 
       - name: Swap Admin slot to production
-        run: az webapp deployment slot swap --name s186${{ vars.ENVIRONMENT_PREFIX }}-cl-admin-app-service --resource-group s186${{ vars.ENVIRONMENT_PREFIX }}-cl-admin-rg --slot staging --target-slot production
+        run: az webapp deployment slot swap --name s263-app-admin --resource-group s263-cl-admin-rg --slot staging --target-slot production
 
       - name: Delete Admin staging slot
-        run: az webapp deployment slot delete --name s186${{ vars.ENVIRONMENT_PREFIX }}-cl-admin-app-service --resource-group s186${{ vars.ENVIRONMENT_PREFIX }}-cl-admin-rg --slot staging
+        run: az webapp deployment slot delete --name s263-app-admin --resource-group s263-cl-admin-rg --slot staging
 
       - name: Deploy Api to Azure Web App
         id: deploy-api
         uses: azure/webapps-deploy@v3
         with:
-          app-name: s186${{ vars.ENVIRONMENT_PREFIX }}-cl-api-app-service
+          app-name: s263-app-api
           slot-name: 'staging'
           images: 'ghcr.io/${{ env.REPO }}-api:${{ needs.package.outputs.image_tag }}'
 
       - name: Swap Api slot to production
-        run: az webapp deployment slot swap --name s186${{ vars.ENVIRONMENT_PREFIX }}-cl-api-app-service --resource-group s186${{ vars.ENVIRONMENT_PREFIX }}-cl-api-rg --slot staging --target-slot production
+        run: az webapp deployment slot swap --name s263-app-api --resource-group s263-cl-api-rg --slot staging --target-slot production
 
       - name: Delete Api staging slot
-        run: az webapp deployment slot delete --name s186${{ vars.ENVIRONMENT_PREFIX }}-cl-api-app-service --resource-group s186${{ vars.ENVIRONMENT_PREFIX }}-cl-api-rg --slot staging
+        run: az webapp deployment slot delete --name s263-app-api --resource-group s263-cl-api-rg --slot staging
 
       - name: Deploy Frontend (MVC) to Azure Web App
         id: deploy-frontend
         uses: azure/webapps-deploy@v3
         with:
-          app-name: s186${{ vars.ENVIRONMENT_PREFIX }}-cl-frontend-app-service
+          app-name: s263-app-frontend
           slot-name: 'staging'
           images: 'ghcr.io/${{ env.REPO }}-frontend:${{ needs.package.outputs.image_tag }}'
 
       - name: Swap Frontend slot to production
-        run: az webapp deployment slot swap --name s186${{ vars.ENVIRONMENT_PREFIX }}-cl-frontend-app-service --resource-group s186${{ vars.ENVIRONMENT_PREFIX }}-cl-frontend-rg --slot staging --target-slot production
+        run: az webapp deployment slot swap --name s263-app-frontend --resource-group s263-cl-frontend-rg --slot staging --target-slot production
 
       - name: Delete Frontend staging slot
-        run: az webapp deployment slot delete --name s186${{ vars.ENVIRONMENT_PREFIX }}-cl-frontend-app-service --resource-group s186${{ vars.ENVIRONMENT_PREFIX }}-cl-frontend-rg --slot staging
-
-      - name: Clear Cache
-        id: clear-cache
-        uses: fjogeleit/http-request-action@v1
-        if: ${{ steps.vars.outputs.clear_cache == 'True' }}
-        with:
-          url: 'https://${{ vars.CUSTOM_DOMAIN }}/b0e0dce2-b96d-4b94-a800-63c3ab56e72f'
-          method: 'POST'
+        run: az webapp deployment slot delete --name s263-app-frontend --resource-group s263-cl-frontend-rg --slot staging
