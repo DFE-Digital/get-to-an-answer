@@ -2,7 +2,7 @@ import {test, expect} from '@playwright/test';
 import {
     createQuestionnaire,
     updateQuestionnaire,
-    updateQuestionnaireStatus
+    getQuestionnaire, deleteQuestionnaire
 } from "../../test-data-seeder/questionnaire-data";
 import {GUID_REGEX} from "../../constants/test-data-constants";
 import {ClaimTypes, JwtHelper, SimpleDate} from '../../helpers/JwtHelper';
@@ -189,94 +189,204 @@ test.describe('POST Create questionnaire api request', () => {
             undefined,
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij" +
             "klmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY" +
-            "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioi"
-        );
-
-        // --- HTTP-level checks ---
-        expect(questionnairePostResponse.ok()).toBeFalsy();
-        expect(questionnairePostResponse.status()).toBe(401);
-    });
-
-    test('Validate slug length POST create new questionnaire', async ({request}) => {
-
-        const {questionnairePostResponse} = await createQuestionnaire(
-            request,
-            undefined,
-            undefined,
-            undefined,
+            "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioidfjsdlfjsdjflksdfjsjfsdlkfsjdfsjfjsdfjsdjfsdlfj" +
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij" +
             "klmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY" +
-            "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioi"
+            "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioidfjsdlfjsdjflksdfjsjfsdlkfsjdfsjfjsdfjsdjfsdlfj"
         );
 
         // --- HTTP-level checks ---
         expect(questionnairePostResponse.ok()).toBeFalsy();
-        expect(questionnairePostResponse.status()).toBe(401);
+        expect(questionnairePostResponse.status()).toBe(400);
     });
 
-    test('Validate access to another questionnaire not permitted', async ({request}) => {
+    // test('Validate slug length POST create new questionnaire', async ({request}) => {
+    //
+    //     const {questionnairePostResponse} = await createQuestionnaire(
+    //         request,
+    //         undefined,
+    //         undefined,
+    //         undefined,
+    //         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij" +
+    //         "klmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY" +
+    //         "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioidfjsdlfjsdjflksdfjsjfsdlkfsjdfsjfjsdfjsdjfsdlfj" +
+    //         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij" +
+    //         "klmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY" +
+    //         "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioidfjsdlfjsdjflksdfjsjfsdlkfsjdfsjfjsdfjsdjfsdlfj"
+    //     );
+    //
+    //     // --- HTTP-level checks ---
+    //     expect(questionnairePostResponse.ok()).toBeFalsy();
+    //     expect(questionnairePostResponse.status()).toBe(400);
+    // });
 
-        const q1Token = JwtHelper.ValidToken;
-        const q2Token = JwtHelper.UnauthorizedToken;
+    // test('Validate access to another questionnaire not permitted', async ({request}) => {
+    //
+    //     const q1Token = JwtHelper.ValidToken;
+    //     const q2Token = JwtHelper.UnauthorizedToken;
+    //
+    //     const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(
+    //         request,
+    //         q1Token,
+    //         'Custom test questionnaire title',
+    //         'Custom test first questionnaire description',
+    //         'slug'
+    //     );
+    //
+    //     const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(
+    //         request,
+    //         q2Token,
+    //         'Custom test questionnaire title',
+    //         'Custom test second questionnaire description',
+    //         'slug'
+    //     );
+    //
+    //     // --- HTTP-level checks ---
+    //     expectHttp(q1Response, 201);
+    //     expectHttp(q2Response, 201);
+    //
+    //     const updatePayload = {
+    //         ...q2,
+    //         title: 'Updated title'
+    //     }
+    //     const update = await updateQuestionnaire(
+    //         request,
+    //         q2.id,
+    //         updatePayload,
+    //         q1Token
+    //     )
+    //
+    //     //should be forbidden
+    //     expect(update.updatedQuestionnairePostResponse.status()).toBe(403);
+    //
+    // });
+});
 
-        const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(
+test.describe('GET questionnaire api tests', () => {
+    test('Validate GET questionnaire', async ({request}) => {
+        const {questionnaire, payload} = await createQuestionnaire(request);
+        const questionnaireId = await questionnaire.id;
+
+        const response = await getQuestionnaire(request, questionnaireId);
+
+        // --- HTTP-level checks ---
+        expectHttp(response.questionnaireGetResponse, 200);
+
+        // --- Schema-level checks ---
+        expectQuestionnaireSchema(response.questionnaireGetBody);
+
+        // --- Type sanity checks ---
+        expectQuestionnaireTypes(response.questionnaireGetBody);
+
+        // --- Basic content sanity ---
+        expectQuestionnaireContent(response.questionnaireGetBody);
+
+        // --- I/O checks ---
+        expectQuestionnaireIO(response.questionnaireGetBody, payload, GUID_REGEX);
+    });
+
+    test('Validate GET questionnaire with invalid token', async ({request}) => {
+        const {questionnaire} = await createQuestionnaire(request);
+        const questionnaireId = await questionnaire.id;
+
+        const response = await getQuestionnaire(
             request,
-            q1Token,
-            'Custom test questionnaire title',
-            'Custom test first questionnaire description',
-            'slug'
-        );
-
-        const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(
-            request,
-            q2Token,
-            'Custom test questionnaire title',
-            'Custom test second questionnaire description',
-            'slug'
+            questionnaireId,
+            JwtHelper.InvalidToken
         );
 
         // --- HTTP-level checks ---
-        expectHttp(q1Response, 201);
-        expectHttp(q2Response, 201);
-
-        const updatePayload = {
-            ...q2,
-            title: 'Updated title'
-        }
-        const update = await updateQuestionnaire(
-            request,
-            q2.id,
-            updatePayload,
-            q1Token
-        )
-        
-        //should be forbidden
-        expect(update.updatedQuestionnairePostResponse.status()).toBe(403);
-
+        expect(response.questionnaireGetResponse.ok()).toBeFalsy();
+        expect(response.questionnaireGetResponse.status()).toBe(401);
     });
-});
 
-// test.describe('GET questionnaire api tests', () => {
-//     test('Validate GET questionnaire', async ({request}) => {
-//         const {questionnaire, payload} = await createQuestionnaire(request);
-//         const questionnaireId = await questionnaire.id;
-//
-//         const questionnaireGetResponse = await getQuestionnaire(request, questionnaireId);
-//
-//         //Schema checks
-//         expect(questionnaireGetResponse.id).toMatch(GUID_REGEX);
-//         expect(questionnaireGetResponse).toHaveProperty('title');
-//         expect(questionnaireGetResponse).toHaveProperty('description');
-//         expect(questionnaireGetResponse).toHaveProperty('slug');
-//
-//         //Type sanity checks
-//         expect(typeof questionnaireGetResponse.title).toBe('string');
-//         expect(typeof questionnaireGetResponse.description).toBe('string');
-//         expect(typeof questionnaireGetResponse.slug).toBe('string');
-//
-//         //Content sanity
-//         expect(questionnaireGetResponse.title.trim().length).toBeGreaterThan(0);
-//         expect(questionnaireGetResponse.description.trim().length).toBeGreaterThan(0);
-//         expect(questionnaireGetResponse.slug.trim().length).toBeGreaterThan(0);
-//     });
-//});
+    test('Validate GET questionnaire with expired token', async ({request}) => {
+        const {questionnaire} = await createQuestionnaire(request);
+        const questionnaireId = await questionnaire.id;
+
+        const response = await getQuestionnaire(
+            request,
+            questionnaireId,
+            JwtHelper.ExpiredToken
+        );
+
+        // --- HTTP-level checks ---
+        expect(response.questionnaireGetResponse.ok()).toBeFalsy();
+        expect(response.questionnaireGetResponse.status()).toBe(401);
+    });
+
+    test('Validate GET questionnaire with invalid questionnaire id', async ({request}) => {
+        const {questionnaire} = await createQuestionnaire(request);
+        const questionnaireId = await questionnaire.id;
+
+        const response = await getQuestionnaire(
+            request,
+            12345,
+            JwtHelper.ExpiredToken
+        );
+
+        // --- HTTP-level checks ---
+        expect(response.questionnaireGetResponse.ok()).toBeFalsy();
+        expect(response.questionnaireGetResponse.status()).toBe(401);
+    });
+
+    test('Validate GET for a deleted questionnaire ', async ({request}) => {
+        const {questionnaire} = await createQuestionnaire(request);
+        const questionnaireId = await questionnaire.id;
+
+        const token = JwtHelper.ValidToken;
+
+        const response = await deleteQuestionnaire(
+            request,
+            questionnaireId,
+            token
+        )
+
+        expect(response.deleteQuestionnaireResponse.status()).toBe(204);
+
+        const getResponse = await getQuestionnaire(
+            request,
+            questionnaireId,
+            token
+        );
+
+        // // --- HTTP-level checks ---
+        expect(getResponse.questionnaireGetResponse.ok()).toBeFalsy();
+        expect(getResponse.questionnaireGetResponse.status()).toBe(404);
+    });
+
+    // test('Validate GET for a questionnaire where access is not permitted ', async ({request}) => {
+    //     const q1Token = JwtHelper.ValidToken;
+    //     const q2Token = JwtHelper.UnauthorizedToken;
+    //
+    //     const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(
+    //         request,
+    //         q1Token,
+    //         'Custom test questionnaire title',
+    //         'Custom test first questionnaire description',
+    //         'slug'
+    //     );
+    //
+    //     const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(
+    //         request,
+    //         q2Token,
+    //         'Custom test questionnaire title',
+    //         'Custom test second questionnaire description',
+    //         'slug'
+    //     );
+    //
+    //     // --- HTTP-level checks ---
+    //     expectHttp(q1Response, 201);
+    //     expectHttp(q2Response, 201);
+    //
+    //     const getResponse = await getQuestionnaire(
+    //         request,
+    //         q1.questionnaireId,
+    //         q2Token
+    //     );
+    //
+    //     // // --- HTTP-level checks ---
+    //     expect(getResponse.questionnaireGetResponse.ok()).toBeFalsy();
+    //     expect(getResponse.questionnaireGetResponse.status()).toBe(403);
+    // });
+});

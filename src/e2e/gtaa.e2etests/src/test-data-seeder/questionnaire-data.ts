@@ -59,11 +59,13 @@ export async function getQuestionnaire(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
-
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to fetch required questionnaire: ${response.status()}`);
+    
+    const responseBody = await safeParseBody(response);
+    
+    return {
+        questionnaireGetResponse: response,
+        questionnaireGetBody: responseBody
     }
-    return await response.json();
 }
 
 export async function listQuestionnaires(
@@ -151,10 +153,13 @@ export async function deleteQuestionnaire(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to delete questionnaire: ${response.status()}`);
+    
+    const responseBody = await safeParseBody(response);
+
+    return {
+        deleteQuestionnaireResponse: response,
+        deleteQuestionnaire: responseBody,
     }
-    return await response.json();
 }
 
 // Versions
