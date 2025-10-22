@@ -131,7 +131,7 @@ resource "azurerm_service_plan" "gettoananswer-web-asp" {
 
 # Azure Container Registry
 resource "azurerm_container_registry" "gettoananswer-registry" {
-  name                = "${var.prefix}acr-uks-gtaa"
+  name                = "${var.prefix}acruksgtaa"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   location            = azurerm_resource_group.gettoananswer-rg.location
   sku                 = "Basic"
