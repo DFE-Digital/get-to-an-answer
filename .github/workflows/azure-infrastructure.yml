@@ -25,7 +25,7 @@ jobs:
     environment: ${{ github.event.inputs.environment }}
     defaults:
       run:
-        working-directory: infrastructure/terraform
+        working-directory: src/infrastructure/terraform
 
     steps:
       - name: "Checkout repository"
