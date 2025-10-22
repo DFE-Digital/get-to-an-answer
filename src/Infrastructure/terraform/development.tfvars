@@ -1,6 +1,6 @@
 env                 = "Dev"
 product             = "Get-To-An-Answer"
-prefix              = "b263d01"
+prefix              = "s263d01"
 suffix              = "-uks-gta01"
 location            = "uksouth"
 api_image_name      = "gettoananswer-api:latest"
