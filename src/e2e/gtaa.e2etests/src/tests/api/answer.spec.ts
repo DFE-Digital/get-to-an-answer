@@ -3,16 +3,15 @@ import {createQuestionnaire} from '../../test-data-seeder/questionnaire-data';
 import {createQuestion} from '../../test-data-seeder/question-data';
 import {createSingleAnswer} from '../../test-data-seeder/answer-data';
 import {QuestionType, QuestionPrefix, AnswerDestinationType, GUID_REGEX} from '../../constants/test-data-constants';
+import { JwtHelper } from '../../helpers/JwtHelper';
 
 test.describe('POST answers api tests', () => {
     test('POST an answer for a single question', async ({request}) => {
-
-        const {questionnaire} = await createQuestionnaire(request);
+        const bearerToken = JwtHelper.ValidToken;
+        const {questionnaire} = await createQuestionnaire(request, bearerToken);
         const questionnaireId = await questionnaire.id;
-
-        const {questionPostResponse} = await createQuestion(request, questionnaireId)
+        const {questionPostResponse} = await createQuestion(request, questionnaireId, bearerToken)
         const qId = await questionPostResponse.id;
-
         const {answerPostResponse, payload} = await createSingleAnswer(
             request,
             {
@@ -23,7 +22,8 @@ test.describe('POST answers api tests', () => {
                 weight: 0.0,
                 destinationType: AnswerDestinationType.PAGE,
                 destination: '/page-destination-url'
-            }
+            },
+            bearerToken
         );
 
         // --- HTTP-level checks ---

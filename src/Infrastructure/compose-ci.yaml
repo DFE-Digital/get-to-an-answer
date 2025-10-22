@@ -14,8 +14,14 @@ services:
       - AzureAd__TenantId=${AZURE_AD_TENANT_ID}
       - AzureAd__Instance=${AZURE_AD_INSTANCE}
       - AzureAd__Domain=${AZURE_AD_DOMAIN}
+      - ASPNETCORE_URLS=http://0.0.0.0:8080
     ports:
       - 8080:8080
+    healthcheck:
+      test: ["CMD", "sh", "-c", "echo 'Calling /scalar healthcheck' && curl -f http://localhost:8080/scalar"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -38,6 +44,4 @@ services:
       - web-api
     environment:
       - API_URL=http://web-api:8080
-    volumes:
-      - ../e2e/gtaa.e2etests/test-results/screenshots:/tests/test-results/screenshots
-    command: ["yarn", "playwright", "test", "src/tests/api", "-c", "playwright.config.ts"]
+    command: ["yarn", "playwright", "test"]
