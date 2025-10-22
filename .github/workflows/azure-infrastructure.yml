@@ -1,0 +1,55 @@
+name: Deploy Azure Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - Development
+          - Test
+
+jobs:
+  terraform:
+    name: "Deploy"
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_sql_admin_username: ${{ secrets.SQL_ADMIN_USERNAME }}
+      TF_VAR_sql_admin_password: ${{ secrets.SQL_ADMIN_PASSWORD }}
+    environment: ${{ github.event.inputs.environment }}
+    defaults:
+      run:
+        working-directory: ./src/Infrastructure/terraform
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v5
+
+      - name: "Setup Terraform"
+        uses: hashicorp/setup-terraform@v3
+
+      - name: "Azure Login"
+        uses: azure/login@v2
+        with:
+          creds: |
+            {
+              "clientId": "${{ env.ARM_CLIENT_ID }}",
+              "clientSecret": "${{ env.ARM_CLIENT_SECRET }}",
+              "tenantId": "${{ env.ARM_TENANT_ID }}",
+              "subscriptionId": "${{ env.ARM_SUBSCRIPTION_ID }}"
+            }
+
+      - name: "Terraform Init"
+        run: terraform init
+
+      - name: "Terraform Plan"
+        run: terraform plan -var-file=${{ toLower(github.event.inputs.environment) }}.tfvars -out=tfplan
+
+      - name: "Terraform Apply"
+        run: terraform apply -auto-approve tfplan
