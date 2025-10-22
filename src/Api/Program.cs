@@ -20,7 +20,7 @@ builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
 builder.Services.AddControllers()
     .AddDataAnnotationsLocalization();
 
-if (builder.Environment.IsDevelopment())
+if (builder.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgnoreCase))
 {
     builder.Services.AddMockAzureAdForApi();
 }
@@ -50,7 +50,7 @@ builder.Services.AddOpenApi(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgnoreCase))
 {
     // Serve OpenAPI JSON at /openapi/v1.json
     app.MapOpenApi();
@@ -78,7 +78,7 @@ using (var scope = app.Services.CreateScope())
     await dbContext.Database.EnsureCreatedAsync();
 }
 
-if (!app.Environment.IsDevelopment())
+if (!app.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgnoreCase))
 {
     app.UseHttpsRedirection();
 }
