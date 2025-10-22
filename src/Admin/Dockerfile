@@ -4,17 +4,29 @@ EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
+
+# working directory in the container
 WORKDIR /src
-COPY ["Admin/Admin.csproj", "Admin/"]
-COPY ["Common/Common.csproj", "Common/"]
+
+# copy to /src/Api and /src/Admin
+COPY ["./src/Admin/Admin.csproj", "Admin/"]
+COPY ["./src/Common/Common.csproj", "Common/"]
+
+# Restore dependencies
 RUN dotnet restore "Admin/Admin.csproj"
-COPY . .
+
+# Copy the rest of the source code
+COPY *.sln .
+COPY Directory.Packages.props .
+COPY ./src ./
+
 WORKDIR "/src/Admin"
 RUN dotnet build "./Admin.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Admin.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+WORKDIR /src/Api
+RUN dotnet publish "./Admin.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 
 FROM base AS final
 WORKDIR /app
