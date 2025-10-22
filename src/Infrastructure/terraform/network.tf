@@ -1,12 +1,12 @@
 resource "azurerm_virtual_network" "gettoananswer_vnet" {
-  name                = "${var.prefix}vnet-uks-gta01"
+  name                = "${var.prefix}vnet-uks-gtaa"
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_network_security_group" "gettoananswer-nsg" {
-  name                = "${var.prefix}nsg-uks-gta01"
+  name                = "${var.prefix}nsg-uks-gtaa"
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
 
@@ -48,14 +48,14 @@ resource "azurerm_subnet_network_security_group_association" "default" {
 }
 
 resource "azurerm_private_dns_zone" "default" {
-  name                = "${var.prefix}pridns-uks-gta01"
+  name                = "${var.prefix}pdz-uks-gtaa.database.windows.net"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
 
   depends_on = [azurerm_subnet_network_security_group_association.default]
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "default" {
-  name                  = "${var.prefix}link-uks-gta01"
+  name                  = "${var.prefix}pdz-uks-vnet-link"
   private_dns_zone_name = azurerm_private_dns_zone.default.name
   virtual_network_id    = azurerm_virtual_network.gettoananswer_vnet.id
   resource_group_name   = azurerm_resource_group.gettoananswer-rg.name
@@ -65,7 +65,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "default" {
 
 #  VNet SQL Firewall Rule
 resource "azurerm_mssql_virtual_network_rule" "mssql_vnet_rule" {
-  name      = "${var.prefix}mssqlrule-uks-gta01"
+  name      = "${var.prefix}sql-uks-mssql-vnet-rule"
   server_id = azurerm_mssql_server.gettoananswer_mssql_server.id
   subnet_id = azurerm_subnet.gettoananswer_main_subnet.id
 }
