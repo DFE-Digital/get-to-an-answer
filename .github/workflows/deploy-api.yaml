@@ -20,14 +20,12 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      ACR_NAME: ${{ vars.ACR_NAME }}
-      ACR_LOGIN_SERVER: ${{ vars.ACR_NAME }}.azurecr.io
-      ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
-      ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
-      OPENAI_KEY: ${{ secrets.AZURE_OPENAI_APIKEY }}
-      AISEARCH_KEY: ${{ secrets.AZURE_AISEARCH_APIKEY }}
-      RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
-      API_NAME: s213d01-app-api
+      ACR_NAME: ${{ vars.AZURE_ACR_NAME }}
+      ACR_LOGIN_SERVER: ${{ vars.AZURE_ACR_NAME }}.azurecr.io
+      ACR_USERNAME: ${{ secrets.AZURE_ACR_USERNAME }}
+      ACR_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
+      RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+      API_NAME: ${{ vars.GTAA_PREFIX }}-app-api
     environment: ${{ github.event.inputs.environment }}
 
     steps:
@@ -55,9 +53,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./api/feat.api/Dockerfile
+          file: ./src/Api/Dockerfile
           push: true
-          tags: ${{ env.ACR_LOGIN_SERVER }}/feat-api:${{ github.sha }}
+          tags: ${{ env.ACR_LOGIN_SERVER }}/gtaa-api:${{ github.sha }}
 
       - name: Configure App Settings
         run: |
@@ -65,8 +63,6 @@ jobs:
             --name "$API_NAME" \
             --resource-group "$RESOURCE_GROUP" \
             --settings \
-              Azure__OpenAiKey="$OPENAI_KEY" \
-              Azure__AiSearchKey="$AISEARCH_KEY" \
               ASPNETCORE_ENVIRONMENT="${{ github.event.inputs.environment }}"
 
       - name: Update API App Service

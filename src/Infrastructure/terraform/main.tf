@@ -7,7 +7,7 @@ terraform {
     }
     azapi = {
       source  = "Azure/azapi"
-      version = "2.4.0"
+      version = "2.7.0"
     }
   }
 }
@@ -18,7 +18,7 @@ provider "azurerm" {
 
 # Resource Group
 resource "azurerm_resource_group" "gettoananswer-rg" {
-  name     = "${var.prefix}-rg"
+  name     = "${var.prefix}rg-uks-gtaa"
   location = var.location
 
   tags = {
@@ -122,7 +122,7 @@ resource "azurerm_resource_group" "gettoananswer-rg" {
 
 # App Service Plan (Web)
 resource "azurerm_service_plan" "gettoananswer-web-asp" {
-  name                = "${var.prefix}-web-asp"
+  name                = "${var.prefix}asp-uks-web"
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   os_type             = "Linux"
@@ -131,7 +131,7 @@ resource "azurerm_service_plan" "gettoananswer-web-asp" {
 
 # Azure Container Registry
 resource "azurerm_container_registry" "gettoananswer-registry" {
-  name                = "${var.prefix}acr"
+  name                = "${var.prefix}acruksgtaa"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   location            = azurerm_resource_group.gettoananswer-rg.location
   sku                 = "Basic"
@@ -140,7 +140,7 @@ resource "azurerm_container_registry" "gettoananswer-registry" {
 
 # Linux Web App - API
 resource "azurerm_linux_web_app" "gettoananswer-api" {
-  name                = "${var.prefix}-app-api"
+  name                = "${var.prefix}app-uks-api"
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
@@ -166,7 +166,7 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
 
 # Linux Web App - Admin
 resource "azurerm_linux_web_app" "gettoananswer-admin" {
-  name                = "${var.prefix}-app-admin"
+  name                = "${var.prefix}app-uks-admin"
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
@@ -191,7 +191,7 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
 
 # Linux Web App - Frontend
 resource "azurerm_linux_web_app" "gettoananswer-frontend" {
-  name                = "${var.prefix}-app-frontend"
+  name                = "${var.prefix}app-uks-frontend"
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
