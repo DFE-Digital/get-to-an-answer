@@ -22,6 +22,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       TF_VAR_sql_admin_username: ${{ secrets.SQL_ADMIN_USERNAME }}
       TF_VAR_sql_admin_password: ${{ secrets.SQL_ADMIN_PASSWORD }}
+      ENVIRONMENT: ${{ github.event.inputs.environment }}
     environment: ${{ github.event.inputs.environment }}
     defaults:
       run:
@@ -46,7 +47,7 @@ jobs:
             }
 
       - name: Lowercase the repo name and username
-        run: echo "ENVIRONMENT_LOWER=${github.event.inputs.environment,,}" >>${GITHUB_ENV}
+        run: echo "ENVIRONMENT_LOWER=${ENVIRONMENT,,}" >>${GITHUB_ENV}
 
       - name: "Terraform Init"
         run: terraform init
