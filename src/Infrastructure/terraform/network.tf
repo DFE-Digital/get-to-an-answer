@@ -56,6 +56,8 @@ resource "azurerm_subnet" "gettoananswer_main_subnet" {
       ]
     }
   }
+
+  depends_on = [azurerm_network_security_group.gettoananswer-nsg]
 }
 
 resource "azurerm_subnet_network_security_group_association" "default" {
