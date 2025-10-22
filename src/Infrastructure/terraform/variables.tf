@@ -15,6 +15,12 @@ variable "prefix" {
     default     = "s213"
 }
 
+variable "suffix" {
+  description = "Suffix for resource names"
+  type        = string
+  default     = "s213"
+}
+
 variable "location" {
   description = "Azure region"
   type        = string

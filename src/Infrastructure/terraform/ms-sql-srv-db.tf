@@ -1,5 +1,5 @@
 resource "azurerm_mssql_server" "gettoananswer_mssql_server" {
-  name                         = "${var.prefix}-sqlsrv"
+  name                         = "${var.prefix}sql-uks-gta01"
   resource_group_name          = azurerm_resource_group.gettoananswer-rg.name
   location                     = azurerm_resource_group.gettoananswer-rg.location
   administrator_login          = var.sql_admin_username
@@ -13,7 +13,7 @@ resource "azurerm_mssql_server" "gettoananswer_mssql_server" {
 }
 
 resource "azurerm_mssql_database" "gettoananswer_mssql_db" {
-  name       = "${var.prefix}-flowdb"
+  name       = "${var.prefix}db-uks-gta01"
   server_id  = azurerm_mssql_server.gettoananswer_mssql_server.id
   sku_name   = "S0"
 
