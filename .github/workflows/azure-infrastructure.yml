@@ -46,13 +46,13 @@ jobs:
             }
 
       - name: Lowercase the repo name and username
-        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+        run: echo "ENVIRONMENT_LOWER=${github.event.inputs.environment,,}" >>${GITHUB_ENV}
 
       - name: "Terraform Init"
         run: terraform init
 
       - name: "Terraform Plan"
-        run: terraform plan -var-file=${{ env.REPO }}.tfvars -out=tfplan
+        run: terraform plan -var-file=${{ env.ENVIRONMENT_LOWER }}.tfvars -out=tfplan
 
       - name: "Terraform Apply"
         run: terraform apply -auto-approve tfplan
