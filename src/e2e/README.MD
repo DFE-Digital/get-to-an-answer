@@ -18,11 +18,13 @@ This project uses Docker Compose to run end-to-end (E2E) tests in a consistent e
    This will build and start the API and SQL Server containers. The API will wait for SQL Server to be ready before starting.
 
 2. **Run your E2E tests:**
-   - If your E2E tests are containerized, add them as a service in `compose-ci.yaml` and run them as part of the stack.
+   - You can run E2E tests in two ways:
+     - **From Docker Compose:** Add your E2E test runner (e.g., Playwright) as a service in `compose-ci.yaml`. The tests will run automatically against the API container when the stack is up.
+     - **From your local machine:** Point your local Playwright (or other test runner) to the API container's exposed port (e.g., `http://localhost:8080`) after the environment is started.
    - If your E2E tests are run from your host machine, execute them after the services are up and healthy. For example:
      ```sh
-     # Example: using Playwright, Cypress, or a .NET test project
-     dotnet test path/to/your/e2e/test/project
+     # Example: using Playwright command
+     yarn playwright test <directory-or-file> -c playwright.config.ts
      ```
 
 3. **Tear down the environment after tests:**
