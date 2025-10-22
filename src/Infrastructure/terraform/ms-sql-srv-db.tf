@@ -17,7 +17,6 @@ resource "azurerm_mssql_database" "gettoananswer_mssql_db" {
   server_id  = azurerm_mssql_server.gettoananswer_mssql_server.id
   sku_name   = "S0"
 
-  auto_pause_delay_in_minutes = 120
   max_size_gb                 = 2
 
   tags = {
