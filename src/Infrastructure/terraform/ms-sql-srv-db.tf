@@ -19,7 +19,6 @@ resource "azurerm_mssql_database" "gettoananswer_mssql_db" {
 
   auto_pause_delay_in_minutes = 120
   max_size_gb                 = 2
-  min_capacity                = 0.5
 
   tags = {
     Environment = var.env
