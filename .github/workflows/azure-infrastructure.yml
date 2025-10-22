@@ -45,11 +45,14 @@ jobs:
               "subscriptionId": "${{ env.ARM_SUBSCRIPTION_ID }}"
             }
 
+      - name: Lowercase the repo name and username
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
       - name: "Terraform Init"
         run: terraform init
 
       - name: "Terraform Plan"
-        run: terraform plan -var-file=${{ toLower(github.event.inputs.environment) }}.tfvars -out=tfplan
+        run: terraform plan -var-file=${{ env.REPO }}.tfvars -out=tfplan
 
       - name: "Terraform Apply"
         run: terraform apply -auto-approve tfplan
