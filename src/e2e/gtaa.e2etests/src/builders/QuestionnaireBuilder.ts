@@ -9,7 +9,7 @@ export class QuestionnaireBuilder {
         const timestamp = Date.now();
         this._title = `Default questionnaire title - ${timestamp}`;
         this._description = `Default questionnaire description - ${timestamp}`;
-        this._slug = `Default questionnaire slug - ${timestamp}`;
+        this._slug = `default-slug-${timestamp}`;
     }
     
     withTitle(title?: string) {
