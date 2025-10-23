@@ -2,7 +2,7 @@ import {test, expect} from '@playwright/test';
 import {
     createQuestionnaire,
     updateQuestionnaire,
-    getQuestionnaire, deleteQuestionnaire
+    getQuestionnaire, deleteQuestionnaire, listQuestionnaires
 } from "../../test-data-seeder/questionnaire-data";
 import {GUID_REGEX} from "../../constants/test-data-constants";
 import {ClaimTypes, JwtHelper, SimpleDate} from '../../helpers/JwtHelper';
@@ -21,7 +21,7 @@ test.describe('POST Create questionnaire api request', () => {
             questionnaire,
             payload
         } = await createQuestionnaire(request);
-        
+
         // --- HTTP-level checks ---
         expectHttp(questionnairePostResponse, 201);
 
@@ -195,7 +195,7 @@ test.describe('POST Create questionnaire api request', () => {
         expect(questionnairePostResponse.ok()).toBeFalsy();
         expect(questionnairePostResponse.status()).toBe(400);
     });
-    
+
     test('Validate slug length POST create new questionnaire', async ({request}) => {
 
         const {questionnairePostResponse} = await createQuestionnaire(
@@ -209,6 +209,21 @@ test.describe('POST Create questionnaire api request', () => {
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij" +
             "klmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY" +
             "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioidfjsdlfjsdjflksdfjsjfsdlkfsjdfsjfjsdfjsdjfsdlfj"
+        );
+
+        // --- HTTP-level checks ---
+        expect(questionnairePostResponse.ok()).toBeFalsy();
+        expect(questionnairePostResponse.status()).toBe(400);
+    });
+
+    test('Validate invalid slug for POST new questionnaire', async ({request}) => {
+
+        const {questionnairePostResponse} = await createQuestionnaire(
+            request,
+            undefined,
+            undefined,
+            undefined,
+            "CAPITAL SLUG AND SPACE"
         );
 
         // --- HTTP-level checks ---
@@ -350,7 +365,7 @@ test.describe('GET questionnaire api tests', () => {
         expect(getResponse.questionnaireGetResponse.ok()).toBeFalsy();
         expect(getResponse.questionnaireGetResponse.status()).toBe(404);
     });
-    
+
     test('Validate GET for a questionnaire where access is not permitted ', async ({request}) => {
         const q1Token = JwtHelper.ValidToken;
         const q2Token = JwtHelper.UnauthorizedToken;
@@ -386,5 +401,35 @@ test.describe('GET questionnaire api tests', () => {
         // // --- HTTP-level checks ---
         expect(getResponse.questionnaireGetResponse.ok()).toBeFalsy();
         expect(getResponse.questionnaireGetResponse.status()).toBe(403);
+    });
+
+    test('Validate GET all questionnaires', async ({request}) => {
+        const qToken = JwtHelper.ValidToken;
+
+        const {questionnaire: q1} = await createQuestionnaire(request, qToken);
+        const {questionnaire: q2} = await createQuestionnaire(request, qToken);
+
+        const response = await listQuestionnaires(request, qToken);
+        //console.log(response);
+
+        // --- HTTP-level checks ---
+        expectHttp(response.questionnaireGetResponse, 200);
+
+        const list: any[] = response.questionnaireGetBody
+        expect(Array.isArray(list)).toBe(true);
+        expect(list.length).toBeGreaterThan(0);
+
+        const sample = list.slice(0, 10); //pick top 5 from list
+        for (const q of sample) {
+
+            // --- Schema-level checks ---
+            expectQuestionnaireSchema(q);
+
+            // --- Type sanity checks ---
+            expectQuestionnaireTypes(q);
+
+            // --- Basic content sanity ---
+            expectQuestionnaireContent(q);
+        }
     });
 });
