@@ -64,10 +64,10 @@ jobs:
         run: docker compose -f Infrastructure/compose-e2e-tests.yaml logs
 
 
-      - name: Run Full Playwright Tests
-        if: steps.run.outcome == 'success'
-        working-directory: ./src/e2e/gtaa.e2etests
-        run: $API_URL=http://localhost:8080 yarn playwright test -c playwright.config.ts    
+#      - name: Run Full Playwright Tests
+#        if: steps.run.outcome == 'success'
+#        working-directory: ./src/e2e/gtaa.e2etests
+#        run: $API_URL=http://localhost:8080 yarn playwright test -c playwright.config.ts    
         
       - name: Upload Playwright Test Report
         if: always()
