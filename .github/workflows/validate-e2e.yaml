@@ -34,6 +34,12 @@ jobs:
         env:
           DEFAULT_CONNECTION_STRING: ${{ secrets.DEFAULT_CONNECTION_STRING }}
           SQLSERVER_SA_PASSWORD: ${{ secrets.SQLSERVER_SA_PASSWORD }}
+          ASPNETCORE_ENVIRONMENT: "Local"
+          AZURE_AD_CLIENT_ID: "123" 
+          AZURE_AD_TENANT_ID: "456"
+          AZURE_AD_CLIENT_SECRET: "789"
+          AZURE_AD_INSTANCE: "https://login.microsoftonline.com/"          
+          AZURE_AD_DOMAIN: "example.onmicrosoft.com"     
         run: docker compose -f Infrastructure/compose-e2e-tests.yaml up -d
 
       - name: Install dependencies
