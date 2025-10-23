@@ -2,7 +2,7 @@
 
 ## Context and Problem Statement
 
-When deploying to the Enterprise Landing Zone (ELZ) we experienced a major blocker. There was a policy that kept failing our terraform infrastructure deployment. There was a lot of trial and error from research and colleague sugeestion.
+When deploying to the Enterprise Landing Zone (ELZ) we encountered a major blocker: a policy repeatedly caused our Terraform infrastructure deployment to fail. There was considerable trial and error based on research and colleagues’ suggestions.
 
 We found that:
 
@@ -10,7 +10,7 @@ We found that:
 
 ![Screenshot 2025-10-22 at 17.32.50.png](../../images/subnet-policy.png)
 
-- To resolve this, it was suggested to use the following to the property (but in the current teraform via it has been deprecated):
+- To resolve this, it was suggested to use the property below (however, in the current Terraform provider it has been deprecated):
 ```terraform
 resource "azurerm_subnet" "gettoananswer-subnet" {
   ...
@@ -19,7 +19,7 @@ resource "azurerm_subnet" "gettoananswer-subnet" {
 }
 ```
 
-- The other suggestion was to use association, but this too was unsuccessful:
+- Another suggestion was to use association resource, but this was also unsuccessful:
 
 ```terraform
 resource "azurerm_subnet_network_security_group_association" "default" {
@@ -30,33 +30,34 @@ resource "azurerm_subnet_network_security_group_association" "default" {
 
 As part of further investigations, we noted that:
 
-- We found that the issue we ELZ specific and a bug was raised to fix this, so an exemption or workaround was in order.
+- The issue was ELZ-specific and a bug was raised to fix it, so an exemption or workaround was required.
 
 ## Considered Options
 
-- Use the azapi provider to customise the creation of the subnet.
-- Doing clickops to create with the association then import the resource to complete provisioning.
-- Using a custom provider to do the creation based on an open PR fix [here](https://github.com/hashicorp/terraform-provider-azurerm/pull/28985).
-- Adding an exception to the policy.
-- Get ELZ admins to Ccange the policy effect type from `deny` to `audit`.
+- Use the AzAPI provider to customise the creation of the subnet.
+- Use click-ops to create the subnet with the association, then import the resource to complete provisioning.
+- Use a custom provider to implement the creation based on the open PR fix [here](https://github.com/hashicorp/terraform-provider-azurerm/pull/28985).
+- Add an exception to the policy.
+- Ask ELZ admins to change the policy effect from `deny` to `audit`.
 
 ### Evaluation
 
-|    Criteria     | Comment                                                                     | Azapi  | Clickops | Custom | exemption | Alter Policy | 
-|:---------------:|:----------------------------------------------------------------------------|:------:|:--------:|:------:|:---------:|:------------:|
-|   Automatable   | Can be implemented into an IaC script, automated in different environments. |   5    |    0     |   5    |     1     |      1       | 
-|   Repeatable    | Can other teams leverage this solution/workaround for their use cases too.  |   5    |    2     |   4    |     3     |      3       | 
-|     Effort      | How easy is it to setup/configure and deploy.                               |   5    |    3     |   3    |     1     |      1       |
-| Error Resistant | Can human error be avoided/mitigated via this approach.                     |   5    |    1     |   4    |     4     |      4       |
-|    **Total**    |                                                                             | **20** |  **7**   | **16** |   **9**   |    **9**     |
+|    Criteria     | Comment                                                                     | AzAPI | Click-ops | Custom | Exemption | Alter Policy |
+|:---------------:|:----------------------------------------------------------------------------|:-----:|:---------:|:------:|:---------:|:------------:|
+|   Automatable   | Can be implemented in IaC and automated across environments.                |   5   |     0     |   5    |     1     |      1       |
+|   Repeatable    | Can other teams leverage this solution/workaround for their use cases too?  |   5   |     2     |   4    |     3     |      3       |
+|     Effort      | How easy is it to set up/configure and deploy?                              |   5   |     3     |   3    |     1     |      1       |
+| Error Resistant | Can human error be avoided/mitigated via this approach?                     |   5   |     1     |   4    |     4     |      4       |
+|    **Total**    |                                                                             | **20**|  **7**    | **16** |  **9**    |   **9**      |
 
 ## Decision Outcome
 
-Based on the analysis above, we have chose to switch to Azapi as this required the least amount of effort, waas easily repeatable by other teams and did require an admin support.
+Based on the analysis above, we chose to switch to AzAPI, as it required the least effort, was easily repeatable by other teams, and did not require admin support.
 
-With the azapi resource, we are able to create the subnet and then associate it with a network security group.
+With the AzAPI resource we can create the subnet and then associate it with a network security group.
 
-This is the replacement (azapi) resource:
+This is the replacement (AzAPI) resource:
+
 
 ```terraform
 resource "azapi_resource" "gettoananswer_main_subnet" {
