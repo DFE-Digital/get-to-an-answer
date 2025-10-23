@@ -21,7 +21,7 @@ services:
       - 8080:8080
     healthcheck:
       # Use CMD-SHELL so shell interpolation works and ensure a non-zero exit on failure
-      test: [ "CMD-SHELL", "echo 'Calling /scalar healthcheck' && curl -f http://localhost:8080/scalar || exit 1" ]
+      test: [ "CMD-SHELL", "echo 'Calling /health healthcheck' && curl -f http://localhost:8080/health || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 10
