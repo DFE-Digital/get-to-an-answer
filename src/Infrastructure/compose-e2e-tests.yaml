@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   web-api:
     image: web-api:e2e
@@ -18,7 +20,8 @@ services:
     ports:
       - 8080:8080
     healthcheck:
-      test: ["CMD", "sh", "-c", "echo 'Calling /scalar healthcheck' && curl -f http://localhost:8080/scalar"]
+      # Use CMD-SHELL so shell interpolation works and ensure a non-zero exit on failure
+      test: [ "CMD-SHELL", "echo 'Calling /scalar healthcheck' && curl -f http://localhost:8080/scalar || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -31,17 +34,8 @@ services:
     ports:
       - "1433:1433"
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${SQLSERVER_SA_PASSWORD}", "-Q", "SELECT 1"]
+      # Use CMD-SHELL so the SA password env var is expanded inside the command
+      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$SQLSERVER_SA_PASSWORD\" -Q \"SELECT 1\" || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
-
-  playwright-tests:
-    build:
-      context: ../e2e/gtaa.e2etests
-      dockerfile: Dockerfile
-    depends_on:
-      - web-api
-    environment:
-      - API_URL=http://web-api:8080
-    command: ["yarn", "playwright", "test", "src/tests/api"]

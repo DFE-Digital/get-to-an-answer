@@ -34,7 +34,28 @@ jobs:
         env:
           DEFAULT_CONNECTION_STRING: ${{ secrets.DEFAULT_CONNECTION_STRING }}
           SQLSERVER_SA_PASSWORD: ${{ secrets.SQLSERVER_SA_PASSWORD }}
-        run: docker compose -f Infrastructure/compose-ci.yaml up --build --abort-on-container-exit
+        run: docker compose -f Infrastructure/compose-ci.yaml up -d
+
+      - name: Install dependencies
+        working-directory: ./src/e2e/gtaa.e2etests
+        run: yarn install
+        
+# Temporarily disabled these until work starts on the new frontend and admin projects
+#        - name: Install Playwright Browsers
+#          working-directory: ./src/e2e/gtaa.e2etests
+#          run: yarn playwright install --with-deps
+
+      - name: Run healthcheck
+        if: steps.run.outcome == 'success'
+        working-directory: ./src/e2e/gtaa.e2etests
+        run: |
+          echo "Running health project to validate API is up..."
+          API_URL=http://localhost:8080 yarn playwright test -c playwright-ci.config.ts --project=health
+
+      - name: Run Full Playwright Tests
+        if: steps.run.outcome == 'success'
+        working-directory: ./src/e2e/gtaa.e2etests
+        run: $API_URL=http://localhost:8080 yarn playwright test -c playwright-ci.config.ts    
 
       - name: Upload Playwright Test Report
         if: always()
@@ -43,7 +64,7 @@ jobs:
           name: playwright-report
           path: ./src/e2e/gtaa.e2etests/playwright-report/
           if-no-files-found: ignore
-      
+
       - name: Upload Screenshots on Failure
         if: failure()
         uses: actions/upload-artifact@v4
