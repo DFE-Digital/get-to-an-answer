@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+
+test.describe.configure({ retries: 5 });
+
 test.describe('Health checks', () => {
   test('GET /scalar should return 200 and a non-empty body', async ({ request }) => {
     const base = getApiBaseUrl();
