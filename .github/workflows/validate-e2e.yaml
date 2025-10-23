@@ -35,21 +35,21 @@ jobs:
           DEFAULT_CONNECTION_STRING: ${{ secrets.DEFAULT_CONNECTION_STRING }}
           SQLSERVER_SA_PASSWORD: ${{ secrets.SQLSERVER_SA_PASSWORD }}
           ASPNETCORE_ENVIRONMENT: "Local"
-          AZURE_AD_CLIENT_ID: "123" 
+          AZURE_AD_CLIENT_ID: "123"
           AZURE_AD_TENANT_ID: "456"
           AZURE_AD_CLIENT_SECRET: "789"
-          AZURE_AD_INSTANCE: "https://login.microsoftonline.com/"          
-          AZURE_AD_DOMAIN: "example.onmicrosoft.com"     
+          AZURE_AD_INSTANCE: "https://login.microsoftonline.com/"
+          AZURE_AD_DOMAIN: "example.onmicrosoft.com"
         run: docker compose -f Infrastructure/compose-e2e-tests.yaml up -d
 
       - name: Install dependencies
         working-directory: ./src/e2e/gtaa.e2etests
         run: yarn install
-        
-# Temporarily disabled these until work starts on the new frontend and admin projects
-#        - name: Install Playwright Browsers
-#          working-directory: ./src/e2e/gtaa.e2etests
-#          run: yarn playwright install --with-deps
+      
+      #     Temporarily disabled these until work starts on the new frontend and admin projects
+      #      - name: Install Playwright Browsers
+      #        working-directory: ./src/e2e/gtaa.e2etests
+      #        run: yarn playwright install --with-deps
 
       - name: Run healthcheck
         if: steps.run.outcome == 'success'
@@ -63,12 +63,11 @@ jobs:
         working-directory: ./src
         run: docker compose -f Infrastructure/compose-e2e-tests.yaml logs
 
+      - name: Run Full Playwright Tests
+        if: steps.run.outcome == 'success'
+        working-directory: ./src/e2e/gtaa.e2etests
+        run: $API_URL=http://localhost:8080 yarn playwright test -c playwright.config.ts
 
-#      - name: Run Full Playwright Tests
-#        if: steps.run.outcome == 'success'
-#        working-directory: ./src/e2e/gtaa.e2etests
-#        run: $API_URL=http://localhost:8080 yarn playwright test -c playwright.config.ts    
-        
       - name: Upload Playwright Test Report
         if: always()
         uses: actions/upload-artifact@v4
