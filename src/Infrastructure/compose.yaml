@@ -7,7 +7,7 @@
       context: ..
       dockerfile: Frontend/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Local
       - ApiSettings__BaseUrl=http://gettoananswer-api:8080
 
   gettoananswer-admin:
@@ -18,7 +18,7 @@
       context: ..
       dockerfile: Admin/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Local
       - ApiSettings__BaseUrl=http://gettoananswer-api:8080
 
   gettoananswer-api:
@@ -27,4 +27,4 @@
       context: ..
       dockerfile: Api/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Local

@@ -2,8 +2,8 @@ services:
   web-api:
     image: web-api:e2e
     build:
-      context: ../..
-      dockerfile: src/Api/Dockerfile
+      context: ..
+      dockerfile: Api/Dockerfile
     depends_on:
       - sqlserver
     environment:
