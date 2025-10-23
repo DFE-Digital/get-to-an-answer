@@ -52,11 +52,17 @@ jobs:
           echo "Running health project to validate API is up..."
           API_URL=http://localhost:8080 yarn playwright test -c playwright.config.ts --project=health
 
+      - name: Display docker compose logs
+        if: failure()
+        working-directory: ./src
+        run: docker compose -f Infrastructure/compose-e2e-tests.yaml logs
+
+
       - name: Run Full Playwright Tests
         if: steps.run.outcome == 'success'
         working-directory: ./src/e2e/gtaa.e2etests
         run: $API_URL=http://localhost:8080 yarn playwright test -c playwright.config.ts    
-
+        
       - name: Upload Playwright Test Report
         if: always()
         uses: actions/upload-artifact@v4
