@@ -1,16 +1,18 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
 using Common.Infrastructure.Persistence;
 using Common.Local;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Identity.Web;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Configuration
+        .AddUserSecrets<Program>(optional: true, reloadOnChange: true);
+}
 
 builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
 { 

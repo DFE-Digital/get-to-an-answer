@@ -84,6 +84,33 @@ public class QuestionnaireTests(ApiFixture factory) :
         dto.Description.Should().Be("Desc");
         AssertNoSensitiveUserData(responseBody);
     }
+    
+    [Fact]
+    public async Task Create_With_Really_Long_Slug_Description_Returns400()
+    {
+        var payload = new
+        {
+            title = "With Slug",
+            slug = new string('a', 700),
+            description = "Desc"
+        };
+
+        using var res = await Create(payload);
+
+        Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
+
+        var responseBody = await res.Content.ReadAsStringAsync();
+
+        var error = JsonSerializer.Deserialize<JsonElement>(responseBody);
+        
+        // Assert response contains validation error for slug length
+        error.GetProperty("title").GetString().Should().Contain("One or more validation errors occurred.");
+        error.TryGetProperty("errors", out var errors).Should().BeTrue();
+        errors.TryGetProperty("Slug", out var slugErrors).Should().BeTrue();
+        slugErrors[0].GetString().Should().Be("The field Slug must be a string or array type with a maximum length of '500'.");
+        
+        AssertNoSensitiveUserData(responseBody);
+    }
 
     [Fact]
     public async Task Create_With_Duplicate_Title_Still_Creates_New_Id()
