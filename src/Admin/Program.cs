@@ -1,5 +1,11 @@
 var builder = WebApplication.CreateBuilder(args);
 
+if (builder.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Configuration
+        .AddUserSecrets<Program>(optional: true, reloadOnChange: true);
+}
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

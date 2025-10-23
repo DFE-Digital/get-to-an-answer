@@ -3,6 +3,10 @@ resource "azurerm_virtual_network" "gettoananswer_vnet" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   address_space       = ["10.0.0.0/16"]
+  
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 resource "azurerm_network_security_group" "gettoananswer-nsg" {
@@ -21,6 +25,10 @@ resource "azurerm_network_security_group" "gettoananswer-nsg" {
     destination_address_prefix = "VirtualNetwork"
     destination_port_ranges    = ["443"]
     source_port_range          = "*"
+  }
+
+  lifecycle {
+    ignore_changes = [tags]
   }
 }
 
@@ -50,6 +58,10 @@ resource "azapi_resource" "gettoananswer_main_subnet" {
     }
   }
 
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
   depends_on = [azurerm_network_security_group.gettoananswer-nsg]
 }
 
@@ -62,6 +74,10 @@ resource "azurerm_private_dns_zone" "default" {
   name                = "${var.prefix}pdz-uks-gtaa.database.windows.net"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
 
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
   depends_on = [azapi_resource.gettoananswer_main_subnet]
 }
 
@@ -70,6 +86,10 @@ resource "azurerm_private_dns_zone_virtual_network_link" "default" {
   private_dns_zone_name = azurerm_private_dns_zone.default.name
   virtual_network_id    = azurerm_virtual_network.gettoananswer_vnet.id
   resource_group_name   = azurerm_resource_group.gettoananswer-rg.name
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 
   depends_on = [azapi_resource.gettoananswer_main_subnet]
 }
