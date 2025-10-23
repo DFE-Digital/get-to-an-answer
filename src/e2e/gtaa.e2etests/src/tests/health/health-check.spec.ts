@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe.configure({ retries: 5 });
 
 test.describe('Health checks', () => {
-  test('GET /scalar should return 200 and a non-empty body', async ({ request }) => {
+  test('GET /health should return 200 and a non-empty body', async ({ request }) => {
     const base = getApiBaseUrl();
     if (!base) {
       // Skip this test when the API URL is not provided in the environment.
@@ -11,7 +11,7 @@ test.describe('Health checks', () => {
       return;
     }
 
-    const url = `${base}/scalar`;
+    const url = `${base}/health`;
 
     const res = await request.get(url);
     expect(res.status(), `Expected 200 from ${url}, got ${res.status()}`).toBe(200);

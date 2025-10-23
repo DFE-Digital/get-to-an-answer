@@ -22,6 +22,12 @@ builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
 builder.Services.AddControllers()
     .AddDataAnnotationsLocalization();
 
+// Register health checks only for Local environment
+if (builder.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddHealthChecks();
+}
+
 if (builder.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgnoreCase))
 {
     builder.Services.AddMockAzureAdForApi();
@@ -63,6 +69,9 @@ if (app.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgno
         options.HideSidebar();
         options.AddPreferredSecuritySchemes("Bearer");
     });
+
+    // Expose health check endpoint only in Local environment
+    app.MapHealthChecks("/health");
 }
 else
 {
