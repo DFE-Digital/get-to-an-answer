@@ -5,27 +5,28 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 
-# Use absolute path for clarity
+# working directory in the container
 WORKDIR /src
 
-# Copy only csproj files first (paths are relative to build context = repo root)
-COPY src/Api/Api.csproj Api/
-COPY src/Common/Common.csproj Common/
+# copy to /src/Api and /src/Common
+COPY ["./src/Api/Api.csproj", "Api/"]
+COPY ["./src/Common/Common.csproj", "Common/"]
 
+# Restore dependencies
+RUN dotnet restore "Api/Api.csproj"
 
-# Copy the rest of the source from repo root's src folder into /src
-COPY src .
+# Copy the rest of the source code
+COPY *.sln .
+COPY Directory.Packages.props .
+COPY ./src ./
 
-WORKDIR /src/Api
-
-RUN dotnet restore "Api.csproj"
-
-RUN dotnet build "Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Api"
+RUN dotnet build "./Api.csproj" -c $BUILD_CONFIGURATION  -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src/Api
-RUN dotnet publish "Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 
 FROM base AS final
 WORKDIR /app

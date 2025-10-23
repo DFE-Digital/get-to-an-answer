@@ -22,7 +22,7 @@ output "azurerm_network_security_group" {
 }
 
 output "azurerm_subnet" {
-  value = azurerm_subnet.gettoananswer_main_subnet.name
+  value = azapi_resource.gettoananswer_main_subnet.name
   description = "Subnet name"
 }
 
