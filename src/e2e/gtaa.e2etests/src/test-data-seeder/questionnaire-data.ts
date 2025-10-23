@@ -75,10 +75,17 @@ export async function listQuestionnaires(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
+    
     if (!response.ok()) {
         throw new Error(`❌ Failed to list questionnaires: ${response.status()}`);
     }
-    return await response.json();
+
+    //const responseBody = await safeParseBody(response);
+
+    return {
+        questionnaireGetResponse: response,
+        questionnaireGetBody: await response.json()
+    }
 }
 
 export async function updateQuestionnaire(
