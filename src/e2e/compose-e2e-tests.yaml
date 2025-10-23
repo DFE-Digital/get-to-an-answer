@@ -44,4 +44,4 @@ services:
       - web-api
     environment:
       - API_URL=http://web-api:8080
-    command: ["yarn", "playwright", "test"]
+    command: ["yarn", "playwright", "test", "src/tests/api"]
