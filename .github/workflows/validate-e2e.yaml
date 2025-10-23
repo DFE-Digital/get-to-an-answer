@@ -50,12 +50,12 @@ jobs:
         working-directory: ./src/e2e/gtaa.e2etests
         run: |
           echo "Running health project to validate API is up..."
-          API_URL=http://localhost:8080 yarn playwright test -c playwright-ci.config.ts --project=health
+          API_URL=http://localhost:8080 yarn playwright test -c playwright.config.ts --project=health
 
       - name: Run Full Playwright Tests
         if: steps.run.outcome == 'success'
         working-directory: ./src/e2e/gtaa.e2etests
-        run: $API_URL=http://localhost:8080 yarn playwright test -c playwright-ci.config.ts    
+        run: $API_URL=http://localhost:8080 yarn playwright test -c playwright.config.ts    
 
       - name: Upload Playwright Test Report
         if: always()
