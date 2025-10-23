@@ -200,6 +200,7 @@ test.describe('POST Create questionnaire api request', () => {
         expect(questionnairePostResponse.status()).toBe(400);
     });
 
+    //Bug: CARE-1446
     // test('Validate slug length POST create new questionnaire', async ({request}) => {
     //
     //     const {questionnairePostResponse} = await createQuestionnaire(
@@ -220,46 +221,46 @@ test.describe('POST Create questionnaire api request', () => {
     //     expect(questionnairePostResponse.status()).toBe(400);
     // });
 
-    // test('Validate access to another questionnaire not permitted', async ({request}) => {
-    //
-    //     const q1Token = JwtHelper.ValidToken;
-    //     const q2Token = JwtHelper.UnauthorizedToken;
-    //
-    //     const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(
-    //         request,
-    //         q1Token,
-    //         'Custom test questionnaire title',
-    //         'Custom test first questionnaire description',
-    //         'slug'
-    //     );
-    //
-    //     const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(
-    //         request,
-    //         q2Token,
-    //         'Custom test questionnaire title',
-    //         'Custom test second questionnaire description',
-    //         'slug'
-    //     );
-    //
-    //     // --- HTTP-level checks ---
-    //     expectHttp(q1Response, 201);
-    //     expectHttp(q2Response, 201);
-    //
-    //     const updatePayload = {
-    //         ...q2,
-    //         title: 'Updated title'
-    //     }
-    //     const update = await updateQuestionnaire(
-    //         request,
-    //         q2.id,
-    //         updatePayload,
-    //         q1Token
-    //     )
-    //
-    //     //should be forbidden
-    //     expect(update.updatedQuestionnairePostResponse.status()).toBe(403);
-    //
-    // });
+    test('Validate access to another questionnaire not permitted', async ({request}) => {
+
+        const q1Token = JwtHelper.ValidToken;
+        const q2Token = JwtHelper.UnauthorizedToken;
+
+        const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(
+            request,
+            q1Token,
+            'Custom test questionnaire title',
+            'Custom test first questionnaire description',
+            'slug'
+        );
+
+        const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(
+            request,
+            q2Token,
+            'Custom test questionnaire title',
+            'Custom test second questionnaire description',
+            'slug'
+        );
+
+        // --- HTTP-level checks ---
+        expectHttp(q1Response, 201);
+        expectHttp(q2Response, 201);
+
+        const updatePayload = {
+            ...q2,
+            title: 'Updated title'
+        }
+        const update = await updateQuestionnaire(
+            request,
+            q2.id,
+            updatePayload,
+            q1Token
+        )
+
+        //should be forbidden
+        expect(update.updatedQuestionnairePostResponse.status()).toBe(403);
+
+    });
 });
 
 test.describe('GET questionnaire api tests', () => {
@@ -355,6 +356,7 @@ test.describe('GET questionnaire api tests', () => {
         expect(getResponse.questionnaireGetResponse.status()).toBe(404);
     });
 
+    //Bug: CARE-1369
     // test('Validate GET for a questionnaire where access is not permitted ', async ({request}) => {
     //     const q1Token = JwtHelper.ValidToken;
     //     const q2Token = JwtHelper.UnauthorizedToken;

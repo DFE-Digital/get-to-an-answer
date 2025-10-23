@@ -2,7 +2,7 @@ import {QuestionnaireBuilder} from '../builders/QuestionnaireBuilder';
 import {ClaimTypes, JwtHelper, SimpleDate} from '../helpers/JwtHelper';
 import {APIRequestContext, APIResponse} from "@playwright/test";
 
-//to parse response body correctly - json body can be json, text or empty string
+//to parse response-body correctly - json body can be json, text or empty string
 async function safeParseBody(response: APIResponse) {
     const ct = (response.headers()['content-type'] || '').toLowerCase();
     const raw = await response.text();
@@ -20,14 +20,12 @@ async function safeParseBody(response: APIResponse) {
 export async function createQuestionnaire(
     request: APIRequestContext,
     bearerToken?: string,
-    //questionnairePrefix?: string,
     title?: string,
     description?: string,
     slug?: string
 ) {
     const payload = new QuestionnaireBuilder()
         .withTitle(title)
-        //.withTitlePrefix(questionnairePrefix)
         .withDescription(description)
         .withSlug(slug)
         .build();
@@ -59,9 +57,9 @@ export async function getQuestionnaire(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
-    
+
     const responseBody = await safeParseBody(response);
-    
+
     return {
         questionnaireGetResponse: response,
         questionnaireGetBody: responseBody
@@ -96,7 +94,7 @@ export async function updateQuestionnaire(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
-    
+
     const responseBody = await safeParseBody(response);
 
     return {
@@ -153,7 +151,7 @@ export async function deleteQuestionnaire(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
-    
+
     const responseBody = await safeParseBody(response);
 
     return {

@@ -119,7 +119,7 @@ export class JwtHelper {
         [ClaimTypes.Name]: 'Test User',
         [ClaimTypes.Email]: 'other-user@education.gov.uk',
         [ClaimTypes.Role]: ['Admin'],
-        [ClaimTypes.Expiration]: new SimpleDate().addDate({days: -1}).toISOString()
+        [ClaimTypes.Expiration]: new SimpleDate().addDate({days: 1}).toISOString()
     })
 
     public static readonly InvalidToken = "invalid-token";
