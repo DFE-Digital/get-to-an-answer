@@ -7,7 +7,7 @@ const apiBase = {
     testDir: './src/tests/api',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: process.env.API_URL || 'https://www.ebay.co.uk/',
+        baseURL: process.env.API_URL || 'http://localhost:5042',
     },
 } as const;
 

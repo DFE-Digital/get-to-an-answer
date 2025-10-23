@@ -1,18 +1,31 @@
 import {QuestionnaireBuilder} from '../builders/QuestionnaireBuilder';
 import {ClaimTypes, JwtHelper, SimpleDate} from '../helpers/JwtHelper';
-import {APIRequestContext} from "@playwright/test";
+import {APIRequestContext, APIResponse} from "@playwright/test";
+
+//to parse response-body correctly - json body can be json, text or empty string
+async function safeParseBody(response: APIResponse) {
+    const ct = (response.headers()['content-type'] || '').toLowerCase();
+    const raw = await response.text();
+    if (!raw) return null;
+    if (ct.includes('application/json')) {
+        try {
+            return JSON.parse(raw);
+        } catch {
+            return null;
+        }
+    }
+    return raw;
+}
 
 export async function createQuestionnaire(
     request: APIRequestContext,
     bearerToken?: string,
-    questionnairePrefix?: string,
     title?: string,
     description?: string,
     slug?: string
 ) {
     const payload = new QuestionnaireBuilder()
         .withTitle(title)
-        .withTitlePrefix(questionnairePrefix)
         .withDescription(description)
         .withSlug(slug)
         .build();
@@ -25,11 +38,13 @@ export async function createQuestionnaire(
         }
     });
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to create questionnaire: ${response.status()}`);
+    const responseBody = await safeParseBody(response);
+
+    return {
+        questionnairePostResponse: response,
+        questionnaire: responseBody,
+        payload
     }
-    
-    return {questionnairePostResponse: response, questionnaire: await response.json(), payload}
 }
 
 export async function getQuestionnaire(
@@ -43,10 +58,12 @@ export async function getQuestionnaire(
         }
     });
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to fetch required questionnaire: ${response.status()}`);
+    const responseBody = await safeParseBody(response);
+
+    return {
+        questionnaireGetResponse: response,
+        questionnaireGetBody: responseBody
     }
-    return await response.json();
 }
 
 export async function listQuestionnaires(
@@ -77,10 +94,13 @@ export async function updateQuestionnaire(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to update questionnaire: ${response.status()}`);
+
+    const responseBody = await safeParseBody(response);
+
+    return {
+        updatedQuestionnairePostResponse: response,
+        updatedQuestionnaire: responseBody,
     }
-    return await response.json();
 }
 
 export async function updateQuestionnaireStatus(
@@ -131,10 +151,13 @@ export async function deleteQuestionnaire(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to delete questionnaire: ${response.status()}`);
+
+    const responseBody = await safeParseBody(response);
+
+    return {
+        deleteQuestionnaireResponse: response,
+        deleteQuestionnaire: responseBody,
     }
-    return await response.json();
 }
 
 // Versions
@@ -145,7 +168,7 @@ export async function listQuestionnaireVersions(
     bearerToken?: string
 ) {
     const response = await request.get(`/api/questionnaires/${questionnaireId}/versions`, {
-        headers: { 'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}` }
+        headers: {'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`}
     });
     if (!response.ok()) {
         throw new Error(`❌ Failed to list questionnaire versions: ${response.status()}`);
@@ -160,7 +183,7 @@ export async function getQuestionnaireVersion(
     bearerToken?: string
 ) {
     const response = await request.get(`/api/questionnaires/${questionnaireId}/versions/${versionNumber}`, {
-        headers: { 'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}` }
+        headers: {'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`}
     });
     if (!response.ok()) {
         throw new Error(`❌ Failed to get questionnaire version: ${response.status()}`);
@@ -174,7 +197,7 @@ export async function getLatestQuestionnaireVersion(
     bearerToken?: string
 ) {
     const response = await request.get(`/api/questionnaires/${questionnaireId}/versions/current`, {
-        headers: { 'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}` }
+        headers: {'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`}
     });
     if (!response.ok()) {
         throw new Error(`❌ Failed to get latest questionnaire version: ${response.status()}`);
@@ -190,7 +213,7 @@ export async function getInitialQuestion(
     bearerToken?: string
 ) {
     const response = await request.get(`/api/questionnaires/${questionnaireId}/initial`, {
-        headers: { 'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}` }
+        headers: {'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`}
     });
     if (!response.ok()) {
         throw new Error(`❌ Failed to get initial question: ${response.status()}`);
