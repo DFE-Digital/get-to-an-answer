@@ -1,6 +1,6 @@
 # End-to-End (E2E) Testing
 
-Run Playwright-based E2E tests against services started with Docker Compose. The `compose-ci.yaml` file brings up the
+Run Playwright-based E2E tests against services started with Docker Compose. The `compose-e2e-tests.yaml` file brings up the
 API and SQL Server; the API waits until SQL is ready.
 
 ## Prerequisites
@@ -8,7 +8,7 @@ API and SQL Server; the API waits until SQL is ready.
 - Docker and Docker Compose
 - Copy `Infrastructure/.env.example` to `Infrastructure/.env` and provide valid secrets/connection strings for DB & API
 - Keep `.env.example` updated whenever `.env` changes
-- If you change the SQL Server service name in `compose-ci.yaml`, update the `Server` value in connection strings in
+- If you change the SQL Server service name in `compose-e2e-tests.yaml`, update the `Server` value in connection strings in
   `.env` and relevant GitHub Actions secrets for the E2E tests
 - Ensure API and test projects are built if required by your workflow
 
@@ -29,15 +29,17 @@ API and SQL Server; the API waits until SQL is ready.
 
 
 2. Start the environment with Docker Compose:
+
+- Change directory to `src/Infrastructure` & Run:
    ```sh
-   docker compose -f compose-ci.yaml up --build
+   docker compose -f compose-e2e-tests.yaml up --build
    ```
    API and SQL containers are built and started; API waits for SQL.
 
 
 3. Tear down:
    ```sh
-   docker compose -f compose-ci.yaml down -v
+   docker compose -f compose-e2e-tests.yaml down -v
    ```
    Note: **The `-v` flag removes volumes for a clean state.**
 
@@ -91,7 +93,7 @@ Key `playwright.config.ts` settings:
 
 - Compose logs:
   ```sh
-  docker compose -f compose-ci.yaml logs
+  docker compose -f compose-e2e-tests.yaml logs
   ```
 - For .NET build/runtime issues: build and run/debug locally, or attach a debugger to the container
 
