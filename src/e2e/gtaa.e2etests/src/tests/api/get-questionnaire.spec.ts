@@ -170,48 +170,47 @@ test.describe('GET questionnaire api tests', () => {
         }
     });
 
-    // test('Validate GET should not include questionnaire that is not permitted in list questionnaires', async ({request}) => {
-    //     const q1Token = JwtHelper.NoRecordsToken;
-    //     const q2Token = JwtHelper.NoRecordsToken;
-    //
-    //     const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(
-    //         request,
-    //         q1Token,
-    //         'Custom test questionnaire title - user 1',
-    //         'Custom test first questionnaire description',
-    //         'slug'
-    //     );
-    //
-    //     const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(
-    //         request,
-    //         q2Token,
-    //         'Custom test questionnaire title - user 2',
-    //         'Custom test second questionnaire description',
-    //         'slug'
-    //     );
-    //
-    //     // --- HTTP-level checks ---
-    //     expectHttp(q1Response, 201);
-    //     expectHttp(q2Response, 201);
-    //
-    //     const response = await listQuestionnaires(request, q2Token);
-    //     console.log(response.questionnaireGetBody);
-    //
-    //     // // --- HTTP-level checks ---
-    //     expectHttp(response.questionnaireGetResponse, 200);
-    //
-    //     const list: any[] = response.questionnaireGetBody
-    //     expect(Array.isArray(list)).toBe(true);
-    //     expect(list.length).toBeGreaterThan(0);
-    //
-    //     for (const q of list) {
-    //         expect(q.id).not.toEqual(q1.id);
-    //     }
-    // });
+    test('Validate GET should not include questionnaire that is not permitted in list questionnaires', async ({request}) => {
+        const q1Token = JwtHelper.NoRecordsToken();
+        const q2Token = JwtHelper.NoRecordsToken();
+
+        const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(
+            request,
+            q1Token,
+            'Custom test questionnaire title - user 1',
+            'Custom test first questionnaire description',
+            'slug'
+        );
+
+        const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(
+            request,
+            q2Token,
+            'Custom test questionnaire title - user 2',
+            'Custom test second questionnaire description',
+            'slug'
+        );
+
+        // --- HTTP-level checks ---
+        expectHttp(q1Response, 201);
+        expectHttp(q2Response, 201);
+
+        const response = await listQuestionnaires(request, q2Token);
+        
+        // // --- HTTP-level checks ---
+        expectHttp(response.questionnaireGetResponse, 200);
+
+        const list: any[] = response.questionnaireGetBody
+        expect(Array.isArray(list)).toBe(true);
+        expect(list.length).toBeGreaterThan(0);
+
+        for (const q of list) {
+            expect(q.id).not.toEqual(q1.id);
+        }
+    });
 
     test('Validate GET all should return empty list if no questionnaire exists', async ({request}) => {
 
-        const response = await listQuestionnaires(request, JwtHelper.NoRecordsToken);
+        const response = await listQuestionnaires(request, JwtHelper.NoRecordsToken());
 
         // // --- HTTP-level checks ---
         expectHttp(response.questionnaireGetResponse, 200);
