@@ -155,7 +155,6 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
-  virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
 
   site_config {
     application_stack {
@@ -186,7 +185,6 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
-  virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
 
   site_config {
     application_stack {
@@ -217,7 +215,6 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
-  virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
 
   site_config {
     application_stack {

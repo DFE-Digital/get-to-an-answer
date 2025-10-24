@@ -50,7 +50,7 @@ jobs:
         run: echo "ENVIRONMENT_LOWER=${ENVIRONMENT,,}" >>${GITHUB_ENV}
 
       - name: "Terraform Init"
-        run: terraform init -upgrade
+        run: terraform init -backend-config="resource_group_name=${{ vars.GTAA_PREFIX }}rg-uks-terraform-state" -backend-config="storage_account_name=gtaatfstatesa" -backend-config="container_name=tfstate" -backend-config="key=${{ env.ENVIRONMENT_LOWER }}.tfstate"
 
       - name: "Terraform Plan"
         run: terraform plan -var-file=${{ env.ENVIRONMENT_LOWER }}.tfvars -out=tfplan
