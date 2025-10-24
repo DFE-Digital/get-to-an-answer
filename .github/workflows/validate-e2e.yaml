@@ -28,45 +28,53 @@ jobs:
       - name: Lowercase the repo name and username
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
-#      Might need a separate docker build step for images to utilise tagging
-#      - name: Build Api Docker Docker Image
-#        id: build
-#        working-directory: ./src
-#        run: docker build . -t gtaa-web-api:e2e -f Api/Dockerfile
-
-      - name: Run E2E Docker Image
+      - name: Run E2E Docker Compose
         id: run
         working-directory: ./src
         env:
           DEFAULT_CONNECTION_STRING: ${{ secrets.DEFAULT_CONNECTION_STRING }}
           SQLSERVER_SA_PASSWORD: ${{ secrets.SQLSERVER_SA_PASSWORD }}
-        run: docker compose -f Infrastructure/compose-ci.yaml up -d
-        
-        # When Frontend work is underway, uncomment the following steps to run E2E tests
-#      - name: Install dependencies
-#        working-directory: ./src/e2e/CareLeavers.E2ETests
-#        run: yarn install
-#
-#      - name: Install Playwright Browsers
-#        working-directory: ./src/e2e/CareLeavers.E2ETests
-#        run: yarn playwright install --with-deps
-#
-#      - name: Run Playwright Tests
-#        if: steps.run.outcome == 'success'
-#        working-directory: ./src/e2e/CareLeavers.E2ETests
-#        run: yarn playwright test -c playwright-ci.config.ts
-#
-#      - name: Upload Playwright Test Report
-#        if: always() 
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: playwright-report
-#          path: ./src/e2e/CareLeavers.E2ETests/playwright-report/
-#          if-no-files-found: ignore
-#          
-#      - name: Upload Screenshots on Failure
-#        if: failure()
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: playwright-screenshots
-#          path: ./src/e2e/CareLeavers.E2ETests/test-results/screenshots/
+          ASPNETCORE_ENVIRONMENT: "Local"
+          AZURE_AD_CLIENT_ID: "123"
+          AZURE_AD_TENANT_ID: "456"
+          AZURE_AD_CLIENT_SECRET: "789"
+          AZURE_AD_INSTANCE: "https://login.microsoftonline.com/"
+          AZURE_AD_DOMAIN: "example.onmicrosoft.com"
+        run: docker compose -f Infrastructure/compose-e2e-tests.yaml up -d
+
+      - name: Install dependencies
+        working-directory: ./src/e2e/gtaa.e2etests
+        run: yarn install
+      
+      #     Temporarily disabled these until work starts on the new frontend and admin projects
+      #      - name: Install Playwright Browsers
+      #        working-directory: ./src/e2e/gtaa.e2etests
+      #        run: yarn playwright install --with-deps
+
+      - name: Run healthcheck
+        if: steps.run.outcome == 'success'
+        working-directory: ./src/e2e/gtaa.e2etests
+        run: |
+          echo "Running health project to validate API is up..."
+          API_URL=http://localhost:8080 yarn playwright test -c playwright.config.ts --project=health
+
+#     Run only API tests for now
+      - name: Run Playwright Tests
+        if: steps.run.outcome == 'success'
+        working-directory: ./src/e2e/gtaa.e2etests
+        run: API_URL=http://localhost:8080 yarn playwright test -c playwright.config.ts --project=Api
+
+      - name: Upload Playwright Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: ./src/e2e/gtaa.e2etests/playwright-report/
+          if-no-files-found: ignore
+
+      - name: Upload Screenshots on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-screenshots
+          path: ./src/e2e/gtaa.e2etests/test-results/screenshots/

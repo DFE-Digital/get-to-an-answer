@@ -8,7 +8,10 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-if (builder.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgnoreCase))
+const string localEnvironmentName = "Local";
+var builderIsLocalEnvironment = builder.Environment.IsEnvironment(localEnvironmentName);
+
+if (builderIsLocalEnvironment)
 {
     builder.Configuration
         .AddUserSecrets<Program>(optional: true, reloadOnChange: true);
@@ -22,8 +25,10 @@ builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
 builder.Services.AddControllers()
     .AddDataAnnotationsLocalization();
 
-if (builder.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgnoreCase))
+
+if (builderIsLocalEnvironment)
 {
+    builder.Services.AddHealthChecks();
     builder.Services.AddMockAzureAdForApi();
 }
 else
@@ -51,8 +56,10 @@ builder.Services.AddOpenApi(options =>
 
 var app = builder.Build();
 
+var appIsLocalEnvironment = app.Environment.IsEnvironment(localEnvironmentName);
+
 // Configure the HTTP request pipeline.
-if (app.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgnoreCase))
+if (appIsLocalEnvironment)
 {
     // Serve OpenAPI JSON at /openapi/v1.json
     app.MapOpenApi();
@@ -63,6 +70,9 @@ if (app.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgno
         options.HideSidebar();
         options.AddPreferredSecuritySchemes("Bearer");
     });
+
+    // Expose health check endpoint only in Local environment
+    app.MapHealthChecks("/health");
 }
 else
 {
@@ -80,7 +90,7 @@ using (var scope = app.Services.CreateScope())
     await dbContext.Database.EnsureCreatedAsync();
 }
 
-if (!app.Environment.EnvironmentName.Equals("Local", StringComparison.OrdinalIgnoreCase))
+if (!appIsLocalEnvironment)
 {
     app.UseHttpsRedirection();
 }

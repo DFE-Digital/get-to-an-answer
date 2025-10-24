@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  web-api:
+    image: web-api:e2e
+    build:
+      context: ../..
+      dockerfile: src/Api/Dockerfile
+    depends_on:
+      - sqlserver
+    environment:
+      - ConnectionStrings__DefaultConnection=${DEFAULT_CONNECTION_STRING}
+      - SQLSERVER_SA_PASSWORD=${SQLSERVER_SA_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - AzureAd__ClientId=${AZURE_AD_CLIENT_ID}
+      - AzureAd__TenantId=${AZURE_AD_TENANT_ID}
+      - AzureAd__Instance=${AZURE_AD_INSTANCE}
+      - AzureAd__Domain=${AZURE_AD_DOMAIN}
+      - ASPNETCORE_URLS=http://0.0.0.0:8080
+    ports:
+      - 8080:8080
+    healthcheck:
+      # Use CMD-SHELL so shell interpolation works and ensure a non-zero exit on failure
+      test: [ "CMD-SHELL", "echo 'Calling /health healthcheck' && curl -f http://localhost:8080/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SQLSERVER_SA_PASSWORD}
+    ports:
+      - "1433:1433"
+    healthcheck:
+      # Use CMD-SHELL so the SA password env var is expanded inside the command
+      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$SQLSERVER_SA_PASSWORD\" -Q \"SELECT 1\" || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
