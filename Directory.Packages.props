@@ -69,6 +69,8 @@
     <PackageVersion Include="Testcontainers" Version="4.7.0" />
     <PackageVersion Include="Testcontainers.MsSql" Version="4.7.0" />
     <PackageVersion Include="WireMock.Net" Version="1.14.0" />
+    <PackageVersion Include="xunit.assert" Version="2.9.3" />
+    <PackageVersion Include="xunit.extensibility.core" Version="2.9.3" />
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="MassTransit" Version="$(MassTransitVersion)" />

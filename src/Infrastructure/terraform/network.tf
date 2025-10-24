@@ -65,11 +65,6 @@ resource "azapi_resource" "gettoananswer_main_subnet" {
   depends_on = [azurerm_network_security_group.gettoananswer-nsg]
 }
 
-# resource "azurerm_subnet_network_security_group_association" "default" {
-#   subnet_id                 = azapi_resource.gettoananswer_main_subnet.id
-#   network_security_group_id = azurerm_network_security_group.gettoananswer-nsg.id
-# }
-
 resource "azurerm_private_dns_zone" "default" {
   name                = "${var.prefix}pdz-uks-gtaa.database.windows.net"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
