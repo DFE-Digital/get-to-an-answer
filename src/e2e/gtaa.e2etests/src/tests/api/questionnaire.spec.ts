@@ -366,7 +366,7 @@ test.describe('GET questionnaire api tests', () => {
         expect(getResponse.questionnaireGetResponse.status()).toBe(404);
     });
 
-    test('Validate GET for a questionnaire where access is not permitted ', async ({request}) => {
+    test('Validate GET for a specific questionnaire where access is not permitted ', async ({request}) => {
         const q1Token = JwtHelper.ValidToken;
         const q2Token = JwtHelper.UnauthorizedToken;
 
@@ -396,8 +396,6 @@ test.describe('GET questionnaire api tests', () => {
             q2Token
         );
 
-        console.log(getResponse)
-
         // // --- HTTP-level checks ---
         expect(getResponse.questionnaireGetResponse.ok()).toBeFalsy();
         expect(getResponse.questionnaireGetResponse.status()).toBe(403);
@@ -410,8 +408,7 @@ test.describe('GET questionnaire api tests', () => {
         const {questionnaire: q2} = await createQuestionnaire(request, qToken);
 
         const response = await listQuestionnaires(request, qToken);
-        //console.log(response);
-
+        
         // --- HTTP-level checks ---
         expectHttp(response.questionnaireGetResponse, 200);
 
@@ -430,6 +427,45 @@ test.describe('GET questionnaire api tests', () => {
 
             // --- Basic content sanity ---
             expectQuestionnaireContent(q);
+        }
+    });
+
+    test('Validate GET should not include questionnaire that is not permitted in list questionnaires', async ({request}) => {
+        const q1Token = JwtHelper.NoRecordsToken;
+        const q2Token = JwtHelper.NoRecordsToken;
+
+        const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(
+            request,
+            q1Token,
+            'Custom test questionnaire title - user 1',
+            'Custom test first questionnaire description',
+            'slug'
+        );
+        
+        const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(
+            request,
+            q2Token,
+            'Custom test questionnaire title - user 2',
+            'Custom test second questionnaire description',
+            'slug'
+        );
+        
+        // --- HTTP-level checks ---
+        expectHttp(q1Response, 201);
+        expectHttp(q2Response, 201);
+
+        const response = await listQuestionnaires(request, q2Token);
+        console.log(response.questionnaireGetBody);
+
+        // // --- HTTP-level checks ---
+        expectHttp(response.questionnaireGetResponse, 200);
+
+        const list: any[] = response.questionnaireGetBody
+        expect(Array.isArray(list)).toBe(true);
+        expect(list.length).toBeGreaterThan(0);
+        
+        for (const q of list) {
+            expect(q.id).not.toEqual(q1.id);
         }
     });
 });
