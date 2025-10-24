@@ -4,11 +4,11 @@ export class SimpleDate extends Date {
     constructor() {
         super();
     }
-    
-    public addDate(data: {years?: number, months?: number, days?: number}): SimpleDate {
+
+    public addDate(data: { years?: number, months?: number, days?: number }): SimpleDate {
         this.setFullYear(
-            this.getFullYear() + (data.years ?? 0), 
-            this.getMonth() + (data.months ?? 0), 
+            this.getFullYear() + (data.years ?? 0),
+            this.getMonth() + (data.months ?? 0),
             this.getDate() + (data.days ?? 0));
         return this;
     }
@@ -76,11 +76,11 @@ export class ClaimTypes {
     public static readonly Uri = `${this.ClaimType2005Namespace}/uri`;
     public static readonly Webpage = `${this.ClaimType2005Namespace}/webpage`;
     public static readonly X500DistinguishedName = `${this.ClaimType2005Namespace}/x500distinguishedname`;
-    
+
     private static readonly ClaimType2009Namespace = "http://schemas.xmlsoap.org/ws/2009/09/identity/claims";
-    
+
     public static readonly Actor = `${this.ClaimType2009Namespace}/actor`;
-    
+
 }
 
 export class JwtHelper {
@@ -98,8 +98,6 @@ export class JwtHelper {
         return jwt.sign(claims, JwtHelper.secret);
     }
 
-    public static readonly InvalidToken = 'invalid-token';
-    
     public static readonly ValidToken = JwtHelper.generateToken({
         [ClaimTypes.Subject]: 'test-subject',
         [ClaimTypes.Name]: 'Test User',
@@ -123,4 +121,14 @@ export class JwtHelper {
         [ClaimTypes.Role]: ['Admin'],
         [ClaimTypes.Expiration]: new SimpleDate().addDate({days: 1}).toISOString()
     })
+
+    public static readonly NoRecordsToken = JwtHelper.generateToken({
+        [ClaimTypes.Subject]: 'test-subject',
+        [ClaimTypes.Name]: 'Test User',
+        [ClaimTypes.Email]: `other-user${Math.round(Math.random() * 1000)}@education.gov.uk`,
+        [ClaimTypes.Role]: ['Admin'],
+        [ClaimTypes.Expiration]: new SimpleDate().addDate({days: 1}).toISOString()
+    })
+    
+    public static readonly InvalidToken = "invalid-token";
 }
