@@ -3,6 +3,11 @@ variable "env" {
   type        = string
 }
 
+variable "subscription_id" {
+  description = "Azure subscription ID where resources exist"
+  type        = string
+}
+
 variable "product" {
   description = "Name of the project"
   type        = string

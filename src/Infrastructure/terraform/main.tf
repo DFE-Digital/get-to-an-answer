@@ -12,6 +12,9 @@ terraform {
   }
 }
 
+provider "azapi" {
+}
+
 provider "azurerm" {
   features {}
 }
@@ -127,6 +130,10 @@ resource "azurerm_service_plan" "gettoananswer-web-asp" {
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   os_type             = "Linux"
   sku_name            = "B1"
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Azure Container Registry
@@ -136,6 +143,10 @@ resource "azurerm_container_registry" "gettoananswer-registry" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   sku                 = "Basic"
   admin_enabled       = true
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Linux Web App - API
@@ -144,6 +155,7 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
+  virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
 
   site_config {
     application_stack {
@@ -154,6 +166,10 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
     }
     # Enforce HTTPS only
     minimum_tls_version = "1.2"
+  }
+
+  lifecycle {
+    ignore_changes = [tags, app_settings, sticky_settings]
   }
 
   app_settings = {
@@ -170,6 +186,7 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
+  virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
 
   site_config {
     application_stack {
@@ -181,12 +198,17 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
     minimum_tls_version = "1.2"
   }
 
+  lifecycle {
+    ignore_changes = [tags, app_settings, sticky_settings]
+  }
+
   app_settings = {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
+    AppSettings__BaseUrl = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
   }
 
   https_only = true
-  depends_on = [azurerm_service_plan.gettoananswer-web-asp]
+  depends_on = [azurerm_service_plan.gettoananswer-web-asp, azurerm_linux_web_app.gettoananswer-api]
 }
 
 # Linux Web App - Frontend
@@ -195,6 +217,7 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
+  virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
 
   site_config {
     application_stack {
@@ -205,11 +228,16 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
     }
     minimum_tls_version = "1.2"
   }
+  
+  lifecycle {
+    ignore_changes = [tags, app_settings, sticky_settings]
+  }
 
   app_settings = {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
+    AppSettings__BaseUrl = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
   }
 
   https_only = true
-  depends_on = [azurerm_service_plan.gettoananswer-web-asp]
+  depends_on = [azurerm_service_plan.gettoananswer-web-asp, azurerm_linux_web_app.gettoananswer-api]
 }

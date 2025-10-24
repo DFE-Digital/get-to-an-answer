@@ -10,6 +10,10 @@ resource "azurerm_mssql_server" "gettoananswer_mssql_server" {
     Environment = var.env
     Product     = var.product
   }
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 resource "azurerm_mssql_database" "gettoananswer_mssql_db" {
@@ -22,6 +26,10 @@ resource "azurerm_mssql_database" "gettoananswer_mssql_db" {
   tags = {
     Environment = var.env
     Product     = var.product
+  }
+  
+  lifecycle {
+    ignore_changes = [tags]
   }
 
   depends_on = [azurerm_mssql_server.gettoananswer_mssql_server]

@@ -11,7 +11,7 @@ WORKDIR /src
 # copy to /src/Api and /src/Common
 COPY ["./src/Api/Api.csproj", "Api/"]
 COPY ["./src/Common/Common.csproj", "Common/"]
-
+    
 # Restore dependencies
 RUN dotnet restore "Api/Api.csproj"
 

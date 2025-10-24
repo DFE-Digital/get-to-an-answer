@@ -1,41 +1,115 @@
-# End-to-End (E2E) Test Setup (In-progress)
+# End-to-End (E2E) Testing
 
-This project uses Docker Compose to run end-to-end (E2E) tests in a consistent environment. The `compose-ci.yaml` file spins up the required services (API and SQL Server) with the correct configuration for integration and E2E testing.
+Run Playwright-based E2E tests against services started with Docker Compose. The `compose-ci.yaml` file brings up the
+API and SQL Server; the API waits until SQL is ready.
 
 ## Prerequisites
-- Docker and Docker Compose installed
-- Copy `.env.example` to `.env` in the `Infrastructure` folder and update it with valid connection strings and secrets
-- The API and test projects built (if required by your workflow)
-- **If any updates are made to the `.env` file, please update the `.env.example` file accordingly.**\
-- If the SQL Server "service name" is changed in `compose-ci.yaml`, ensure to update the "Server" field in the connection strings within the `.env` file and also secrets in Github Actions workflows.
 
-## Running E2E Tests (to be confirmed)
+- Docker and Docker Compose
+- Copy `Infrastructure/.env.example` to `Infrastructure/.env` and provide valid secrets/connection strings for DB & API
+- Keep `.env.example` updated whenever `.env` changes
+- If you change the SQL Server service name in `compose-ci.yaml`, update the `Server` value in connection strings in
+  `.env` and relevant GitHub Actions secrets for the E2E tests
+- Ensure API and test projects are built if required by your workflow
 
-1. **Start the test environment:**
+## Installation
+
+1. Clone the repository
+2. Change directory to `src/e2e/gtaa.e2etests`:
+
+   ```sh
+   yarn install
+   yarn playwright install
+   ```
+
+## Spinning up the Environment (API & SQL Database)
+
+1. As mentioned in the Prerequisites, copy `src/Infrastructure/.env.example` to `src/Infrastructure/.env` and provide
+   valid secrets/connection strings for DB & API.
+
+
+2. Start the environment with Docker Compose:
    ```sh
    docker compose -f compose-ci.yaml up --build
    ```
-   This will build and start the API and SQL Server containers. The API will wait for SQL Server to be ready before starting.
+   API and SQL containers are built and started; API waits for SQL.
 
-2. **Run your E2E tests:**
-   - If your E2E tests are containerized, add them as a service in `compose-ci.yaml` and run them as part of the stack.
-   - If your E2E tests are run from your host machine, execute them after the services are up and healthy. For example:
-     ```sh
-     # Example: using Playwright, Cypress, or a .NET test project
-     dotnet test path/to/your/e2e/test/project
-     ```
 
-3. **Tear down the environment after tests:**
+3. Tear down:
    ```sh
    docker compose -f compose-ci.yaml down -v
    ```
-   The `-v` flag removes any volumes, ensuring a clean state for the next run.
+   Note: **The `-v` flag removes volumes for a clean state.**
+
+## Running the Tests from your local machine
+
+1. Change directory to `src/e2e/gtaa.e2etests`, modify the `.env` to point to the correct API URL (e.g.,
+   `http://localhost:8080` for Docker Compose network).
+2. Run tests (commands):
+
+```sh
+     # all tests
+     yarn playwright test
+```
+
+```sh
+     # specific test
+     yarn playwright test src/tests/example.spec.ts
+```
+
+```sh
+     # specific browser
+     yarn playwright test --project=Chromium   
+```
+
+```sh
+    # debug mode
+    yarn playwright test --debug
+```
+
+## Reporting and Artifacts
+
+- HTML report:
+
+  ```sh
+  yarn playwright show-report
+  ```
+- Screenshots: captured on failures
+- Videos: retained on failures (configurable in `playwright.config.ts`)
+
+## Configuration
+
+Key `playwright.config.ts` settings:
+
+- `testDir`: where tests live
+- `timeout`: per-test timeout
+- `retries`: retry count on failure
+- `projects`: browser/device configs
+- `use`: defaults (e.g., trace, screenshot, video)
+
+## Debugging
+
+- Compose logs:
+  ```sh
+  docker compose -f compose-ci.yaml logs
+  ```
+- For .NET build/runtime issues: build and run/debug locally, or attach a debugger to the container
 
 ## Notes
-- Ensure your `.env` file is up to date and not checked into source control.
-- The API service uses a wait-for-db entrypoint to ensure it only starts after SQL Server is ready.
-- You can extend `compose-ci.yaml` to add other dependencies or test runners as needed.
 
----
+- Keep `.env` up to date and out of source control
+- Extend `compose-ci.yaml` with additional dependencies or test runners as needed
 
-For more details, see the main project README or contact the maintainers.
+## Contribution
+
+1. Fork and create a feature/bugfix branch
+2. Commit with clear messages
+3. Open a pull request for review
+
+## License
+
+MIT. See the `LICENSE` file.
+
+## Support
+
+Open an issue or contact the maintainer.

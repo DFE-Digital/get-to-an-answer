@@ -3,6 +3,14 @@ dotenv.config({ path: '.env' });
 
 import {defineConfig, devices} from '@playwright/test';
 
+const healthBase = {
+    testDir: './src/tests/health',
+    testMatch: '**/*.spec.ts',
+    use: {
+        baseURL: process.env.API_URL || 'http://localhost:5042',
+    },
+} as const;
+
 const apiBase = {
     testDir: './src/tests/api',
     testMatch: '**/*.spec.ts',
@@ -48,6 +56,11 @@ export default defineConfig({
     },
 
     projects: [
+        {
+          name: 'health',
+          ...healthBase,
+          use: {...healthBase.use},  
+        },
         {
             name: 'api',
             ...apiBase,
