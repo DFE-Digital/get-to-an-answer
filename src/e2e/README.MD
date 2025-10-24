@@ -1,12 +1,12 @@
-# End-to-End (E2E) Testing (In-progress)
+# End-to-End (E2E) Testing
 
 Run Playwright-based E2E tests against services started with Docker Compose. The `compose-ci.yaml` file brings up the API and SQL Server; the API waits until SQL is ready.
 
 ## Prerequisites
 - Docker and Docker Compose
-- Copy `Infrastructure/.env.example` to `Infrastructure/.env` and provide valid secrets/connection strings
+- Copy `Infrastructure/.env.example` to `Infrastructure/.env` and provide valid secrets/connection strings for DB & API
 - Keep `.env.example` updated whenever `.env` changes
-- If you change the SQL Server service name in `compose-ci.yaml`, update the `Server` value in connection strings in `.env` and relevant GitHub Actions secrets
+- If you change the SQL Server service name in `compose-ci.yaml`, update the `Server` value in connection strings in `.env` and relevant GitHub Actions secrets for the E2E tests
 - Ensure API and test projects are built if required by your workflow
 
 ## Installation
@@ -17,33 +17,40 @@ Run Playwright-based E2E tests against services started with Docker Compose. The
    yarn playwright install
    ```
 
-## Running E2E Tests (in Docker  environment)
-1. Start the environment:
+## Spinning up the Environment (API & SQL Database)
+1. As mentioned in the Prerequisites, copy `Infrastructure/.env.example` to `Infrastructure/.env` and provide valid secrets/connection strings for DB & API.
+
+
+2. Start the environment with Docker Compose:
    ```sh
    docker compose -f compose-ci.yaml up --build
    ```
    API and SQL containers are built and started; API waits for SQL.
 
 
-2. Run tests:
-   - Via Docker Compose: add your test runner (e.g., Playwright) as a service in `compose-ci.yaml` to run automatically against the API container.
-   - From your machine (point to the API port, e.g., `http://localhost:8080`):
-     ```sh
-     # all tests
-     yarn playwright test
-     # specific test
-     yarn playwright test src/tests/example.spec.ts
-     # specific browser
-     yarn playwright test --project=Chromium
-     # debug mode
-     yarn playwright test --debug
-     ```
-
 3. Tear down:
    ```sh
    docker compose -f compose-ci.yaml down -v
    ```
    The `-v` flag removes volumes for a clean state.
+
+## Running the Tests
+
+Run tests (commands):
+
+1. In `src/e2e/gtaa.e2etests`, modify the `.env` to point to the correct API URL (e.g., `http://localhost:8080` for Docker Compose network).
+2. Run tests:
+   
+```sh
+        # all tests
+        yarn playwright test
+        # specific test
+        yarn playwright test src/tests/example.spec.ts
+        # specific browser
+        yarn playwright test --project=Chromium
+        # debug mode
+        yarn playwright test --debug
+```
 
 ## Reporting and Artifacts
 - HTML report:
