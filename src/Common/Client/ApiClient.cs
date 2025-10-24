@@ -30,6 +30,8 @@ public interface IApiClient
     Task<string?> UpdateQuestionAsync(Guid questionId, UpdateQuestionRequestDto request);
     Task<string?> UpdateQuestionStatusAsync(Guid questionId, UpdateQuestionStatusRequestDto request);
     Task<string?> DeleteQuestionAsync(Guid questionId);
+    Task<string?> MoveQuestionDownOneAsync(Guid questionnaireId, Guid questionId);
+    Task<string?> MoveQuestionUpOneAsync(Guid questionnaireId, Guid questionId);
     
     // === For Answers ===
     
@@ -200,7 +202,23 @@ public class ApiClient : IApiClient
 
         return await response.Content.ReadFromJsonAsync<string>();
     }
-    
+
+    public async Task<string?> MoveQuestionDownOneAsync(Guid questionnaireId, Guid questionId)
+    {
+        var response = await _httpClient.PutAsync($"questionnaires/{questionnaireId}/questions/{questionId}/move-down", null);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string>();
+    }
+
+    public async Task<string?> MoveQuestionUpOneAsync(Guid questionnaireId, Guid questionId)
+    {
+        var response = await _httpClient.PutAsync($"questionnaires/{questionnaireId}/questions/{questionId}/move-up", null);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string>();
+    }
+
     // Answer
 
     public async Task<AnswerDto?> GetAnswerAsync(Guid answerId)

@@ -6,6 +6,8 @@ public class QuestionnaireDto
 {
     public Guid Id { get; set; }
     
+    public string? DisplayTitle { get; set; }
+    
     public string Title { get; set; }
     
     public string? Slug { get; set; }
@@ -27,7 +29,7 @@ public class QuestionnaireInfoDto
 {
     public Guid Id { get; set; }
     
-    public string Title { get; set; }
+    public string? DisplayTitle { get; set; }
     
     public string? Slug { get; set; }
     

@@ -21,7 +21,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
         if (!await db.HasAccessToEntity<QuestionEntity>(email, request.QuestionId))
-            return Unauthorized();
+            return Forbid();
 
         var entity = new AnswerEntity
         {
@@ -65,11 +65,12 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
         if (!await db.HasAccessToEntity<AnswerEntity>(email, id))
-            return Unauthorized();
+            return Forbid();
 
         // Example: check ownership in your persistence layer
         var answer = db.Answers
-            .FirstOrDefault(q => q.Id == id);
+            .FirstOrDefault(q => q.Id == id && 
+                                 !q.IsDeleted);
 
         if (answer == null)
             return NotFound();
@@ -83,10 +84,11 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
         if (!await db.HasAccessToEntity<QuestionEntity>(email, questionId))
-            return Unauthorized();
+            return Forbid();
 
         var answers = db.Answers
-            .Where(q => q.QuestionId == questionId);
+            .Where(q => q.QuestionId == questionId && 
+                        !q.IsDeleted);
         
         return Ok(answers.ToList());
     }
@@ -97,9 +99,10 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
         if (!await db.HasAccessToEntity<AnswerEntity>(email, id))
-            return Unauthorized();
+            return Forbid();
         
-        var answer = db.Answers.FirstOrDefault(q => q.Id == id);
+        var answer = db.Answers.FirstOrDefault(q => q.Id == id && 
+                                                    !q.IsDeleted);
         
         if (answer == null)
             return NotFound();
@@ -125,20 +128,21 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
-        if (!await db.HasAccessToEntity<AnswerEntity>(email, id))
-            return Unauthorized();
+        var access = await db.HasAccessToEntity<AnswerEntity>(email, id);
         
-        var answer = new AnswerEntity
-        {
-            Id = id,
-        };
-
-        db.Answers.Attach(answer);
-        db.Answers.Remove(answer);
+        if (!access)
+            return Forbid();
+        
+        var answer = db.Answers.FirstOrDefault(q => q.Id == id);
+        
+        if (answer == null)
+            return NotFound();
+        
+        answer.IsDeleted = true;
+        answer.UpdatedAt = DateTime.UtcNow;
         
         await db.SaveChangesAsync();
         
-        // Logic to delete a answer
-        return Ok("Answer deleted.");
+        return NoContent();
     }
 }

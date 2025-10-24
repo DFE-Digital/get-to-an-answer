@@ -10,6 +10,47 @@
   <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questions/@Model.QuestionId/edit">Back to questionnaire</a>
 }
 
+@if (Model.JustUpdated)
+{
+   <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+         <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+               <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                  Success
+               </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+               <h3 class="govuk-notification-banner__heading">
+                  Your answers have been saved.
+               </h3>
+               <p class="govuk-body">Continue editing your answers.</p>
+            </div>
+         </div>
+      </div>
+   </div>
+}
+else if (Model.JustDeleted)
+{
+   <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+         <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+               <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                  Success
+               </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+               <h3 class="govuk-notification-banner__heading">
+                  Your answer has been deleted.
+               </h3>
+               <p class="govuk-body">Continue editing your answers.</p>
+            </div>
+         </div>
+      </div>
+   </div>
+}
+
 <div class="govuk-grid-row">
    <div class="govuk-grid-column-two-thirds">
       <form asp-route="/admin/questionnaires/@Model.QuestionnaireId/questions/@Model.QuestionId/answers/edit" asp accept-charset="UTF-8" method="post">

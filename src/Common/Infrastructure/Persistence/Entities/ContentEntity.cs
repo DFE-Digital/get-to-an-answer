@@ -13,11 +13,6 @@ public class ContentEntity
     public Guid Id { get; set; }
     
     public Guid QuestionnaireId { get; set; }
-    
-    /*
-     * Shorthand name for this content.
-     */
-    public string? RefName { get; set; }
 
     [Required]
     [MaxLength(250)]
@@ -32,5 +27,6 @@ public class ContentEntity
     public DateTime UpdatedAt { get; set; }
     
     [MaxLength(100)]
+    [NotMapped]
     public string? SyncId { get; set; }
 }

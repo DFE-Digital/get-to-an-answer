@@ -2,12 +2,12 @@
 
 @{
   ViewData["Title"] = "Edit the questionnaire";
-  var hasErrors = Model?.CreateQuestionnaire != null && !ViewData.ModelState.IsValid;
+  var hasErrors = Model?.UpdateQuestionnaire != null && !ViewData.ModelState.IsValid;
   string? ErrorFor(string key) => ViewData.ModelState.ContainsKey(key) && ViewData.ModelState[key]?.Errors.Count > 0
     ? ViewData.ModelState[key]!.Errors[0].ErrorMessage
     : null;
 
-  var hasTitleError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Title)) != null;
+  var hasSlugError = Model?.UpdateQuestionnaire != null && ErrorFor(nameof(Model.UpdateQuestionnaire.Slug)) != null;
 }
 
 @section BeforeContent
@@ -40,24 +40,24 @@
     <form action="/admin/questionnaires/create" accept-charset="UTF-8" method="post">
       <div class="govuk-form-group">
         <h1 class="govuk-label-wrapper">
-          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the title of your questionnaire?</label>
+          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the slug for your questionnaire?</label>
         </h1>
         <div class="govuk-hint" id="forms-name-input-name-hint">The questionnaire name will be shown at the top of each page of the form. Use a name
           that describes what the form will help people to do. For example ‘Apply for a
           juggling licence’.
         </div>
-        @if (hasTitleError)
+        @if (hasSlugError)
         {
           <p class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.CreateQuestionnaire.Title))
+            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.UpdateQuestionnaire.Slug))
           </p>
         }
 
-        <input id="forms-name-input-name-field" class="govuk-input @(hasTitleError ? "govuk-input--error" : "")"
+        <input id="forms-name-input-name-field" class="govuk-input @(hasSlugError ? "govuk-input--error" : "")"
                aria-describedby="forms-name-input-name-hint"
                type="text"
-               name="Title"
-               value="@(Model?.CreateQuestionnaire?.Title ?? "")">
+               name="Slug"
+               value="@(Model?.UpdateQuestionnaire?.Slug ?? "")">
       </div>
       <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
     </form>

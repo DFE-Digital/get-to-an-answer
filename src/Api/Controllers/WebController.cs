@@ -23,7 +23,8 @@ public class WebController(GetToAnAnswerDbContext db) : Controller
     {
         var questionnaireVersionJson =  await db.QuestionnaireVersions
             .Where(qv => db.Questionnaires
-                .Any(q => q.Id == qv.QuestionnaireId && q.Slug == questionnaireSlug))
+                .Any(q => q.Id == qv.QuestionnaireId && q.Slug == questionnaireSlug && 
+                          q.Status != EntityStatus.Deleted))
             .OrderByDescending(qv => qv.Version)
             .Select(qv => qv.QuestionnaireJson)
             .FirstOrDefaultAsync();
@@ -47,7 +48,7 @@ public class WebController(GetToAnAnswerDbContext db) : Controller
         return Ok(new QuestionnaireInfoDto
         {
             Id = questionnaire.Id,
-            Title = questionnaire.Title,
+            DisplayTitle = questionnaire.DisplayTitle,
             Description = questionnaire.Description,
             Slug = questionnaire.Slug,
         });
@@ -58,7 +59,8 @@ public class WebController(GetToAnAnswerDbContext db) : Controller
     {
         var initialQuestion = await db.Questions
             .Include(x => x.Answers)
-            .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == 1);
+            .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == 1 && 
+                                      !x.IsDeleted);
         
         if (initialQuestion == null)
             return BadRequest();
@@ -70,7 +72,6 @@ public class WebController(GetToAnAnswerDbContext db) : Controller
             Content = initialQuestion.Content,
             Description = initialQuestion.Description,
             Order = initialQuestion.Order,
-            Status = initialQuestion.Status,
             Answers = initialQuestion.Answers.Select(a => new AnswerDto
             {
                 Id = a.Id,
@@ -145,7 +146,6 @@ public class WebController(GetToAnAnswerDbContext db) : Controller
                     QuestionId = a.QuestionId,
                     Score = a.Score,
                 }).ToList(),
-                Status = questionEntity.Status,
                 Type = questionEntity.Type,
             }
         });

@@ -9,6 +9,110 @@
   <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.QuestionnaireId/track">Back to questionnaire</a>
 }
 
+@if (Model.JustCreated)
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            Your question has been created.
+          </h3>
+          <p class="govuk-body">Edit your new questionnaire below.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+else if (Model.JustUpdated)
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            Your question has been saved.
+          </h3>
+          <p class="govuk-body">Continue editing your questionnaire.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+else if (Model.JustDeleted)
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            Your question has been deleted.
+          </h3>
+          <p class="govuk-body">Continue editing your questions.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+else if (Model.JustMovedUp)
+{
+  var upMovedQuestion = Model.Questions?.Where(q => q.Id == Model.QuestionId).FirstOrDefault();
+  
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            '@upMovedQuestion?.Content' has moved up to number @upMovedQuestion?.Order.'
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+else if (Model.JustMovedDown)
+{
+  var downMovedQuestion = Model.Questions?.Where(q => q.Id == Model.QuestionId).FirstOrDefault();
+  
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            '@downMovedQuestion?.Content' has moved up to number @downMovedQuestion?.Order.'
+          </h3>
+          <p class="govuk-body">Continue editing your questions.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
@@ -20,7 +124,7 @@
       <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model.Questionnaire?.Status">@Model.Questionnaire?.Status</strong></dd>
     </dl>
     <div class="govuk-button-group">
-      <a class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" href="/admin/questionnaires/@Model.QuestionnaireId/questions/Create" data-govuk-button-init="">Add a question</a>
+      <a class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" href="/admin/questionnaires/@Model.QuestionnaireId/questions/create" data-govuk-button-init="">Add a question</a>
       <a class="govuk-link" href="/admin/questionnaires/@Model.QuestionnaireId/Start/Preview">Preview this questionnaire</a>
     </div>
     <h2 class="govuk-heading-m govuk-!-margin-top-7 govuk-!-margin-bottom-0">Your questions</h2>

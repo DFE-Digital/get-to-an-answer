@@ -64,11 +64,9 @@ public static class CheckerDbContextExtensions
         
         if (typeof(TEntityType) == typeof(QuestionnaireEntity))
         {
-            return await db.Questions
-                .Select(q => db.Questionnaires
-                    .Where(qq => qq.Id == id)
-                    .SelectMany(qq => qq.Contributors)
-                    .Any(e => e == email))
+            return await db.Questionnaires
+                .Where(qq => qq.Id == id)
+                .Select(qq => qq.Contributors.Contains(email))
                 .FirstOrDefaultAsync();
         }
         

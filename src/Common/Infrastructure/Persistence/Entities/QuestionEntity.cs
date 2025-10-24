@@ -24,7 +24,7 @@ public class QuestionEntity
     [Required]
     public QuestionType Type { get; set; }
 
-    [Required] public EntityStatus Status { get; set; } = EntityStatus.Draft;
+    public bool IsDeleted { get; set; }
     
     public DateTime CreatedAt { get; set; }
     
@@ -39,6 +39,7 @@ public class QuestionEntity
     public QuestionnaireEntity? Questionnaire { get; set; }
     
     [MaxLength(100)]
+    [NotMapped]
     public string? SyncId { get; set; }
     
     // TODO: Add fields for:

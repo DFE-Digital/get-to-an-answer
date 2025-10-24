@@ -32,7 +32,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
             Description = request.Description,
             Type = request.Type,
             Order = db.Questions.Count(x => x.QuestionnaireId == request.QuestionnaireId
-                                            && x.Status != EntityStatus.Deleted) + 1,
+                                            && !x.IsDeleted) + 1,
             CreatedAt = DateTime.UtcNow
         };
         
@@ -49,8 +49,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
             Content = entity.Content,
             Description = entity.Description,
             Type = entity.Type,
-            Order = entity.Order,
-            Status = entity.Status
+            Order = entity.Order
         });
     }
     
@@ -66,7 +65,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
         var question = db.Questions
             .Include(q => q.Answers)
             .FirstOrDefault(q => q.Id == id 
-                                 && q.Status != EntityStatus.Deleted);
+                                 && !q.IsDeleted);
 
         if (question == null)
             return NotFound();
@@ -79,7 +78,6 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
             Content = question.Content,
             Description = question.Description,
             Order = question.Order,
-            Status = question.Status,
             Answers = question.Answers.Select(a => new AnswerDto
             {
                 Id = a.Id,
@@ -102,7 +100,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
         
         var questions = db.Questions
             .Where(q => q.QuestionnaireId == questionnaireId
-                        && q.Status != EntityStatus.Deleted);
+                        && !q.IsDeleted);
         
         return Ok(questions);
     }
@@ -145,7 +143,6 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
         if (question == null)
             return NotFound();
         
-        question.Status = request.Status;
         question.UpdatedAt = DateTime.UtcNow;
         
         await db.SaveChangesAsync();
@@ -165,13 +162,13 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
         });
     }
     
-    [HttpDelete("questionnaires/{questionnaireId}/questions/{id}/move-down")]
+    [HttpPut("questionnaires/{questionnaireId}/questions/{id}/move-down")]
     public async Task<IActionResult> MoveQuestionDownOne(Guid questionnaireId, Guid id)
     {
         return await MoveQuestionByOne(questionnaireId, id, +1);
     }
     
-    [HttpDelete("questionnaires/{questionnaireId}/questions/{id}/move-up")]
+    [HttpPut("questionnaires/{questionnaireId}/questions/{id}/move-up")]
     public async Task<IActionResult> MoveQuestionUpOne(Guid questionnaireId, Guid id)
     {
         return await MoveQuestionByOne(questionnaireId, id, -1);
@@ -195,7 +192,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
         var next = await db.Questions
             .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId 
                                       && x.Order == current.Order + direction
-                                      && x.Status != EntityStatus.Deleted);
+                                      && !x.IsDeleted);
 
         // If already last, nothing to do
         if (next == null) return NoContent();

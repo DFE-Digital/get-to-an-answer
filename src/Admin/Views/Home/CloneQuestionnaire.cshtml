@@ -8,7 +8,6 @@
     : null;
 
   var hasTitleError = Model?.CloneQuestionnaire != null && ErrorFor(nameof(Model.CloneQuestionnaire.Title)) != null;
-  var hasDescError = Model?.CloneQuestionnaire != null && ErrorFor(nameof(Model.CloneQuestionnaire.Description)) != null;
 }
 
 @section BeforeContent
@@ -58,21 +57,7 @@
                aria-describedby="forms-name-input-name-hint"
                type="text"
                name="Title"
-               value="@(Model?.CloneQuestionnaire?.Title ?? "")">
-      </div>
-      <div class="govuk-form-group">
-        <label for="pages-question-input-hint-text-field" class="govuk-label">Hint text (optional)</label>
-        <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description of what the questionnaire is about.</div>
-        @if (hasDescError)
-        {
-          <p class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.CloneQuestionnaire.Description))
-          </p>
-        }
-        <textarea class="govuk-textarea @(hasDescError ? "govuk-textarea--error" : "")"
-              id="Description"
-              name="Description"
-              rows="5">@(Model?.CloneQuestionnaire?.Description ?? "")</textarea>
+               value="Copy of @(Model?.CloneQuestionnaire?.Title ?? "")">
       </div>
       <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
     </form>

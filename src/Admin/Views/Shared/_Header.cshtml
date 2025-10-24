@@ -1,5 +1,7 @@
 @using Common.Configuration
+@using Microsoft.Extensions.Options
 @inject IWebHostEnvironment WebHostEnvironment
+@inject IOptions<ScriptOptions> ScriptOptions
 
 @{
     var languageCode = Context.Request.RouteValues["languageCode"]?.ToString();
@@ -10,6 +12,11 @@
     <div class="environment-banner">
         <div class="govuk-body-s"><strong>ATTENTION!</strong> This is the <strong>@WebHostEnvironment.EnvironmentName</strong> version of @Model.ServiceName website.</div>
     </div>
+}
+
+@if (ScriptOptions.Value.ShowCookieBanner && !Model.IsError)
+{
+    <partial name="_CookieConsentPartial" model="@Model"/>
 }
 
 <div class="govuk-width-container">

@@ -18,7 +18,13 @@ public class QuestionnaireVersionEntity
     
     public DateTime CreatedAt { get; set; }
     
+    [MaxLength(500)]
+    public required string CreatedBy { get; set; }
+    
+    public required string ChangeDescription { get; set; }
+    
     [MaxLength(100)]
+    [NotMapped]
     public string? SyncId { get; set; }
 }
 

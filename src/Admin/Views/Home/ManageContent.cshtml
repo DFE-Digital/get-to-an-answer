@@ -9,6 +9,47 @@
   <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.Questionnaire?.Id/track">Back to questionnaire</a>
 }
 
+@if (Model.JustCreated)
+{
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <h3 class="govuk-notification-banner__heading">
+          Your destination content has been created.
+        </h3>
+        <p class="govuk-body">Edit your new destination content below.</p>
+      </div>
+    </div>
+  </div>
+</div>
+}
+else if (Model.JustUpdated)
+{
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <h3 class="govuk-notification-banner__heading">
+          Your destination content has been saved.
+        </h3>
+        <p class="govuk-body">Continue editing your destination content.</p>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l govuk-!-margin-bottom-2">

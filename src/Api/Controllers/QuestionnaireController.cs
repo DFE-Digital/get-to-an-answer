@@ -26,11 +26,10 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         var entity = new QuestionnaireEntity
         {
             Title = request.Title,
-            Description = request.Description,
-            Slug = request.Slug,
             Contributors = [email],
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
+            CreatedBy = email
         };
         
         db.Questionnaires.Add(entity);
@@ -116,7 +115,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         var email = User.FindFirstValue(ClaimTypes.Email)!;
 
         if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, id))
-            return Unauthorized();
+            return Forbid();
 
         var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => x.Id == id);
 
@@ -131,6 +130,8 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         }
 
         questionnaire.UpdatedAt = DateTime.UtcNow;
+        questionnaire.PublishedBy = email;
+        questionnaire.PublishedAt = DateTime.UtcNow;
         
         await db.SaveChangesAsync();
 
@@ -157,7 +158,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
-        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => x.Id == id);
+        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => x.Id == id && x.Status != EntityStatus.Deleted);
         
         if (questionnaire == null) 
             return NotFound();
@@ -175,9 +176,14 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     [HttpPost("questionnaires/{id}/clones")]
     public async Task<IActionResult> CloneQuestionnaire(Guid id, CloneQuestionnaireRequestDto request)
     {
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        
+        if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, id))
+            return Forbid();
+        
         var questionnaire = await db.Questionnaires
             .AsNoTracking()
-            .Where(q => q.Id == id)
+            .Where(q => q.Id == id && q.Status != EntityStatus.Deleted)
             .Include(q => q.Questions)
             .ThenInclude(qq => qq.Answers)
             .FirstOrDefaultAsync();
@@ -188,11 +194,11 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         var cloneQuestionnaire = new QuestionnaireEntity
         {
             Title = request.Title,
-            Description = request.Description,
             Status = EntityStatus.Draft,
             Contributors = questionnaire.Contributors,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            CreatedBy = email
         };
 
         db.Questionnaires.Add(cloneQuestionnaire);
@@ -213,7 +219,6 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
                 Description = question.Description,
                 Type = question.Type,
                 Order = question.Order,
-                Status = EntityStatus.Draft,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             };
@@ -279,7 +284,9 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
             QuestionnaireId = questionnaire.Id,
             Version = versionNumber,
             QuestionnaireJson = json,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = questionnaire.PublishedBy ?? string.Empty,
+            ChangeDescription = "TODO"
         };
 
         db.QuestionnaireVersions.Add(snapshot);

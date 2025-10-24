@@ -11,11 +11,6 @@ public class AnswerEntity
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
-    
-    /*
-     * Shorthand name for this answer.
-     */
-    public string? RefName { get; set; }
 
     [Required]
     [MaxLength(250)]
@@ -38,6 +33,8 @@ public class AnswerEntity
     
     public DateTime UpdatedAt { get; set; }
 
+    public bool IsDeleted { get; set; }
+
     // Foreign key
     public Guid QuestionId { get; set; }
     
@@ -47,5 +44,6 @@ public class AnswerEntity
     public Guid QuestionnaireId { get; set; }
     
     [MaxLength(100)]
+    [NotMapped]
     public string? SyncId { get; set; }
 }

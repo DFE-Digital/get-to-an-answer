@@ -15,7 +15,5 @@ public class QuestionDto
     public DateTime CreatedAt { get; set; }
     
     public DateTime UpdatedAt { get; set; }
-    
-    public EntityStatus Status { get; set; } = EntityStatus.Draft;
     public List<AnswerDto> Answers { get; set; } = new();
 }

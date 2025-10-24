@@ -14,9 +14,23 @@
     <h1 class="govuk-heading-l">Are you sure you want to delete this question?</h1>
     <p class="govuk-body">By submitting this application you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
     <form action="/admin/questions/@Model.Question?.Id/Delete" method="post" novalidate>
+      <div class="govuk-form-group">
+        <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
+          <div class="govuk-radios__item">
+            <input id="del-question-yes-input" aria-describedby="pages-selection-type-input-only-one-option-true-hint"
+                   class="govuk-radios__input" type="radio" value="true" name="DeleteQuestion">
+            <label for="del-question-yes-input" class="govuk-label govuk-radios__label">Yes</label>
+          </div>
+          <div class="govuk-radios__item">
+            <input id="del-question-no-input" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
+                   class="govuk-radios__input" type="radio" value="false" name="DeleteQuestion">
+            <label for="del-question-no-input" class="govuk-label govuk-radios__label">No</label>
+          </div>
+        </div>
+      </div>
+      
       <div class="govuk-button-group">
-        <button class="govuk-button govuk-button--warning" type="submit">Yes</button>
-        <a class="govuk-button govuk-button--secondary" href="/admin/questionnaires/@Model.Question?.Id/track">Cancel</a>
+        <button class="govuk-button govuk-button--primary" type="submit">Continue</button>
       </div>
     </form>
   </div>
