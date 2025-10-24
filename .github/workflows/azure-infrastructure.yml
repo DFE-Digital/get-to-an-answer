@@ -10,14 +10,6 @@ on:
         options:
           - Development
           - Test
-      mode:
-        description: "Mode to run in"
-        required: true
-        type: choice
-        default: 'create'
-        options:
-          - create
-          - update
 
 jobs:
   terraform:
@@ -30,8 +22,6 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       TF_VAR_sql_admin_username: ${{ secrets.SQL_ADMIN_USERNAME }}
       TF_VAR_sql_admin_password: ${{ secrets.SQL_ADMIN_PASSWORD }}
-      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      TF_LOG: DEBUG
       ENVIRONMENT: ${{ github.event.inputs.environment }}
     environment: ${{ github.event.inputs.environment }}
     defaults:
@@ -58,10 +48,6 @@ jobs:
 
       - name: Lowercase the repo name and username
         run: echo "ENVIRONMENT_LOWER=${ENVIRONMENT,,}" >>${GITHUB_ENV}
-
-      - name: Remove imports to create new (create mode)
-        if: ${{ inputs.mode == 'create' }}
-        run: rm -f imports.tf
 
       - name: "Terraform Init"
         run: terraform init -upgrade
