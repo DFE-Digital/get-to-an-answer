@@ -76,15 +76,11 @@ export async function listQuestionnaires(
         }
     });
     
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to list questionnaires: ${response.status()}`);
-    }
-
-    //const responseBody = await safeParseBody(response);
+    const responseBody = await safeParseBody(response);
 
     return {
         questionnaireGetResponse: response,
-        questionnaireGetBody: await response.json()
+        questionnaireGetBody: responseBody
     }
 }
 
