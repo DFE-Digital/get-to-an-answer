@@ -9,7 +9,7 @@ namespace Admin.Controllers;
 
 public class PreviewController(ILogger<HomeController> logger, IApiClient apiClient) : Controller
 {
-    [HttpGet("admin/questionnaires/{questionnaireId}/Start/Preview")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/start/preview")]
     public async Task<IActionResult> GetStartPage(Guid questionnaireId)
     {
         return View("PreviewQuestionnaireStart", new QuestionnaireViewModel

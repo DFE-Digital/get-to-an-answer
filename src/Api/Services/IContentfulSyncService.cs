@@ -152,7 +152,6 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
                         Description = S("description"),
                         Type = ParseQuestionType(S("type")),
                         Order = order,
-                        Status = ParseStatus(S("status")),
                         CreatedAt = D("createdAtUtc") ?? DateTime.UtcNow,
                         UpdatedAt = D("updatedAtUtc") ?? DateTime.UtcNow
                     };
@@ -164,7 +163,6 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
                     existing.Content = content;
                     existing.Description = S("description");
                     existing.Type = ParseQuestionType(S("type"));
-                    existing.Status = ParseStatus(S("status"));
                     existing.UpdatedAt = D("updatedAtUtc") ?? DateTime.UtcNow;
 
                     db.Questions.Update(existing);
@@ -283,7 +281,9 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
                         QuestionnaireId = questionnaireId.Value,
                         Version = version,
                         QuestionnaireJson = json,
-                        CreatedAt = D("createdAtUtc") ?? DateTime.UtcNow
+                        CreatedAt = D("createdAtUtc") ?? DateTime.UtcNow,
+                        CreatedBy = S("CreatedBy")!,
+                        ChangeDescription = S("ChangeDescription")!
                     };
                     db.QuestionnaireVersions.Add(entity);
                 }

@@ -22,7 +22,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
-        if (!await db.HasAccessToEntity<QuestionEntity>(email, request.QuestionnaireId))
+        if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, request.QuestionnaireId))
             return Unauthorized();
 
         var entity = new QuestionEntity
@@ -119,30 +119,8 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
             return NotFound();
         
         question.Content = request.Content;
-        question.Description = request.Description;
+        question.Description = request.Description ?? question.Description;
         question.Type = request.Type;
-        question.UpdatedAt = DateTime.UtcNow;
-        
-        await db.SaveChangesAsync();
-        
-        await db.ResetQuestionnaireToDraft(question.QuestionnaireId);
-        
-        return Ok("Question updated.");
-    }
-    
-    [HttpPut("questions/{id}/status")]
-    public async Task<IActionResult> UpdateQuestionStatus(Guid id, UpdateQuestionStatusRequestDto request)
-    {
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
-        
-        if (!await db.HasAccessToEntity<QuestionEntity>(email, id))
-            return Unauthorized();
-        
-        var question = db.Questions.FirstOrDefault(q => q.Id == id);
-        
-        if (question == null)
-            return NotFound();
-        
         question.UpdatedAt = DateTime.UtcNow;
         
         await db.SaveChangesAsync();
@@ -155,11 +133,24 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
     [HttpDelete("questions/{id}")]
     public async Task<IActionResult> DeleteQuestion(Guid id)
     {
-        return await UpdateQuestionStatus(id, new UpdateQuestionStatusRequestDto
-        {
-            Id = id,
-            Status = EntityStatus.Deleted
-        });
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        
+        if (!await db.HasAccessToEntity<QuestionEntity>(email, id))
+            return Unauthorized();
+        
+        var question = db.Questions.FirstOrDefault(q => q.Id == id);
+        
+        if (question == null)
+            return NotFound();
+        
+        question.IsDeleted = true;
+        question.UpdatedAt = DateTime.UtcNow;
+        
+        await db.SaveChangesAsync();
+        
+        await db.ResetQuestionnaireToDraft(question.QuestionnaireId);
+        
+        return Ok("Question updated.");
     }
     
     [HttpPut("questionnaires/{questionnaireId}/questions/{id}/move-down")]

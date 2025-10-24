@@ -85,17 +85,17 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, id))
             return Unauthorized();
         
-        var questionnaire = new QuestionnaireEntity
-        {
-            Id = id,
-        };
-
-        db.Questionnaires.Attach(questionnaire);
+        var questionnaire = db.Questionnaires.FirstOrDefault(q => q.Id == id &&
+                                                                  q.Status != EntityStatus.Deleted);
         
-        questionnaire.Title = request.Title;
+        if (questionnaire == null) 
+            return NotFound();
+
+        questionnaire.DisplayTitle = request.DisplayTitle ?? questionnaire.DisplayTitle;
+        questionnaire.Title = request.Title ?? questionnaire.Title;
         questionnaire.Status = EntityStatus.Draft;
-        questionnaire.Slug = request.Slug;
-        questionnaire.Description = request.Description;
+        questionnaire.Slug = request.Slug ?? questionnaire.Slug;
+        questionnaire.Description = request.Description ?? questionnaire.Description;
         questionnaire.UpdatedAt = DateTime.UtcNow;
         
         db.Entry(questionnaire).Property(s => s.Title).IsModified = true;

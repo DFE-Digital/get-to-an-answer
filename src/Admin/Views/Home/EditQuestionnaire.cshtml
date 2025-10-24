@@ -8,8 +8,6 @@
     : null;
 
   var hasTitleError = Model?.UpdateQuestionnaire != null && ErrorFor(nameof(Model.UpdateQuestionnaire.Title)) != null;
-  var hasDescError = Model?.UpdateQuestionnaire != null && ErrorFor(nameof(Model.UpdateQuestionnaire.Description)) != null;
-  var hasSlugError = Model?.UpdateQuestionnaire != null && ErrorFor(nameof(Model.UpdateQuestionnaire.Slug)) != null;
 }
 
 @section BeforeContent
@@ -42,7 +40,7 @@
     <form action="/admin/questionnaires/@Model?.UpdateQuestionnaire?.Id/edit" accept-charset="UTF-8" method="post">
       <div class="govuk-form-group">
         <h1 class="govuk-label-wrapper">
-          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">Change the title of your questionnaire</label>
+          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the title of your questionnaire?</label>
         </h1>
         <div class="govuk-hint" id="forms-name-input-name-hint">The form name will be shown at the top of each page of the form. Use a name
           that describes what the form will help people to do. For example ‘Apply for a
@@ -60,35 +58,6 @@
                type="text"
                name="Title"
                value="@(Model?.UpdateQuestionnaire?.Title ?? "")">
-      </div>
-      <div class="govuk-form-group">
-        <label for="pages-question-input-hint-text-field" class="govuk-label">Slug (optional)</label>
-        <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description of what the questionnaire is about.</div>
-        @if (hasDescError)
-        {
-          <p class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.UpdateQuestionnaire.Slug))
-          </p>
-        }
-        <input id="forms-name-input-name-field" class="govuk-input @(hasSlugError ? "govuk-input--error" : "")"
-               aria-describedby="forms-name-input-name-hint"
-               type="text"
-               name="Slug"
-               value="@(Model?.UpdateQuestionnaire?.Slug ?? "")">
-      </div>
-      <div class="govuk-form-group">
-        <label for="pages-question-input-hint-text-field" class="govuk-label">Hint text (optional)</label>
-        <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description of what the questionnaire is about.</div>
-        @if (hasDescError)
-        {
-          <p class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.UpdateQuestionnaire.Description))
-          </p>
-        }
-        <textarea class="govuk-textarea @(hasDescError ? "govuk-textarea--error" : "")"
-              id="Description"
-              name="Description"
-              rows="5">@(Model?.UpdateQuestionnaire?.Description ?? "")</textarea>
       </div>
       <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
     </form>

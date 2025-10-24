@@ -108,7 +108,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
             return NotFound();
         
         answer.Content = request.Content;
-        answer.Description = request.Description;
+        answer.Description = request.Description ?? answer.Description;
         answer.DestinationUrl = request.DestinationUrl;
         answer.DestinationType = request.DestinationType;
         answer.DestinationQuestionId = request.DestinationQuestionId;

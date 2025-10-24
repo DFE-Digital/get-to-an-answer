@@ -41,9 +41,8 @@ else if (Model.JustUpdated)
         </div>
         <div class="govuk-notification-banner__content">
           <h3 class="govuk-notification-banner__heading">
-            Your question has been saved.
+            Your changes have been saved.
           </h3>
-          <p class="govuk-body">Continue editing your questionnaire.</p>
         </div>
       </div>
     </div>
@@ -125,7 +124,7 @@ else if (Model.JustMovedDown)
     </dl>
     <div class="govuk-button-group">
       <a class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" href="/admin/questionnaires/@Model.QuestionnaireId/questions/create" data-govuk-button-init="">Add a question</a>
-      <a class="govuk-link" href="/admin/questionnaires/@Model.QuestionnaireId/Start/Preview">Preview this questionnaire</a>
+      <a class="govuk-link" href="/admin/questionnaires/@Model.QuestionnaireId/start/preview">Preview this questionnaire</a>
     </div>
     <h2 class="govuk-heading-m govuk-!-margin-top-7 govuk-!-margin-bottom-0">Your questions</h2>
     <div class="app-page-list">
@@ -135,40 +134,38 @@ else if (Model.JustMovedDown)
         @if (Model.Questions is { } questions)
         {
           <dl class="govuk-summary-list govuk-!-static-margin-top-3">
-          
-          @for (int i = 0; i < questions.Count; i++)
-          {
-            var question = questions[i];
-            
-            <div id="page_1050713" class="govuk-summary-list__row">
-              <dt class="govuk-summary-list__key app-page-list__key govuk-summary-list__key-s">
-                @i
-              </dt>
-              <dd class="govuk-summary-list__value">
-                @question.Content
-              </dd>
-              <dd class="govuk-summary-list__actions govuk-summary-list__actions-m">
-                <ul class="govuk-summary-list__actions-list">
-                  <li class="govuk-summary-list__actions-list-item">
-                    <a class="govuk-link" href="/admin/questions/@question.Id/edit">Edit</a>
-                  </li>
-                  @if (question.Order > 1)
-                  {
+
+            @foreach (var question in questions)
+            {
+              <div id="page_1050713" class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key app-page-list__key govuk-summary-list__key-s">
+                  @question.Order
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  @question.Content
+                </dd>
+                <dd class="govuk-summary-list__actions govuk-summary-list__actions-m">
+                  <ul class="govuk-summary-list__actions-list">
                     <li class="govuk-summary-list__actions-list-item">
-                      <a class="govuk-link" href="/admin/questions/@question.Id/reorder/@(question.Order - 1)">Move Up</a>
+                      <a class="govuk-link" href="/admin/questions/@question.Id/edit">Edit</a>
                     </li>
-                  }
-                  @if (question.Order < questions.Count-1)
-                  {
-                    <li class="govuk-summary-list__actions-list-item">
-                      <a class="govuk-link" href="/admin/questions/@question.Id/reorder/@(question.Order + 1)">Move Down</a>
-                    </li>
-                  }
-                </ul>
-              </dd>
-            </div>
-          }
-        </dl>
+                    @if (question.Order > 1)
+                    {
+                      <li class="govuk-summary-list__actions-list-item">
+                        <a class="govuk-link" href="/admin/questions/@question.Id/reorder/@(question.Order - 1)">Move Up</a>
+                      </li>
+                    }
+                    @if (question.Order < questions.Count-1)
+                    {
+                      <li class="govuk-summary-list__actions-list-item">
+                        <a class="govuk-link" href="/admin/questions/@question.Id/reorder/@(question.Order + 1)">Move Down</a>
+                      </li>
+                    }
+                  </ul>
+                </dd>
+              </div>
+            }
+          </dl>
         }
       </form>
     </div>

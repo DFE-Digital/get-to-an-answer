@@ -1,0 +1,91 @@
+﻿@model QuestionnaireViewModel
+
+@{
+  ViewData["Title"] = "Edit the questionnaire start page";
+  var hasErrors = Model?.UpdateQuestionnaire != null && !ViewData.ModelState.IsValid;
+  string? ErrorFor(string key) => ViewData.ModelState.ContainsKey(key) && ViewData.ModelState[key]?.Errors.Count > 0
+    ? ViewData.ModelState[key]!.Errors[0].ErrorMessage
+    : null;
+
+  var hasDisplayTitleError = Model?.UpdateQuestionnaire != null && ErrorFor(nameof(Model.UpdateQuestionnaire.DisplayTitle)) != null;
+  var hasDescError = Model?.UpdateQuestionnaire != null && ErrorFor(nameof(Model.UpdateQuestionnaire.Description)) != null;
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model?.UpdateQuestionnaire?.Id/track">Back to questionnaire '@Model?.UpdateQuestionnaire?.Title'</a>
+}
+
+@if (hasErrors)
+{
+  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+    <h2 class="govuk-error-summary__title" id="error-summary-title">
+      There is a problem
+    </h2>
+    <div class="govuk-error-summary__body">
+      <ul class="govuk-list govuk-error-summary__list">
+        @foreach (var kvp in ViewData.ModelState.Where(ms => ms.Value!.Errors.Count > 0))
+        {
+          var fieldName = kvp.Key;
+          var message = kvp.Value!.Errors[0].ErrorMessage;
+          // The href should link to the input id for accessibility
+          <li><a href="#@fieldName">@message</a></li>
+        }
+      </ul>
+    </div>
+  </div>
+}
+
+<h1 class="govuk-heading-l">
+  <span class="govuk-caption-l">@Model?.UpdateQuestionnaire?.Title</span><span class="govuk-visually-hidden"> - </span>
+  Add a start page (optional)
+</h1>
+
+<p class="govuk-body">A start page appears before the questions.</p>
+<p class="govuk-body">It is optional.</p>
+<div class="govuk-body">
+  It can include: 
+  <ul>
+    <li>just enough information to help them understand what the questionnaire does nad whether it will meet their need</li>
+    <li>any information users are likely to need before they start using it</li>
+  </ul>
+</div>
+
+<div class="govuk-grid-row govuk-!-margin-top-9">
+  <div class="govuk-grid-column-two-thirds">
+    <form action="/admin/questionnaires/@Model?.UpdateQuestionnaire?.Id/edit" accept-charset="UTF-8" method="post">
+      <div class="govuk-form-group">
+        <label for="forms-name-input-name-field" class="govuk-label govuk-label--m">Enter the title of your start page</label>
+        <div class="govuk-hint" id="forms-name-input-name-hint">You can add a heading for your start page.
+        </div>
+        @if (hasDisplayTitleError)
+        {
+          <p class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.UpdateQuestionnaire.DisplayTitle))
+          </p>
+        }
+
+        <input id="forms-name-input-name-field" class="govuk-input @(hasDisplayTitleError ? "govuk-input--error" : "")"
+               aria-describedby="forms-name-input-name-hint"
+               type="text"
+               name="DisplayTitle"
+               value="@(Model?.UpdateQuestionnaire?.DisplayTitle ?? "")">
+      </div>
+      <div class="govuk-form-group">
+        <label for="Description" class="govuk-label govuk-label--m">Enter description text for the start page</label>
+        <div class="govuk-hint" id="pages-question-input-hint-text-hint">You can add a short description of your start page.</div>
+        @if (hasDescError)
+        {
+          <p class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.UpdateQuestionnaire.Description))
+          </p>
+        }
+        <textarea class="govuk-textarea @(hasDescError ? "govuk-textarea--error" : "")"
+              id="Description"
+              name="Description"
+              rows="5">@(Model?.UpdateQuestionnaire?.Description ?? "")</textarea>
+      </div>
+      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
+    </form>
+  </div>
+</div>

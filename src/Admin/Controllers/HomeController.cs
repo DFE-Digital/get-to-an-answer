@@ -92,7 +92,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     }
     
     [HttpPost("admin/questionnaires/{questionnaireId}/questions/create")]
-    public async Task<IActionResult> PerformQuestionnaireCreation(Guid questionnaireId, CreateQuestionRequestDto request)
+    public async Task<IActionResult> PerformQuestionCreation(Guid questionnaireId, CreateQuestionRequestDto request)
     {
         if (!ModelState.IsValid)
         {
@@ -239,6 +239,47 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
             return NotFound();
         
         return View("EditQuestionnaire", new QuestionnaireViewModel
+        {
+            UpdateQuestionnaire = new UpdateQuestionnaireRequestDto
+            {
+                Id = questionnaireId,
+                Title = questionnaire.Title, 
+                Description = questionnaire.Description,
+                Slug = questionnaire.Slug
+            }
+        });
+    }
+    
+    [HttpGet("admin/questionnaires/{questionnaireId}/start-page/edit")]
+    public async Task<IActionResult> QuestionnaireStartPageEditPage(Guid questionnaireId)
+    {
+        var questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId);
+        
+        if (questionnaire == null)
+            return NotFound();
+        
+        return View("EditQuestionnaireStartPage", new QuestionnaireViewModel
+        {
+            UpdateQuestionnaire = new UpdateQuestionnaireRequestDto
+            {
+                Id = questionnaireId,
+                Title = questionnaire.Title, 
+                Description = questionnaire.Description,
+                Slug = questionnaire.Slug,
+                DisplayTitle = questionnaire.DisplayTitle,
+            }
+        });
+    }
+    
+    [HttpGet("admin/questionnaires/{questionnaireId}/slug/edit")]
+    public async Task<IActionResult> QuestionnaireSlugEditPage(Guid questionnaireId)
+    {
+        var questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId);
+        
+        if (questionnaire == null)
+            return NotFound();
+        
+        return View("EditQuestionnaireSlug", new QuestionnaireViewModel
         {
             UpdateQuestionnaire = new UpdateQuestionnaireRequestDto
             {

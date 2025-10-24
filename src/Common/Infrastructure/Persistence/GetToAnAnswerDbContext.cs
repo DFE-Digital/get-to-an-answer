@@ -54,7 +54,7 @@ public static class CheckerDbContextExtensions
         {
             return await db.Questions
                 .Where(q => q.Id == id
-                            && q.Status != EntityStatus.Deleted)
+                            && !q.IsDeleted)
                 .Select(q => db.Questionnaires
                     .Where(qq => qq.Id == q.QuestionnaireId)
                     .SelectMany(qq => qq.Contributors)
