@@ -4,6 +4,10 @@
 // Import dfe
 @import '../../node_modules/dfe-frontend/packages/dfefrontend';
 
+// Import dfe
+@import '../../node_modules/@govuk-prototype-kit/step-by-step/sass/_step-by-step-navigation.scss';
+@import '../../node_modules/@govuk-prototype-kit/step-by-step/sass/_step-by-step-navigation-header.scss';
+@import '../../node_modules/@govuk-prototype-kit/step-by-step/sass/_step-by-step-navigation-related.scss';
 
 // Override font
 @import url('https://rsms.me/inter/inter.css');

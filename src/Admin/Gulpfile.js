@@ -10,6 +10,11 @@ let paths = {
     dist: 'wwwroot/'
 }
 
+gulp.task('govuk-step-by-step-js', function () {
+    return gulp.src('node_modules/@govuk-prototype-kit/step-by-step/javascripts/*.js')
+        .pipe(gulp.dest(paths.dist + 'js'));
+});
+
 gulp.task('govuk-assets', function() {
     return gulp.src('node_modules/govuk-frontend/dist/govuk/assets/**/*')
         .pipe(gulp.dest(paths.dist + 'assets'));
@@ -39,6 +44,8 @@ gulp.task('dfe-assets', function() {
         .pipe(gulp.dest(paths.dist + 'assets'));
 });
 
+
+
 gulp.task("sass", function () {
     return gulp.src(paths.src + '/scss/**/*.scss')
         .pipe(sass({
@@ -56,6 +63,7 @@ gulp.task("images", function() {
 
 gulp.task("dev",
     gulp.series(
+        "govuk-step-by-step-js",
         "govuk-assets",
         "govuk-js",
         "govuk-css",

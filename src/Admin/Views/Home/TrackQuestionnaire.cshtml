@@ -233,3 +233,11 @@ else if (Model.JustPublished)
     </p>
   </div>
 </div>
+
+@section Scripts {
+  <script type="text/javascript">
+    var $element = document.querySelector('#step-by-step-navigation')
+    var stepByStepNavigation = new GOVUK.Modules.AppStepNav($element).init()
+  </script>
+}
+

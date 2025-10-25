@@ -117,6 +117,8 @@
     await Html.RenderPartialAsync("_Footer");
 }
 
+<script asp-add-nonce="true" src="/js/step-by-step-navigation.js"></script>
+<script asp-add-nonce="true" src="/js/step-by-step-polyfills.js"></script>
 @await RenderSectionAsync("Scripts", false)
 <script asp-add-nonce="true" type="module">
     import { initAll } from '/js/govuk-frontend.min.js'
