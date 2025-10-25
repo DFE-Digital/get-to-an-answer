@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Admin.Models;
 using Common.Client;
 using Common.Domain;
+using Common.Domain.Request.Add;
 using Microsoft.AspNetCore.Mvc;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
@@ -302,7 +303,54 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
             justUpdated = true
         });
     }
-
+    
+    [HttpGet("admin/questionnaires/{questionnaireId}/contributors/new")]
+    public IActionResult AddQuestionnaireContributorPage(Guid questionnaireId)
+    {
+        return View("AddContributor", new QuestionnaireViewModel
+        {
+            QuestionnaireId = questionnaireId,
+        });
+    }
+    
+    [HttpGet("admin/questionnaires/{questionnaireId}/contributors")]
+    public async Task<IActionResult> QuestionnaireContributorsPage(Guid questionnaireId, 
+        bool justCreated = false, bool justDeleted = false)
+    {
+        return View("ManageContributors", new QuestionnaireViewModel
+        {
+            JustDeleted = justDeleted,
+            JustCreated = justCreated,
+            QuestionnaireId = questionnaireId,
+            Contributors = await apiClient.GetQuestionnaireContributors(questionnaireId),
+            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId)
+        });
+    }
+    
+    [HttpPost("admin/questionnaires/{questionnaireId}/contributors")]
+    public async Task<IActionResult> AddQuestionnaireContributor(Guid questionnaireId, AddContributorRequestDto request)
+    {
+        await apiClient.AddQuestionnaireContributor(questionnaireId, request);
+        
+        return RedirectToAction(nameof(QuestionnaireContributorsPage), new
+        {
+            questionnaireId, 
+            justCreated = true
+        });
+    }
+    
+    [HttpDelete("admin/questionnaires/{questionnaireId}/contributors")]
+    public async Task<IActionResult> DeleteQuestionnaireContributor(Guid questionnaireId, [FromForm(Name = "Email")] string email)
+    {
+        await apiClient.RemoveQuestionnaireContributor(questionnaireId, email);
+        
+        return RedirectToAction(nameof(QuestionnaireContributorsPage), new
+        {
+            questionnaireId, 
+            justDeleted = true
+        });
+    }
+    
     [HttpGet("admin/questionnaires/{questionnaireId}/questions")]
     public async Task<IActionResult> QuestionManagementPage(
         Guid questionnaireId, 
@@ -436,7 +484,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        return View(new QuestionnaireViewModel());
     }
     
     [HttpPost("admin/questionnaires/{questionnaireId}/content/create")]

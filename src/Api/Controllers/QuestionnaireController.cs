@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Api.Infrastructure.Persistence;
 using Common.Domain;
+using Common.Domain.Request.Add;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Common.Enum;
@@ -152,26 +153,6 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
             Status = EntityStatus.Deleted
         });
     }
-    
-    [HttpPut("questionnaires/{id}/contributors")]
-    public async Task<IActionResult> AddQuestionnaireContributor(Guid id)
-    {
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
-        
-        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => x.Id == id && x.Status != EntityStatus.Deleted);
-        
-        if (questionnaire == null) 
-            return NotFound();
-
-        if (!questionnaire.Contributors.Contains(email))
-        {
-            questionnaire.Contributors.Add(email);
-        
-            await db.SaveChangesAsync();
-        }
-        
-        return Ok("Question updated.");
-    }
 
     [HttpPost("questionnaires/{id}/clones")]
     public async Task<IActionResult> CloneQuestionnaire(Guid id, CloneQuestionnaireRequestDto request)
@@ -264,7 +245,69 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         
         return Ok(cloneQuestionnaire);
     }
+    
+    [HttpGet("questionnaires/{questionnaireId}/contributors")]
+    public async Task<IActionResult> GetContributors(Guid questionnaireId)
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
 
+        if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, questionnaireId))
+            return Forbid();
+
+        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => 
+            x.Id == questionnaireId && x.Status != EntityStatus.Deleted);
+
+        if (questionnaire == null)
+            return NotFound();
+
+        return Ok(questionnaire.Contributors);
+    }
+
+    [HttpPut("questionnaires/{id}/contributors")]
+    public async Task<IActionResult> AddContributor(Guid id, AddContributorRequestDto request)
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+
+        if (!await db.HasAccessToEntity<QuestionnaireEntity>(email, id))
+            return Forbid();
+
+        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => 
+            x.Id == id && x.Status != EntityStatus.Deleted);
+
+        if (questionnaire == null)
+            return NotFound();
+
+        if (!questionnaire.Contributors.Contains(request.Email))
+        {
+            questionnaire.Contributors.Add(request.Email);
+            await db.SaveChangesAsync();
+        }
+
+        return Ok();
+    }
+
+    [HttpDelete("questionnaires/{id}/contributors/{email}")]
+    public async Task<IActionResult> RemoveContributor(Guid id, string email)
+    {
+        var currentUserEmail = User.FindFirstValue(ClaimTypes.Email)!;
+
+        if (!await db.HasAccessToEntity<QuestionnaireEntity>(currentUserEmail, id))
+            return Forbid();
+
+        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (questionnaire == null)
+            return NotFound();
+
+        if (questionnaire.Contributors.Count > 2 && questionnaire.Contributors.Contains(email))
+        {
+            questionnaire.Contributors.Remove(email);
+            await db.SaveChangesAsync();
+        }
+
+        return Ok();
+    }
+    
     private async Task StoreQuestionnaireVersion(Guid id, int versionNumber)
     {
         var questionnaire = await db.Questionnaires

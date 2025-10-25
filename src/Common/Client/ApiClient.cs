@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Common.Domain;
 using Common.Domain.Frontend;
+using Common.Domain.Request.Add;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,9 @@ public interface IApiClient
     Task<string?> UpdateQuestionnaireStatusAsync(Guid questionnaireId, UpdateQuestionnaireStatusRequestDto request);
     Task<QuestionnaireDto?> CloneQuestionnaireAsync(Guid questionnaireId, CloneQuestionnaireRequestDto request);
     Task<string?> DeleteQuestionnaireAsync(Guid questionnaireId);
+    Task<string?> AddQuestionnaireContributor(Guid questionnaireId, AddContributorRequestDto request);
+    Task<string[]> GetQuestionnaireContributors(Guid questionnaireId);
+    Task<string?> RemoveQuestionnaireContributor(Guid questionnaireId, string contributorEmail);
     
     // === For Questions ===
     
@@ -152,7 +156,31 @@ public class ApiClient : IApiClient
 
         return await response.Content.ReadFromJsonAsync<string>();
     }
+
+    public async Task<string[]> GetQuestionnaireContributors(Guid questionnaireId)
+    {
+        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireId}/contributors");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string[]>() ?? [];
+    }
+
+    public async Task<string?> RemoveQuestionnaireContributor(Guid questionnaireId, string contributorEmail)
+    {
+        var response = await _httpClient.DeleteAsync($"questionnaires/{questionnaireId}/contributors/{contributorEmail}");
+        response.EnsureSuccessStatusCode();
+        
+        return await response.Content.ReadFromJsonAsync<string>();   
+    }
     
+    public async Task<string?> AddQuestionnaireContributor(Guid questionnaireId, AddContributorRequestDto request)
+    {
+        var response = await _httpClient.PutAsync($"questionnaires/{questionnaireId}/contributors", null);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string>();
+    }
+
     // Question
 
     public async Task<QuestionDto?> GetQuestionAsync(Guid questionId)

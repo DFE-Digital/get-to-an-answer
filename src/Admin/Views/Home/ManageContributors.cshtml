@@ -1,0 +1,132 @@
+﻿@model QuestionnaireViewModel
+
+@using System.Security.Claims;
+
+@functions {
+  private static string EmailToDisplayName(string? email)
+  {
+    if (string.IsNullOrWhiteSpace(email)) return string.Empty;
+
+    var at = email.IndexOf('@');
+    var local = at > 0 ? email[..at] : email;
+
+    // Strip aliases like +team
+    var plus = local.IndexOf('+');
+    if (plus > -1)
+    {
+      local = local[..plus];
+    }
+
+    // Split on common separators
+    var parts = local
+      .Split(new[] { '.', '_', '-', ' ' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+      .Where(p => !string.IsNullOrWhiteSpace(p))
+      .ToArray();
+
+    if (parts.Length == 0) return local;
+
+    // Title-case each token
+    for (int i = 0; i < parts.Length; i++)
+    {
+      var p = parts[i].ToLowerInvariant();
+      parts[i] = char.ToUpperInvariant(p[0]) + (p.Length > 1 ? p[1..] : string.Empty);
+    }
+
+    return string.Join(' ', parts);
+  }
+}
+
+@{
+  ViewData["Title"] = "Home Page";
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model?.Questionnaire?.Id/track">Back to questionnaire '@Model?.Questionnaire?.Title'</a>
+}
+
+@if (Model.JustDeleted)
+{
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <h3 class="govuk-notification-banner__heading">
+          A contributor has been deleted.
+        </h3>
+      </div>
+    </div>
+  </div>
+</div>
+}
+else if (Model.JustCreated)
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            A contributor has been added.
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<h1 class="govuk-heading-l">
+  <span class="govuk-caption-l">@Model.Questionnaire?.Title</span><span class="govuk-visually-hidden"> - </span>
+  People who can edit this questionnaire
+</h1>
+
+<a class="govuk-button govuk-button--start" data-module="govuk-button" draggable="false" role="button"
+   href="/admin/questionnaires/@Model.Questionnaire?.Id/contributors/new" data-govuk-button-init="">Add a contributor
+  <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19"
+       viewBox="0 0 33 40" focusable="false" aria-hidden="true">
+    <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z"></path>
+  </svg>
+</a>
+
+<div class="app-scrolling-wrapper" role="region" tabindex="0" aria-label="Questionnaires in ‘Care Leavers’">
+
+  <table class="govuk-table">
+    <caption class="govuk-table__caption govuk-table__caption--m">Your contributors</caption>
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header" scope="col">Name</th>
+      <th class="govuk-table__header" scope="col">Email</th>
+      <th class="govuk-table__header" scope="col">Role</th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col"></th>
+    </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    @if (Model.Contributors is {} contributors)
+    {
+      @foreach (var contributor in contributors)
+      {
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">@EmailToDisplayName(contributor)</td>
+          <td class="govuk-table__cell">@contributor</td>
+          <td class="govuk-table__cell">Editor</td>
+          <td class="govuk-table__cell govuk-table__cell--numeric">
+            <form method="post" action="/admin/questionnaires/@Model.QuestionnaireId/contributors/@contributor">
+              <button type="submit" class="govuk-!-margin-0 govuk-button govuk-button--warning">Remove</button>
+            </form>
+          </td>
+        </tr>
+      }
+    }
+    </tbody>
+  </table>
+
+</div>

@@ -24,4 +24,6 @@ public class ConfigViewModel
     public bool ShowFooterLinks { get; set; } = true;
 
     public string LanguageCode { get; set; } = "en";
+    
+    public bool IsError { get; set; } = false;
 }
