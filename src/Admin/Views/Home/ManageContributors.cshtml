@@ -1,40 +1,9 @@
 ﻿@model QuestionnaireViewModel
 
 @using System.Security.Claims;
+@using Common.Extensions
 
-@functions {
-  private static string EmailToDisplayName(string? email)
-  {
-    if (string.IsNullOrWhiteSpace(email)) return string.Empty;
 
-    var at = email.IndexOf('@');
-    var local = at > 0 ? email[..at] : email;
-
-    // Strip aliases like +team
-    var plus = local.IndexOf('+');
-    if (plus > -1)
-    {
-      local = local[..plus];
-    }
-
-    // Split on common separators
-    var parts = local
-      .Split(new[] { '.', '_', '-', ' ' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-      .Where(p => !string.IsNullOrWhiteSpace(p))
-      .ToArray();
-
-    if (parts.Length == 0) return local;
-
-    // Title-case each token
-    for (int i = 0; i < parts.Length; i++)
-    {
-      var p = parts[i].ToLowerInvariant();
-      parts[i] = char.ToUpperInvariant(p[0]) + (p.Length > 1 ? p[1..] : string.Empty);
-    }
-
-    return string.Join(' ', parts);
-  }
-}
 
 @{
   ViewData["Title"] = "Home Page";
@@ -115,7 +84,7 @@ else if (Model.JustCreated)
       @foreach (var contributor in contributors)
       {
         <tr class="govuk-table__row">
-          <td class="govuk-table__cell">@EmailToDisplayName(contributor)</td>
+          <td class="govuk-table__cell">@contributor.ToDisplayName()</td>
           <td class="govuk-table__cell">@contributor</td>
           <td class="govuk-table__cell">Editor</td>
           <td class="govuk-table__cell govuk-table__cell--numeric">
