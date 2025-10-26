@@ -23,6 +23,9 @@ public class QuestionnaireEntity
     [MaxLength(500)]
     public string? Slug { get; set; }
 
+    [MaxLength(500)]
+    public string? DisplayTitle { get; set; }
+
     [Required]
     [MaxLength(500)]
     public string Title { get; set; }
@@ -38,7 +41,14 @@ public class QuestionnaireEntity
     
     public DateTime UpdatedAt { get; set; }
     
+    [Required]
+    [MaxLength(500)]
     public string CreatedBy { get; set; }
+    
+    [MaxLength(500)]
+    public string? PublishedBy { get; set; }
+    
+    public DateTime? PublishedAt { get; set; }
 
     // Child entities
     public ICollection<QuestionEntity> Questions { get; set; } = new List<QuestionEntity>();

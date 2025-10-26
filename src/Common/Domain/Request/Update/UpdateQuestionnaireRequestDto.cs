@@ -7,11 +7,13 @@ namespace Common.Domain.Request.Update;
 
 public class UpdateQuestionnaireRequestDto
 {
-    [Required(ErrorMessage = "Enter a questionnaire title")]
     [MaxLength(500)]
     [GdsTitle(MinLength = 1, MaxLength = 500,
         ErrorMessage = "Title must be in plain language, avoid all-caps, not be empty or only whitespace, and should not contain repeated spaces.")]
-    public required string Title { get; set; }
+    public string? Title { get; set; }
+    
+    [MaxLength(500)]
+    public string? DisplayTitle { get; set; }
     
     [MaxLength(500)]
     [RegularExpression(@"^[a-z0-9]+(?:-[a-z0-9]+)*$", 

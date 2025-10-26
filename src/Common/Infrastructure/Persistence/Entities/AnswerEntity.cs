@@ -11,11 +11,6 @@ public class AnswerEntity
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
-    
-    /*
-     * Shorthand name for this answer.
-     */
-    public string? RefName { get; set; }
 
     [Required]
     [MaxLength(250)]

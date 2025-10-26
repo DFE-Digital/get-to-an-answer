@@ -23,12 +23,13 @@ namespace Api.Controllers;
 [AllowAnonymous]
 public class QuestionnaireRunnerController(GetToAnAnswerDbContext db) : Controller
 {
-    [HttpGet("questionnaires/{questionnaireSlug}/info")]
-    public async Task<IActionResult> GetQuestionnaireInfo(string questionnaireSlug)
+    [HttpGet("questionnaires/{questionnaireSlug}/publishes/last/info")]
+    public async Task<IActionResult> GetLastPublishedQuestionnaireInfo(string questionnaireSlug)
     {
         var questionnaireVersionJson =  await db.QuestionnaireVersions
             .Where(qv => db.Questionnaires
-                .Any(q => q.Id == qv.QuestionnaireId && q.Slug == questionnaireSlug))
+                .Any(q => q.Id == qv.QuestionnaireId && q.Slug == questionnaireSlug && 
+                          q.Status != EntityStatus.Deleted))
             .OrderByDescending(qv => qv.Version)
             .Select(qv => qv.QuestionnaireJson)
             .FirstOrDefaultAsync();
@@ -52,7 +53,7 @@ public class QuestionnaireRunnerController(GetToAnAnswerDbContext db) : Controll
         return Ok(new QuestionnaireInfoDto
         {
             Id = questionnaire.Id,
-            Title = questionnaire.Title,
+            DisplayTitle = questionnaire.DisplayTitle,
             Description = questionnaire.Description,
             Slug = questionnaire.Slug,
         });
@@ -63,7 +64,8 @@ public class QuestionnaireRunnerController(GetToAnAnswerDbContext db) : Controll
     {
         var initialQuestion = await db.Questions
             .Include(x => x.Answers)
-            .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == 1);
+            .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == 1 && 
+                                      !x.IsDeleted);
         
         if (initialQuestion == null)
             return BadRequest();

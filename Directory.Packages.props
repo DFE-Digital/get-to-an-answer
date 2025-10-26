@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
+    <PackageVersion Include="HtmlSanitizer" Version="9.0.886" />
+    <PackageVersion Include="Markdig" Version="0.43.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc" Version="2.3.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.DataAnnotations" Version="2.3.0" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.9" />

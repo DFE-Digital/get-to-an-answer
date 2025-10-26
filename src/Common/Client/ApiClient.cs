@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Common.Domain;
 using Common.Domain.Frontend;
+using Common.Domain.Request.Add;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +15,17 @@ public interface IApiClient
     // === For Questionnaires ===
     
     Task<QuestionnaireDto?> GetQuestionnaireAsync(Guid questionnaireId);
-    Task<QuestionnaireInfoDto?> GetQuestionnaireInfoAsync(string questionnaireSlug);
+    Task<QuestionnaireInfoDto?> GetLastPublishedQuestionnaireInfoAsync(string questionnaireSlug);
     Task<List<QuestionnaireDto>> GetQuestionnairesAsync();
     Task<QuestionnaireDto?> CreateQuestionnaireAsync(CreateQuestionnaireRequestDto request);
     Task<string?> UpdateQuestionnaireAsync(Guid questionnaireId, UpdateQuestionnaireRequestDto request);
-    Task<string?> UpdateQuestionnaireStatusAsync(Guid questionnaireId, PublishQuestionnaireRequestDto request);
+    Task<string?> PublishQuestionnaireAsync(Guid questionnaireId);
+    Task<string?> UnpublishQuestionnaireAsync(Guid questionnaireId);
     Task<QuestionnaireDto?> CloneQuestionnaireAsync(Guid questionnaireId, CloneQuestionnaireRequestDto request);
     Task<string?> DeleteQuestionnaireAsync(Guid questionnaireId);
+    Task<string?> AddQuestionnaireContributor(Guid questionnaireId, AddContributorRequestDto request);
+    Task<string[]> GetQuestionnaireContributors(Guid questionnaireId);
+    Task<string?> RemoveQuestionnaireContributor(Guid questionnaireId, string contributorEmail);
     
     // === For Questions ===
     
@@ -30,6 +35,8 @@ public interface IApiClient
     Task<string?> UpdateQuestionAsync(Guid questionId, UpdateQuestionRequestDto request);
     Task<string?> UpdateQuestionStatusAsync(Guid questionId, UpdateQuestionStatusRequestDto request);
     Task<string?> DeleteQuestionAsync(Guid questionId);
+    Task<string?> MoveQuestionDownOneAsync(Guid questionnaireId, Guid questionId);
+    Task<string?> MoveQuestionUpOneAsync(Guid questionnaireId, Guid questionId);
     
     // === For Answers ===
     
@@ -76,9 +83,9 @@ public class ApiClient : IApiClient
         return await response.Content.ReadFromJsonAsync<QuestionnaireDto>();
     }
     
-    public async Task<QuestionnaireInfoDto?> GetQuestionnaireInfoAsync(string questionnaireSlug)
+    public async Task<QuestionnaireInfoDto?> GetLastPublishedQuestionnaireInfoAsync(string questionnaireSlug)
     {
-        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireSlug}/info");
+        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireSlug}/publishes/last/info");
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<QuestionnaireInfoDto>();
@@ -119,9 +126,17 @@ public class ApiClient : IApiClient
         return await response.Content.ReadFromJsonAsync<string>();
     }
 
-    public async Task<string?> UpdateQuestionnaireStatusAsync(Guid questionnaireId, PublishQuestionnaireRequestDto request)
+    public async Task<string?> PublishQuestionnaireAsync(Guid questionnaireId)
     {
-        var response = await _httpClient.PutAsJsonAsync($"questionnaires/{questionnaireId}/status", request);
+        var response = await _httpClient.PutAsync($"questionnaires/{questionnaireId}/publish", null);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string>();
+    }
+
+    public async Task<string?> UnpublishQuestionnaireAsync(Guid questionnaireId)
+    {
+        var response = await _httpClient.DeleteAsync($"questionnaires/{questionnaireId}/unpublish");
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<string>();
@@ -142,7 +157,31 @@ public class ApiClient : IApiClient
 
         return await response.Content.ReadFromJsonAsync<string>();
     }
+
+    public async Task<string[]> GetQuestionnaireContributors(Guid questionnaireId)
+    {
+        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireId}/contributors");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string[]>() ?? [];
+    }
+
+    public async Task<string?> RemoveQuestionnaireContributor(Guid questionnaireId, string contributorEmail)
+    {
+        var response = await _httpClient.DeleteAsync($"questionnaires/{questionnaireId}/contributors/{contributorEmail}");
+        response.EnsureSuccessStatusCode();
+        
+        return await response.Content.ReadFromJsonAsync<string>();   
+    }
     
+    public async Task<string?> AddQuestionnaireContributor(Guid questionnaireId, AddContributorRequestDto request)
+    {
+        var response = await _httpClient.PutAsync($"questionnaires/{questionnaireId}/contributors", null);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string>();
+    }
+
     // Question
 
     public async Task<QuestionDto?> GetQuestionAsync(Guid questionId)
@@ -192,7 +231,23 @@ public class ApiClient : IApiClient
 
         return await response.Content.ReadFromJsonAsync<string>();
     }
-    
+
+    public async Task<string?> MoveQuestionDownOneAsync(Guid questionnaireId, Guid questionId)
+    {
+        var response = await _httpClient.PutAsync($"questionnaires/{questionnaireId}/questions/{questionId}/move-down", null);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string>();
+    }
+
+    public async Task<string?> MoveQuestionUpOneAsync(Guid questionnaireId, Guid questionId)
+    {
+        var response = await _httpClient.PutAsync($"questionnaires/{questionnaireId}/questions/{questionId}/move-up", null);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string>();
+    }
+
     // Answer
 
     public async Task<AnswerDto?> GetAnswerAsync(Guid answerId)

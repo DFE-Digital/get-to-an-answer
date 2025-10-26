@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Common.Enum;
+using Common.Local;
 
 namespace Common.Infrastructure.Persistence.Entities;
 
@@ -19,4 +20,15 @@ public class QuestionnaireVersionEntity
     public int Version { get; set; }
     
     public DateTime CreatedAt { get; set; }
+    
+    [MaxLength(500)]
+    public required string CreatedBy { get; set; }
+    
+    public string? ChangeDescription { get; set; }
+    
+    public string? ChangeLog { get; set; }
+    
+    [MaxLength(100)]
+    [NotMapped]
+    public string? SyncId { get; set; }
 }
