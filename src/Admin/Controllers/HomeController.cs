@@ -646,4 +646,54 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
             justDeleted = true
         });
     }
+    private const string TermsCookieName = "accepAgreementCookieString"; // from selection
+    private const int TermsCookieDays = 365;
+
+    // Show the terms page unless already accepted
+    [HttpGet("/admin/terms-of-service-agreement")]
+    public IActionResult TermsOfServiceAgreement()
+    {
+        if (HasAcceptedTerms())
+        {
+            return RedirectToAction(nameof(ManageQuestionnairesPage));
+        }
+
+        return View("TermsOfServiceAgreement", new QuestionnaireViewModel());
+    }
+
+    // Called when the user clicks "Accept"
+    [HttpPost("/admin/terms-of-service-agreement")]
+    //[ValidateAntiForgeryToken]
+    public IActionResult AcceptTerms([FromForm(Name = "Accepted")] string? accepted)
+    {
+        if (accepted == "true")
+        {
+            SetTermsAcceptedCookie();
+            return RedirectToAction(nameof(ManageQuestionnairesPage));
+        }
+        
+        ModelState.AddModelError("Accepted", "You must accept the terms to continue.");
+        
+        return View("TermsOfServiceAgreement", new QuestionnaireViewModel());
+    }
+
+    private bool HasAcceptedTerms()
+    {
+        var cookie = Request.Cookies[TermsCookieName];
+        return string.Equals(cookie, "accepted", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void SetTermsAcceptedCookie()
+    {
+        var options = new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.AddDays(TermsCookieDays),
+            Secure = true,              // send only over HTTPS
+            HttpOnly = false,           // allow client-side checks if needed
+            SameSite = SameSiteMode.Lax,
+            Path = "/"                  // available to entire site
+        };
+
+        Response.Cookies.Append(TermsCookieName, "accepted", options);
+    }
 }
