@@ -54,5 +54,6 @@ public class QuestionnaireViewModel : ConfigViewModel
     public bool JustMovedUp { get; set; }
     public bool JustMovedDown { get; set; }
     public bool JustPublished { get; set; }
+    public bool JustUnpublished { get; set; }
     public string[] Contributors { get; set; } = [];
 }

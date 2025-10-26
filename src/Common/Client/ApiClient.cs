@@ -15,11 +15,12 @@ public interface IApiClient
     // === For Questionnaires ===
     
     Task<QuestionnaireDto?> GetQuestionnaireAsync(Guid questionnaireId);
-    Task<QuestionnaireInfoDto?> GetQuestionnaireInfoAsync(string questionnaireSlug);
+    Task<QuestionnaireInfoDto?> GetLastPublishedQuestionnaireInfoAsync(string questionnaireSlug);
     Task<List<QuestionnaireDto>> GetQuestionnairesAsync();
     Task<QuestionnaireDto?> CreateQuestionnaireAsync(CreateQuestionnaireRequestDto request);
     Task<string?> UpdateQuestionnaireAsync(Guid questionnaireId, UpdateQuestionnaireRequestDto request);
-    Task<string?> UpdateQuestionnaireStatusAsync(Guid questionnaireId, UpdateQuestionnaireStatusRequestDto request);
+    Task<string?> PublishQuestionnaireAsync(Guid questionnaireId);
+    Task<string?> UnpublishQuestionnaireAsync(Guid questionnaireId);
     Task<QuestionnaireDto?> CloneQuestionnaireAsync(Guid questionnaireId, CloneQuestionnaireRequestDto request);
     Task<string?> DeleteQuestionnaireAsync(Guid questionnaireId);
     Task<string?> AddQuestionnaireContributor(Guid questionnaireId, AddContributorRequestDto request);
@@ -90,9 +91,9 @@ public class ApiClient : IApiClient
         return await response.Content.ReadFromJsonAsync<QuestionnaireDto>();
     }
     
-    public async Task<QuestionnaireInfoDto?> GetQuestionnaireInfoAsync(string questionnaireSlug)
+    public async Task<QuestionnaireInfoDto?> GetLastPublishedQuestionnaireInfoAsync(string questionnaireSlug)
     {
-        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireSlug}/info");
+        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireSlug}/publishes/last/info");
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<QuestionnaireInfoDto>();
@@ -133,9 +134,17 @@ public class ApiClient : IApiClient
         return await response.Content.ReadFromJsonAsync<string>();
     }
 
-    public async Task<string?> UpdateQuestionnaireStatusAsync(Guid questionnaireId, UpdateQuestionnaireStatusRequestDto request)
+    public async Task<string?> PublishQuestionnaireAsync(Guid questionnaireId)
     {
-        var response = await _httpClient.PutAsJsonAsync($"questionnaires/{questionnaireId}/status", request);
+        var response = await _httpClient.PutAsync($"questionnaires/{questionnaireId}/publish", null);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string>();
+    }
+
+    public async Task<string?> UnpublishQuestionnaireAsync(Guid questionnaireId)
+    {
+        var response = await _httpClient.DeleteAsync($"questionnaires/{questionnaireId}/unpublish");
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<string>();

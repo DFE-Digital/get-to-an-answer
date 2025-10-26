@@ -9,6 +9,8 @@ using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
+using Common.Local;
+using Common.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -110,8 +112,25 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         return Ok("Questionnaire updated.");
     }
 
-    [HttpPut("questionnaires/{id}/status")]
-    public async Task<IActionResult> UpdateQuestionnaireStatus(Guid id, UpdateQuestionnaireStatusRequestDto request)
+    [HttpPut("questionnaires/{id}/publish")]
+    public async Task<IActionResult> PublishQuestionnaire(Guid id)
+    {
+        return await UpdateQuestionnaireStatus(id, EntityStatus.Published);
+    }
+
+    [HttpDelete("questionnaires/{id}/unpublish")]
+    public async Task<IActionResult> UnpublishQuestionnaire(Guid id)
+    {
+        return await UpdateQuestionnaireStatus(id, EntityStatus.Draft);
+    }
+
+    [HttpDelete("questionnaires/{id}")]
+    public async Task<IActionResult> DeleteQuestionnaire(Guid id)
+    {
+        return await UpdateQuestionnaireStatus(id, EntityStatus.Deleted);
+    }
+    
+    private async Task<IActionResult> UpdateQuestionnaireStatus(Guid id, EntityStatus status)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
 
@@ -125,9 +144,14 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         
         var versionNumber = 1;
 
-        questionnaire.Status = request.Status;
-        if (request.Status == EntityStatus.Published) {
+        questionnaire.Status = status;
+        if (status == EntityStatus.Published) 
+        {
             versionNumber = ++questionnaire.Version;
+        } 
+        else if (status == EntityStatus.Draft) // Rollback to previous version
+        {
+            versionNumber = questionnaire.Version--;
         }
 
         questionnaire.UpdatedAt = DateTime.UtcNow;
@@ -136,22 +160,16 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         
         await db.SaveChangesAsync();
 
-        if (request.Status == EntityStatus.Published)
+        if (status == EntityStatus.Published)
         {
             await StoreQuestionnaireVersion(id, versionNumber);
         }
+        else if (status == EntityStatus.Draft)
+        {
+            await RemoveQuestionnaireVersion(id, versionNumber);       
+        }
         
         return Ok("Question updated.");
-    }
-
-    [HttpDelete("questionnaires/{id}")]
-    public async Task<IActionResult> DeleteQuestionnaire(Guid id)
-    {
-        return await UpdateQuestionnaireStatus(id, new UpdateQuestionnaireStatusRequestDto
-        {
-            Id = id,
-            Status = EntityStatus.Deleted
-        });
     }
 
     [HttpPost("questionnaires/{id}/clones")]
@@ -333,6 +351,42 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         };
 
         db.QuestionnaireVersions.Add(snapshot);
+        
+        await db.SaveChangesAsync();
+
+        if (versionNumber <= 1)
+        {
+            return; // No need to compare to the previous version
+        }
+        
+        var previousVersion = await db.QuestionnaireVersions.FirstOrDefaultAsync(v => 
+            v.QuestionnaireId == id && v.Version == versionNumber - 1);
+        
+        if (previousVersion == null)
+            return;
+        
+        // compare the new published version to the old one, then populate teh ChangeLog and the ChangeDescription
+
+        var changeMap = VersionDiffRenderer.RenderCompare(previousVersion.QuestionnaireJson, json);
+
+        var newChangeMap = changeMap?.FilterChangesForSide(true).Values.ToJson() ?? string.Empty;
+
+        snapshot.ChangeLog = newChangeMap;
+        
+        await db.SaveChangesAsync();
+        
+        Console.WriteLine(newChangeMap);
+    }
+    
+    private async Task RemoveQuestionnaireVersion(Guid id, int versionNumber)
+    {
+        var version = await db.QuestionnaireVersions
+            .FirstOrDefaultAsync(q => q.Id == id && q.Version == versionNumber);
+
+        if (version == null)
+            return;
+        
+        db.QuestionnaireVersions.Remove(version);
         
         await db.SaveChangesAsync();
     }

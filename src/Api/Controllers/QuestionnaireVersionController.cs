@@ -4,8 +4,10 @@ using System.Text.Json.Serialization;
 using Common.Domain;
 using Common.Domain.Request.Update;
 using Common.Enum;
+using Common.Extensions;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
+using Common.Local;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -90,6 +92,9 @@ public class QuestionnaireVersionController(GetToAnAnswerDbContext db) : Control
                 QuestionnaireId = q.QuestionnaireId,
                 Version = q.Version,
                 CreatedAt = q.CreatedAt,
+                ChangeDescription = q.ChangeDescription,
+                CreatedBy = q.CreatedBy,
+                ChangeLog = q.ChangeLog.ToChangeDataList()
             })
             .OrderByDescending(q => q.Version)
             .ToList();
