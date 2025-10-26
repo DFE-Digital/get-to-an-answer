@@ -106,6 +106,25 @@ else if (Model.JustPublished)
     </div>
   </div>
 }
+else if (Model.JustUnpublished)
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            Your questionnaire has been unpublished.
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -217,27 +236,20 @@ else if (Model.JustPublished)
     <div class="govuk-button-group">
       @if (Model.Questionnaire?.Status == EntityStatus.Draft)
       {
-        <a class="govuk-button govuk-button--primary" data-module="govuk-button" href="/admin/questionnaires/@Model.Questionnaire.Id/Publish/Confirm" data-govuk-button-init="">Publish questionnaire</a>
+        <a class="govuk-button govuk-button--primary" data-module="govuk-button" href="/admin/questionnaires/@Model.Questionnaire.Id/publish/confirm" data-govuk-button-init="">Publish questionnaire</a>
       } 
       else if (Model.Questionnaire?.Status == EntityStatus.Published)
       {
-        <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="/admin/questionnaires/@Model.Questionnaire.Id/Unpublish/Confirm" data-govuk-button-init="">Unpublish questionnaire</a>
+        <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="/admin/questionnaires/@Model.Questionnaire.Id/unpublish/confirm" data-govuk-button-init="">Unpublish questionnaire</a>
       }
-      <a class="govuk-button govuk-button--warning" data-module="govuk-button" href="/admin/questionnaires/@Model.Questionnaire?.Id/Delete/Confirm" data-govuk-button-init="">Delete questionnaire</a>
+      <a class="govuk-button govuk-button--warning" data-module="govuk-button" href="/admin/questionnaires/@Model.Questionnaire?.Id/delete/confirm" data-govuk-button-init="">Delete questionnaire</a>
     </div>
     <p>
-      <a class="govuk-link" href="/admin/questionnaires/@Model.Questionnaire?.Id/versions/@(Model.Questionnaire?.Version -1)/compare">View questionnaire versions</a>
+      <a class="govuk-link" href="/admin/questionnaires/@Model.Questionnaire?.Id/versions">View questionnaire versions</a>
     </p>
     <p>
       <a class="govuk-link" href="/admin/questionnaires/@Model.Questionnaire?.Id/clone">Clone this questionnaire</a>
     </p>
   </div>
 </div>
-
-@section Scripts {
-  <script type="text/javascript">
-    var $element = document.querySelector('#step-by-step-navigation')
-    var stepByStepNavigation = new GOVUK.Modules.AppStepNav($element).init()
-  </script>
-}
 

@@ -115,7 +115,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         return RedirectToAction(nameof(QuestionPage), new { questionId = question.Id });
     }
     
-    [HttpGet("admin/questionnaires/{questionnaireId}/Publish/Confirm")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/publish/confirm")]
     public async Task<IActionResult> ConfirmQuestionnairePublish(Guid questionnaireId)
     {
         return View("PublishQuestionnaireConfirmation", new QuestionnaireViewModel
@@ -124,14 +124,10 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
     
-    [HttpPost("admin/questionnaires/{questionnaireId}/Publish")]
+    [HttpPost("admin/questionnaires/{questionnaireId}/publish")]
     public async Task<IActionResult> PublishQuestionnaire(Guid questionnaireId)
     {
-        await apiClient.UpdateQuestionnaireStatusAsync(questionnaireId, new UpdateQuestionnaireStatusRequestDto
-        {
-            Id = questionnaireId,
-            Status = EntityStatus.Published
-        });
+        await apiClient.PublishQuestionnaireAsync(questionnaireId);
         
         return RedirectToAction(nameof(QuestionnaireTrackingPage), new
         {
@@ -140,7 +136,28 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
     
-    [HttpGet("admin/questionnaires/{questionnaireId}/Delete/Confirm")]
+    [HttpGet("admin/questionnaires/{questionnaireId}/unpublish/confirm")]
+    public async Task<IActionResult> ConfirmQuestionnaireUnpublish(Guid questionnaireId)
+    {
+        return View("UnpublishQuestionnaireConfirmation", new QuestionnaireViewModel
+        {
+            Questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId)
+        });
+    }
+    
+    [HttpPost("admin/questionnaires/{questionnaireId}/unpublish")]
+    public async Task<IActionResult> UnpublishQuestionnaire(Guid questionnaireId)
+    {
+        await apiClient.UnpublishQuestionnaireAsync(questionnaireId);
+        
+        return RedirectToAction(nameof(QuestionnaireTrackingPage), new
+        {
+            questionnaireId,
+            justUnpublished = true
+        });
+    }
+    
+    [HttpGet("admin/questionnaires/{questionnaireId}/delete/confirm")]
     public async Task<IActionResult> ConfirmQuestionnaireDelete(Guid questionnaireId)
     {
         return View("DeleteQuestionnaireConfirmation", new QuestionnaireViewModel
@@ -149,7 +166,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         });
     }
     
-    [HttpPost("admin/questionnaires/{questionnaireId}/Delete")]
+    [HttpPost("admin/questionnaires/{questionnaireId}/delete")]
     public async Task<IActionResult> DeleteQuestionnaire(Guid questionnaireId)
     {
         await apiClient.DeleteQuestionnaireAsync(questionnaireId);
@@ -184,10 +201,12 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
         bool justCloned = false, 
         bool justUpdated = false,
         bool justDeleted = false,
-        bool justPublished = false)
+        bool justPublished = false,
+        bool justUnpublished = false)
     {
         return View("TrackQuestionnaire", new QuestionnaireViewModel
         {
+            JustUnpublished = justUnpublished,
             JustPublished = justPublished,
             JustDeleted = justDeleted,
             JustUpdated = justUpdated,

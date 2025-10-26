@@ -1,7 +1,7 @@
 ﻿@model QuestionnaireViewModel
 
 @{
-  ViewData["Title"] = "Publish the questionnaire";
+  ViewData["Title"] = "Unpublish the questionnaire";
 }
 
 @section BeforeContent
@@ -11,9 +11,9 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds-from-desktop">
-    <h1 class="govuk-heading-l">Are you sure you want to publish this questionnaire?</h1>
-    <p class="govuk-body">By submitting this application you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
-    <form action="/admin/questionnaires/@Model.Questionnaire?.Id/publish" method="post" novalidate>
+    <h1 class="govuk-heading-l">Are you sure you want to unpublish this questionnaire?</h1>
+    <p class="govuk-body">By unpublishing your rolling users back to the previous version.</p>
+    <form action="/admin/questionnaires/@Model.Questionnaire?.Id/unpublish" method="post" novalidate>
       <div class="govuk-form-group">
         <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
           <div class="govuk-radios__item">

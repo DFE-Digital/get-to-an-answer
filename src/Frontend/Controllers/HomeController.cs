@@ -17,14 +17,14 @@ public class HomeController(IApiClient apiClient, ILogger<HomeController> logger
     {
         return View("QuestionnaireStart", new QuestionnaireViewModel
         {
-            Questionnaire = await apiClient.GetQuestionnaireInfoAsync(questionnaireSlug),
+            Questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(questionnaireSlug),
         });
     }
     
     [HttpGet("questionnaires/{questionnaireSlug}")]
     public async Task<IActionResult> GetInitialQuestionPage(string questionnaireSlug)
     {
-        var questionnaire = await apiClient.GetQuestionnaireInfoAsync(questionnaireSlug);
+        var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(questionnaireSlug);
         
         if (questionnaire == null)
             return NotFound();
@@ -45,7 +45,7 @@ public class HomeController(IApiClient apiClient, ILogger<HomeController> logger
     public async Task<IActionResult> GetNextStatePage(string questionnaireSlug, GetNextStateRequest request, 
         [FromForm(Name = "Scores")] Dictionary<Guid, float> scores)
     {
-        var questionnaire = await apiClient.GetQuestionnaireInfoAsync(questionnaireSlug);
+        var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(questionnaireSlug);
         
         if (questionnaire == null)
             return NotFound();
