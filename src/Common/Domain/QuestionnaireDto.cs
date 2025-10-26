@@ -18,6 +18,8 @@ public class QuestionnaireDto
     
     public DateTime UpdatedAt { get; set; }
     
+    public string? CreatedBy { get; set; }
+    
     public EntityStatus Status { get; set; } = EntityStatus.Draft;
     
     public int Version { get; set; }
