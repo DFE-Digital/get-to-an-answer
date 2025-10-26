@@ -163,6 +163,15 @@ public static class JwtTestTokenGenerator
         hmacSecret: Secret
     );
     
+    public static readonly string NewValidJwtToken = JwtTestTokenGenerator.Create(
+        subject: "user_mock" + Guid.NewGuid(),
+        issuer: "http://dfe-issuer",
+        audience: "test-audience",
+        expiresIn: TimeSpan.FromHours(1),
+        algorithm: "HS256", //with hmacSecret for signed tokens
+        hmacSecret: Secret
+    );
+    
     public static readonly string ExpiredJwtToken = JwtTestTokenGenerator.Create(
         subject: "user_mock",
         issuer: "http://dfe-issuer",

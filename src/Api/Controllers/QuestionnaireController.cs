@@ -136,7 +136,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         questionnaire.DisplayTitle = request.DisplayTitle ?? questionnaire.DisplayTitle;
         questionnaire.Title = request.Title ?? questionnaire.Title;
         questionnaire.Status = EntityStatus.Draft;
-        questionnaire.Slug = request.Slug ?? questionnaire.Slug ?? string.Empty;
+        questionnaire.Slug = request.Slug ?? questionnaire.Slug;
         questionnaire.Description = request.Description ?? questionnaire.Description  ?? string.Empty;
         questionnaire.UpdatedAt = DateTime.UtcNow;
         

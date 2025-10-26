@@ -195,9 +195,9 @@ public class QuestionnaireTests(ApiFixture factory) :
     public async Task Get_All_For_Current_User_Only()
     {
         // Seed: create two questionnaires for current user
-        using (var res = await Create(new { title = "Q1" }, JwtTestTokenGenerator.ValidJwtToken)) 
+        using (var res = await Create(new { title = "Q1" }, JwtTestTokenGenerator.NewValidJwtToken)) 
         { Assert.Equal(HttpStatusCode.Created, res.StatusCode); }
-        using (var res = await Create(new { title = "Q2" }, JwtTestTokenGenerator.ValidJwtToken))
+        using (var res = await Create(new { title = "Q2" }, JwtTestTokenGenerator.NewValidJwtToken))
         { Assert.Equal(HttpStatusCode.Created, res.StatusCode); }
 
         // Seed: create a questionnaire as a different user (unauthorised for current user)
@@ -205,7 +205,7 @@ public class QuestionnaireTests(ApiFixture factory) :
         { Assert.Equal(HttpStatusCode.Created, res.StatusCode); }
 
         // Act
-        using var getRes = await GetAll(JwtTestTokenGenerator.ValidJwtToken);
+        using var getRes = await GetAll(JwtTestTokenGenerator.NewValidJwtToken);
         
         // Assert
         Assert.Equal(HttpStatusCode.OK, getRes.StatusCode);
