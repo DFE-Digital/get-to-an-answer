@@ -2,9 +2,12 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 using Common.Enum;
+using Microsoft.EntityFrameworkCore;
 
 namespace Common.Infrastructure.Persistence.Entities;
 
+[Index(nameof(Slug), nameof(Status))] // WebController: Any(q => q.Slug == slug && Status != Deleted)
+[Index(nameof(Slug), IsUnique = true)] // if Slug must be unique across all questionnaires
 [Table("Questionnaires")]
 public class QuestionnaireEntity
 {

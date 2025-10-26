@@ -30,6 +30,16 @@
           "Newtonsoft.Json": "13.0.1"
         }
       },
+      "HtmlSanitizer": {
+        "type": "Direct",
+        "requested": "[9.0.886, )",
+        "resolved": "9.0.886",
+        "contentHash": "qw87Q+bffcs2Fw/Rd3VXWg/QK+K9eIxeE9QidQLz3C/ffgUGuOB0X4MWUuuolUnnBvoD/u6FqXhsqIA67nL4kg==",
+        "dependencies": {
+          "AngleSharp": "[0.17.1]",
+          "AngleSharp.Css": "[0.17.0]"
+        }
+      },
       "Microsoft.AspNetCore.Authentication.JwtBearer": {
         "type": "Direct",
         "requested": "[9.0.9, )",
@@ -204,15 +214,6 @@
           "System.Memory": "4.5.4",
           "System.Text.Json": "4.7.2",
           "System.Threading.Tasks.Extensions": "4.5.4"
-        }
-      },
-      "HtmlSanitizer": {
-        "type": "Transitive",
-        "resolved": "9.0.886",
-        "contentHash": "qw87Q+bffcs2Fw/Rd3VXWg/QK+K9eIxeE9QidQLz3C/ffgUGuOB0X4MWUuuolUnnBvoD/u6FqXhsqIA67nL4kg==",
-        "dependencies": {
-          "AngleSharp": "[0.17.1]",
-          "AngleSharp.Css": "[0.17.0]"
         }
       },
       "Humanizer.Core": {

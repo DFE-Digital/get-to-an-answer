@@ -97,6 +97,8 @@ export class JwtHelper {
 
         return jwt.sign(claims, JwtHelper.secret);
     }
+
+    public static readonly InvalidToken = 'invalid-token';
     
     public static readonly ValidToken = JwtHelper.generateToken({
         [ClaimTypes.Subject]: 'test-subject',

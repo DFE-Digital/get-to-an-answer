@@ -21,6 +21,11 @@ export function expectQuestionnaireSchema(questionnaire: any) {
     }
 }
 
+export function expectQuestionnaireInitStateTypes(questionnaire: any) {
+    expect(typeof questionnaire.id).toBe('string');
+    expect(typeof questionnaire.title).toBe('string');
+}
+
 export function expectQuestionnaireTypes(questionnaire: any) {
     expect(typeof questionnaire.id).toBe('string');
     expect(typeof questionnaire.title).toBe('string');
@@ -43,6 +48,13 @@ export function expectQuestionnaireContent(q: any) {
     } else {
         expect(q.slug.trim().length).toBeGreaterThan(0);
     }
+}
+
+export function expectQuestionnaireInitStateIO(q: any, payload: any, guidRegex: RegExp) {
+    expect(q.id).toMatch(guidRegex);
+    expect(q.title).toBe(payload.title);
+    expect(isEmpty(q.description)).toBeTruthy();
+    expect(isEmpty(q.slug)).toBeTruthy();
 }
 
 export function expectQuestionnaireIO(q: any, payload: any, guidRegex: RegExp) {

@@ -2,9 +2,12 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Common.Enum;
 using Common.Local;
+using Microsoft.EntityFrameworkCore;
 
 namespace Common.Infrastructure.Persistence.Entities;
 
+[Index(nameof(QuestionnaireId), nameof(Version), IsUnique = true)] // point lookup by version; also OrderBy on Version
+[Index(nameof(QuestionnaireId))]                                   // list versions by questionnaire
 [Table("QuestionnaireVersions")]
 public class QuestionnaireVersionEntity
 {
