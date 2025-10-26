@@ -41,8 +41,38 @@ Variables are retrieved via environment variables set in CI (GitHub Secrets):
 - Terraform automatically maps TF_VAR_<variable_name> to the corresponding input variable.
 - For example, TF_VAR_sql_admin_password populates variable "sql_admin_password".
 
+### Create Azure Storage Account
+The Terraform state is stored in an Azure Storage Account.
+
+1) Create a resource group:
+```bash
+az group create \
+-n {prefix}rg-uks-terraform-state \
+-l uksouth \
+--tags Environment=Dev Product="Get-To-An-Answer"
+```
+
+2) Create a storage account:
+```bash
+az storage account create \
+-g {prefix}rg-uks-terraform-state \
+-n gtaatfstatesa \
+-l uksouth \
+--sku Standard_LRS \
+--kind StorageV2 \
+--https-only true \
+--min-tls-version TLS1_2 \
+--allow-blob-public-access false \
+--tags Environment=Dev Product="Get-To-An-Answer"
+```
+
+3) Create a storage container:
+```bash
+az storage container create --name tfstate --account-name gtaatfstatesa --auth-mode login
+```
+
 ## Set up for local development
-1) Sign in to Azure and select subscription:
+1) Sign in to Azure and select a subscription:
 ```bash
 az login az account set --subscription "<your-subscription-id>"
 ```

@@ -3,11 +3,13 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Common.Domain;
+using Common.Domain.Request.Add;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
+using Common.Local;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,8 +32,6 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         var entity = new QuestionnaireEntity
         {
             Title = request.Title,
-            Description = request.Description ?? string.Empty,
-            Slug = request.Slug ?? string.Empty,
             Contributors = [email],
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
@@ -46,10 +46,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         {
             Id = entity.Id,
             Title = entity.Title,
-            Description = entity.Description,
-            Slug = entity.Slug,
             CreatedAt = entity.CreatedAt,
-            UpdatedAt = entity.UpdatedAt
         };
         
         return Created($"api/questionnaires/{dto.Id}", dto);
@@ -115,6 +112,11 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     [HttpPut("questionnaires/{id}")]
     public async Task<IActionResult> UpdateQuestionnaire(Guid id, UpdateQuestionnaireRequestDto request)
     {
+        if (request.DisplayTitle == null && request.Title == null && request.Slug == null && request.Description == null)
+        {
+            return BadRequest("No fields to update");
+        }
+        
         var email = User.FindFirstValue(ClaimTypes.Email)!;
 
         var access = db.HasAccessToEntity<QuestionnaireEntity>(email, id);
@@ -130,10 +132,11 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         
         if (questionnaire == null) 
             return NotFound();
-        
-        questionnaire.Title = request.Title;
+
+        questionnaire.DisplayTitle = request.DisplayTitle ?? questionnaire.DisplayTitle;
+        questionnaire.Title = request.Title ?? questionnaire.Title;
         questionnaire.Status = EntityStatus.Draft;
-        questionnaire.Slug = request.Slug ?? questionnaire.Slug ?? string.Empty;
+        questionnaire.Slug = request.Slug ?? questionnaire.Slug;
         questionnaire.Description = request.Description ?? questionnaire.Description  ?? string.Empty;
         questionnaire.UpdatedAt = DateTime.UtcNow;
         
@@ -145,11 +148,13 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     [HttpPut("questionnaires/{id}/publish")]
     public async Task<IActionResult> PublishQuestionnaire(Guid id)
     {
-        return await UpdateQuestionnaireStatus(id, new PublishQuestionnaireRequestDto
-        {
-            Id = id,
-            Status = EntityStatus.Published
-        });
+        return await UpdateQuestionnaireStatus(id, EntityStatus.Published);
+    }
+
+    [HttpDelete("questionnaires/{id}/unpublish")]
+    public async Task<IActionResult> UnpublishQuestionnaire(Guid id)
+    {
+        return await UpdateQuestionnaireStatus(id, EntityStatus.Draft);
     }
 
     [HttpDelete("questionnaires/{id}")]
@@ -165,15 +170,11 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
             .ExecuteUpdateAsync(s => s
                 .SetProperty(b => b.IsDeleted, true));
         
-        return await UpdateQuestionnaireStatus(id, new PublishQuestionnaireRequestDto
-        {
-            Id = id,
-            Status = EntityStatus.Deleted
-        });
+        return await UpdateQuestionnaireStatus(id, EntityStatus.Deleted);
     }
     
-    [HttpPut("questionnaires/{id}/contributors")]
-    public async Task<IActionResult> AddQuestionnaireContributor(Guid id)
+    [HttpPut("questionnaires/{id}/contributors/self")]
+    public async Task<IActionResult> AddSelfToQuestionnaireContributors(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -211,7 +212,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         
         var questionnaire = await db.Questionnaires
             .AsNoTracking()
-            .Where(q => q.Id == id)
+            .Where(q => q.Id == id && q.Status != EntityStatus.Deleted)
             .Include(q => q.Questions)
             .ThenInclude(qq => qq.Answers)
             .FirstOrDefaultAsync();
@@ -222,12 +223,11 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         var cloneQuestionnaire = new QuestionnaireEntity
         {
             Title = request.Title,
-            Description = request.Description,
             Status = EntityStatus.Draft,
             Contributors = questionnaire.Contributors,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            CreatedBy = email,
+            CreatedBy = email
         };
 
         db.Questionnaires.Add(cloneQuestionnaire);
@@ -294,6 +294,83 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         return Created($"/api/questionnaires/{cloneQuestionnaire.Id}", 
             EntityToDto(cloneQuestionnaire));
     }
+    
+    [HttpGet("questionnaires/{questionnaireId}/contributors")]
+    public async Task<IActionResult> GetContributors(Guid questionnaireId)
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+
+        var access = db.HasAccessToEntity<QuestionnaireEntity>(email, questionnaireId);
+        
+        if (access == EntityAccess.NotFound)
+            return NotFound();
+        
+        if (access == EntityAccess.Deny)
+            return Forbid();
+
+        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => 
+            x.Id == questionnaireId && x.Status != EntityStatus.Deleted);
+
+        if (questionnaire == null)
+            return NotFound();
+
+        return Ok(questionnaire.Contributors);
+    }
+
+    [HttpPut("questionnaires/{id}/contributors")]
+    public async Task<IActionResult> AddContributor(Guid id, AddContributorRequestDto request)
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+
+        var access = db.HasAccessToEntity<QuestionnaireEntity>(email, id);
+        
+        if (access == EntityAccess.NotFound)
+            return NotFound();
+        
+        if (access == EntityAccess.Deny)
+            return Forbid();
+
+        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => 
+            x.Id == id && x.Status != EntityStatus.Deleted);
+
+        if (questionnaire == null)
+            return NotFound();
+
+        if (!questionnaire.Contributors.Contains(request.Email))
+        {
+            questionnaire.Contributors.Add(request.Email);
+            await db.SaveChangesAsync();
+        }
+
+        return Ok();
+    }
+
+    [HttpDelete("questionnaires/{id}/contributors/{email}")]
+    public async Task<IActionResult> RemoveContributor(Guid id, string email)
+    {
+        var currentUserEmail = User.FindFirstValue(ClaimTypes.Email)!;
+
+        var access = db.HasAccessToEntity<QuestionnaireEntity>(currentUserEmail, id);
+        
+        if (access == EntityAccess.NotFound)
+            return NotFound();
+        
+        if (access == EntityAccess.Deny)
+            return Forbid();
+
+        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (questionnaire == null)
+            return NotFound();
+
+        if (questionnaire.Contributors.Count > 2 && questionnaire.Contributors.Contains(email))
+        {
+            questionnaire.Contributors.Remove(email);
+            await db.SaveChangesAsync();
+        }
+
+        return Ok();
+    }
 
     [ApiExplorerSettings(IgnoreApi = true)]
     private async Task StoreQuestionnaireVersion(Guid id, int versionNumber)
@@ -315,16 +392,41 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
             QuestionnaireId = questionnaire.Id,
             Version = versionNumber,
             QuestionnaireJson = json,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = questionnaire.PublishedBy ?? string.Empty,
+            ChangeDescription = "TODO"
         };
 
         db.QuestionnaireVersions.Add(snapshot);
         
         await db.SaveChangesAsync();
+
+        if (versionNumber <= 1)
+        {
+            return; // No need to compare to the previous version
+        }
+        
+        var previousVersion = await db.QuestionnaireVersions.FirstOrDefaultAsync(v => 
+            v.QuestionnaireId == id && v.Version == versionNumber - 1);
+        
+        if (previousVersion == null)
+            return;
+        
+        // compare the new published version to the old one, then populate teh ChangeLog and the ChangeDescription
+
+        var changeMap = VersionDiffRenderer.RenderCompare(previousVersion.QuestionnaireJson, json);
+
+        var newChangeMap = changeMap?.FilterChangesForSide(true).Values.ToJson() ?? string.Empty;
+
+        snapshot.ChangeLog = newChangeMap;
+        
+        await db.SaveChangesAsync();
+        
+        Console.WriteLine(newChangeMap);
     }
     
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> UpdateQuestionnaireStatus(Guid id, PublishQuestionnaireRequestDto request)
+    public async Task<IActionResult> UpdateQuestionnaireStatus(Guid id, EntityStatus status)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
@@ -343,18 +445,29 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         
         var versionNumber = 1;
 
-        questionnaire.Status = request.Status;
-        if (request.Status == EntityStatus.Published) {
+        questionnaire.Status = status;
+        if (status == EntityStatus.Published) 
+        {
             versionNumber = ++questionnaire.Version;
+        }
+        else if (status == EntityStatus.Draft) // Rollback to previous version
+        {
+            versionNumber = questionnaire.Version--;
         }
 
         questionnaire.UpdatedAt = DateTime.UtcNow;
+        questionnaire.PublishedBy = email;
+        questionnaire.PublishedAt = DateTime.UtcNow;
         
         await db.SaveChangesAsync();
 
-        if (request.Status == EntityStatus.Published)
+        if (status == EntityStatus.Published)
         {
             await StoreQuestionnaireVersion(id, versionNumber);
+        }
+        else if (status == EntityStatus.Draft)
+        {
+            await RemoveQuestionnaireVersion(id, versionNumber);       
         }
         
         return NoContent();
@@ -399,5 +512,19 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
                 }).ToList()
             }).ToList()
         };
+    }
+    
+    [ApiExplorerSettings(IgnoreApi = true)]
+    private async Task RemoveQuestionnaireVersion(Guid id, int versionNumber)
+    {
+        var version = await db.QuestionnaireVersions
+            .FirstOrDefaultAsync(q => q.Id == id && q.Version == versionNumber);
+
+        if (version == null)
+            return;
+        
+        db.QuestionnaireVersions.Remove(version);
+        
+        await db.SaveChangesAsync();
     }
 }

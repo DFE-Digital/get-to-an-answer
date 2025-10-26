@@ -49,8 +49,33 @@ jobs:
       - name: Lowercase the repo name and username
         run: echo "ENVIRONMENT_LOWER=${ENVIRONMENT,,}" >>${GITHUB_ENV}
 
-      - name: "Terraform Init"
-        run: terraform init -upgrade
+      - name: Check if remote state exists
+        id: tfstate
+        run: |
+          set -e
+          KEY="${{ env.ENVIRONMENT_LOWER }}.tfstate"
+          # Try to stat the blob; exit code 0 if exists
+          if az storage blob exists \
+               --auth-mode login \
+               --account-name gtaatfstatesa \
+               --container-name tfstate \
+               --name "$KEY" \
+               --query exists -o tsv | grep -q true; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+    
+      - name: Terraform Init (migrate or reconfigure)
+        run: |
+          COMMON='-backend-config="resource_group_name=${{ vars.GTAA_PREFIX }}rg-uks-terraform-state" -backend-config="storage_account_name=gtaatfstatesa" -backend-config="container_name=tfstate" -backend-config="key=${{ env.ENVIRONMENT_LOWER }}.tfstate"'
+          if [ "${{ steps.tfstate.outputs.exists }}" = "true" ]; then
+            echo "Remote state exists -> reconfigure"
+            eval terraform init -reconfigure $COMMON
+          else
+            echo "Remote state missing -> migrate local state"
+            eval terraform init -migrate-state $COMMON
+          fi
 
       - name: "Terraform Plan"
         run: terraform plan -var-file=${{ env.ENVIRONMENT_LOWER }}.tfvars -out=tfplan

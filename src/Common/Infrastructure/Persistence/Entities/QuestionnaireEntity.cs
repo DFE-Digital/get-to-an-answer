@@ -2,9 +2,12 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 using Common.Enum;
+using Microsoft.EntityFrameworkCore;
 
 namespace Common.Infrastructure.Persistence.Entities;
 
+[Index(nameof(Slug), nameof(Status))] // WebController: Any(q => q.Slug == slug && Status != Deleted)
+[Index(nameof(Slug), IsUnique = true)] // if Slug must be unique across all questionnaires
 [Table("Questionnaires")]
 public class QuestionnaireEntity
 {
@@ -23,6 +26,9 @@ public class QuestionnaireEntity
     [MaxLength(500)]
     public string? Slug { get; set; }
 
+    [MaxLength(500)]
+    public string? DisplayTitle { get; set; }
+
     [Required]
     [MaxLength(500)]
     public string Title { get; set; }
@@ -38,7 +44,14 @@ public class QuestionnaireEntity
     
     public DateTime UpdatedAt { get; set; }
     
+    [Required]
+    [MaxLength(500)]
     public string CreatedBy { get; set; }
+    
+    [MaxLength(500)]
+    public string? PublishedBy { get; set; }
+    
+    public DateTime? PublishedAt { get; set; }
 
     // Child entities
     public ICollection<QuestionEntity> Questions { get; set; } = new List<QuestionEntity>();

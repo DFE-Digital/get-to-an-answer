@@ -30,6 +30,16 @@
           "Newtonsoft.Json": "13.0.1"
         }
       },
+      "HtmlSanitizer": {
+        "type": "Direct",
+        "requested": "[9.0.886, )",
+        "resolved": "9.0.886",
+        "contentHash": "qw87Q+bffcs2Fw/Rd3VXWg/QK+K9eIxeE9QidQLz3C/ffgUGuOB0X4MWUuuolUnnBvoD/u6FqXhsqIA67nL4kg==",
+        "dependencies": {
+          "AngleSharp": "[0.17.1]",
+          "AngleSharp.Css": "[0.17.0]"
+        }
+      },
       "Microsoft.AspNetCore.Authentication.JwtBearer": {
         "type": "Direct",
         "requested": "[9.0.9, )",
@@ -166,6 +176,23 @@
         "dependencies": {
           "Microsoft.ApplicationInsights": "2.20.0",
           "Serilog": "2.11.0"
+        }
+      },
+      "AngleSharp": {
+        "type": "Transitive",
+        "resolved": "0.17.1",
+        "contentHash": "5MPI4bbixlwxb0W/smOMeIR+QlxMy5/5jD+WnIAw4pBC+7AhLPe5bS3cLgQMJyvd6q0A48sG+uYOt/ep406GLA==",
+        "dependencies": {
+          "System.Buffers": "4.5.1",
+          "System.Text.Encoding.CodePages": "6.0.0"
+        }
+      },
+      "AngleSharp.Css": {
+        "type": "Transitive",
+        "resolved": "0.17.0",
+        "contentHash": "bg0AcugmX6BFEi/DHG61QrwRU8iuiX4H8LZehdIzYdqOM/dgb3BsCTzNIcc1XADn4+xfQEdVwJYTSwUxroL4vg==",
+        "dependencies": {
+          "AngleSharp": "[0.17.0, 0.18.0)"
         }
       },
       "Azure.Core": {
@@ -1832,6 +1859,8 @@
       "common": {
         "type": "Project",
         "dependencies": {
+          "HtmlSanitizer": "[9.0.886, )",
+          "Markdig": "[0.43.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[9.0.9, )",
           "Microsoft.AspNetCore.Mvc": "[2.3.0, )",
           "Microsoft.EntityFrameworkCore": "[9.0.9, )",
@@ -1858,6 +1887,12 @@
         "dependencies": {
           "Azure.Core": "1.46.2"
         }
+      },
+      "Markdig": {
+        "type": "CentralTransitive",
+        "requested": "[0.43.0, )",
+        "resolved": "0.43.0",
+        "contentHash": "tbP3Y/GYC5pIUWXw6Iqf+R5CwBGA4VJswnlgS2x3TgcHoH4IlnGVmL7hfA1sXkZoCPm/4mhzS8cJUkWhQthaPg=="
       },
       "Microsoft.AspNetCore.Http.Abstractions": {
         "type": "CentralTransitive",

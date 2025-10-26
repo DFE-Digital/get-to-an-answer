@@ -91,31 +91,6 @@ public class QuestionnaireControllerTests
     }
 
     [Fact]
-    public async Task CreateQuestionnaire_With_Slug_And_Description_Succeeds()
-    {
-        using var db = CreateInMemoryDb(nameof(CreateQuestionnaire_With_Slug_And_Description_Succeeds));
-        var controller = CreateController(db, CreateUser());
-
-        var req = new CreateQuestionnaireRequestDto
-        {
-            Title = "With Slug",
-            Description = "Desc",
-            Slug = "with-slug"
-        };
-
-        var result = await controller.CreateQuestionnaire(req);
-
-        result.Should().BeOfType<CreatedResult>();
-        var created = (CreatedResult)result;
-        created.StatusCode.Should().Be(StatusCodes.Status201Created);
-        
-        var questionnaire = created.Value as QuestionnaireDto;
-        questionnaire?.Title.Should().Be("With Slug");
-        questionnaire?.Description.Should().Be("Desc");
-        questionnaire?.Slug.Should().Be("with-slug");
-    }
-
-    [Fact]
     public async Task CreateQuestionnaire_Duplicate_Title_Produces_Different_Ids()
     {
         using var db = CreateInMemoryDb(nameof(CreateQuestionnaire_Duplicate_Title_Produces_Different_Ids));

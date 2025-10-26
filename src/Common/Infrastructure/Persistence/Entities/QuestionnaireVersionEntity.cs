@@ -1,9 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Common.Enum;
+using Common.Local;
+using Microsoft.EntityFrameworkCore;
 
 namespace Common.Infrastructure.Persistence.Entities;
 
+[Index(nameof(QuestionnaireId), nameof(Version), IsUnique = true)] // point lookup by version; also OrderBy on Version
+[Index(nameof(QuestionnaireId))]                                   // list versions by questionnaire
 [Table("QuestionnaireVersions")]
 public class QuestionnaireVersionEntity
 {
@@ -19,4 +23,15 @@ public class QuestionnaireVersionEntity
     public int Version { get; set; }
     
     public DateTime CreatedAt { get; set; }
+    
+    [MaxLength(500)]
+    public required string CreatedBy { get; set; }
+    
+    public string? ChangeDescription { get; set; }
+    
+    public string? ChangeLog { get; set; }
+    
+    [MaxLength(100)]
+    [NotMapped]
+    public string? SyncId { get; set; }
 }

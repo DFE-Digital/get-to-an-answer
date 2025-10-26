@@ -11,7 +11,7 @@ import {
     expectQuestionnaireSchema,
     expectQuestionnaireTypes,
     expectQuestionnaireContent,
-    expectQuestionnaireIO
+    expectQuestionnaireIO, expectQuestionnaireInitStateTypes, expectQuestionnaireInitStateIO
 } from '../../helpers/api-assertions-helper'
 
 test.describe('POST Create questionnaire api request', () => {
@@ -29,13 +29,13 @@ test.describe('POST Create questionnaire api request', () => {
         expectQuestionnaireSchema(questionnaire);
 
         // --- Type sanity checks ---
-        expectQuestionnaireTypes(questionnaire);
+        expectQuestionnaireInitStateTypes(questionnaire);
 
         // --- Basic content sanity ---
         expectQuestionnaireContent(questionnaire);
 
         // --- I/O checks ---
-        expectQuestionnaireIO(questionnaire, payload, GUID_REGEX);
+        expectQuestionnaireInitStateIO(questionnaire, payload, GUID_REGEX);
     });
 
     test('Validate POST create new questionnaire with Title only', async ({request}) => {
@@ -61,7 +61,7 @@ test.describe('POST Create questionnaire api request', () => {
         expectQuestionnaireSchema(questionnaire);
 
         // --- Type sanity checks ---
-        expectQuestionnaireTypes(questionnaire);
+        expectQuestionnaireInitStateTypes(questionnaire);
 
         // --- Basic content sanity ---
         expectQuestionnaireContent(questionnaire);
@@ -88,13 +88,13 @@ test.describe('POST Create questionnaire api request', () => {
         expectQuestionnaireSchema(questionnaire);
 
         // --- Type sanity checks ---
-        expectQuestionnaireTypes(questionnaire);
+        expectQuestionnaireInitStateTypes(questionnaire);
 
         // --- Basic content sanity ---
         expectQuestionnaireContent(questionnaire);
 
         // --- I/O checks ---
-        expectQuestionnaireIO(questionnaire, payload, GUID_REGEX);
+        expectQuestionnaireInitStateIO(questionnaire, payload, GUID_REGEX);
     });
 
     test('Validate POST create new questionnaire with matching Title to another questionnaire', async ({request}) => {
@@ -141,14 +141,12 @@ test.describe('POST Create questionnaire api request', () => {
     });
 
     test('Validate POST create new questionnaire with invalid payload', async ({request}) => {
-        const wrongTypeDescription: any = 12345;
+        const wrongTypeTitle: any = 12345;
 
         const {questionnairePostResponse} = await createQuestionnaire(
             request,
             undefined,
-            'Custom test questionnaire title',
-            wrongTypeDescription,
-            undefined
+            wrongTypeTitle
         );
 
         // --- HTTP-level checks ---
@@ -157,8 +155,6 @@ test.describe('POST Create questionnaire api request', () => {
     });
 
     test('Validate POST create new questionnaire with invalid token', async ({request}) => {
-        const wrongTypeDescription: any = 12345;
-
         const {questionnairePostResponse} = await createQuestionnaire(
             request,
             JwtHelper.InvalidToken
@@ -277,13 +273,13 @@ test.describe('GET questionnaire api tests', () => {
         expectQuestionnaireSchema(response.questionnaireGetBody);
 
         // --- Type sanity checks ---
-        expectQuestionnaireTypes(response.questionnaireGetBody);
+        expectQuestionnaireInitStateTypes(response.questionnaireGetBody);
 
         // --- Basic content sanity ---
         expectQuestionnaireContent(response.questionnaireGetBody);
 
         // --- I/O checks ---
-        expectQuestionnaireIO(response.questionnaireGetBody, payload, GUID_REGEX);
+        expectQuestionnaireInitStateIO(response.questionnaireGetBody, payload, GUID_REGEX);
     });
 
     test('Validate GET questionnaire with invalid token', async ({request}) => {
