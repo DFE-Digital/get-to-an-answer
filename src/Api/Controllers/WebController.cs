@@ -18,8 +18,8 @@ namespace Api.Controllers;
 [AllowAnonymous]
 public class WebController(GetToAnAnswerDbContext db) : Controller
 {
-    [HttpGet("questionnaires/{questionnaireSlug}/info")]
-    public async Task<IActionResult> GetQuestionnaireInfo(string questionnaireSlug)
+    [HttpGet("questionnaires/{questionnaireSlug}/publishes/last/info")]
+    public async Task<IActionResult> GetLastPublishedQuestionnaireInfo(string questionnaireSlug)
     {
         var questionnaireVersionJson =  await db.QuestionnaireVersions
             .Where(qv => db.Questionnaires
