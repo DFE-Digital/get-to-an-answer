@@ -2,9 +2,13 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Common.Enum;
+using Microsoft.EntityFrameworkCore;
 
 namespace Common.Infrastructure.Persistence.Entities;
 
+[Index(nameof(QuestionnaireId), nameof(IsDeleted))] // frequent filter: by questionnaire and not deleted
+[Index(nameof(QuestionnaireId), nameof(Order))]     // initial question and reordering lookups
+[Index(nameof(QuestionnaireId), nameof(Id))]        // access checks that join questionnaire scope + id
 [Table("Questions")]
 public class QuestionEntity
 {

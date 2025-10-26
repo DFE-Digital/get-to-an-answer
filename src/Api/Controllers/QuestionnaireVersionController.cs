@@ -98,7 +98,45 @@ public class QuestionnaireVersionController(GetToAnAnswerDbContext db) : Control
             })
             .OrderByDescending(q => q.Version)
             .ToList();
+
+        if (questionnaireVersions.Count > 0)
+        {
+            var previousVersion = db.QuestionnaireVersions
+                .Where(q => q.QuestionnaireId == questionnaireId)
+                .Select(q => new QuestionnaireVersionDto
+                {
+                    Version = q.Version,
+                    QuestionnaireJson = q.QuestionnaireJson,
+                })
+                .OrderByDescending(q => q.Version)
+                .First();
+            
+            var questionnaire = await db.Questionnaires
+                .AsNoTracking()
+                .Include(q => q.Questions)
+                .ThenInclude(qq => qq.Answers)
+                .FirstAsync(q => q.Id == questionnaireId);
         
+            var json = JsonSerializer.Serialize(questionnaire, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Converters = { new JsonStringEnumConverter() }
+            });
+
+            var changeMap = VersionDiffRenderer.RenderCompare(previousVersion.QuestionnaireJson, json);
+
+            questionnaireVersions.Insert(0, new QuestionnaireVersionDto
+            {
+                Id = questionnaireId,
+                QuestionnaireId = questionnaireId,
+                Version = previousVersion.Version + 1,
+                CreatedAt = DateTime.UtcNow,
+                ChangeDescription = "Current draft changes",
+                CreatedBy = email,
+                ChangeLog = changeMap?.FilterChangesForSide(true).Values.ToList()!
+            });
+        }
+
         return Ok(questionnaireVersions);
     }
 }

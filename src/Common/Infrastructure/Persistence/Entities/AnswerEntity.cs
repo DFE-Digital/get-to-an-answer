@@ -2,9 +2,12 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Common.Enum;
+using Microsoft.EntityFrameworkCore;
 
 namespace Common.Infrastructure.Persistence.Entities;
 
+[Index(nameof(QuestionId), nameof(IsDeleted))]  // GetAnswers and lookups by question, not deleted
+[Index(nameof(QuestionnaireId), nameof(IsDeleted))] // cross-questionnaire filters and cascades
 [Table("Answers")]
 public class AnswerEntity
 {
