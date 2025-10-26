@@ -1,0 +1,37 @@
+﻿@model QuestionnaireViewModel
+
+@{
+  ViewData["Title"] = "You are being redirected to another page";
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.Questionnaire?.Id/track">Back to questionnaire '@Model.Questionnaire?.Title'</a>
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds-from-desktop">
+    <h1 class="govuk-heading-l">Are you sure you want to redirect the questionnaire to another page?</h1>
+    <p class="govuk-body">TDB.</p>
+    <form action="@Model.Destination?.Content" method="get" novalidate>
+      <div class="govuk-form-group">
+        <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
+          <div class="govuk-radios__item">
+            <input id="publish-questionnaire-yes-input" aria-describedby="pages-selection-type-input-only-one-option-true-hint"
+                   class="govuk-radios__input" type="radio" value="true" name="PublishQuestionnaire">
+            <label for="publish-questionnaire-yes-input" class="govuk-label govuk-radios__label">Yes</label>
+          </div>
+          <div class="govuk-radios__item">
+            <input id="publish-questionnaire-no-input" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
+                   class="govuk-radios__input" type="radio" value="false" name="PublishQuestionnaire">
+            <label for="publish-questionnaire-no-input" class="govuk-label govuk-radios__label">No</label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="govuk-button-group">
+        <button class="govuk-button govuk-button--primary" type="submit">Continue</button>
+      </div>
+    </form>
+  </div>
+</div>
