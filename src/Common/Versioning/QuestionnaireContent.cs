@@ -31,7 +31,7 @@ public class AnswerContent
     
     public string? Destination { get; set; }
     
-    public int? DestinationQuestionId { get; set; }
+    public Guid? DestinationQuestionId { get; set; }
     
-    public int? DestinationContentId { get; set; }
+    public Guid? DestinationContentId { get; set; }
 }

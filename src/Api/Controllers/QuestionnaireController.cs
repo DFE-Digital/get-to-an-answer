@@ -347,7 +347,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
             QuestionnaireJson = json,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = questionnaire.PublishedBy ?? string.Empty,
-            ChangeDescription = "TODO"
+            ChangeDescription = "Questionnaire Published"
         };
 
         db.QuestionnaireVersions.Add(snapshot);
@@ -367,15 +367,22 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         
         // compare the new published version to the old one, then populate teh ChangeLog and the ChangeDescription
 
-        var changeMap = VersionDiffRenderer.RenderCompare(previousVersion.QuestionnaireJson, json);
+        try
+        {
+            var changeMap = VersionDiffRenderer.RenderCompare(previousVersion.QuestionnaireJson, json);
 
-        var newChangeMap = changeMap?.FilterChangesForSide(true).Values.ToJson() ?? string.Empty;
+            var newChangeMap = changeMap?.FilterChangesForSide(true).Values.ToJson() ?? string.Empty;
 
-        snapshot.ChangeLog = newChangeMap;
-        
-        await db.SaveChangesAsync();
-        
-        Console.WriteLine(newChangeMap);
+            snapshot.ChangeLog = newChangeMap;
+
+            await db.SaveChangesAsync();
+
+            Console.WriteLine(newChangeMap);
+        }
+        catch (Exception e)
+        {
+            
+        }
     }
     
     private async Task RemoveQuestionnaireVersion(Guid id, int versionNumber)

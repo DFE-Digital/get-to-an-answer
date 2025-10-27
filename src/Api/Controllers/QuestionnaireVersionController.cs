@@ -123,18 +123,25 @@ public class QuestionnaireVersionController(GetToAnAnswerDbContext db) : Control
                 Converters = { new JsonStringEnumConverter() }
             });
 
-            var changeMap = VersionDiffRenderer.RenderCompare(previousVersion.QuestionnaireJson, json);
-
-            questionnaireVersions.Insert(0, new QuestionnaireVersionDto
+            try
             {
-                Id = questionnaireId,
-                QuestionnaireId = questionnaireId,
-                Version = previousVersion.Version + 1,
-                CreatedAt = DateTime.UtcNow,
-                ChangeDescription = "Current draft changes",
-                CreatedBy = email,
-                ChangeLog = changeMap?.FilterChangesForSide(true).Values.ToList()!
-            });
+                var changeMap = VersionDiffRenderer.RenderCompare(previousVersion.QuestionnaireJson, json);
+
+                questionnaireVersions.Insert(0, new QuestionnaireVersionDto
+                {
+                    Id = questionnaireId,
+                    QuestionnaireId = questionnaireId,
+                    Version = previousVersion.Version + 1,
+                    CreatedAt = DateTime.UtcNow,
+                    ChangeDescription = "Current draft changes",
+                    CreatedBy = email,
+                    ChangeLog = changeMap?.FilterChangesForSide(true).Values.ToList()!
+                });
+            }
+            catch (Exception e) 
+            {
+                Console.WriteLine(e);
+            }
         }
 
         return Ok(questionnaireVersions);
