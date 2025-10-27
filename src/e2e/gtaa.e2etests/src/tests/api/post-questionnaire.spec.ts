@@ -2,7 +2,6 @@ import {test, expect} from '@playwright/test';
 import {
     createQuestionnaire,
     updateQuestionnaire,
-    getQuestionnaire, deleteQuestionnaire
 } from "../../test-data-seeder/questionnaire-data";
 import {GUID_REGEX} from "../../constants/test-data-constants";
 import {ClaimTypes, JwtHelper, SimpleDate} from '../../helpers/JwtHelper';
@@ -11,7 +10,8 @@ import {
     expectQuestionnaireSchema,
     expectQuestionnaireTypes,
     expectQuestionnaireContent,
-    expectQuestionnaireIO, expectQuestionnaireInitStateTypes, expectQuestionnaireInitStateIO
+    expectQuestionnaireIO, expectQuestionnaireInitStateTypes, expectQuestionnaireInitStateIO,
+    expectQuestionnaireInitStateContent
 } from '../../helpers/api-assertions-helper'
 
 test.describe('POST Create questionnaire api request', () => {
@@ -32,7 +32,7 @@ test.describe('POST Create questionnaire api request', () => {
         expectQuestionnaireInitStateTypes(questionnaire);
 
         // --- Basic content sanity ---
-        expectQuestionnaireContent(questionnaire);
+        expectQuestionnaireInitStateContent(questionnaire);
 
         // --- I/O checks ---
         expectQuestionnaireInitStateIO(questionnaire, payload, GUID_REGEX);
@@ -196,27 +196,6 @@ test.describe('POST Create questionnaire api request', () => {
         expect(questionnairePostResponse.status()).toBe(400);
     });
 
-    //Bug: CARE-1446
-    // test('Validate slug length POST create new questionnaire', async ({request}) => {
-    //
-    //     const {questionnairePostResponse} = await createQuestionnaire(
-    //         request,
-    //         undefined,
-    //         undefined,
-    //         undefined,
-    //         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij" +
-    //         "klmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY" +
-    //         "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioidfjsdlfjsdjflksdfjsjfsdlkfsjdfsjfjsdfjsdjfsdlfj" +
-    //         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij" +
-    //         "klmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY" +
-    //         "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioidfjsdlfjsdjflksdfjsjfsdlkfsjdfsjfjsdfjsdjfsdlfj"
-    //     );
-    //
-    //     // --- HTTP-level checks ---
-    //     expect(questionnairePostResponse.ok()).toBeFalsy();
-    //     expect(questionnairePostResponse.status()).toBe(400);
-    // });
-
     test('Validate access to another questionnaire not permitted', async ({request}) => {
 
         const q1Token = JwtHelper.ValidToken;
@@ -255,136 +234,5 @@ test.describe('POST Create questionnaire api request', () => {
 
         //should be forbidden
         expect(update.updatedQuestionnairePostResponse.status()).toBe(403);
-
     });
-});
-
-test.describe('GET questionnaire api tests', () => {
-    test('Validate GET questionnaire', async ({request}) => {
-        const {questionnaire, payload} = await createQuestionnaire(request);
-        const questionnaireId = await questionnaire.id;
-
-        const response = await getQuestionnaire(request, questionnaireId);
-
-        // --- HTTP-level checks ---
-        expectHttp(response.questionnaireGetResponse, 200);
-
-        // --- Schema-level checks ---
-        expectQuestionnaireSchema(response.questionnaireGetBody);
-
-        // --- Type sanity checks ---
-        expectQuestionnaireInitStateTypes(response.questionnaireGetBody);
-
-        // --- Basic content sanity ---
-        expectQuestionnaireContent(response.questionnaireGetBody);
-
-        // --- I/O checks ---
-        expectQuestionnaireInitStateIO(response.questionnaireGetBody, payload, GUID_REGEX);
-    });
-
-    test('Validate GET questionnaire with invalid token', async ({request}) => {
-        const {questionnaire} = await createQuestionnaire(request);
-        const questionnaireId = await questionnaire.id;
-
-        const response = await getQuestionnaire(
-            request,
-            questionnaireId,
-            JwtHelper.InvalidToken
-        );
-
-        // --- HTTP-level checks ---
-        expect(response.questionnaireGetResponse.ok()).toBeFalsy();
-        expect(response.questionnaireGetResponse.status()).toBe(401);
-    });
-
-    test('Validate GET questionnaire with expired token', async ({request}) => {
-        const {questionnaire} = await createQuestionnaire(request);
-        const questionnaireId = await questionnaire.id;
-
-        const response = await getQuestionnaire(
-            request,
-            questionnaireId,
-            JwtHelper.ExpiredToken
-        );
-
-        // --- HTTP-level checks ---
-        expect(response.questionnaireGetResponse.ok()).toBeFalsy();
-        expect(response.questionnaireGetResponse.status()).toBe(401);
-    });
-
-    test('Validate GET questionnaire with invalid questionnaire id', async ({request}) => {
-        const {questionnaire} = await createQuestionnaire(request);
-        const questionnaireId = await questionnaire.id;
-
-        const response = await getQuestionnaire(
-            request,
-            12345,
-            JwtHelper.ExpiredToken
-        );
-
-        // --- HTTP-level checks ---
-        expect(response.questionnaireGetResponse.ok()).toBeFalsy();
-        expect(response.questionnaireGetResponse.status()).toBe(401);
-    });
-
-    test('Validate GET for a deleted questionnaire ', async ({request}) => {
-        const {questionnaire} = await createQuestionnaire(request);
-        const questionnaireId = await questionnaire.id;
-
-        const token = JwtHelper.ValidToken;
-
-        const response = await deleteQuestionnaire(
-            request,
-            questionnaireId,
-            token
-        )
-
-        expect(response.deleteQuestionnaireResponse.status()).toBe(204);
-
-        const getResponse = await getQuestionnaire(
-            request,
-            questionnaireId,
-            token
-        );
-
-        // // --- HTTP-level checks ---
-        expect(getResponse.questionnaireGetResponse.ok()).toBeFalsy();
-        expect(getResponse.questionnaireGetResponse.status()).toBe(404);
-    });
-
-    //Bug: CARE-1369
-    // test('Validate GET for a questionnaire where access is not permitted ', async ({request}) => {
-    //     const q1Token = JwtHelper.ValidToken;
-    //     const q2Token = JwtHelper.UnauthorizedToken;
-    //
-    //     const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(
-    //         request,
-    //         q1Token,
-    //         'Custom test questionnaire title',
-    //         'Custom test first questionnaire description',
-    //         'slug'
-    //     );
-    //
-    //     const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(
-    //         request,
-    //         q2Token,
-    //         'Custom test questionnaire title',
-    //         'Custom test second questionnaire description',
-    //         'slug'
-    //     );
-    //
-    //     // --- HTTP-level checks ---
-    //     expectHttp(q1Response, 201);
-    //     expectHttp(q2Response, 201);
-    //
-    //     const getResponse = await getQuestionnaire(
-    //         request,
-    //         q1.questionnaireId,
-    //         q2Token
-    //     );
-    //
-    //     // // --- HTTP-level checks ---
-    //     expect(getResponse.questionnaireGetResponse.ok()).toBeFalsy();
-    //     expect(getResponse.questionnaireGetResponse.status()).toBe(403);
-    // });
 });
