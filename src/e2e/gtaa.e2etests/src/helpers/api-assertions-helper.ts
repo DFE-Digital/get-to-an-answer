@@ -48,6 +48,25 @@ export function expectQuestionnaireTypes(questionnaire: any) {
     expect(Array.isArray(questionnaire.questions)).toBe(true);
 }
 
+export function expectQuestionnaireInitStateContent(q: any) {
+
+    expect(q.title?.trim().length).toBeGreaterThan(0);
+
+    expect(isEmpty(q.description)).toBeTruthy();
+    expect(isEmpty(q.slug)).toBeTruthy();
+
+    expect(q.questions.length).toBeGreaterThanOrEqual(0);
+    expect([1, 2, 3, 4]).toContain(q.status);
+    expect(q.version).toBeGreaterThanOrEqual(0);
+
+    //timestamp-sanity
+    const c = new Date(q.createdAt).getTime();
+    const u = new Date(q.updatedAt).getTime();
+    expect(!isNaN(c)).toBeTruthy();
+    expect(!isNaN(u)).toBeTruthy();
+    expect(u).toBeGreaterThanOrEqual(c);
+}
+
 export function expectQuestionnaireContent(q: any) {
 
     expect(q.title?.trim().length).toBeGreaterThan(0);

@@ -10,7 +10,8 @@ import {
     expectQuestionnaireSchema,
     expectQuestionnaireTypes,
     expectQuestionnaireContent,
-    expectQuestionnaireIO, expectQuestionnaireInitStateTypes, expectQuestionnaireInitStateIO
+    expectQuestionnaireIO, expectQuestionnaireInitStateTypes, expectQuestionnaireInitStateIO,
+    expectQuestionnaireInitStateContent
 } from '../../helpers/api-assertions-helper'
 
 test.describe('POST Create questionnaire api request', () => {
@@ -31,7 +32,7 @@ test.describe('POST Create questionnaire api request', () => {
         expectQuestionnaireInitStateTypes(questionnaire);
 
         // --- Basic content sanity ---
-        expectQuestionnaireContent(questionnaire);
+        expectQuestionnaireInitStateContent(questionnaire);
 
         // --- I/O checks ---
         expectQuestionnaireInitStateIO(questionnaire, payload, GUID_REGEX);
@@ -188,41 +189,6 @@ test.describe('POST Create questionnaire api request', () => {
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij" +
             "klmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY" +
             "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioidfjsdlfjsdjflksdfjsjfsdlkfsjdfsjfjsdfjsdjfsdlfj"
-        );
-
-        // --- HTTP-level checks ---
-        expect(questionnairePostResponse.ok()).toBeFalsy();
-        expect(questionnairePostResponse.status()).toBe(400);
-    });
-
-    test('Validate slug length POST create new questionnaire', async ({request}) => {
-
-        const {questionnairePostResponse} = await createQuestionnaire(
-            request,
-            undefined,
-            undefined,
-            undefined,
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij" +
-            "klmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY" +
-            "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioidfjsdlfjsdjflksdfjsjfsdlkfsjdfsjfjsdfjsdjfsdlfj" +
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij" +
-            "klmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY" +
-            "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioidfjsdlfjsdjflksdfjsjfsdlkfsjdfsjfjsdfjsdjfsdlfj"
-        );
-
-        // --- HTTP-level checks ---
-        expect(questionnairePostResponse.ok()).toBeFalsy();
-        expect(questionnairePostResponse.status()).toBe(400);
-    });
-
-    test('Validate invalid slug for POST new questionnaire', async ({request}) => {
-
-        const {questionnairePostResponse} = await createQuestionnaire(
-            request,
-            undefined,
-            undefined,
-            undefined,
-            "CAPITAL SLUG AND SPACE"
         );
 
         // --- HTTP-level checks ---

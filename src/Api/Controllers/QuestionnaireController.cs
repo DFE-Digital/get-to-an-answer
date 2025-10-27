@@ -47,6 +47,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
             Id = entity.Id,
             Title = entity.Title,
             CreatedAt = entity.CreatedAt,
+            UpdatedAt = entity.CreatedAt,
         };
         
         return Created($"api/questionnaires/{dto.Id}", dto);

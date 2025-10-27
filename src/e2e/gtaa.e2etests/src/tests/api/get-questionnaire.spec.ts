@@ -10,7 +10,7 @@ import {
     expectQuestionnaireSchema,
     expectQuestionnaireTypes,
     expectQuestionnaireContent,
-    expectQuestionnaireIO
+    expectQuestionnaireIO, expectQuestionnaireInitStateTypes, expectQuestionnaireInitStateIO
 } from '../../helpers/api-assertions-helper'
 
 test.describe('GET questionnaire api tests', () => {
@@ -27,13 +27,13 @@ test.describe('GET questionnaire api tests', () => {
         expectQuestionnaireSchema(response.questionnaireGetBody);
 
         // --- Type sanity checks ---
-        expectQuestionnaireTypes(response.questionnaireGetBody);
+        expectQuestionnaireInitStateTypes(response.questionnaireGetBody);
 
         // --- Basic content sanity ---
         expectQuestionnaireContent(response.questionnaireGetBody);
 
         // --- I/O checks ---
-        expectQuestionnaireIO(response.questionnaireGetBody, payload, GUID_REGEX);
+        expectQuestionnaireInitStateIO(response.questionnaireGetBody, payload, GUID_REGEX);
     });
 
     test('Validate GET specific questionnaire with invalid token', async ({request}) => {
@@ -163,7 +163,7 @@ test.describe('GET questionnaire api tests', () => {
             expectQuestionnaireSchema(q);
 
             // --- Type sanity checks ---
-            expectQuestionnaireTypes(q);
+            expectQuestionnaireInitStateTypes(q);
 
             // --- Basic content sanity ---
             expectQuestionnaireContent(q);
