@@ -8,6 +8,7 @@ export function expectHttp(response: APIResponse, expectedStatus: number = 201) 
     expect(response.status(), `Expected status ${expectedStatus}`).toBe(expectedStatus);
 }
 
+// --- Questionnaire related validation functions ---
 export function expectQuestionnaireSchema(questionnaire: any) {
     const expectedProps = [
         'id',
@@ -116,5 +117,69 @@ export function expectQuestionnaireIO(q: any, payload: any, guidRegex: RegExp) {
         expect(isEmpty(q.slug)).toBeTruthy();
     } else {
         expect(q.slug).toBe(payload.slug);
+    }
+}
+
+// --- Question related validation functions ---
+export function expectQuestionSchema(question: any) {
+    const expectedProps = [
+        'id',
+        'questionnaireId',
+        'order',
+        'content',
+        'description',
+        'type',
+        'createdAt',
+        'updatedAt',
+        'answers'
+    ];
+
+    for (const prop of expectedProps) {
+        expect(question, `Missing property:${prop}`).toHaveProperty((prop))
+    }
+}
+
+export function expectQuestionTypes(question: any) {
+    expect(typeof question.id).toBe('string');
+    expect(typeof question.order).toBe('number');
+    expect(typeof question.content).toBe('string');
+    expect(typeof question.description).toBe('string');
+    expect(typeof question.type).toBe('number');
+    expect(typeof question.createdAt).toBe('string');
+    expect(typeof question.updatedAt).toBe('string');
+    expect(Array.isArray(question.answers)).toBe(true);
+}
+
+export function expectQuestionContent(q: any) {
+
+    expect(q.order).toBeGreaterThanOrEqual(0);
+    expect(q.content?.trim().length).toBeGreaterThan(0);
+
+    if (isEmpty(q.description)) {
+        expect(isEmpty(q.description)).toBeTruthy();
+    } else {
+        expect(q.description.trim().length).toBeGreaterThan(0);
+    }
+
+    expect(q.answers.length).toBeGreaterThanOrEqual(0);
+    expect([1, 2, 3]).toContain(q.type);
+
+    //timestamp-sanity
+    const c = new Date(q.createdAt).getTime();
+    const u = new Date(q.updatedAt).getTime();
+    expect(!isNaN(c)).toBeTruthy();
+    expect(!isNaN(u)).toBeTruthy();
+    expect(u).toBeGreaterThanOrEqual(c);
+}
+
+export function expectQuestionIO(q: any, payload: any, guidRegex: RegExp) {
+    expect(q.id).toMatch(guidRegex);
+    expect(q.content).toBe(payload.content);
+    expect(q.type).toBe(payload.type);
+    
+    if (isEmpty(payload.description)) {
+        expect(isEmpty(q.description)).toBeTruthy();
+    } else {
+        expect(q.description).toBe(payload.description);
     }
 }

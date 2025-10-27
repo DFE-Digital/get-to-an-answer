@@ -11,8 +11,9 @@ export enum QuestionPrefix {
 
 // Define question types
 export enum QuestionType {
-    SINGLE = 'single',
-    MULTIPLE = 'multiple'
+    SINGLE = 1,
+    MULTIPLE = 2,
+    DROPDOWN = 3
 }
 
 // Define destination types
