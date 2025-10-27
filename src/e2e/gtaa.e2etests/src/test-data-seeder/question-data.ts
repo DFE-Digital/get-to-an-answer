@@ -21,10 +21,10 @@ async function safeParseBody(response: APIResponse) {
 export async function createQuestion(
     request: any,
     questionnaireId: string,
+    bearerToken?: string,
     content?: string,
-    description?: string,
     type?: QuestionType,
-    bearerToken?: string
+    description?: string,
 ) {
 
     const payload = new QuestionBuilder(questionnaireId)
@@ -40,11 +40,7 @@ export async function createQuestion(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
-
-    // if (!response.ok()) {
-    //     throw new Error(`❌ Failed to create question: ${response.status()}`);
-    // }
-
+    
     const responseBody = await safeParseBody(response);
 
     return {
@@ -105,12 +101,13 @@ export async function updateQuestion(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
+    
+    const responseBody = await safeParseBody(response);
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to update question: ${response.status()}`);
+    return {
+        updatedQuestionPostResponse: response,
+        UpdatedQuestion: responseBody,
     }
-
-    return await response.json();
 }
 
 export async function deleteQuestion(
