@@ -13,16 +13,17 @@ namespace Frontend.Controllers;
 public class HomeController(IApiClient apiClient, ILogger<HomeController> logger) : Controller
 {
     [HttpGet("questionnaires/{questionnaireSlug}/start")]
-    public async Task<IActionResult> GetStartPage(string questionnaireSlug)
+    public async Task<IActionResult> GetStartPage(string questionnaireSlug, [FromQuery] bool? embed = null)
     {
         return View("QuestionnaireStart", new QuestionnaireViewModel
         {
+            IsEmbedded = embed ?? false,
             Questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(questionnaireSlug),
         });
     }
     
     [HttpGet("questionnaires/{questionnaireSlug}")]
-    public async Task<IActionResult> GetInitialQuestionPage(string questionnaireSlug)
+    public async Task<IActionResult> GetInitialQuestionPage(string questionnaireSlug, [FromQuery] bool? embed = null)
     {
         var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(questionnaireSlug);
         
@@ -31,6 +32,7 @@ public class HomeController(IApiClient apiClient, ILogger<HomeController> logger
         
         return View("QuestionnaireQuestion", new QuestionnaireViewModel
         {
+            IsEmbedded = embed ?? false,
             Questionnaire = questionnaire,
             NextStateRequest = new GetNextStateRequest(),
             Destination = new DestinationDto
@@ -43,7 +45,7 @@ public class HomeController(IApiClient apiClient, ILogger<HomeController> logger
     
     [HttpPost("/questionnaires/{questionnaireSlug}")]
     public async Task<IActionResult> GetNextStatePage(string questionnaireSlug, GetNextStateRequest request, 
-        [FromForm(Name = "Scores")] Dictionary<Guid, float> scores)
+        [FromForm(Name = "Scores")] Dictionary<Guid, float> scores, [FromQuery] bool? embed = null)
     {
         var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(questionnaireSlug);
         
@@ -69,6 +71,7 @@ public class HomeController(IApiClient apiClient, ILogger<HomeController> logger
         
         return View("QuestionnaireQuestion", new QuestionnaireViewModel
         {
+            IsEmbedded = embed ?? false,
             Questionnaire = questionnaire,
             NextStateRequest = new GetNextStateRequest(),
             Destination = destination

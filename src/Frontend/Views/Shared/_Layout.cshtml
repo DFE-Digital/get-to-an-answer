@@ -63,29 +63,35 @@
 
 <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
 @{
-    await Html.RenderPartialAsync("_Header");
+    if (!Model.IsEmbedded)
+    {
+        await Html.RenderPartialAsync("_Header");
+    }
 }
 
-<div class="govuk-service-navigation app-service-navigation" data-module="govuk-service-navigation" data-govuk-service-navigation-init="">
-    <div class="govuk-width-container">
-        <div class="govuk-service-navigation__container">
-            <nav aria-label="Menu" class="govuk-service-navigation__wrapper">
-                <button type="button" class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle" aria-controls="navigation" hidden="">Menu</button>
-                <ul id="navigation" class="govuk-service-navigation__list">
-                    <li class="govuk-service-navigation__item">
-                        <a class="govuk-service-navigation__link" aria-current="true" href="https://www.forms.service.gov.uk/support">Support</a>
-                    </li>
-                    <li class="govuk-service-navigation__item app-service-navigation__item--featured">
-                        <span class="govuk-service-navigation__text">@ViewBag.FullName</span>
-                    </li>
-                    <li class="govuk-service-navigation__item">
-                        <a class="govuk-service-navigation__link" aria-current="true" href="/sign-out">Sign out</a>
-                    </li>
-                </ul>
-            </nav>
+@if (!Model.IsEmbedded)
+{
+    <div class="govuk-service-navigation app-service-navigation" data-module="govuk-service-navigation" data-govuk-service-navigation-init="">
+        <div class="govuk-width-container">
+            <div class="govuk-service-navigation__container">
+                <nav aria-label="Menu" class="govuk-service-navigation__wrapper">
+                    <button type="button" class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle" aria-controls="navigation" hidden="">Menu</button>
+                    <ul id="navigation" class="govuk-service-navigation__list">
+                        <li class="govuk-service-navigation__item">
+                            <a class="govuk-service-navigation__link" aria-current="true" href="https://www.forms.service.gov.uk/support">Support</a>
+                        </li>
+                        <li class="govuk-service-navigation__item app-service-navigation__item--featured">
+                            <span class="govuk-service-navigation__text">@ViewBag.FullName</span>
+                        </li>
+                        <li class="govuk-service-navigation__item">
+                            <a class="govuk-service-navigation__link" aria-current="true" href="/sign-out">Sign out</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
-</div>
+}
 
 @if (IsSectionDefined("BeforeGDSContent"))
 
@@ -114,10 +120,14 @@
 }
 
 @{
-    //await Html.RenderPartialAsync("_Footer");
+    if (!Model.IsEmbedded)
+    {
+        await Html.RenderPartialAsync("_Footer");
+    }
 }
 
 @await RenderSectionAsync("Scripts", false)
+<script src="/js/gtaa.internal.js"></script>
 <script asp-add-nonce="true" type="module">
     import { initAll } from '/js/govuk-frontend.min.js'
     initAll()

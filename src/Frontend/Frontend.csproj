@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="HtmlSanitizer" Version="9.0.886" />
+      <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
       <PackageReference Include="Markdig" Version="0.42.0" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.0" />
       <PackageReference Include="Microsoft.Identity.Web" Version="3.14.1" />

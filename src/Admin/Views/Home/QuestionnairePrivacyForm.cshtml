@@ -1,0 +1,80 @@
+﻿@model QuestionnaireViewModel?
+
+@{
+  ViewData["Title"] = "Questionnaire privacy information";
+  var hasErrors = Model?.CreateQuestionnaire != null && !ViewData.ModelState.IsValid;
+  string? ErrorFor(string key) => ViewData.ModelState.ContainsKey(key) && ViewData.ModelState[key]?.Errors.Count > 0
+    ? ViewData.ModelState[key]!.Errors[0].ErrorMessage
+    : null;
+
+  var hasTitleError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Title)) != null;
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires">Back to questionnaires</a>
+}
+
+@if (hasErrors)
+{
+  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+    <h2 class="govuk-error-summary__title" id="error-summary-title">
+      There is a problem
+    </h2>
+    <div class="govuk-error-summary__body">
+      <ul class="govuk-list govuk-error-summary__list">
+        @foreach (var kvp in ViewData.ModelState.Where(ms => ms.Value!.Errors.Count > 0))
+        {
+          var fieldName = kvp.Key;
+          var message = kvp.Value!.Errors[0].ErrorMessage;
+          // The href should link to the input id for accessibility
+          <li><a href="#@fieldName">@message</a></li>
+        }
+      </ul>
+    </div>
+  </div>
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <form action="/forms/262709/privacy-policy" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="p6EURB9Dg6KYGC7fcllADAG_bhLfC0AXY05sKtyjHBwKHWU89kuj2eNiY8uoG9HbeYtdX4K3-AUv5RIKyFA-kw" autocomplete="off">
+
+      <h1 class="govuk-heading-l">
+        Provide a link to privacy information for this form
+      </h1>
+
+      <p>
+  To comply with the UK General Data Protection Regulation (UK GDPR), you must provide privacy information for the people who will enter their data into your form.
+</p>
+
+<p>
+  The privacy information must include details such as:
+  </p><ul class="govuk-list govuk-list--bullet">
+    <li>
+      your purposes for processing the personal data
+    </li>
+    <li>
+      how long you’ll keep the personal data
+    </li>
+    <li>
+      who the data will be shared with
+    </li>
+    <li>
+      contact details for your department and your data protection officer
+    </li>
+  </ul>
+<p></p>
+
+<p>
+  You may already publish this information, for example in a privacy notice or personal information charter. Existing privacy information may need to be updated to cover the data you are collecting in this form, or you may need a new privacy notice.
+</p>
+
+<p>
+  To get help, contact your department’s data protection officer or data protection manager.
+</p>
+
+      <div class="govuk-form-group"><label for="forms-privacy-policy-input-privacy-policy-url-field" class="govuk-label govuk-label--m">Enter a link to privacy information for this form</label><div class="govuk-hint" id="forms-privacy-policy-input-privacy-policy-url-hint">For example, https://www.gov.uk/help/privacy-notice</div><input id="forms-privacy-policy-input-privacy-policy-url-field" class="govuk-input govuk-!-width-two-thirds" aria-describedby="forms-privacy-policy-input-privacy-policy-url-hint" spellcheck="false" type="text" name="forms_privacy_policy_input[privacy_policy_url]"></div>
+      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
+</form>  </div>
+</div>

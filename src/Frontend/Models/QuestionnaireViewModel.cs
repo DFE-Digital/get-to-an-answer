@@ -12,4 +12,5 @@ public class QuestionnaireViewModel : ConfigViewModel
     public int? QuestionId { get; set; }
     
     public bool AddEmptyAnswerOption { get; set; }
+    public bool IsEmbedded { get; set; }
 }

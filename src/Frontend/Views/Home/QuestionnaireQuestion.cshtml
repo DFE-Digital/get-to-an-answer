@@ -62,7 +62,7 @@
   <div class="govuk-grid-column-full">
     @if (Model.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
     {
-      <form action="/questionnaires/@Model.Questionnaire?.Slug" accept-charset="UTF-8" method="post">
+      <form action="/questionnaires/@Model.Questionnaire?.Slug?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
         <input type="hidden" name="CurrentQuestionId" value="@Model.Destination.Question.Id" autocomplete="off">
         <input type="hidden" name="CurrentQuestionOrder" value="@Model.Destination.Question.Order" autocomplete="off">
         <div class="govuk-form-group">

@@ -1,0 +1,78 @@
+@model QuestionnaireViewModel?
+
+@{
+  ViewData["Title"] = "Questionnaire privacy information";
+  var hasErrors = Model?.CreateQuestionnaire != null && !ViewData.ModelState.IsValid;
+  string? ErrorFor(string key) => ViewData.ModelState.ContainsKey(key) && ViewData.ModelState[key]?.Errors.Count > 0
+    ? ViewData.ModelState[key]!.Errors[0].ErrorMessage
+    : null;
+
+  var hasTitleError = Model?.CreateQuestionnaire != null && ErrorFor(nameof(Model.CreateQuestionnaire.Title)) != null;
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires">Back to questionnaires</a>
+}
+
+@if (hasErrors)
+{
+  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+    <h2 class="govuk-error-summary__title" id="error-summary-title">
+      There is a problem
+    </h2>
+    <div class="govuk-error-summary__body">
+      <ul class="govuk-list govuk-error-summary__list">
+        @foreach (var kvp in ViewData.ModelState.Where(ms => ms.Value!.Errors.Count > 0))
+        {
+          var fieldName = kvp.Key;
+          var message = kvp.Value!.Errors[0].ErrorMessage;
+          // The href should link to the input id for accessibility
+          <li><a href="#@fieldName">@message</a></li>
+        }
+      </ul>
+    </div>
+  </div>
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <form action="/forms/262709/contact-details" accept-charset="UTF-8" method="post" data-gtm-form-interact-id="0"><input type="hidden" name="authenticity_token" value="K-yIUn0QSiVZDX6gXQ8foDPaXUejcKAYtLny60AmohNlWDNYGH--CLjf9bicegDTIgYl2DMxKW0qsvowXTUeQw" autocomplete="off">
+
+      <h1 class="govuk-heading-l">
+        <span class="govuk-caption-l">This is a research form</span>
+        Provide contact details for support
+      </h1>
+
+      <p>
+  You need to provide at least one way for people to get help if they get stuck.
+</p>
+
+<p>
+  Contact information will be shown:
+</p>
+<ul class="govuk-list govuk-list--bullet">
+  <li>at the bottom of every page of the form</li>
+  <li>in an email confirming the date and time a form was submitted - if someone chooses to receive this</li>
+</ul>
+
+
+      <p class="govuk-!-margin-bottom-6">
+        The optional email confirmation will also include the ‘what happens next’ information you provide. It will not contain a copy of their answers.
+      </p>
+
+      <div class="govuk-form-group"><fieldset class="govuk-fieldset" aria-describedby="forms-contact-details-input-contact-details-supplied-hint"><legend class="govuk-fieldset__legend govuk-fieldset__legend--m">How can people get help with filling in this form?</legend><div class="govuk-hint" id="forms-contact-details-input-contact-details-supplied-hint">Select at least one option</div><input value="" name="forms_contact_details_input[contact_details_supplied][]" autocomplete="off" type="hidden" id="forms_contact_details_input_contact_details_supplied"><div class="govuk-checkboxes" data-module="govuk-checkboxes" data-govuk-checkboxes-init="">
+        <div class="govuk-checkboxes__item"><input id="forms-contact-details-input-contact-details-supplied-supply-email-field" class="govuk-checkboxes__input" type="checkbox" value="supply_email" name="forms_contact_details_input[contact_details_supplied][]" aria-controls="forms-contact-details-input-contact-details-supplied-supply-email-conditional" aria-expanded="true" data-gtm-form-interact-field-id="0"><label for="forms-contact-details-input-contact-details-supplied-supply-email-field" class="govuk-label govuk-checkboxes__label">Email</label></div><div class="govuk-checkboxes__conditional" id="forms-contact-details-input-contact-details-supplied-supply-email-conditional">
+          <div class="govuk-form-group"><label for="forms-contact-details-input-email-field" class="govuk-label">Enter the email address</label><input id="forms-contact-details-input-email-field" class="govuk-input" type="text" name="forms_contact_details_input[email]"></div>
+</div>
+        <div class="govuk-checkboxes__item"><input id="forms-contact-details-input-contact-details-supplied-supply-phone-field" class="govuk-checkboxes__input" type="checkbox" value="supply_phone" name="forms_contact_details_input[contact_details_supplied][]" aria-controls="forms-contact-details-input-contact-details-supplied-supply-phone-conditional" aria-expanded="true" data-gtm-form-interact-field-id="1"><label for="forms-contact-details-input-contact-details-supplied-supply-phone-field" class="govuk-label govuk-checkboxes__label">Phone</label></div><div class="govuk-checkboxes__conditional" id="forms-contact-details-input-contact-details-supplied-supply-phone-conditional">
+          <div class="govuk-form-group"><label for="forms-contact-details-input-phone-field" class="govuk-label">Enter the phone number and its opening times</label><textarea id="forms-contact-details-input-phone-field" class="govuk-textarea" rows="5" name="forms_contact_details_input[phone]"></textarea></div>
+</div>
+        <div class="govuk-checkboxes__item"><input id="forms-contact-details-input-contact-details-supplied-supply-link-field" class="govuk-checkboxes__input" type="checkbox" value="supply_link" name="forms_contact_details_input[contact_details_supplied][]" aria-controls="forms-contact-details-input-contact-details-supplied-supply-link-conditional" aria-expanded="true" data-gtm-form-interact-field-id="2"><label for="forms-contact-details-input-contact-details-supplied-supply-link-field" class="govuk-label govuk-checkboxes__label">Online contact link</label></div><div class="govuk-checkboxes__conditional" id="forms-contact-details-input-contact-details-supplied-supply-link-conditional">
+          <div class="govuk-form-group"><label for="forms-contact-details-input-link-href-field" class="govuk-label">Enter the link</label><div class="govuk-hint" id="forms-contact-details-input-link-href-hint">For example, https://gov.uk/contact-form</div><input id="forms-contact-details-input-link-href-field" class="govuk-input" aria-describedby="forms-contact-details-input-link-href-hint" type="text" name="forms_contact_details_input[link_href]"></div>
+          <div class="govuk-form-group"><label for="forms-contact-details-input-link-text-field" class="govuk-label">What text should be used to describe this link?</label><div class="govuk-hint" id="forms-contact-details-input-link-text-hint">For example, ‘Online contact form’</div><input id="forms-contact-details-input-link-text-field" class="govuk-input" aria-describedby="forms-contact-details-input-link-text-hint" type="text" name="forms_contact_details_input[link_text]"></div>
+</div></div></fieldset></div>
+      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
+</form>  </div>
+</div>

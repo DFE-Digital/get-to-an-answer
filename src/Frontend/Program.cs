@@ -1,7 +1,11 @@
 using Common.Client;
 using Common.Configuration;
+using Joonasw.AspNetCore.SecurityHeaders;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// to add nonce to js tags
+builder.Services.AddCsp(nonceByteAmount: 32);
 
 // Get the API URL from appsettings
 var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
@@ -49,5 +53,11 @@ app.MapControllerRoute(
         pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Content-Security-Policy"] =
+        "default-src 'self'; frame-src *; frame-ancestors *;";
+    await next();
+});
 
 app.Run();
