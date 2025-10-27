@@ -6,7 +6,6 @@ export class QuestionBuilder {
     private _content: string
     private _description: string
     private _type: QuestionType
-    private _prefix: string
 
     constructor(questionnaireId: string) {
         const timestamp = Date.now();
@@ -14,20 +13,11 @@ export class QuestionBuilder {
         this._content = `Default question content - ${timestamp}`;
         this._description = `Default question description - ${timestamp}`;
         this._type = QuestionType.SINGLE; //set to default
-        this._prefix = 'Default question prefix';
     }
 
     withContent(content?: string) {
         if (content !== undefined)
             this._content = content;
-        return this;
-    }
-
-    withContentPrefix(prefix?: string) {
-        if (prefix && prefix.trim().length > 0)
-            this._content = `${prefix} - ${this._content}`;
-        else
-            this._content = `${this._prefix} - ${this._content}`;
         return this;
     }
 

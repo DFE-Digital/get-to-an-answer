@@ -1,20 +1,34 @@
 import {QuestionBuilder} from '../builders/QuestionBuilder';
 import {QuestionType} from '../constants/test-data-constants';
 import { JwtHelper } from "../helpers/JwtHelper";
+import {APIRequestContext, APIResponse} from "@playwright/test";
 
+//duplicate method - need to move in one place
+//to parse response-body correctly - json body can be json, text or empty string
+async function safeParseBody(response: APIResponse) {
+    const ct = (response.headers()['content-type'] || '').toLowerCase();
+    const raw = await response.text();
+    if (!raw) return null;
+    if (ct.includes('application/json')) {
+        try {
+            return JSON.parse(raw);
+        } catch {
+            return null;
+        }
+    }
+    return raw;
+}
 export async function createQuestion(
     request: any,
     questionnaireId: string,
+    bearerToken?: string,
     content?: string,
-    description?: string,
     type?: QuestionType,
-    questionPrefix?: string,
-    bearerToken?: string
+    description?: string,
 ) {
 
     const payload = new QuestionBuilder(questionnaireId)
         .withContent(content)
-        .withContentPrefix(questionPrefix)
         .withDescription(description)
         .withType(type)
         .build();
@@ -26,13 +40,14 @@ export async function createQuestion(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
+    
+    const responseBody = await safeParseBody(response);
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to create question: ${response.status()}`);
+    return {
+        questionPostResponse: response,
+        question: responseBody,
+        payload
     }
-
-    const questionPostResponse = await response.json();
-    return {questionPostResponse, payload}
 }
 
 export async function getQuestion(
@@ -86,12 +101,13 @@ export async function updateQuestion(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
+    
+    const responseBody = await safeParseBody(response);
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to update question: ${response.status()}`);
+    return {
+        updatedQuestionPostResponse: response,
+        UpdatedQuestion: responseBody,
     }
-
-    return await response.json();
 }
 
 export async function deleteQuestion(
