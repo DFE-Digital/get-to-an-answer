@@ -183,3 +183,22 @@ export function expectQuestionIO(q: any, payload: any, guidRegex: RegExp) {
         expect(q.description).toBe(payload.description);
     }
 }
+// --- Answer related validation functions ---
+export function expectAnswerSchema(answer: any) {
+    const expectedProps = [
+        'id',
+        'questionId',
+        'questionnaireId',
+        'content',
+        'description',
+        'destinationUrl',
+        'destinationType',
+        'score',
+        'createdAt',
+        'updatedAt'
+    ];
+    
+    for (const prop of expectedProps) {
+        expect(answer, `Missing property:${prop}`).toHaveProperty((prop))
+    }
+}
