@@ -62,11 +62,12 @@ export async function getQuestion(
         }
     });
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to fetch required question: ${response.status()}`);
-    }
+    const responseBody = await safeParseBody(response);
 
-    return await response.json();
+    return {
+        questionGetResponse: response,
+        questionGetBody: responseBody
+    }
 }
 
 export async function listQuestions(
@@ -81,11 +82,12 @@ export async function listQuestions(
         }
     });
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to list questions: ${response.status()}`);
-    }
+    const responseBody = await safeParseBody(response);
 
-    return await response.json();
+    return {
+        questionGetResponse: response,
+        questionGetBody: responseBody
+    }
 }
 
 export async function updateQuestion(
