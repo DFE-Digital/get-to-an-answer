@@ -564,13 +564,18 @@ public class QuestionTests(ApiFixture factory) :
         text.Should().NotBeNullOrWhiteSpace();
     }
 
-    // Scenario: Update a question with only the Content
+    #endregion
+    
+    // === Tests for the Update questions endpoint ===
+    
+    #region Update Question Endpoint Tests
+
     [Fact]
     public async Task Update_Content_Only_NoContent_And_Description_Unchanged()
     {
         // Arrange
         var questionnaireId = await CreateQuestionnaire();
-        
+
         string id;
         const string originalDesc = "Original desc";
         using (var postRes = await Create(new
@@ -587,7 +592,7 @@ public class QuestionTests(ApiFixture factory) :
 
         // Act
         using var res = await UpdateById(id, new { content = "T1" });
-        
+
         // Assert 204, then GET to verify
         res.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
@@ -598,8 +603,7 @@ public class QuestionTests(ApiFixture factory) :
         question.UpdatedAt.Should().NotBe(default);
     }
 
-    // Scenario: Update a question with missing Content
-    [Fact]
+    [Fact(DisplayName = "Update with missing content returns 400 Bad Request")]
     public async Task Update_Missing_Content_BadRequest_NoContent_Not_Used()
     {
         // Arrange
@@ -626,9 +630,35 @@ public class QuestionTests(ApiFixture factory) :
         question.Content.Should().Be("T0");
         question.Description.Should().Be("D0");
     }
+    
+    [Fact(DisplayName = "Update with invalid question type returns 400 Bad Request")]
+    public async Task Update_Invalid_Question_Type_BadRequest()
+    {
+        // Arrange
+        var questionnaireId = await CreateQuestionnaire();
+        
+        string id;
+        using (var postRes = await Create(new { questionnaireId, content = "T0", description = "D0", type = QuestionType.MultiSelect }))
+        {
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
+            id = ExtractId(await postRes.Content.ReadAsStringAsync());
+        }
 
-    // Scenario: Update with Content and Description
-    [Fact]
+        // Act
+        using var res = await UpdateById(id, new { content = "T0", type = (QuestionType)123 });
+
+        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var text = await res.Content.ReadAsStringAsync();
+        text.Should().NotContain("userId");
+        text.Should().NotContain("userEmail");
+
+        // Verify nothing changed
+        var question = await GetById<QuestionDto>(id);
+        question.Content.Should().Be("T0");
+        question.Description.Should().Be("D0");
+    }
+
+    [Fact(DisplayName = "Update content and description returns 204 and updates values")]
     public async Task Update_Content_And_Description_NoContent_Then_Get()
     {
         // Arrange

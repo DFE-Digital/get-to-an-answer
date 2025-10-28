@@ -14,5 +14,7 @@ public class CreateQuestionRequestDto
         ErrorMessage = "Content must be in plain language, avoid all-caps, not be empty or only whitespace, and should not contain repeated spaces.")]
     public required string Content { get; set; }
     public string? Description { get; set; }
+    
+    [EnumDefined]
     public required QuestionType Type { get; set; }
 }
