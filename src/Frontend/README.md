@@ -18,7 +18,7 @@ flowchart TD
   B -->|Answer B| D[Next Question / Destination]
   C --> E{More questions?}
   D --> E
-  E -- Yes --> F[Subsequent Question(s)]
+  E -- Yes --> F[Subsequent Questions]
   F --> E
   E -- No --> G[Outcome / External Destination]
   G --> H[Support & next steps shown]
