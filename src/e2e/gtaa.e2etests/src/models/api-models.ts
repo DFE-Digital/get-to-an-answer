@@ -15,9 +15,10 @@ export interface QuestionModel {
 
 export interface AnswerModel {
     questionId: string;
+    questionnaireId: string;
     content: string;
     description: string;
-    destination: string;
+    destinationUrl: string;
     destinationType: AnswerDestinationType;
-    weight: number;
+    score: number;
 }

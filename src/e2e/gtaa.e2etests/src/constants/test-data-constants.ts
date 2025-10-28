@@ -18,9 +18,9 @@ export enum QuestionType {
 
 // Define destination types
 export enum AnswerDestinationType {
-    QUESTION = 'question',
-    PAGE = 'page',
-    EXTERNAL = 'external'
+    QUESTION = 1,
+    PAGE = 2,
+    EXTERNAL = 3
 }
 
 export const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
