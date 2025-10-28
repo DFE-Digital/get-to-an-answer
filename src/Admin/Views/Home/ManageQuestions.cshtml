@@ -155,7 +155,7 @@ else if (Model.JustMovedDown)
                         <a class="govuk-link" href="/admin/questions/@question.Id/reorder/@(question.Order - 1)">Move Up</a>
                       </li>
                     }
-                    @if (question.Order < questions.Count-1)
+                    @if (question.Order < questions.Count)
                     {
                       <li class="govuk-summary-list__actions-list-item">
                         <a class="govuk-link" href="/admin/questions/@question.Id/reorder/@(question.Order + 1)">Move Down</a>

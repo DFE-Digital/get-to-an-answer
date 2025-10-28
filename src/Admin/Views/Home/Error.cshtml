@@ -1,7 +1,7 @@
 @model QuestionnaireViewModel
 
 @{
-    ViewBag.Title = "Sorry, there is a problem with the service";
+    ViewBag.Title = Model.ErrorMessage ?? "Sorry, there is a problem with the service";
     Layout = "_ErrorLayout";
 }
 
@@ -17,7 +17,7 @@
 }
 
 <p class="govuk-body">
-    Try again later.
+    @(Model.ErrorMessage ?? "Try again later").
 </p>
 
 

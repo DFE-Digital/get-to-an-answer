@@ -56,4 +56,6 @@ public class QuestionnaireViewModel : ConfigViewModel
     public bool JustPublished { get; set; }
     public bool JustUnpublished { get; set; }
     public string[] Contributors { get; set; } = [];
+    public string? Error { get; set; } = "";
+    public string? ErrorMessage { get; set; } = "";
 }
