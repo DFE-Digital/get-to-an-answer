@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Common.Domain;
 using Common.Enum;
+using Common.Validation;
 
 namespace Common.Domain.Request.Create;
 
@@ -13,6 +14,7 @@ public class CreateAnswerRequestDto
     
     public float Score { get; set; }
     
+    [EnumDefined]
     public DestinationType? DestinationType { get; set; }
     
     [RegularExpression(@"^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$", 
