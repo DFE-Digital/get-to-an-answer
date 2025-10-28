@@ -78,13 +78,13 @@ flowchart TB
 ## Local development
 
 - Docker Compose runs API, Admin, and Frontend together.
-- Internal service DNS allows Admin/Frontend to call API at http://gettoananswer-api:8080.
+- Internal service DNS allows Admin/Frontend to call API at https://localhost:7243.
 - ASPNETCORE_ENVIRONMENT=Local is used for all containers.
 
 ```mermaid
 flowchart LR
-  FE[Frontend Container] -->|http://gettoananswer-api:8080| API[API Container]
-  ADM[Admin Container] -->|http://gettoananswer-api:8080| API
+  FE[Frontend Container] -->|https://localhost:7243| API[API Container]
+  ADM[Admin Container] -->|https://localhost:7243| API
 ```
 
 
