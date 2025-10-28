@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Common.Domain;
 using Common.Enum;
+using Common.Validation;
 
 namespace Common.Domain.Request.Update;
 
@@ -11,6 +12,7 @@ public class UpdateAnswerRequestDto
     
     public float? Score { get; set; }
     
+    [EnumDefined]
     public DestinationType? DestinationType { get; set; }
     
     
