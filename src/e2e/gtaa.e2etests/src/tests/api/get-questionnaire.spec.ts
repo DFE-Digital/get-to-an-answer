@@ -4,13 +4,12 @@ import {
     getQuestionnaire, deleteQuestionnaire, listQuestionnaires
 } from "../../test-data-seeder/questionnaire-data";
 import {GUID_REGEX} from "../../constants/test-data-constants";
-import {ClaimTypes, JwtHelper, SimpleDate} from '../../helpers/JwtHelper';
+import {JwtHelper} from '../../helpers/JwtHelper';
 import {
     expectHttp,
     expectQuestionnaireSchema,
-    expectQuestionnaireTypes,
     expectQuestionnaireContent,
-    expectQuestionnaireIO, expectQuestionnaireInitStateTypes, expectQuestionnaireInitStateIO
+    expectQuestionnaireInitStateTypes, expectQuestionnaireInitStateIO
 } from '../../helpers/api-assertions-helper'
 
 test.describe('GET questionnaire api tests', () => {
@@ -67,9 +66,6 @@ test.describe('GET questionnaire api tests', () => {
     });
 
     test('Validate GET specific questionnaire with invalid questionnaire id', async ({request}) => {
-        const {questionnaire} = await createQuestionnaire(request);
-        const questionnaireId = await questionnaire.id;
-
         const response = await getQuestionnaire(
             request,
             12345,
@@ -110,42 +106,29 @@ test.describe('GET questionnaire api tests', () => {
         const q1Token = JwtHelper.ValidToken;
         const q2Token = JwtHelper.UnauthorizedToken;
 
-        const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(
-            request,
-            q1Token,
-            'Custom test questionnaire title',
-            'Custom test first questionnaire description',
-            'slug'
-        );
-
-        const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(
-            request,
-            q2Token,
-            'Custom test questionnaire title',
-            'Custom test second questionnaire description',
-            'slug'
-        );
+        const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(request, q1Token);
+        const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(request, q2Token);
 
         // --- HTTP-level checks ---
         expectHttp(q1Response, 201);
         expectHttp(q2Response, 201);
 
-        const getResponse = await getQuestionnaire(
+        const response = await getQuestionnaire(
             request,
             q1.id,
             q2Token
         );
 
         // // --- HTTP-level checks ---
-        expect(getResponse.questionnaireGetResponse.ok()).toBeFalsy();
-        expect(getResponse.questionnaireGetResponse.status()).toBe(403);
+        expect(response.questionnaireGetResponse.ok()).toBeFalsy();
+        expect(response.questionnaireGetResponse.status()).toBe(403);
     });
 
     test('Validate GET all questionnaires', async ({request}) => {
         const qToken = JwtHelper.ValidToken;
 
-        const {questionnaire: q1} = await createQuestionnaire(request, qToken);
-        const {questionnaire: q2} = await createQuestionnaire(request, qToken);
+        await createQuestionnaire(request, qToken);
+        await createQuestionnaire(request, qToken);
 
         const response = await listQuestionnaires(request, qToken);
 
@@ -177,17 +160,13 @@ test.describe('GET questionnaire api tests', () => {
         const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(
             request,
             q1Token,
-            'Custom test questionnaire title - user 1',
-            'Custom test first questionnaire description',
-            'slug'
+            'Custom test questionnaire title - user 1'
         );
 
         const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(
             request,
             q2Token,
-            'Custom test questionnaire title - user 2',
-            'Custom test second questionnaire description',
-            'slug'
+            'Custom test questionnaire title - user 2'
         );
 
         // --- HTTP-level checks ---
@@ -195,7 +174,7 @@ test.describe('GET questionnaire api tests', () => {
         expectHttp(q2Response, 201);
 
         const response = await listQuestionnaires(request, q2Token);
-        
+
         // // --- HTTP-level checks ---
         expectHttp(response.questionnaireGetResponse, 200);
 
