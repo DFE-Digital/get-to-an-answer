@@ -159,7 +159,7 @@ export async function deleteQuestionnaire(
 
     return {
         deleteQuestionnaireResponse: response,
-        deleteQuestionnaire: responseBody,
+        deleteQuestionnaireBody: responseBody,
     }
 }
 
