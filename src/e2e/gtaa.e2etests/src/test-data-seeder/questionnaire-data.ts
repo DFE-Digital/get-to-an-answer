@@ -3,18 +3,35 @@ import {ClaimTypes, JwtHelper, SimpleDate} from '../helpers/JwtHelper';
 import {APIRequestContext, APIResponse} from "@playwright/test";
 
 //to parse response-body correctly - json body can be json, text or empty string
+//duplicate - to be fixed later
 async function safeParseBody(response: APIResponse) {
     const ct = (response.headers()['content-type'] || '').toLowerCase();
-    const raw = await response.text();
-    if (!raw) return null;
-    if (ct.includes('application/json')) {
-        try {
-            return JSON.parse(raw);
-        } catch {
+
+    try {
+        const raw = await response.text();
+
+        // If empty body, return null
+        if (!raw || raw.trim() === '') {
             return null;
         }
+
+        // If JSON content type, try to parse
+        if (ct.includes('application/json')) {
+            try {
+                return JSON.parse(raw);
+            } catch (parseError) {
+                console.error('JSON parse error:', parseError);
+                console.error('Raw text:', raw);
+                return null;
+            }
+        }
+
+        // Return raw text for non-JSON responses
+        return raw;
+    } catch (error) {
+        console.error('Error reading response body:', error);
+        return null;
     }
-    return raw;
 }
 
 export async function createQuestionnaire(

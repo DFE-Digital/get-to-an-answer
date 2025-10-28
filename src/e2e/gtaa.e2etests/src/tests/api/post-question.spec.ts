@@ -169,12 +169,7 @@ test.describe('POST Create question api request', () => {
             request,
             questionnaireId,
             undefined,
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij" +
-            "klmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY" +
-            "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioidfjsdlfjsdjflksdfjsjfsdlkfsjdfsjfjsdfjsdjfsdlfj" +
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij" +
-            "klmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY" +
-            "ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOopioidfjsdlfjsdjflksdfjsjfsdlkfsjdfsjfjsdfjsdjfsdlfj",
+            "A".repeat(600), // Exceeds max length
             1
         );
         

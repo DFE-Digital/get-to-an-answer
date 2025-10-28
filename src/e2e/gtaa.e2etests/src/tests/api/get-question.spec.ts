@@ -64,15 +64,11 @@ test.describe('GET all questions api tests', () => {
     });
 
     test('Validate GET all questions with invalid questionnaire id', async ({request}) => {
-        const response = await listQuestions(
-            request,
-            '12345',
-            JwtHelper.ExpiredToken
-        );
+        const response = await listQuestions(request, '12345');
 
         // --- HTTP-level checks ---
         expect(response.questionGetResponse.ok()).toBeFalsy();
-        expect(response.questionGetResponse.status()).toBe(401);
+        expect(response.questionGetResponse.status()).toBe(400);
     });
 
     test('Validate GET list questions where questions belongs to this questionnaire only', async ({request}) => {
@@ -147,5 +143,60 @@ test.describe('GET all questions api tests', () => {
 
         // --- I/O checks ---
         expectQuestionIO(response.questionGetBody, payload, GUID_REGEX);
+    });
+
+    test('Validate GET specific question that belongs to a questionnaire with no access', async ({request}) => {
+        const q1Token = JwtHelper.NoRecordsToken();
+        const q2Token = JwtHelper.NoRecordsToken();
+
+        const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(request, q1Token);
+        const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(request, q2Token);
+
+        // --- HTTP-level checks ---
+        expectHttp(q1Response, 201);
+        expectHttp(q2Response, 201);
+
+        const {question: question1} = await createQuestion(request, q1.id, q1Token);
+        const {question: question2} = await createQuestion(request, q2.id, q2Token);
+
+        const response = await getQuestion(request, question2.id, q1Token);
+
+        // // --- HTTP-level checks ---
+        expect(response.questionGetResponse.ok()).toBeFalsy();
+        expect(response.questionGetResponse.status()).toBe(403);
+    });
+
+    test('Validate GET specific question with invalid token', async ({request}) => {
+        const {questionnaire} = await createQuestionnaire(request);
+        const questionnaireId = questionnaire.id;
+
+        const {question} = await createQuestion(request, questionnaireId);
+
+        const response = await getQuestion(request, question.id, JwtHelper.InvalidToken);
+
+        // --- HTTP-level checks ---
+        expect(response.questionGetResponse.ok()).toBeFalsy();
+        expect(response.questionGetResponse.status()).toBe(401);
+    });
+
+    test('Validate GET specific question with expired token', async ({request}) => {
+        const {questionnaire} = await createQuestionnaire(request);
+        const questionnaireId = questionnaire.id;
+
+        const {question} = await createQuestion(request, questionnaireId);
+
+        const response = await getQuestion(request, question.id, JwtHelper.ExpiredToken);
+
+        // --- HTTP-level checks ---
+        expect(response.questionGetResponse.ok()).toBeFalsy();
+        expect(response.questionGetResponse.status()).toBe(401);
+    });
+
+    test('Validate GET specific question with invalid questionnaire id', async ({request}) => {
+        const response = await getQuestion(request, '12345');
+
+        // --- HTTP-level checks ---
+        expect(response.questionGetResponse.ok()).toBeFalsy();
+        expect(response.questionGetResponse.status()).toBe(400);
     });
 });
