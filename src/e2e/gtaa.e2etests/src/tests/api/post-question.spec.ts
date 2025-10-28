@@ -5,7 +5,7 @@ import {
     expectQuestionSchema
 } from "../../helpers/api-assertions-helper";
 import {GUID_REGEX} from "../../constants/test-data-constants";
-import {createQuestionnaire, getQuestionnaire, updateQuestionnaire} from "../../test-data-seeder/questionnaire-data";
+import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {JwtHelper} from "../../helpers/JwtHelper";
 
 test.describe('POST Create question api request', () => {
@@ -146,7 +146,7 @@ test.describe('POST Create question api request', () => {
         expectHttpStatusCode(questionPostResponse, 201);
     });
 
-    test('Validate GET specific question with invalid questionnaire id', async ({request}) => {
+    test('Validate POST specific question with invalid questionnaire id', async ({request}) => {
         const response = await createQuestion(
             request,
             '123456',
@@ -189,44 +189,20 @@ test.describe('POST Create question api request', () => {
         const q2Token = JwtHelper.UnauthorizedToken;
 
         //create questionnaire1 for user1
-        const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(
-            request,
-            q1Token,
-            'Custom test questionnaire title',
-            'Custom test first questionnaire description',
-            'slug'
-        );
+        const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(request, q1Token);
 
         //create questionnaire2 for user2
-        const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(
-            request,
-            q2Token,
-            'Custom test questionnaire title',
-            'Custom test second questionnaire description',
-            'slug'
-        );
+        const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(request, q2Token,)
 
         // --- HTTP-level checks ---
         expectHttpStatusCode(q1Response, 201);
         expectHttpStatusCode(q2Response, 201);
 
         //create question1 for questionnaire1
-        const {question: question1} = await createQuestion(
-            request,
-            q1.id,
-            q1Token,
-            undefined,
-            1
-        );
+        const {question: question1} = await createQuestion(request, q1.id, q1Token);
 
         //create question2 for questionnaire2
-        const {question: question2} = await createQuestion(
-            request,
-            q2.id,
-            q2Token,
-            undefined,
-            1
-        );
+        const {question: question2} = await createQuestion(request, q2.id, q2Token);
 
         //update payload for question2
         const updateQuestionPayload = {
@@ -245,6 +221,4 @@ test.describe('POST Create question api request', () => {
         //should be forbidden
         expect(update.updatedQuestionPostResponse.status()).toBe(403);
     });
-
-
 });
