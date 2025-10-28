@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using Common.Infrastructure.Persistence;
 using Common.Local;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,6 +25,11 @@ builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
 
 builder.Services.AddControllers()
     .AddDataAnnotationsLocalization();
+
+builder.Services.ConfigureHttpJsonOptions(o =>
+{
+    o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 
 if (builderIsLocalEnvironment)

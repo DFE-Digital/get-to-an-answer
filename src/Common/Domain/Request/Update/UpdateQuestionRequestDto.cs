@@ -13,5 +13,6 @@ public class UpdateQuestionRequestDto
     public required string Content { get; set; }
     public string? Description { get; set; }
     
+    [EnumDefined]
     public QuestionType? Type { get; set; }
 }
