@@ -66,15 +66,11 @@ test.describe('GET questionnaire api tests', () => {
     });
 
     test('Validate GET specific questionnaire with invalid questionnaire id', async ({request}) => {
-        const response = await getQuestionnaire(
-            request,
-            12345,
-            JwtHelper.ExpiredToken
-        );
+        const response = await getQuestionnaire(request, 12345);
 
         // --- HTTP-level checks ---
         expect(response.questionnaireGetResponse.ok()).toBeFalsy();
-        expect(response.questionnaireGetResponse.status()).toBe(401);
+        expect(response.questionnaireGetResponse.status()).toBe(400);
     });
 
     test('Validate GET for a deleted questionnaire ', async ({request}) => {
