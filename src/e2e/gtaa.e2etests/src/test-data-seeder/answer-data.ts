@@ -1,7 +1,39 @@
 import {AnswerBuilder} from '../builders/AnswerBuilder';
 import {AnswerDestinationType} from '../constants/test-data-constants'
-import { JwtHelper } from "../helpers/JwtHelper";
+import {JwtHelper} from "../helpers/JwtHelper";
 import {APIResponse} from "@playwright/test";
+
+//to parse response-body correctly - json body can be json, text or empty string
+//duplicate - to be fixed later
+async function safeParseBody(response: APIResponse) {
+    const ct = (response.headers()['content-type'] || '').toLowerCase();
+
+    try {
+        const raw = await response.text();
+
+        // If empty body, return null
+        if (!raw || raw.trim() === '') {
+            return null;
+        }
+
+        // If JSON content type, try to parse
+        if (ct.includes('application/json')) {
+            try {
+                return JSON.parse(raw);
+            } catch (parseError) {
+                console.error('JSON parse error:', parseError);
+                console.error('Raw text:', raw);
+                return null;
+            }
+        }
+
+        // Return raw text for non-JSON responses
+        return raw;
+    } catch (error) {
+        console.error('Error reading response body:', error);
+        return null;
+    }
+}
 
 // export async function createMultipleAnswers(
 //     request: any,
@@ -59,7 +91,7 @@ import {APIResponse} from "@playwright/test";
 interface CreateAnswerRequest {
     questionId: string;
     questionnaireId: string;
-    destinationQuestionId?:string;
+    destinationQuestionId?: string;
     content?: string;
     description?: string;
     answerPrefix?: string;
@@ -72,7 +104,7 @@ export async function createSingleAnswer(
     request: any,
     answerRequest: CreateAnswerRequest,
     bearerToken?: string,
-): Promise<{ res: APIResponse; responseBody: any; payload: any }> {
+) {
     const payload = new AnswerBuilder(answerRequest.questionId, answerRequest.questionnaireId)
         .withDestinationQuestionId(answerRequest.destinationQuestionId)
         .withContent(answerRequest.content)
@@ -81,26 +113,26 @@ export async function createSingleAnswer(
         .withDestinationType(answerRequest.destinationType)
         .withScore(answerRequest.score)
         .build();
-    
-    const res = await request.post('/api/answers', {
+
+    const response = await request.post('/api/answers', {
         data: payload,
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
-    
-    if (!res.ok()) {
-        throw new Error(`❌ Failed to create answer: ${res.status()}`);
-    }
 
-    const responseBody = await res.json();
+    const responseBody = await safeParseBody(response);
 
     console.log(
         `✅ Created 1 answer → destination "${answerRequest.destinationUrl}" for question ${answerRequest.questionId}`
     );
-
-    return {res, responseBody, payload};
+    
+    return {
+        answerPostResponse: response,
+        answer: responseBody,
+        payload
+    }
 }
 
 export async function getAnswer(
@@ -118,7 +150,7 @@ export async function getAnswer(
     if (!response.ok()) {
         throw new Error(`❌ Failed to get answer: ${response.status()}`);
     }
-    
+
     return await response.json();
 }
 
