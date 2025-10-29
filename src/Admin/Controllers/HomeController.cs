@@ -696,4 +696,18 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
 
         Response.Cookies.Append(TermsCookieName, "accepted", options);
     }
+    
+    [HttpGet("/admin/questionnaires/{id:guid}/branching-map")]
+    public async Task<IActionResult> BranchingMap(Guid id)
+    {
+        var branchingMap = await apiClient.GetBranchingMap(id);
+        
+        if (branchingMap == null)
+            return NotFound();
+        
+        return View("BranchingMap", new QuestionnaireViewModel
+        {
+            BranchingMap = branchingMap
+        });
+    }
 }

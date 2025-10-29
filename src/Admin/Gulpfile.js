@@ -13,6 +13,11 @@ gulp.task('govuk-step-by-step-js', function () {
         .pipe(gulp.dest(paths.dist + 'js'));
 });
 
+gulp.task('mermaid-js', function () {
+    return gulp.src('node_modules/mermaid/dist/mermaid.esm.min.mjs')
+        .pipe(gulp.dest(paths.dist + 'js'));
+});
+
 gulp.task('govuk-assets', function() {
     return gulp.src('node_modules/govuk-frontend/dist/govuk/assets/**/*')
         .pipe(gulp.dest(paths.dist + 'assets'));
@@ -68,6 +73,7 @@ gulp.task("dev",
         "dfe-js",
         "dfe-css",
         "dfe-assets",
+        "mermaid-js",
         "images",
         "sass"
     )

@@ -58,4 +58,5 @@ public class QuestionnaireViewModel : ConfigViewModel
     public string[] Contributors { get; set; } = [];
     public string? Error { get; set; } = "";
     public string? ErrorMessage { get; set; } = "";
+    public QuestionnaireBranchingMap BranchingMap { get; set; }
 }

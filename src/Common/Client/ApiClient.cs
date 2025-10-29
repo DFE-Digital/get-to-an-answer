@@ -49,8 +49,7 @@ public interface IApiClient
     // === For Questionnaire Versions ===
     
     Task<List<QuestionnaireVersionDto>> GetQuestionnaireVersionsAsync(Guid questionnaireId);
-    Task<QuestionnaireVersionDto?> GetQuestionnaireVersionAsync(Guid questionnaireId, int versionNumber);
-    Task<QuestionnaireVersionDto?> GetLatestQuestionnaireVersion(Guid questionnaireId);
+    Task<QuestionnaireBranchingMap?> GetBranchingMap(Guid questionnaireId);
     
     // === For Content ===
     
@@ -314,12 +313,12 @@ public class ApiClient : IApiClient
         return await response.Content.ReadFromJsonAsync<QuestionnaireVersionDto?>();
     }
 
-    public async Task<QuestionnaireVersionDto?> GetLatestQuestionnaireVersion(Guid questionnaireId)
+    public async Task<QuestionnaireBranchingMap?> GetBranchingMap(Guid questionnaireId)
     {
-        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireId}/versions/current");
+        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireId}/branching-map");
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<QuestionnaireVersionDto?>();
+        return await response.Content.ReadFromJsonAsync<QuestionnaireBranchingMap?>();
     }
 
     public async Task<ContentDto?> CreateContentAsync(CreateContentRequestDto request)

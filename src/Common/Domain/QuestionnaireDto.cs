@@ -37,3 +37,12 @@ public class QuestionnaireInfoDto
     
     public string? Description { get; set; }
 }
+
+public class QuestionnaireBranchingMap
+{
+    public Guid QuestionnaireId { get; set; }
+    
+    public string? QuestionnaireTitle { get; set; }
+    
+    public string? BranchingMap { get; set; }
+}
