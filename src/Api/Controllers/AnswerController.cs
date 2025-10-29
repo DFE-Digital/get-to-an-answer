@@ -41,6 +41,12 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
 
         if (request is { DestinationType: DestinationType.Question, DestinationQuestionId: not null })
         {
+            // Check if the parent question of this answer is different from the destination question
+            if (request.QuestionId == request.DestinationQuestionId)
+            {
+                return BadRequest();
+            }
+            
             // Check if the destination question is part of the questionnaire
             var isDestQuestionFromQuestionnaire = db.Questions.Any(q => 
                 q.Id == request.DestinationQuestionId &&
@@ -139,6 +145,12 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
 
         if (request is { DestinationType: DestinationType.Question, DestinationQuestionId: not null })
         {
+            // Check if the parent question of this answer is different from the destination question
+            if (answer.QuestionId == request.DestinationQuestionId)
+            {
+                return BadRequest();
+            }
+            
             // Check if the question is part of the questionnaire
             var isQuestionFromQuestionnaire = db.Questions.Any(q => 
                 q.Id == request.DestinationQuestionId &&
