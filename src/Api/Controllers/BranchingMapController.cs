@@ -27,18 +27,23 @@ public class BranchingMapController(GetToAnAnswerDbContext db) : ControllerBase
         var questionnaire = await db.Questionnaires
             .AsNoTracking()    
             .Where(q => q.Id == questionnaireId)
-            .Include(q => q.Questions)
-            .ThenInclude(qq => qq.Answers)
+            .Include(q => q.Questions.Where(a => !a.IsDeleted))
+            .ThenInclude(qq => qq.Answers.Where(a => !a.IsDeleted))
             .FirstOrDefaultAsync();
 
         if (questionnaire == null)
             return NotFound();
+
+        var contentMap = await db.Contents
+            .AsNoTracking()
+            .Where(x => x.QuestionnaireId == questionnaireId)
+            .ToDictionaryAsync(c => c.Id, c => c.Title);
         
         return Ok(new QuestionnaireBranchingMap
         {
             QuestionnaireId = questionnaire.Id,
             QuestionnaireTitle = questionnaire.Title,
-            Source = questionnaire.ToMermaidDiagram()
+            Source = questionnaire.ToMermaidDiagram(contentMap)
         });
     }
 }

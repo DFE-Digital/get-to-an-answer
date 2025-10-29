@@ -217,8 +217,8 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
         var questionnaire = await db.Questionnaires
             .AsNoTracking()
             .Where(q => q.Id == id && q.Status != EntityStatus.Deleted)
-            .Include(q => q.Questions)
-            .ThenInclude(qq => qq.Answers)
+            .Include(q => q.Questions.Where(a => !a.IsDeleted))
+            .ThenInclude(qq => qq.Answers.Where(a => !a.IsDeleted))
             .FirstOrDefaultAsync();
 
         if (questionnaire == null)
@@ -364,8 +364,8 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     {
         var questionnaire = await db.Questionnaires
             .AsNoTracking()
-            .Include(q => q.Questions)
-            .ThenInclude(qq => qq.Answers)
+            .Include(q => q.Questions.Where(a => !a.IsDeleted))
+            .ThenInclude(qq => qq.Answers.Where(a => !a.IsDeleted))
             .FirstAsync(q => q.Id == id);
         
         var json = JsonSerializer.Serialize(questionnaire, new JsonSerializerOptions

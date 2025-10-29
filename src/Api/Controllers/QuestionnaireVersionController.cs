@@ -53,8 +53,8 @@ public class QuestionnaireVersionController(GetToAnAnswerDbContext db) : Control
             
             var questionnaire = await db.Questionnaires
                 .AsNoTracking()
-                .Include(q => q.Questions)
-                .ThenInclude(qq => qq.Answers)
+                .Include(q => q.Questions.Where(a => !a.IsDeleted))
+                .ThenInclude(qq => qq.Answers.Where(a => !a.IsDeleted))
                 .FirstAsync(q => q.Id == questionnaireId);
         
             var json = JsonSerializer.Serialize(questionnaire, new JsonSerializerOptions

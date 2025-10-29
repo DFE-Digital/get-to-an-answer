@@ -69,8 +69,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
 
         // Example: check ownership in your persistence layer
         var answer = db.Answers
-            .FirstOrDefault(q => q.Id == id && 
-                                 !q.IsDeleted);
+            .FirstOrDefault(q => q.Id == id && !q.IsDeleted);
 
         if (answer == null)
             return NotFound();
@@ -87,8 +86,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
             return Forbid();
 
         var answers = db.Answers
-            .Where(q => q.QuestionId == questionId && 
-                        !q.IsDeleted);
+            .Where(q => q.QuestionId == questionId && !q.IsDeleted);
         
         return Ok(answers.ToList());
     }
@@ -101,8 +99,8 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
         if (!await db.HasAccessToEntity<AnswerEntity>(email, id))
             return Forbid();
         
-        var answer = db.Answers.FirstOrDefault(q => q.Id == id && 
-                                                    !q.IsDeleted);
+        var answer = db.Answers.FirstOrDefault(q => 
+            q.Id == id && !q.IsDeleted);
         
         if (answer == null)
             return NotFound();

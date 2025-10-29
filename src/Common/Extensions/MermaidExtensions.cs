@@ -13,12 +13,13 @@ using System.Text;
 // - Destinations supported: Question, External Link, Custom Info Page
 public static class MermaidExtensions
 {
-    public static string ToMermaidDiagram(this QuestionnaireEntity questionnaire)
+    public static string ToMermaidDiagram(this QuestionnaireEntity questionnaire, Dictionary<Guid, string>? contentMap = null)
     {
+        contentMap ??= new Dictionary<Guid, string>();
+        
         if (questionnaire == null) throw new ArgumentNullException(nameof(questionnaire));
 
         var sb = new StringBuilder();
-        //sb.AppendLine("```mermaid");
         sb.AppendLine("flowchart TD");
         sb.AppendLine("  %% Generated from Questionnaire -> Questions -> Answers");
         sb.AppendLine("  %% Destinations: Question, External Link, Custom Info Page");
@@ -55,7 +56,7 @@ public static class MermaidExtensions
         }
 
         // Containers for special destinations (info pages and external links) to avoid duplicate nodes
-        var customInfoNodes = new Dictionary<string, string>();   // key: content id or destination string
+        var customInfoNodes = new Dictionary<Guid, string>();   // key: content id or destination string
         var externalLinkNodes = new Dictionary<string, string>(); // key: url
 
         // Edges from answers based on destinations
@@ -76,17 +77,23 @@ public static class MermaidExtensions
 
                     case DestinationType.InternalPage:
                         {
-                            var key = a.DestinationContentId?.ToString() ?? a.DestinationUrl ?? $"info:{a.Id}";
-                            if (!customInfoNodes.TryGetValue(key, out var infoNodeId))
+                            if (a.DestinationContentId is { } key)
                             {
-                                infoNodeId = NodeId($"CI{customInfoNodes.Count + 1}");
-                                customInfoNodes[key] = infoNodeId;
-                                var infoLabel = EscapeLabel(string.IsNullOrWhiteSpace(a.DestinationUrl)
-                                    ? $"Custom Info {customInfoNodes.Count}"
-                                    : Truncate(a.DestinationUrl!, 60));
-                                sb.AppendLine($"  {infoNodeId}[[{infoLabel}]]:::info");
+                                if (!customInfoNodes.TryGetValue(key, out var infoNodeId))
+                                {
+                                    infoNodeId = NodeId($"CI{customInfoNodes.Count + 1}");
+                                    customInfoNodes[key] = infoNodeId;
+
+                                    var contentTitle = contentMap[key];
+                                
+                                    var infoLabel = EscapeLabel(string.IsNullOrWhiteSpace(a.DestinationUrl)
+                                        ? $"Custom Info '{contentTitle}'"
+                                        : Truncate(a.DestinationUrl!, 60));
+                                    sb.AppendLine($"  {infoNodeId}[[{infoLabel}]]:::info");
+                                }
+                                sb.AppendLine($"  {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {infoNodeId}");
                             }
-                            sb.AppendLine($"  {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {infoNodeId}");
+                            
                             break;
                         }
 
@@ -105,7 +112,18 @@ public static class MermaidExtensions
                         }
 
                     default:
-                        // No valid destination configured; skip drawing an edge
+                        if (q.Order < questions.Count && questions[q.Order] is { } nextQuestion && 
+                            questionIds.TryGetValue(nextQuestion.Id, out var nextQNode))
+                        {
+                            sb.AppendLine(
+                                $"  {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {nextQNode}");
+                        }
+                        else
+                        {
+                            sb.AppendLine(
+                                $"  {qNode} -- \"{EscapeLabel(answerLabel)}\" --> UNKNOWN([Unknown])");
+                        }
+
                         break;
                 }
             }
@@ -124,7 +142,6 @@ public static class MermaidExtensions
         sb.AppendLine();
         sb.AppendLine("  classDef info fill:#e6f4ff,stroke:#2b7cd3,color:#0b3d91;");
         sb.AppendLine("  classDef link fill:#fff3e6,stroke:#d37c2b,color:#7a3d0b;");
-        //sb.AppendLine("```");
 
         return sb.ToString();
     }

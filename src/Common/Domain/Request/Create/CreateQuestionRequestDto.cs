@@ -7,6 +7,6 @@ public class CreateQuestionRequestDto
 {
     public required Guid QuestionnaireId { get; set; }
     public required string Content { get; set; }
-    public required string Description { get; set; }
+    public string? Description { get; set; }
     public required QuestionType Type { get; set; }
 } 
