@@ -150,8 +150,8 @@ test.describe('GET all questions api tests', () => {
         const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(request, q2Token);
 
         // --- HTTP-level checks ---
-        expectHttp(q1Response, 201);
-        expectHttp(q2Response, 201);
+        expectHttpStatusCode(q1Response, 201);
+        expectHttpStatusCode(q2Response, 201);
 
         const {question: question1} = await createQuestion(request, q1.id, q1Token);
         const {question: question2} = await createQuestion(request, q2.id, q2Token);
