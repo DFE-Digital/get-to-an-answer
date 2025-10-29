@@ -3,62 +3,63 @@ import {AnswerDestinationType} from '../constants/test-data-constants'
 import { JwtHelper } from "../helpers/JwtHelper";
 import {APIResponse} from "@playwright/test";
 
-export async function createMultipleAnswers(
-    request: any,
-    questionId: string,
-    questionnaireId: string,
-    numberOfAnswers: number,
-    useDifferentDestinations?: boolean,
-    bearerToken?: string,
-) {
-    const createdAnswers = [];
-    const createdPayloads = [];
-    
-    const destinationType = AnswerDestinationType.PAGE;
-    const destination = '/default-destination'
-    const score = 0.0;
-
-    for (let i = 1; i <= numberOfAnswers; i++) {
-        const content = `Auto-generated answer content - Choice ${i}`;
-        const description = `Auto-generated description - option ${i}`;
-
-        // Either same destination or /default-destination-1, /default-destination-2, etc.
-        const finalDestination = useDifferentDestinations ? `${destination}-${i}` : destination;
-
-        const payload = new AnswerBuilder(questionId, questionnaireId)
-            .withContent(content)
-            .withDescription(description)
-            .withDestinationUrl(finalDestination)
-            .withDestinationType(destinationType)
-            .withScore(score)
-            .build();
-
-        const response = await request.post('/api/answers', {
-            data: payload,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
-            }
-        });
-
-        if (!response.ok()) {
-            throw new Error(`❌ Failed to create answer ${i}: ${response.status()}`);
-        }
-
-        const body = await response.json();
-        createdAnswers.push(body);
-        createdPayloads.push(payload);
-    }
-
-    console.log(
-        `✅ Created ${numberOfAnswers} ${useDifferentDestinations ? 'different' : 'same'} outcomes for question ${questionId}`
-    );
-    return {createdAnswers, createdPayloads};
-}
+// export async function createMultipleAnswers(
+//     request: any,
+//     questionId: string,
+//     questionnaireId: string,
+//     numberOfAnswers: number,
+//     useDifferentDestinations?: boolean,
+//     bearerToken?: string,
+// ) {
+//     const createdAnswers = [];
+//     const createdPayloads = [];
+//    
+//     const destinationType = AnswerDestinationType.PAGE;
+//     const destination = '/default-destination'
+//     const score = 0.0;
+//
+//     for (let i = 1; i <= numberOfAnswers; i++) {
+//         const content = `Auto-generated answer content - Choice ${i}`;
+//         const description = `Auto-generated description - option ${i}`;
+//
+//         // Either same destination or /default-destination-1, /default-destination-2, etc.
+//         const finalDestination = useDifferentDestinations ? `${destination}-${i}` : destination;
+//
+//         const payload = new AnswerBuilder(questionId, questionnaireId)
+//             .withContent(content)
+//             .withDescription(description)
+//             .withDestinationUrl(finalDestination)
+//             .withDestinationType(destinationType)
+//             .withScore(score)
+//             .build();
+//
+//         const response = await request.post('/api/answers', {
+//             data: payload,
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
+//             }
+//         });
+//
+//         if (!response.ok()) {
+//             throw new Error(`❌ Failed to create answer ${i}: ${response.status()}`);
+//         }
+//
+//         const body = await response.json();
+//         createdAnswers.push(body);
+//         createdPayloads.push(payload);
+//     }
+//
+//     console.log(
+//         `✅ Created ${numberOfAnswers} ${useDifferentDestinations ? 'different' : 'same'} outcomes for question ${questionId}`
+//     );
+//     return {createdAnswers, createdPayloads};
+// }
 
 interface CreateAnswerRequest {
     questionId: string;
     questionnaireId: string;
+    destinationQuestionId?:string;
     content?: string;
     description?: string;
     answerPrefix?: string;
@@ -73,6 +74,7 @@ export async function createSingleAnswer(
     bearerToken?: string,
 ): Promise<{ res: APIResponse; responseBody: any; payload: any }> {
     const payload = new AnswerBuilder(answerRequest.questionId, answerRequest.questionnaireId)
+        .withDestinationQuestionId(answerRequest.destinationQuestionId)
         .withContent(answerRequest.content)
         .withDescription(answerRequest.description)
         .withDestinationUrl(answerRequest.destinationUrl)
@@ -80,7 +82,7 @@ export async function createSingleAnswer(
         .withScore(answerRequest.score)
         .build();
     
-    const response = await request.post('/api/answers', {
+    const res = await request.post('/api/answers', {
         data: payload,
         headers: {
             'Content-Type': 'application/json',
@@ -88,15 +90,16 @@ export async function createSingleAnswer(
         }
     });
     
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to create answer: ${response.status()}`);
+    if (!res.ok()) {
+        throw new Error(`❌ Failed to create answer: ${res.status()}`);
     }
-    
-    const res = await response;
-    const responseBody = res.json();
+
+    const responseBody = await res.json();
+
     console.log(
         `✅ Created 1 answer → destination "${answerRequest.destinationUrl}" for question ${answerRequest.questionId}`
     );
+
     return {res, responseBody, payload};
 }
 
