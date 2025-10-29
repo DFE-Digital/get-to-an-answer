@@ -23,7 +23,7 @@ test.describe('DELETE Questionnaire', () => {
 
         expectHttpStatusCode(questionnairePostResponse, 201);
 
-        const {deleteQuestionnaireResponse, deleteQuestionnaireBody } = await deleteQuestionnaire(
+        const {deleteQuestionnaireResponse } = await deleteQuestionnaire(
             request,
             questionnaire.id
         );
@@ -47,23 +47,19 @@ test.describe('DELETE Questionnaire', () => {
         const {
             questionnairePostResponse,
             questionnaire,
-            payload: questionnairePayload
         } = await createQuestionnaire(request);
 
         expectHttpStatusCode(questionnairePostResponse, 201);
 
         const {   
             questionPostResponse,
-            question,
-            payload: questionPayload
+            question
         } = await createQuestion(request, questionnaire.id);
 
         expectHttpStatusCode(questionPostResponse, 201);
         
         const {
             res: answerPostResponse, 
-            responseBody,
-            payload
         } = await createSingleAnswer(
             request,
             {
@@ -75,25 +71,23 @@ test.describe('DELETE Questionnaire', () => {
         
         expectHttpStatusCode(answerPostResponse, 200);
         
-        const {deleteQuestionnaireResponse, 
-            deleteQuestionnaireBody} = await deleteQuestionnaire(
+        const {deleteQuestionnaireResponse, deleteQuestionnaireBody: resBody } = await deleteQuestionnaire(
             request,
             questionnaire.id
         );
-
+        
         expectHttpStatusCode(deleteQuestionnaireResponse, 204);
     });
 
     test('SOFT DELETE a questionnaire that is not permitted', async ({ request }) => {
         const {
             questionnairePostResponse,
-            questionnaire,
-            payload: questionnairePayload
+            questionnaire
         } = await createQuestionnaire(request);
 
         expectHttpStatusCode(questionnairePostResponse, 201);
 
-        const { deleteQuestionnaireResponse, deleteQuestionnaireBody } = await deleteQuestionnaire(
+        const { deleteQuestionnaireResponse } = await deleteQuestionnaire(
             request,
             questionnaire.id,
             JwtHelper.UnauthorizedToken
@@ -106,7 +100,6 @@ test.describe('DELETE Questionnaire', () => {
     });
 
     test('DELETE non-existent questionnaire returns 404 and no deletion occurs', async ({ request }) => {
-        // Use a random GUID unlikely to exist
         const fakeId = '00000000-0000-0000-0000-000000000999';
 
         const { deleteQuestionnaireResponse, deleteQuestionnaireBody } = await deleteQuestionnaire(
@@ -114,6 +107,9 @@ test.describe('DELETE Questionnaire', () => {
             fakeId
         );
 
+        console.log("Status" + deleteQuestionnaireResponse.status());
+        console.log("Body" + deleteQuestionnaireBody);
+        
         expect(deleteQuestionnaireResponse.status()).toBe(404);
 
         expect(deleteQuestionnaireBody).toBeTruthy();
@@ -131,7 +127,7 @@ test.describe('DELETE Questionnaire', () => {
 
         expectHttpStatusCode(questionnairePostResponse, 201);
 
-        const { deleteQuestionnaireResponse, deleteQuestionnaireBody } = await deleteQuestionnaire(
+        const { deleteQuestionnaireResponse} = await deleteQuestionnaire(
             request,
             questionnaire.id,
             JwtHelper.InvalidToken
@@ -152,7 +148,7 @@ test.describe('DELETE Questionnaire', () => {
 
         expectHttpStatusCode(questionnairePostResponse, 201);
 
-        const { deleteQuestionnaireResponse, deleteQuestionnaireBody } = await deleteQuestionnaire(
+        const { deleteQuestionnaireResponse} = await deleteQuestionnaire(
             request,
             questionnaire.id,
             JwtHelper.ExpiredToken
@@ -190,7 +186,6 @@ test.describe('DELETE Questionnaire', () => {
 
         const {
             questionPostResponse,
-            question,
         } = await createQuestion(request, questionnaire.id);
 
         expectHttpStatusCode(questionPostResponse, 201);

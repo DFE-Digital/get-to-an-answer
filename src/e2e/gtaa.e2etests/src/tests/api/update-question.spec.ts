@@ -226,7 +226,7 @@ test.describe('PUT Update question api request', () => {
             question.id,
             updatePayload
         );
-
+        
         expect(updatedQuestionPostResponse.ok()).toBeFalsy();
         expect(updatedQuestionPostResponse.status()).toBe(400);
     });
