@@ -1,10 +1,12 @@
 import {AnswerBuilder} from '../builders/AnswerBuilder';
 import {AnswerDestinationType} from '../constants/test-data-constants'
 import { JwtHelper } from "../helpers/JwtHelper";
+import {APIResponse} from "@playwright/test";
 
 export async function createMultipleAnswers(
     request: any,
     questionId: string,
+    questionnaireId: string,
     numberOfAnswers: number,
     useDifferentDestinations?: boolean,
     bearerToken?: string,
@@ -14,7 +16,7 @@ export async function createMultipleAnswers(
     
     const destinationType = AnswerDestinationType.PAGE;
     const destination = '/default-destination'
-    const weight = 0.0;
+    const score = 0.0;
 
     for (let i = 1; i <= numberOfAnswers; i++) {
         const content = `Auto-generated answer content - Choice ${i}`;
@@ -23,12 +25,12 @@ export async function createMultipleAnswers(
         // Either same destination or /default-destination-1, /default-destination-2, etc.
         const finalDestination = useDifferentDestinations ? `${destination}-${i}` : destination;
 
-        const payload = new AnswerBuilder(questionId)
+        const payload = new AnswerBuilder(questionId, questionnaireId)
             .withContent(content)
             .withDescription(description)
-            .withDestination(finalDestination)
+            .withDestinationUrl(finalDestination)
             .withDestinationType(destinationType)
-            .withWeight(weight)
+            .withScore(score)
             .build();
 
         const response = await request.post('/api/answers', {
@@ -56,28 +58,28 @@ export async function createMultipleAnswers(
 
 interface CreateAnswerRequest {
     questionId: string;
+    questionnaireId: string;
     content?: string;
     description?: string;
     answerPrefix?: string;
-    weight?: number;
+    score?: number;
     destinationType?: AnswerDestinationType;
-    destination?: string;
+    destinationUrl?: string;
 }
 
 export async function createSingleAnswer(
     request: any,
     answerRequest: CreateAnswerRequest,
     bearerToken?: string,
-) {
-    const payload = new AnswerBuilder(answerRequest.questionId)
+): Promise<{ res: APIResponse; responseBody: any; payload: any }> {
+    const payload = new AnswerBuilder(answerRequest.questionId, answerRequest.questionnaireId)
         .withContent(answerRequest.content)
-        .withContentPrefix(answerRequest.answerPrefix)
         .withDescription(answerRequest.description)
-        .withDestination(answerRequest.destination)
+        .withDestinationUrl(answerRequest.destinationUrl)
         .withDestinationType(answerRequest.destinationType)
-        .withWeight(answerRequest.weight)
+        .withScore(answerRequest.score)
         .build();
-
+    
     const response = await request.post('/api/answers', {
         data: payload,
         headers: {
@@ -85,16 +87,17 @@ export async function createSingleAnswer(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
-
+    
     if (!response.ok()) {
         throw new Error(`❌ Failed to create answer: ${response.status()}`);
     }
-
-    const answerPostResponse = await response.json();
+    
+    const res = await response;
+    const responseBody = res.json();
     console.log(
-        `✅ Created 1 answer → destination "${answerRequest.destination}" for question ${answerRequest.questionId}`
+        `✅ Created 1 answer → destination "${answerRequest.destinationUrl}" for question ${answerRequest.questionId}`
     );
-    return {answerPostResponse, payload};
+    return {res, responseBody, payload};
 }
 
 export async function getAnswer(

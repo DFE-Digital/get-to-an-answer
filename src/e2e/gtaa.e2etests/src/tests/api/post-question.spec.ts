@@ -1,7 +1,7 @@
 import {expect, test} from "@playwright/test";
 import {createQuestion, updateQuestion} from "../../test-data-seeder/question-data";
 import {
-    expectHttp, expectQuestionTypes, expectQuestionContent, expectQuestionIO,
+    expectHttpStatusCode, expectQuestionTypes, expectQuestionContent, expectQuestionIO,
     expectQuestionSchema
 } from "../../helpers/api-assertions-helper";
 import {GUID_REGEX} from "../../constants/test-data-constants";
@@ -20,7 +20,7 @@ test.describe('POST Create question api request', () => {
         } = await createQuestion(request, questionnaireId);
 
         // --- HTTP-level checks ---
-        expectHttp(questionPostResponse, 201);
+        expectHttpStatusCode(questionPostResponse, 201);
 
         // --- Schema-level checks ---
         expectQuestionSchema(question);
@@ -143,7 +143,7 @@ test.describe('POST Create question api request', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttp(questionPostResponse, 201);
+        expectHttpStatusCode(questionPostResponse, 201);
     });
 
     test('Validate POST specific question with invalid questionnaire id', async ({request}) => {
@@ -190,8 +190,8 @@ test.describe('POST Create question api request', () => {
         const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(request, q2Token,)
 
         // --- HTTP-level checks ---
-        expectHttp(q1Response, 201);
-        expectHttp(q2Response, 201);
+        expectHttpStatusCode(q1Response, 201);
+        expectHttpStatusCode(q2Response, 201);
 
         //create question1 for questionnaire1
         const {question: question1} = await createQuestion(request, q1.id, q1Token);

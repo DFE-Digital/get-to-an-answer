@@ -3,22 +3,24 @@ import {AnswerDestinationType} from '../constants/test-data-constants';
 
 export class AnswerBuilder {
     private _questionId: string;
+    private _questionnaireId: string;
     private _content: string;
     private _description: string;
-    private _destination: string;
+    private _destinationUrl: string;
     private _destinationType: AnswerDestinationType;
-    private _weight: number;
-    private _answerPrefix: string
+    private _score: number;
+    // private _answerPrefix: string
 
-    constructor(questionId: string) {
+    constructor(questionId: string, questionnaireId: string) {
         const timestamp = Date.now();
         this._questionId = questionId;
+        this._questionnaireId = questionnaireId;
         this._content = `Default answer content - ${timestamp}`;
         this._description = `Default answer description - ${timestamp}`;
-        this._destination = `Default answer destination - ${timestamp}`;
+        this._destinationUrl = `https://example.com/destination-url-${timestamp}`;
         this._destinationType = AnswerDestinationType.QUESTION; //set to default
-        this._weight = 0.0; //set to default
-        this._answerPrefix = 'Default answer prefix';
+        this._score = 0.0; //set to default
+        // this._answerPrefix = 'Default answer prefix';
     }
 
     withContent(content?: string) {
@@ -27,13 +29,13 @@ export class AnswerBuilder {
         return this;
     }
 
-    withContentPrefix(prefix?: string) {
-        if (prefix && prefix.trim().length > 0)
-            this._content = `${prefix} - ${this._content}`;
-        else
-            this._content = `${this._answerPrefix} - ${this._content}`;
-        return this;
-    }
+    // withContentPrefix(prefix?: string) {
+    //     if (prefix && prefix.trim().length > 0)
+    //         this._content = `${prefix} - ${this._content}`;
+    //     else
+    //         this._content = `${this._answerPrefix} - ${this._content}`;
+    //     return this;
+    // }
     
     withDescription(description?: string) {
         if (description !== undefined)
@@ -41,9 +43,9 @@ export class AnswerBuilder {
         return this;
     }
 
-    withDestination(destination?: string) {
-        if (destination !== undefined)
-            this._destination = destination;
+    withDestinationUrl(destinationUrl?: string) {
+        if (destinationUrl !== undefined)
+            this._destinationUrl = destinationUrl;
         return this;
     }
 
@@ -53,20 +55,21 @@ export class AnswerBuilder {
         return this;
     }
 
-    withWeight(weight?: number) {
-        if (weight !== undefined)
-            this._weight = weight;
+    withScore(score?: number) {
+        if (score !== undefined)
+            this._score = score;
         return this;
     }
 
     build(): AnswerModel {
         return {
             questionId: this._questionId,
+            questionnaireId: this._questionnaireId,
             content: this._content,
             description: this._description,
-            destination: this._destination,
+            destinationUrl: this._destinationUrl,
             destinationType: this._destinationType,
-            weight: this._weight
+            score: this._score
         };
     }
 }
