@@ -44,5 +44,5 @@ public class QuestionnaireBranchingMap
     
     public string? QuestionnaireTitle { get; set; }
     
-    public string? BranchingMap { get; set; }
+    public string? Source { get; set; }
 }

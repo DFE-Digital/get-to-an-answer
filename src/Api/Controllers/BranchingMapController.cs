@@ -38,7 +38,7 @@ public class BranchingMapController(GetToAnAnswerDbContext db) : ControllerBase
         {
             QuestionnaireId = questionnaire.Id,
             QuestionnaireTitle = questionnaire.Title,
-            BranchingMap = questionnaire.ToMermaidDiagram()
+            Source = questionnaire.ToMermaidDiagram()
         });
     }
 }
