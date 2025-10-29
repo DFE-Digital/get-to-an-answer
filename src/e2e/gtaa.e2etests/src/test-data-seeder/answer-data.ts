@@ -123,10 +123,6 @@ export async function createSingleAnswer(
     });
 
     const responseBody = await safeParseBody(response);
-
-    console.log(
-        `✅ Created 1 answer → destination "${answerRequest.destinationUrl}" for question ${answerRequest.questionId}`
-    );
     
     return {
         answerPostResponse: response,
