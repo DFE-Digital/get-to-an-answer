@@ -127,7 +127,41 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
     [HttpDelete("questionnaires/{id}")]
     public async Task<IActionResult> DeleteQuestionnaire(Guid id)
     {
+        // soft delete questions under the questionnaire
+        await db.Questions.Where(q => q.QuestionnaireId == id)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(b => b.IsDeleted, true));
+        
+        // soft delete answers under the questionnaire
+        await db.Answers.Where(q => q.QuestionnaireId == id)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(b => b.IsDeleted, true));
+        
         return await UpdateQuestionnaireStatus(id, EntityStatus.Deleted);
+    }
+    
+    [HttpPut("questionnaires/{id}/contributors/self")]
+    public async Task<IActionResult> AddSelfToQuestionnaireContributors(Guid id)
+    {
+        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        
+        var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => x.Id == id);
+        
+        if (questionnaire == null) 
+            return NotFound();
+
+        if (!questionnaire.Contributors.Contains(email))
+        {
+            questionnaire.Contributors.Add(email);
+        
+            await db.SaveChangesAsync();
+        }
+        else
+        {
+            return Conflict();       
+        }
+        
+        return NoContent();
     }
     
     private async Task<IActionResult> UpdateQuestionnaireStatus(Guid id, EntityStatus status)

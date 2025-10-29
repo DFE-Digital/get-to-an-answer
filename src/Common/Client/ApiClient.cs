@@ -380,7 +380,7 @@ public class ApiClient : IApiClient
 
     public async Task<string?> AddSelfToQuestionnaireContributorAsync(Guid questionnaireId)
     {
-        var response = await _httpClient.PutAsync($"questionnaires/{questionnaireId}/contributors", null);
+        var response = await _httpClient.PutAsync($"questionnaires/{questionnaireId}/contributors/self", null);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<string>();
