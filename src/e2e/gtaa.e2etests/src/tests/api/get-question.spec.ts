@@ -1,7 +1,7 @@
 import {expect, test} from "@playwright/test";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {
-    expectHttpStatusCode, expectQuestionContent, expectQuestionIO, expectQuestionSchema, expectQuestionTypes
+    expect200HttpStatusCode, expectQuestionContent, expectQuestionIO, expectQuestionSchema, expectQuestionTypes
 } from "../../helpers/api-assertions-helper";
 import {GUID_REGEX} from "../../constants/test-data-constants";
 import {createQuestion, getQuestion, listQuestions} from "../../test-data-seeder/question-data";
@@ -18,7 +18,7 @@ test.describe('GET all questions api tests', () => {
         const response = await listQuestions(request, questionnaireId);
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(response.questionGetResponse, 200);
+        expect200HttpStatusCode(response.questionGetResponse, 200);
 
         const list: any[] = response.questionGetBody;
         expect(Array.isArray(list)).toBe(true);
@@ -79,8 +79,8 @@ test.describe('GET all questions api tests', () => {
         const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(request, q2Token);
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(q1Response, 201);
-        expectHttpStatusCode(q2Response, 201);
+        expect200HttpStatusCode(q1Response, 201);
+        expect200HttpStatusCode(q2Response, 201);
 
         const {question: question1} = await createQuestion(request, q1.id, q1Token);
         await createQuestion(request, q2.id, q2Token);
@@ -88,7 +88,7 @@ test.describe('GET all questions api tests', () => {
         const response = await listQuestions(request, q2.id, q2Token);
 
         // // --- HTTP-level checks ---
-        expectHttpStatusCode(response.questionGetResponse, 200);
+        expect200HttpStatusCode(response.questionGetResponse, 200);
 
         const list: any[] = response.questionGetBody
         expect(Array.isArray(list)).toBe(true);
@@ -105,12 +105,12 @@ test.describe('GET all questions api tests', () => {
         const {questionnairePostResponse: q1Response, questionnaire: q1} = await createQuestionnaire(request, q1Token);
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(q1Response, 201);
+        expect200HttpStatusCode(q1Response, 201);
 
         const response = await listQuestions(request, q1.id, q1Token);
 
         // // --- HTTP-level checks ---
-        expectHttpStatusCode(response.questionGetResponse, 200);
+        expect200HttpStatusCode(response.questionGetResponse, 200);
 
         const list: any[] = response.questionGetBody
         expect(Array.isArray(list)).toBe(true);
@@ -127,7 +127,7 @@ test.describe('GET all questions api tests', () => {
         const response = await getQuestion(request, question1.id);
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(response.questionGetResponse, 200);
+        expect200HttpStatusCode(response.questionGetResponse, 200);
 
         // --- Schema-level checks ---
         expectQuestionSchema(response.questionGetBody);
@@ -150,8 +150,8 @@ test.describe('GET all questions api tests', () => {
         const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(request, q2Token);
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(q1Response, 201);
-        expectHttpStatusCode(q2Response, 201);
+        expect200HttpStatusCode(q1Response, 201);
+        expect200HttpStatusCode(q2Response, 201);
 
         const {question: question1} = await createQuestion(request, q1.id, q1Token);
         const {question: question2} = await createQuestion(request, q2.id, q2Token);

@@ -2,39 +2,10 @@ import {QuestionBuilder} from '../builders/QuestionBuilder';
 import {QuestionType} from '../constants/test-data-constants';
 import { JwtHelper } from "../helpers/JwtHelper";
 import {APIRequestContext, APIResponse} from "@playwright/test";
+import {parseBody} from "../helpers/ParseBody";
 
 //to parse response-body correctly - json body can be json, text or empty string
 //duplicate - to be fixed later
-async function safeParseBody(response: APIResponse) {
-    const ct = (response.headers()['content-type'] || '').toLowerCase();
-
-    try {
-        const raw = await response.text();
-
-        // If empty body, return null
-        if (!raw || raw.trim() === '') {
-            return null;
-        }
-
-        // If JSON content type, try to parse
-        if (ct.includes('application/json')) {
-            try {
-                return JSON.parse(raw);
-            } catch (parseError) {
-                console.error('JSON parse error:', parseError);
-                console.error('Raw text:', raw);
-                return null;
-            }
-        }
-
-        // Return raw text for non-JSON responses
-        return raw;
-    } catch (error) {
-        console.error('Error reading response body:', error);
-        return null;
-    }
-}
-
 export async function createQuestion(
     request: any,
     questionnaireId: string,
@@ -58,7 +29,7 @@ export async function createQuestion(
         }
     });
     
-    const responseBody = await safeParseBody(response);
+    const responseBody = await parseBody(response);
 
     return {
         questionPostResponse: response,
@@ -79,7 +50,7 @@ export async function getQuestion(
         }
     });
 
-    const responseBody = await safeParseBody(response);
+    const responseBody = await parseBody(response);
 
     return {
         questionGetResponse: response,
@@ -99,7 +70,7 @@ export async function listQuestions(
         }
     });
 
-    const responseBody = await safeParseBody(response);
+    const responseBody = await parseBody(response);
 
     return {
         questionGetResponse: response,
@@ -121,7 +92,7 @@ export async function updateQuestion(
         }
     });
     
-    const responseBody = await safeParseBody(response);
+    const responseBody = await parseBody(response);
 
     return {
         updatedQuestionPostResponse: response,
@@ -141,7 +112,7 @@ export async function deleteQuestion(
         }
     });
 
-    const responseBody = await safeParseBody(response);
+    const responseBody = await parseBody(response);
 
     return {
         deleteQuestionResponse: response,

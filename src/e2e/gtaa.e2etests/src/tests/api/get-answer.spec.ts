@@ -3,7 +3,7 @@ import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {createQuestion} from "../../test-data-seeder/question-data";
 import {createSingleAnswer, getAnswer, listAnswers} from "../../test-data-seeder/answer-data";
 import {
-    expectHttpStatusCode,
+    expect200HttpStatusCode,
     expectAnswerSchema,
     expectAnswerTypes,
     expectAnswerContent
