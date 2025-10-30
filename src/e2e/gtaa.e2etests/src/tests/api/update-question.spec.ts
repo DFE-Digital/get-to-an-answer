@@ -3,7 +3,7 @@ import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire, updateQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {createQuestion, updateQuestion, getQuestion} from "../../test-data-seeder/question-data";
 import {
-    expectHttpStatusCode, expectQuestionContent, expectQuestionIO, expectQuestionSchema, expectQuestionTypes
+    expect200HttpStatusCode, expectQuestionContent, expectQuestionIO, expectQuestionSchema, expectQuestionTypes
 } from "../../helpers/api-assertions-helper";
 import {GUID_REGEX, QuestionType} from "../../constants/test-data-constants";
 
@@ -25,7 +25,7 @@ test.describe('PUT Update question api request', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(updatedQuestionPostResponse, 204);
+        expect200HttpStatusCode(updatedQuestionPostResponse, 204);
 
         // Verify update by fetching the question
         const {questionGetBody} = await getQuestion(request, question.id);
@@ -63,7 +63,7 @@ test.describe('PUT Update question api request', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(updatedQuestionPostResponse, 204);
+        expect200HttpStatusCode(updatedQuestionPostResponse, 204);
         
         const {questionGetBody} = await getQuestion(request, question.id);
         expect(questionGetBody.type).toBe(QuestionType.MULTIPLE);
@@ -274,7 +274,7 @@ test.describe('PUT Update question api request', () => {
         );
 
         // Update should succeed
-        expectHttpStatusCode(updatedQuestionPostResponse, 204);
+        expect200HttpStatusCode(updatedQuestionPostResponse, 204);
 
         // Then the response payload should have a different Id to the existing question
         const {questionGetBody: updatedQuestion2} = await getQuestion(request, question2.id);

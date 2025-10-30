@@ -6,7 +6,7 @@ import {
 import {GUID_REGEX} from "../../constants/test-data-constants";
 import {JwtHelper} from '../../helpers/JwtHelper';
 import {
-    expectHttpStatusCode,
+    expect200HttpStatusCode,
     expectQuestionnaireSchema,
     expectQuestionnaireContent,
     expectQuestionnaireInitStateTypes, expectQuestionnaireInitStateIO
@@ -20,7 +20,7 @@ test.describe('GET questionnaire api tests', () => {
         const response = await getQuestionnaire(request, questionnaireId);
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(response.questionnaireGetResponse, 200);
+        expect200HttpStatusCode(response.questionnaireGetResponse, 200);
 
         // --- Schema-level checks ---
         expectQuestionnaireSchema(response.questionnaireGetBody);
@@ -106,8 +106,8 @@ test.describe('GET questionnaire api tests', () => {
         const {questionnairePostResponse: q2Response, questionnaire: q2} = await createQuestionnaire(request, q2Token);
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(q1Response, 201);
-        expectHttpStatusCode(q2Response, 201);
+        expect200HttpStatusCode(q1Response, 201);
+        expect200HttpStatusCode(q2Response, 201);
 
         const response = await getQuestionnaire(
             request,
@@ -129,7 +129,7 @@ test.describe('GET questionnaire api tests', () => {
         const response = await listQuestionnaires(request, qToken);
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(response.questionnaireGetResponse, 200);
+        expect200HttpStatusCode(response.questionnaireGetResponse, 200);
 
         const list: any[] = response.questionnaireGetBody
         expect(Array.isArray(list)).toBe(true);
@@ -166,13 +166,13 @@ test.describe('GET questionnaire api tests', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(q1Response, 201);
-        expectHttpStatusCode(q2Response, 201);
+        expect200HttpStatusCode(q1Response, 201);
+        expect200HttpStatusCode(q2Response, 201);
 
         const response = await listQuestionnaires(request, q2Token);
 
         // // --- HTTP-level checks ---
-        expectHttpStatusCode(response.questionnaireGetResponse, 200);
+        expect200HttpStatusCode(response.questionnaireGetResponse, 200);
 
         const list: any[] = response.questionnaireGetBody
         expect(Array.isArray(list)).toBe(true);
@@ -188,7 +188,7 @@ test.describe('GET questionnaire api tests', () => {
         const response = await listQuestionnaires(request, JwtHelper.NoRecordsToken());
 
         // // --- HTTP-level checks ---
-        expectHttpStatusCode(response.questionnaireGetResponse, 200);
+        expect200HttpStatusCode(response.questionnaireGetResponse, 200);
 
         const list: any[] = response.questionnaireGetBody
         expect(Array.isArray(list)).toBe(true);
