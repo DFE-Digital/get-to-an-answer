@@ -2,7 +2,7 @@ import {expect, test} from "@playwright/test";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestion, deleteQuestion, getQuestion, listQuestions} from "../../test-data-seeder/question-data";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
-import {expectHttpStatusCode} from "../../helpers/api-assertions-helper";
+import {expect200HttpStatusCode} from "../../helpers/api-assertions-helper";
 import {QuestionType} from "../../constants/test-data-constants";
 
 test.describe('DELETE Question API request', () => {
@@ -23,7 +23,7 @@ test.describe('DELETE Question API request', () => {
 
         // Verify question exists before deletion
         const {questionGetResponse: beforeDelete} = await getQuestion(request, questionId);
-        expectHttpStatusCode(beforeDelete, 200);
+        expect200HttpStatusCode(beforeDelete, 200);
 
         const {deleteQuestionResponse, deleteQuestionBody} = await deleteQuestion(
             request,
@@ -78,7 +78,7 @@ test.describe('DELETE Question API request', () => {
             question.id,
             ownerToken
         );
-        expectHttpStatusCode(verifyExists, 200);
+        expect200HttpStatusCode(verifyExists, 200);
     });
 
     test('Validate DELETE question not found (invalid question id)', async ({request}) => {
@@ -137,7 +137,7 @@ test.describe('DELETE Question API request', () => {
 
         // And no deletion occurs
         const {questionGetResponse: verifyExists} = await getQuestion(request, question.id);
-        expectHttpStatusCode(verifyExists, 200);
+        expect200HttpStatusCode(verifyExists, 200);
     });
 
     test('Validate DELETE question with expired JWT bearer token', async ({request}) => {
@@ -166,7 +166,7 @@ test.describe('DELETE Question API request', () => {
 
         // And no deletion occurs
         const {questionGetResponse: verifyExists} = await getQuestion(request, question.id);
-        expectHttpStatusCode(verifyExists, 200);
+        expect200HttpStatusCode(verifyExists, 200);
     });
 
     test('Validate DELETE already deleted question (idempotency)', async ({request}) => {

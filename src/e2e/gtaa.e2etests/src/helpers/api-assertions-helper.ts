@@ -3,7 +3,8 @@ import {expect, APIResponse} from '@playwright/test';
 const isEmpty = (v: any) =>
     v == null || (typeof v === 'string' && v.trim() === '');
 
-export function expectHttpStatusCode(response: APIResponse, expectedStatus: number = 201) {
+//Expect 200 status codes
+export function expect200HttpStatusCode(response: APIResponse, expectedStatus: number = 201) {
     expect(response.ok(), 'Response should be OK').toBeTruthy();
     expect(response.status(), `Expected status ${expectedStatus}`).toBe(expectedStatus);
 }

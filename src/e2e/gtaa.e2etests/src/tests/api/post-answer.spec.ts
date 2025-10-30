@@ -4,7 +4,7 @@ import {
     expectAnswerContent, expectAnswerIO,
     expectAnswerSchema,
     expectAnswerTypes,
-    expectHttpStatusCode
+    expect200HttpStatusCode
 } from "../../helpers/api-assertions-helper";
 import {createQuestion, deleteQuestion} from "../../test-data-seeder/question-data";
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";
@@ -19,7 +19,7 @@ test.describe('POST answers', () => {
             payload: questionnairePayload
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
@@ -27,7 +27,7 @@ test.describe('POST answers', () => {
             payload: questionPayload
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         const {
             answerPostResponse,
@@ -42,7 +42,7 @@ test.describe('POST answers', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(answerPostResponse, 200);
+        expect200HttpStatusCode(answerPostResponse, 200);
 
         // --- Schema-level checks ---
         expectAnswerSchema(answer);
@@ -65,14 +65,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         const invalidPayload = {
             questionId: question.id,
@@ -109,14 +109,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         const invalidPayload = {
             questionId: question.id,
@@ -151,7 +151,7 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         // Use a valid GUID format but for a question that doesn't exist
         const nonExistentQuestionId = '00000000-0000-0000-0000-000000000000';
@@ -179,14 +179,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         // Attempt to create answer with invalid JWT token
         const {
@@ -213,14 +213,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         const {
             answerPostResponse,
@@ -247,14 +247,14 @@ test.describe('POST answers', () => {
             questionnaire: questionnaire1,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnaire1Response, 201);
+        expect200HttpStatusCode(questionnaire1Response, 201);
 
         const {
             questionPostResponse: question1Response,
             question: question1,
         } = await createQuestion(request, questionnaire1.id);
 
-        expectHttpStatusCode(question1Response, 201);
+        expect200HttpStatusCode(question1Response, 201);
 
         //second questionnaire
         const {
@@ -262,14 +262,14 @@ test.describe('POST answers', () => {
             questionnaire: questionnaire2,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnaire2Response, 201);
+        expect200HttpStatusCode(questionnaire2Response, 201);
 
         const {
             questionPostResponse: question2Response,
             question: question2,
         } = await createQuestion(request, questionnaire2.id);
 
-        expectHttpStatusCode(question2Response, 201);
+        expect200HttpStatusCode(question2Response, 201);
 
         // Create an answer for question1 with destinationQuestionId pointing to question2 (from different questionnaire)
         const {
@@ -297,14 +297,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         // Attempt to create an answer with destination pointing to the same question (creates a cycle)
         const {
@@ -335,14 +335,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request, authorizedToken);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id, authorizedToken);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         // Attempt to create an answer with a different user's token (not authorized for this questionnaire)
         const {
@@ -369,14 +369,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         // Create answer with empty description
         const emptyDescription: any = '';
@@ -396,7 +396,7 @@ test.describe('POST answers', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(answerPostResponse, 200);
+        expect200HttpStatusCode(answerPostResponse, 200);
 
         // --- Schema-level checks ---
         expectAnswerSchema(answer);
@@ -420,14 +420,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         // Use an invalid/non-existent questionnaire ID
         const invalidQuestionnaireId = '00000000-0000-0000-0000-000000000000';
@@ -455,14 +455,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         // Soft delete the questionnaire
         const {
@@ -495,14 +495,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         // Soft delete the question
         const {
@@ -535,14 +535,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         // Create answer with exactly 250 characters (maximum allowed)
         const maxLengthContent = 'A'.repeat(250);
@@ -561,7 +561,7 @@ test.describe('POST answers', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(answerPostResponse, 200);
+        expect200HttpStatusCode(answerPostResponse, 200);
         
         // --- Business rule validation: Content length should be exactly 250 ---
         expect(answer.content).toBe(maxLengthContent);
@@ -575,14 +575,14 @@ test.describe('POST answers', () => {
     //         questionnaire,
     //     } = await createQuestionnaire(request);
     //
-    //     expectHttpStatusCode(questionnairePostResponse, 201);
+    //     expect200HttpStatusCode(questionnairePostResponse, 201);
     //
     //     const {
     //         questionPostResponse,
     //         question,
     //     } = await createQuestion(request, questionnaire.id);
     //
-    //     expectHttpStatusCode(questionPostResponse, 201);
+    //     expect200HttpStatusCode(questionPostResponse, 201);
     //
     //     // Create answer with 251 characters (exceeds maximum)
     //     const tooLongContent = 'A'.repeat(251);
@@ -610,7 +610,7 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         // Create two questions - one will be the source, the other the destination
         const {
@@ -618,14 +618,14 @@ test.describe('POST answers', () => {
             question: question1,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(question1Response, 201);
+        expect200HttpStatusCode(question1Response, 201);
 
         const {
             questionPostResponse: question2Response,
             question: question2,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(question2Response, 201);
+        expect200HttpStatusCode(question2Response, 201);
 
         // Create an answer with destination type Question and valid destinationQuestionId
         const {
@@ -644,7 +644,7 @@ test.describe('POST answers', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(answerPostResponse, 200);
+        expect200HttpStatusCode(answerPostResponse, 200);
         
         // --- Business rule validation: Destination should match ---
         expect(answer.destinationType).toBe(AnswerDestinationType.Question);
@@ -658,14 +658,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         // Create an answer with destination type ExternalLink and valid URL
         const externalUrl = 'https://www.gov.uk/government/organisations/department-for-education';
@@ -686,7 +686,7 @@ test.describe('POST answers', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(answerPostResponse, 200);
+        expect200HttpStatusCode(answerPostResponse, 200);
         
         // --- Business rule validation: Destination should match ---
         expect(answer.destinationType).toBe(AnswerDestinationType.ExternalLink);
@@ -700,14 +700,14 @@ test.describe('POST answers', () => {
     //         questionnaire,
     //     } = await createQuestionnaire(request);
     //
-    //     expectHttpStatusCode(questionnairePostResponse, 201);
+    //     expect200HttpStatusCode(questionnairePostResponse, 201);
     //
     //     const {
     //         questionPostResponse,
     //         question,
     //     } = await createQuestion(request, questionnaire.id);
     //
-    //     expectHttpStatusCode(questionPostResponse, 201);
+    //     expect200HttpStatusCode(questionPostResponse, 201);
     //
     //     // Create an answer with destination-type as Question but no destinationQuestionId
     //     const {
@@ -735,14 +735,14 @@ test.describe('POST answers', () => {
             questionnaire,
         } = await createQuestionnaire(request);
 
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         const {
             questionPostResponse,
             question,
         } = await createQuestion(request, questionnaire.id);
 
-        expectHttpStatusCode(questionPostResponse, 201);
+        expect200HttpStatusCode(questionPostResponse, 201);
 
         // Create an answer with invalid URL format
         const invalidUrl = 'not-a-valid-url';

@@ -6,7 +6,7 @@ import {
 import {GUID_REGEX} from "../../constants/test-data-constants";
 import {ClaimTypes, JwtHelper, SimpleDate} from '../../helpers/JwtHelper';
 import {
-    expectHttpStatusCode,
+    expect200HttpStatusCode,
     expectQuestionnaireSchema,
     expectQuestionnaireTypes,
     expectQuestionnaireContent,
@@ -23,7 +23,7 @@ test.describe('POST Create questionnaire api request', () => {
         } = await createQuestionnaire(request);
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         // // --- Schema-level checks ---
         expectQuestionnaireSchema(questionnaire);
@@ -55,7 +55,7 @@ test.describe('POST Create questionnaire api request', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         // --- Schema-level checks ---
         expectQuestionnaireSchema(questionnaire);
@@ -82,7 +82,7 @@ test.describe('POST Create questionnaire api request', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(questionnairePostResponse, 201);
+        expect200HttpStatusCode(questionnairePostResponse, 201);
 
         // --- Schema-level checks ---
         expectQuestionnaireSchema(questionnaire);
@@ -116,8 +116,8 @@ test.describe('POST Create questionnaire api request', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(q1Response, 201);
-        expectHttpStatusCode(q2Response, 201);
+        expect200HttpStatusCode(q1Response, 201);
+        expect200HttpStatusCode(q2Response, 201);
 
         // --- Content sanity ---
         expect(q1.title).toBe(q2.title);
@@ -218,8 +218,8 @@ test.describe('POST Create questionnaire api request', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(q1Response, 201);
-        expectHttpStatusCode(q2Response, 201);
+        expect200HttpStatusCode(q1Response, 201);
+        expect200HttpStatusCode(q2Response, 201);
 
         const updatePayload = {
             ...q2,
