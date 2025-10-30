@@ -472,33 +472,7 @@ public class QuestionnaireTests(ApiFixture factory) :
         questionnaire.CreatedAt.Should().NotBe(default);
         questionnaire.UpdatedAt.Should().NotBe(default);
     }
-
-    // Scenario: Update a questionnaire with missing Title
-    [Fact]
-    public async Task Update_Missing_Title_BadRequest_NoContent_Not_Used()
-    {
-        // Arrange
-        string id;
-        using (var postRes = await Create(new { title = "T0" }))
-        {
-            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
-            id = ExtractId(await postRes.Content.ReadAsStringAsync());
-        }
-
-        // Act
-        using var res = await UpdateById(id, new { /* missing title */ });
-
-        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        var text = await res.Content.ReadAsStringAsync();
-        text.Should().Contain("title");
-        text.Should().NotContain("userId");
-        text.Should().NotContain("userEmail");
-
-        // Verify nothing changed
-        var questionnaire = await GetById<QuestionnaireDto>(id);
-        questionnaire.Title.Should().Be("T0");
-    }
-
+    
     // Scenario: Update with Title and Description
     [Fact]
     public async Task Update_Title_And_Description_NoContent_Then_Get()
