@@ -8,8 +8,8 @@ export class AnswerBuilder {
     private _description: string;
     private _destinationUrl: string;
     private _destinationType: AnswerDestinationType;
+    private _destinationQuestionId: string;
     private _score: number;
-    // private _answerPrefix: string
 
     constructor(questionId: string, questionnaireId: string) {
         const timestamp = Date.now();
@@ -18,25 +18,22 @@ export class AnswerBuilder {
         this._content = `Default answer content - ${timestamp}`;
         this._description = `Default answer description - ${timestamp}`;
         this._destinationUrl = `https://example.com/destination-url-${timestamp}`;
-        this._destinationType = AnswerDestinationType.QUESTION; //set to default
+        this._destinationType = AnswerDestinationType.Question; //set to default
+        this._destinationQuestionId = '';
         this._score = 0.0; //set to default
-        // this._answerPrefix = 'Default answer prefix';
     }
-
+    
+    withDestinationQuestionId(destinationQuestionId?: string) {
+        if (destinationQuestionId !== undefined)
+            this._destinationQuestionId = destinationQuestionId;
+        return this;
+    }
     withContent(content?: string) {
         if (content !== undefined)
             this._content = content;
         return this;
     }
 
-    // withContentPrefix(prefix?: string) {
-    //     if (prefix && prefix.trim().length > 0)
-    //         this._content = `${prefix} - ${this._content}`;
-    //     else
-    //         this._content = `${this._answerPrefix} - ${this._content}`;
-    //     return this;
-    // }
-    
     withDescription(description?: string) {
         if (description !== undefined)
             this._description = description;
@@ -54,7 +51,7 @@ export class AnswerBuilder {
             this._destinationType = destinationType;
         return this;
     }
-
+    
     withScore(score?: number) {
         if (score !== undefined)
             this._score = score;
@@ -62,7 +59,7 @@ export class AnswerBuilder {
     }
 
     build(): AnswerModel {
-        return {
+        const answer: AnswerModel = {
             questionId: this._questionId,
             questionnaireId: this._questionnaireId,
             content: this._content,
@@ -71,5 +68,10 @@ export class AnswerBuilder {
             destinationType: this._destinationType,
             score: this._score
         };
+
+        if (this._destinationQuestionId && this._destinationQuestionId.trim() !== '') {
+            answer.destinationQuestionId = this._destinationQuestionId;
+        }
+        return answer;
     }
 }
