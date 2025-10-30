@@ -7,7 +7,8 @@ import {
     expectAnswerTypes,
     expectAnswerContent,
     expectAnswerIO,
-    expectHttpStatusCode, expectQuestionSchema, expectQuestionTypes, expectQuestionContent, expectQuestionIO
+    expectHttpStatusCode, expectQuestionSchema, expectQuestionTypes, expectQuestionContent, expectQuestionIO,
+    expect200HttpStatusCode
 } from "../../helpers/api-assertions-helper";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {GUID_REGEX, AnswerDestinationType} from "../../constants/test-data-constants";
@@ -40,7 +41,7 @@ test.describe('PUT Update answer', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(updatedAnswerPostResponse, 204);
+        expect200HttpStatusCode(updatedAnswerPostResponse, 204);
 
         // Verify an update by fetching the question
         const {answer} = await getAnswer(request, createdAnswer.id);
@@ -481,7 +482,7 @@ test.describe('PUT Update answer', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(updatedAnswerPostResponse, 204);
+        expect200HttpStatusCode(updatedAnswerPostResponse, 204);
     });
 
     //500 error, raise a bug
@@ -546,7 +547,7 @@ test.describe('PUT Update answer', () => {
         );
 
         // --- HTTP-level checks ---
-        expectHttpStatusCode(updatedAnswerPostResponse, 204);
+        expect200HttpStatusCode(updatedAnswerPostResponse, 204);
 
         // Verify the update by fetching the answer
         const {answer: fetchedAnswer} = await getAnswer(request, createdAnswer.id);
