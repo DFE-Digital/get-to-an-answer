@@ -7,7 +7,7 @@ import {
     expectAnswerTypes,
     expectAnswerContent,
     expectAnswerIO,
-    expectHttpStatusCode, expectQuestionSchema, expectQuestionTypes, expectQuestionContent, expectQuestionIO,
+    expectQuestionSchema, expectQuestionTypes, expectQuestionContent, expectQuestionIO,
     expect200HttpStatusCode
 } from "../../helpers/api-assertions-helper";
 import {JwtHelper} from "../../helpers/JwtHelper";
