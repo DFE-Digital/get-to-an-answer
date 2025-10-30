@@ -6,10 +6,10 @@ import {
 } from "../../test-data-seeder/questionnaire-data";
 
 import {
-  expectHttpStatusCode,
-  expectQuestionnaireSchema,
-  expectQuestionnaireTypes,
-  expectQuestionnaireContent, 
+    expectHttpStatusCode,
+    expectQuestionnaireSchema,
+    expectQuestionnaireTypes,
+    expectQuestionnaireContent,
     expectQuestionnaireInitStateTypes,
     expectQuestionnaireInitStateContent,
     expectQuestionnaireInitStateIO
@@ -18,8 +18,7 @@ import {JwtHelper} from "../../helpers/JwtHelper";
 import {AnswerDestinationType, GUID_REGEX} from "../../constants/test-data-constants";
 
 test.describe('UPDATE Questionnaire API tests', () => {
-    
-    test('Validate UPDATE questionnaire with valid payload & correct response returned', async ({request}) => {
+    test('Validate UPDATE questionnaire successfully with updated & valid response', async ({request}) => {
 
         // First, create a new questionnaire to ensure there is one to update
 
@@ -33,50 +32,35 @@ test.describe('UPDATE Questionnaire API tests', () => {
         } = await createQuestionnaire(request, undefined, initialTitle, initialDescription);
 
         expectHttpStatusCode(questionnairePostResponse, 201);
-        
-        
-    })
-    
-    test('Validate UPDATE questionnaire successfully', async ({request}) => {
 
-        // First, create a new questionnaire to ensure there is one to update
-        
-        const initialTitle = 'Initial Test Questionnaire Title';
-        const initialDescription = 'Initial Test Questionnaire Description';
-        
-        const {
-            questionnairePostResponse,
-            questionnaire,
-            payload
-        } = await createQuestionnaire(request, undefined, initialTitle, initialDescription);
-
-        expectHttpStatusCode(questionnairePostResponse, 201);
-        
         const newTitle = 'Updated Test Questionnaire Title';
         const newDescription = 'Updated Test Questionnaire Description';
         //random slug each time 
         const newSlug = `updated-test-questionnaire-slug-${Math.floor(Math.random() * 1000000000)}`;
-        
+
         // Change the questionnaire title
-        const {updatedQuestionnairePostResponse, updatedQuestionnaire: updateQuestionnaireResBody } = await updateQuestionnaire(
+        const {
+            updatedQuestionnairePostResponse,
+            updatedQuestionnaire: updateQuestionnaireResBody
+        } = await updateQuestionnaire(
             request,
             questionnaire.id,
-            { 
-                title: newTitle, 
+            {
+                title: newTitle,
                 description: newDescription,
                 slug: newSlug
             }
         );
-        
+
         expectHttpStatusCode(updatedQuestionnairePostResponse, 204);
-        
+
         // Check for no content in body - validate structure
         expect(updateQuestionnaireResBody).toBeFalsy();
-        
+
         // Check new entries have been updated in questionnaire
         const {
             questionnaireGetResponse: getUpdatedQuestionnaireGetResponse,
-            questionnaireGetBody : getUpdatedQuestionnaireBody
+            questionnaireGetBody: getUpdatedQuestionnaireBody
         } = await getQuestionnaire(
             request,
             questionnaire.id);
@@ -92,10 +76,91 @@ test.describe('UPDATE Questionnaire API tests', () => {
         //
         // // --- I/O checks ---
         expectQuestionnaireInitStateIO(questionnaire, payload, GUID_REGEX);
-        
+
         expect(getUpdatedQuestionnaireBody.title).toEqual(newTitle);
         expect(getUpdatedQuestionnaireBody.description).toEqual(newDescription);
         expect(getUpdatedQuestionnaireBody.slug).toEqual(newSlug);
+
+    });
+
+    test('UPDATE questionnaire with invalid auth token', async ({request}) => {
+
+        // First, create a new questionnaire to ensure there is one to update
+
+        const initialTitle = 'Initial Test Questionnaire Title';
+        const initialDescription = 'Initial Test Questionnaire Description';
+
+        const {
+            questionnairePostResponse,
+            questionnaire,
+        } = await createQuestionnaire(request, undefined, initialTitle, initialDescription);
+
+        expectHttpStatusCode(questionnairePostResponse, 201);
+
+        const newTitle = 'Updated Test Questionnaire Title';
+
+        // Change the questionnaire title
+        const {
+            updatedQuestionnairePostResponse,
+        } = await updateQuestionnaire(
+            request,
+            questionnaire.id,
+            {
+                title: newTitle,
+            },
+            JwtHelper.InvalidToken
+        );
+        
+        expect(updatedQuestionnairePostResponse.status()).toBe(401);
+    });
+
+    test('UPDATE questionnaire with expired auth token', async ({request}) => {
+
+        // First, create a new questionnaire to ensure there is one to update
+
+        const initialTitle = 'Initial Test Questionnaire Title';
+        const initialDescription = 'Initial Test Questionnaire Description';
+
+        const {
+            questionnairePostResponse,
+            questionnaire,
+        } = await createQuestionnaire(request, undefined, initialTitle, initialDescription);
+
+        expectHttpStatusCode(questionnairePostResponse, 201);
+
+        const newTitle = 'Updated Test Questionnaire Title';
+
+        // Change the questionnaire title
+        const {
+            updatedQuestionnairePostResponse,
+        } = await updateQuestionnaire(
+            request,
+            questionnaire.id,
+            {
+                title: newTitle,
+            },
+            JwtHelper.ExpiredToken
+        );
+
+        expect(updatedQuestionnairePostResponse.status()).toBe(401);
+    });
+    
+    test('UPDATE questionnaire with invalid id', async ({request}) => {
+
+        const newTitle = 'Updated Test Questionnaire Title';
+        const invalidId = '00000000-0000-0000-0000-000000000999';
+        
+        const {
+            updatedQuestionnairePostResponse, updatedQuestionnaire: updateQuestionnaireResBody
+        } = await updateQuestionnaire(
+            request,
+            invalidId,
+            {
+                title: newTitle,
+            }
+        );
+        
+        expect(updatedQuestionnairePostResponse.status()).toBe(404);
         
     });
-});
+})
