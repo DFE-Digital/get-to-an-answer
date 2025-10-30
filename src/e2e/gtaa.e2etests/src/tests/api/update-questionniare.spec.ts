@@ -4,13 +4,18 @@ import {
     getQuestionnaire,
     updateQuestionnaire
 } from "../../test-data-seeder/questionnaire-data";
+
 import {
   expectHttpStatusCode,
   expectQuestionnaireSchema,
   expectQuestionnaireTypes,
-  expectQuestionnaireContent
+  expectQuestionnaireContent, 
+    expectQuestionnaireInitStateTypes,
+    expectQuestionnaireInitStateContent,
+    expectQuestionnaireInitStateIO
 } from "../../helpers/api-assertions-helper";
 import {JwtHelper} from "../../helpers/JwtHelper";
+import {AnswerDestinationType, GUID_REGEX} from "../../constants/test-data-constants";
 
 test.describe('UPDATE Questionnaire API tests', () => {
     
@@ -75,10 +80,22 @@ test.describe('UPDATE Questionnaire API tests', () => {
         } = await getQuestionnaire(
             request,
             questionnaire.id);
+
+        // // --- Schema-level checks ---
+        expectQuestionnaireSchema(questionnaire);
+
+        // // --- Type sanity checks ---
+        expectQuestionnaireInitStateTypes(questionnaire);
+        //
+        // // --- Basic content sanity ---
+        expectQuestionnaireInitStateContent(questionnaire);
+        //
+        // // --- I/O checks ---
+        expectQuestionnaireInitStateIO(questionnaire, payload, GUID_REGEX);
         
         expect(getUpdatedQuestionnaireBody.title).toEqual(newTitle);
         expect(getUpdatedQuestionnaireBody.description).toEqual(newDescription);
         expect(getUpdatedQuestionnaireBody.slug).toEqual(newSlug);
+        
     });
-
 });
