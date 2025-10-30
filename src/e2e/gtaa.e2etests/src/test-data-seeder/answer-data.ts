@@ -1,64 +1,97 @@
 import {AnswerBuilder} from '../builders/AnswerBuilder';
 import {AnswerDestinationType} from '../constants/test-data-constants'
-import { JwtHelper } from "../helpers/JwtHelper";
+import {JwtHelper} from "../helpers/JwtHelper";
 import {APIResponse} from "@playwright/test";
 
-export async function createMultipleAnswers(
-    request: any,
-    questionId: string,
-    questionnaireId: string,
-    numberOfAnswers: number,
-    useDifferentDestinations?: boolean,
-    bearerToken?: string,
-) {
-    const createdAnswers = [];
-    const createdPayloads = [];
-    
-    const destinationType = AnswerDestinationType.PAGE;
-    const destination = '/default-destination'
-    const score = 0.0;
+//to parse response-body correctly - json body can be json, text or empty string
+//duplicate - to be fixed later
+async function safeParseBody(response: APIResponse) {
+    const ct = (response.headers()['content-type'] || '').toLowerCase();
 
-    for (let i = 1; i <= numberOfAnswers; i++) {
-        const content = `Auto-generated answer content - Choice ${i}`;
-        const description = `Auto-generated description - option ${i}`;
+    try {
+        const raw = await response.text();
 
-        // Either same destination or /default-destination-1, /default-destination-2, etc.
-        const finalDestination = useDifferentDestinations ? `${destination}-${i}` : destination;
-
-        const payload = new AnswerBuilder(questionId, questionnaireId)
-            .withContent(content)
-            .withDescription(description)
-            .withDestinationUrl(finalDestination)
-            .withDestinationType(destinationType)
-            .withScore(score)
-            .build();
-
-        const response = await request.post('/api/answers', {
-            data: payload,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
-            }
-        });
-
-        if (!response.ok()) {
-            throw new Error(`❌ Failed to create answer ${i}: ${response.status()}`);
+        // If empty body, return null
+        if (!raw || raw.trim() === '') {
+            return null;
         }
 
-        const body = await response.json();
-        createdAnswers.push(body);
-        createdPayloads.push(payload);
-    }
+        // If JSON content type, try to parse
+        if (ct.includes('application/json')) {
+            try {
+                return JSON.parse(raw);
+            } catch (parseError) {
+                console.error('JSON parse error:', parseError);
+                console.error('Raw text:', raw);
+                return null;
+            }
+        }
 
-    console.log(
-        `✅ Created ${numberOfAnswers} ${useDifferentDestinations ? 'different' : 'same'} outcomes for question ${questionId}`
-    );
-    return {createdAnswers, createdPayloads};
+        // Return raw text for non-JSON responses
+        return raw;
+    } catch (error) {
+        console.error('Error reading response body:', error);
+        return null;
+    }
 }
+
+// export async function createMultipleAnswers(
+//     request: any,
+//     questionId: string,
+//     questionnaireId: string,
+//     numberOfAnswers: number,
+//     useDifferentDestinations?: boolean,
+//     bearerToken?: string,
+// ) {
+//     const createdAnswers = [];
+//     const createdPayloads = [];
+//    
+//     const destinationType = AnswerDestinationType.PAGE;
+//     const destination = '/default-destination'
+//     const score = 0.0;
+//
+//     for (let i = 1; i <= numberOfAnswers; i++) {
+//         const content = `Auto-generated answer content - Choice ${i}`;
+//         const description = `Auto-generated description - option ${i}`;
+//
+//         // Either same destination or /default-destination-1, /default-destination-2, etc.
+//         const finalDestination = useDifferentDestinations ? `${destination}-${i}` : destination;
+//
+//         const payload = new AnswerBuilder(questionId, questionnaireId)
+//             .withContent(content)
+//             .withDescription(description)
+//             .withDestinationUrl(finalDestination)
+//             .withDestinationType(destinationType)
+//             .withScore(score)
+//             .build();
+//
+//         const response = await request.post('/api/answers', {
+//             data: payload,
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
+//             }
+//         });
+//
+//         if (!response.ok()) {
+//             throw new Error(`❌ Failed to create answer ${i}: ${response.status()}`);
+//         }
+//
+//         const body = await response.json();
+//         createdAnswers.push(body);
+//         createdPayloads.push(payload);
+//     }
+//
+//     console.log(
+//         `✅ Created ${numberOfAnswers} ${useDifferentDestinations ? 'different' : 'same'} outcomes for question ${questionId}`
+//     );
+//     return {createdAnswers, createdPayloads};
+// }
 
 interface CreateAnswerRequest {
     questionId: string;
     questionnaireId: string;
+    destinationQuestionId?: string;
     content?: string;
     description?: string;
     answerPrefix?: string;
@@ -71,15 +104,16 @@ export async function createSingleAnswer(
     request: any,
     answerRequest: CreateAnswerRequest,
     bearerToken?: string,
-): Promise<{ res: APIResponse; responseBody: any; payload: any }> {
+) {
     const payload = new AnswerBuilder(answerRequest.questionId, answerRequest.questionnaireId)
+        .withDestinationQuestionId(answerRequest.destinationQuestionId)
         .withContent(answerRequest.content)
         .withDescription(answerRequest.description)
         .withDestinationUrl(answerRequest.destinationUrl)
         .withDestinationType(answerRequest.destinationType)
         .withScore(answerRequest.score)
         .build();
-    
+
     const response = await request.post('/api/answers', {
         data: payload,
         headers: {
@@ -87,22 +121,19 @@ export async function createSingleAnswer(
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
+
+    const responseBody = await safeParseBody(response);
     
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to create answer: ${response.status()}`);
+    return {
+        answerPostResponse: response,
+        answer: responseBody,
+        payload
     }
-    
-    const res = await response;
-    const responseBody = res.json();
-    console.log(
-        `✅ Created 1 answer → destination "${answerRequest.destinationUrl}" for question ${answerRequest.questionId}`
-    );
-    return {res, responseBody, payload};
 }
 
 export async function getAnswer(
     request: any,
-    answerId: number,
+    answerId: string,
     bearerToken?: string,
 ) {
     const response = await request.get(`/api/answers/${answerId}`, {
@@ -112,11 +143,12 @@ export async function getAnswer(
         }
     });
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to get answer: ${response.status()}`);
+    const responseBody = await safeParseBody(response);
+
+    return {
+        answerGetResponse: response,
+        answer: responseBody
     }
-    
-    return await response.json();
 }
 
 export async function listAnswers(
@@ -131,11 +163,12 @@ export async function listAnswers(
         }
     });
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to get answers: ${response.status()}`);
-    }
+    const responseBody = await safeParseBody(response);
 
-    return await response.json();
+    return {
+        answersGetResponse: response,
+        answers: responseBody
+    }
 }
 
 export async function updateAnswer(

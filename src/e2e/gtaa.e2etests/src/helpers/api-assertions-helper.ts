@@ -193,6 +193,7 @@ export function expectAnswerSchema(answer: any) {
         'description',
         'destinationUrl',
         'destinationType',
+        'destinationQuestionId',
         'score',
         'createdAt',
         'updatedAt'
@@ -201,4 +202,80 @@ export function expectAnswerSchema(answer: any) {
     for (const prop of expectedProps) {
         expect(answer, `Missing property:${prop}`).toHaveProperty((prop))
     }
+}
+
+export function expectAnswerTypes(answer: any) {
+    expect(typeof answer.id).toBe('string');
+    expect(typeof answer.questionId).toBe('string');
+    expect(typeof answer.questionnaireId).toBe('string');
+    expect(typeof answer.content).toBe('string');
+    expect(typeof answer.description).toBe('string');
+    expect(typeof answer.destinationUrl).toBe('string');
+    expect(typeof answer.destinationType).toBe('number');
+    expect(typeof answer.score).toBe('number');
+    expect(typeof answer.createdAt).toBe('string');
+    expect(typeof answer.updatedAt).toBe('string');
+    if (answer.destinationQuestionId !== null) {
+        expect(typeof answer.destinationQuestionId).toBe('string');
+    }
+
+}
+
+export function expectAnswerContent(a: any) {
+    expect(a.content?.trim().length).toBeGreaterThan(0);
+
+    if (isEmpty(a.description)) {
+        expect(isEmpty(a.description)).toBeTruthy();
+    } else {
+        expect(a.description.trim().length).toBeGreaterThan(0);
+    }
+
+    if (isEmpty(a.destinationUrl)) {
+        expect(isEmpty(a.destinationUrl)).toBeTruthy();
+    } else {
+        expect(a.destinationUrl.trim().length).toBeGreaterThan(0);
+    }
+
+    expect([1, 2]).toContain(a.destinationType);
+    expect(typeof a.score).toBe('number');
+
+    if (a.destinationQuestionId !== null && a.destinationQuestionId !== undefined) {
+        expect(a.destinationQuestionId.trim().length).toBeGreaterThan(0);
+    }
+    
+    //timestamp-sanity
+    const c = new Date(a.createdAt).getTime();
+    const u = new Date(a.updatedAt).getTime();
+    expect(!isNaN(c)).toBeTruthy();
+    expect(!isNaN(u)).toBeTruthy();
+    expect(u).toBeGreaterThanOrEqual(c);
+}
+
+export function expectAnswerIO(a: any, payload: any, guidRegex: RegExp) {
+    expect(a.id).toMatch(guidRegex);
+    expect(a.questionId).toBe(payload.questionId);
+    expect(a.questionnaireId).toBe(payload.questionnaireId);
+    expect(a.content).toBe(payload.content);
+    expect(a.destinationType).toBe(payload.destinationType);
+    expect(a.score).toBe(payload.score);
+
+    if (isEmpty(payload.description)) {
+        expect(isEmpty(a.description)).toBeTruthy();
+    } else {
+        expect(a.description).toBe(payload.description);
+    }
+
+    if (isEmpty(payload.destinationUrl)) {
+        expect(isEmpty(a.destinationUrl)).toBeTruthy();
+    } else {
+        expect(a.destinationUrl).toBe(payload.destinationUrl);
+    }
+
+    if (payload.destinationQuestionId === undefined || payload.destinationQuestionId === null || isEmpty(payload.destinationQuestionId)) {
+        expect(a.destinationQuestionId === null || a.destinationQuestionId === undefined).toBeTruthy();
+    } else {
+        expect(a.destinationQuestionId).toBe(payload.destinationQuestionId);
+        expect(a.destinationQuestionId).toMatch(guidRegex);
+    }
+
 }

@@ -20,7 +20,7 @@ flowchart TD
   D --> E
   E -- Yes --> F[Subsequent Questions]
   F --> E
-  E -- No --> G[Outcome / External Destination]
+  E -- No --> G[Custom Page / External Destination]
   G --> H[Support & next steps shown]
 ```
 
@@ -31,7 +31,7 @@ flowchart TD
 graph LR
   ST[Start Page] --- Q1[Question Page]
   Q1 --- QN[Subsequent Questions]
-  QN --- OUT[Outcome / Redirect]
+  QN --- OUT[Redirect]
   ST --- PRIV[Privacy Info]
   ST --- SUP[Support Details]
 
@@ -41,6 +41,6 @@ graph LR
 
 - Start Page: introduces the questionnaire, what to expect, and how to begin.
 - Question Page(s): presents each question, validates inputs, and advances the flow.
-- Outcome / Redirect: shows the result or sends the user to an external destination based on answers.
+- Custom Page / Redirect: shows the result or sends the user to an external destination based on answers.
 - Privacy Info: explains how information is used.
 - Support Details: provides ways to get help during completion.
