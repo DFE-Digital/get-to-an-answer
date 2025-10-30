@@ -10,3 +10,5 @@ _“How might we ensure that UCD teams can create content flows that are easy to
 ## Documentation
 
 This site is a collection of documentation to help developers understand the project and its components.
+
+You can find the requirements and design documentation in the [design](design) folder.
