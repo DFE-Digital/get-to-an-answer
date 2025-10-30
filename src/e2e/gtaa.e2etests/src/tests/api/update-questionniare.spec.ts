@@ -245,4 +245,33 @@ test.describe('UPDATE Questionnaire API tests', () => {
         expect(getUpdatedQuestionnaireBody.title).toEqual(initialTitle);
         
     });
+    
+    test('UPDATE questionnaire slug', async ({request}) => {
+        const {
+            questionnairePostResponse,
+            questionnaire,
+        } = await createQuestionnaire(request, undefined, 'Test Questionnaire');
+        
+        expect200HttpStatusCode(questionnairePostResponse, 201);
+        console.log(questionnaire.id);
+        
+        
+        const initialSlug = `questionnaire-slug-${Math.floor(Math.random() * 1000000000)}`;
+        
+        //Add the initial slug to the questionnaire
+        const {
+            updatedQuestionnairePostResponse,
+            updatedQuestionnaire: updatedQuestionnaireResBody
+        } = await updateQuestionnaire(
+            request,
+            questionnaire.id,
+            {
+                slug: initialSlug
+            }
+        );
+        
+        console.log("First q update res body: " + updatedQuestionnaireResBody);
+        
+        expect200HttpStatusCode(updatedQuestionnairePostResponse, 204);
+    })
 })
