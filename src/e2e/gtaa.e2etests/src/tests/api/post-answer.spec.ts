@@ -12,7 +12,7 @@ import {AnswerDestinationType, GUID_REGEX} from "../../constants/test-data-const
 import {JwtHelper} from "../../helpers/JwtHelper";
 
 test.describe('POST answers', () => {
-    test('Post an answer for a question in a questionnaire validations', async ({request}) => {
+    test('POST an answer for a question in a questionnaire validations', async ({request}) => {
         const {
             questionnairePostResponse,
             questionnaire,
@@ -567,8 +567,8 @@ test.describe('POST answers', () => {
         expect(answer.content).toBe(maxLengthContent);
         expect(answer.content.length).toBe(250);
     });
-
-    //500 error - need to raise a bug
+    
+    //bug raised
     // test('Validate POST create answer with content exceeding maximum length (251 characters)', async ({ request }) => {
     //     const {
     //         questionnairePostResponse,
@@ -693,7 +693,7 @@ test.describe('POST answers', () => {
         expect(answer.destinationUrl).toBe(externalUrl);
     });
     
-    //should i be able to create and answer without destinationQuestionId?
+    //should I be able to create and answer without destinationQuestionId? Need clarification
     // test('Validate POST create answer with destination type Question without destinationQuestionId', async ({ request }) => {
     //     const {
     //         questionnairePostResponse,
@@ -725,8 +725,8 @@ test.describe('POST answers', () => {
     //     );
     //
     //     // --- HTTP-level checks ---
-    //     expect(answerPostResponse.ok()).toBeFalsy();
-    //     expect(answerPostResponse.status()).toBe(400);
+    //     expect(answerPostResponse.ok()).toBeTruthy();
+    //     expect(answerPostResponse.status()).toBe(200);
     // });
 
     test('Validate POST create answer with invalid URL format in destinationUrl', async ({ request }) => {

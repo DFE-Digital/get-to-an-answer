@@ -133,7 +133,7 @@ export async function createSingleAnswer(
 
 export async function getAnswer(
     request: any,
-    answerId: number,
+    answerId: string,
     bearerToken?: string,
 ) {
     const response = await request.get(`/api/answers/${answerId}`, {
@@ -143,11 +143,12 @@ export async function getAnswer(
         }
     });
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to get answer: ${response.status()}`);
-    }
+    const responseBody = await safeParseBody(response);
 
-    return await response.json();
+    return {
+        answerGetResponse: response,
+        answer: responseBody
+    }
 }
 
 export async function listAnswers(
@@ -162,11 +163,12 @@ export async function listAnswers(
         }
     });
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to get answers: ${response.status()}`);
-    }
+    const responseBody = await safeParseBody(response);
 
-    return await response.json();
+    return {
+        answersGetResponse: response,
+        answers: responseBody
+    }
 }
 
 export async function updateAnswer(
