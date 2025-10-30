@@ -13,9 +13,6 @@
 |:--------------------:|:--------------------------------------------------|
 |  Azure App Service   | 99.95%                                            |
 |   Azure Front Door   | 99.95%                                            |
-|  Azure Redis Cache   | 99.99%                                            |
-| Azure AI Translation | 99.99%                                            |
-|    Contentful API    | [99.99%](https://www.contentful.com/enterprise/)  |
 
 ## Availability
 
@@ -26,4 +23,3 @@ effectively fail over and skip the cache/service from cache only respectively.
 |         Scenario         | Availability |
 |:------------------------:|:------------:|
 |      All Services        |    99.64%    |
-| Contentful or Redis down |    99.74%    |"

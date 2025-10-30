@@ -63,7 +63,7 @@ public class QuestionnaireRunnerController(GetToAnAnswerDbContext db) : Controll
     public async Task<IActionResult> GetInitialQuestion(Guid questionnaireId)
     {
         var initialQuestion = await db.Questions
-            .Include(x => x.Answers)
+            .Include(x => x.Answers.Where(a => !a.IsDeleted))
             .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == 1 && 
                                       !x.IsDeleted);
         
@@ -123,7 +123,7 @@ public class QuestionnaireRunnerController(GetToAnAnswerDbContext db) : Controll
     private async Task<IActionResult> GetDestinationQuestion(Expression<Func<QuestionEntity,bool>> destination)
     {
         var questionEntity = await db.Questions.Where(destination)
-            .Include(x => x.Answers)
+            .Include(x => x.Answers.Where(a => !a.IsDeleted))
             .FirstOrDefaultAsync();
             
         if (questionEntity == null)

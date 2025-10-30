@@ -1,68 +1,98 @@
 # Project Setup
 
-The project is made up of various components, each with their own README files detailing setup.
+This repository contains a multi-project .NET 9 solution with three web applications (API, Admin, Frontend), a shared Common library, automated tests, infrastructure-as-code, and developer documentation.
 
-## Website
+## Prerequisites
 
-This is the main website for the Care Leavers project. It is a .NET MVC application that uses Contentful
-as a headless CMS and accesses these via the Contentful API.
+- .NET SDK 9.x
+- Node.js 18+ with npm (for Admin/Frontend assets and E2E tests)
+- Docker Desktop (for local compose and E2E)
+- Azure CLI and Terraform/OpenTofu (for infrastructure workflows, optional)
+- Git
 
-To run this, you will need to have access to a contentful space and ensured the content models have been migrated.
+## Solution structure (high level)
 
-- [README Here](../../src/web/README.md)
+- src/
+    - Api — backend HTTP services
+    - Admin — back-office management UI
+    - Frontend — public-facing questionnaire site
+    - Common — shared domain and infrastructure code
+    - Infrastructure — Terraform and local Docker Compose
+    - e2e — end-to-end tests
+- tests/
+    - Unit.Tests — unit tests
+    - Integration.Tests — integration tests
+- docs/ — documentation and developer guides
+
+Refer to each project’s README for details.
+
+## Running locally
+
+Option A: Run via IDE
+- Restore and build the solution.
+- Start the API, then Admin and Frontend.
+- Ensure Admin/Frontend are configured to call the API base URL from appsettings.Local.json.
+
+Option B: Run via Docker Compose
+- Copy Infrastructure/.env.example to .env and adjust values as needed.
+- From src/Infrastructure run:
+    - docker compose -f compose.yaml up --build
+- Services will be available at the ports defined in compose.yaml.
+
+## Configuration
+
+- Each app has appsettings.*.json files. For local development, use appsettings.Local.json (not committed).
+- Typical settings include API base URLs, database connection strings, and feature flags.
+- Keep secrets out of source control; use environment variables or local user secrets when not using Docker.
 
 ## End-to-end tests
 
-We have a suite of end-to-end tests that run against the website to ensure it is functioning as expected.
-This uses Playwright Typescript which runs against a site host either locally or via Docker in the Pipeline. 
-The E2E tests have their own dedicated Contentful environment which should only be changed when working on the tests.
+We provide Playwright-based E2E tests that run against a locally hosted site or containers.
 
-The best way to ensure full E2E testing is to do the following:
+Recommended workflow:
+- Build local images and run the local compose stack (see “Running locally — Docker Compose”).
+- From the E2E project folder, install and run tests:
+    - npm ci
+    - npx playwright install
+    - npx playwright test
+- To view failures:
+    - npx playwright show-report
 
-- Rebuild the docker image using the Dockerfile in the `/web` folder
-- Ensure you have a `docker-compose-local.yml` file in the `/src/infrastructure/docker` folder
-- _** DO NOT ADD THIS FILE TO GITHUB **_ as it will later contain secrets
-- Add the following to the file:
-```yaml
-name: 'care-leavers'
-services:
-  care-leavers-web:
-    image: care-leavers-web:e2e
-    ports:
-      - "8080:8080"
-      - "8081:8081"
-      - "7050:8081"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=EndToEnd
-      - Caching__Type=Memory
-      - ContentfulOptions__DeliveryApiKey={YOUR_DELIVERY_API_KEY_HERE}
-      - ContentfulOptions__PreviewApiKey={YOUR_PREVIEW_API_KEY_HERE}
-      - ContentfulOptions__SpaceId={YOUR_SPACE_ID_HERE}
-      - ContentfulOptions__UsePreviewApi=true
-      - ContentfulOptions__Environment=e2e
-      - ASPNETCORE_URLS=http://+:8080;https://+:8081
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=e2e
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/aspnetapp.pfx
-```
-- Ensure any existing development instances are stopped
-- Start this docker-compose file via the IDE or Command Line
-- Open a shell in the `/src/e2e/CareLeavers.E2ETests` folder
-- Run your E2E tests using `yarn playwright test`
-- If there are any failures, view them easily using `yarn playwright show-report`
+Note: Stop any conflicting local instances before running against containers to avoid port clashes.
 
+## Testing (unit and integration)
 
-Further testing information is available via the [README here](../../src/e2e/CareLeavers.E2ETests/README.md)
+- From the repo root:
+    - dotnet test
+- Integration tests may rely on local configuration (see tests/Integration.Tests/appsettings.LocalTest.json). Ensure the API and any required services are reachable or use the compose stack.
 
 ## Infrastructure
 
-All other services are hosted on Azure. These services are provisioned via Terraform and are deployed as part of the deployment
-pipeline. 
+Infrastructure (Azure resources, networking, and app hosting) is defined under src/Infrastructure/terraform and deployed via CI/CD. Local development does not require provisioning cloud resources.
 
-- [README Here](../../src/infrastructure/terraform/README.md)
+- To experiment locally with IaC workflows:
+    - Ensure Azure CLI authentication.
+    - Use terraform init/plan/apply with a non-shared state backend if testing outside CI.
+- Do not commit local state or secrets.
 
-## Contentful Migration
+## Developer workflows
 
-Contentful models are tracked code first and can be migrated to a Contentful space using this project and the Contentful CLI.
-Ensure you have followed the steps of logging in and have the CLI installed.
+- Branching and release processes are documented in docs/developers.
+- CI pipelines validate code quality, run tests, and build container images.
+- Application deploy workflows target environments using tagged images.
 
-- [README Here](../../src/contentful/CareLeavers.ContentfulMigration/README.md)
+## Troubleshooting
+
+- Port conflicts: stop existing instances or adjust compose/launch settings.
+- SSL locally: verify HTTPS ports and certificates where applicable, or use HTTP for local if configured.
+- Frontend/Admin cannot reach API: confirm API base URL and CORS settings in appsettings.Local.json or environment variables.
+- Playwright issues: run npx playwright install and ensure services are reachable before tests.
+
+## References
+
+- API: src/Api/README.md
+- Admin: src/Admin/README.md
+- Frontend: src/Frontend/README.md
+- Common: src/Common/README.md
+- Infrastructure: src/Infrastructure/README.md
+- E2E: src/e2e/README.md (or the E2E project README within src/e2e)

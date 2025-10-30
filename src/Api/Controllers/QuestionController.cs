@@ -75,9 +75,8 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
 
         // Example: check ownership in your persistence layer
         var question = db.Questions
-            .Include(q => q.Answers)
-            .FirstOrDefault(q => q.Id == id 
-                                 && !q.IsDeleted);
+            .Include(q => q.Answers.Where(a => !a.IsDeleted))
+            .FirstOrDefault(q => q.Id == id && !q.IsDeleted);
 
         if (question == null)
             return NotFound();
