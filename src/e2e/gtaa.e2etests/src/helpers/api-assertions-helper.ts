@@ -10,6 +10,13 @@ export function expectHttpStatusCode(response: APIResponse, expectedStatus: numb
 
 // --- Questionnaire related validation functions ---
 export function expectQuestionnaireSchema(questionnaire: any) {
+    // Add detailed logging
+    console.log('=== Questionnaire Schema Validation ===');
+    //console.log('Questionnaire object:', JSON.stringify(questionnaire, null, 2));
+    console.log('Questionnaire is null?', questionnaire === null);
+    console.log('Questionnaire is undefined?', questionnaire === undefined);
+    console.log('Questionnaire type:', typeof questionnaire);
+
     const expectedProps = [
         'id',
         'title',
@@ -23,8 +30,15 @@ export function expectQuestionnaireSchema(questionnaire: any) {
     ];
 
     for (const prop of expectedProps) {
-        expect(questionnaire, `Missing property:${prop}`).toHaveProperty((prop))
+        const hasProperty = questionnaire && questionnaire.hasOwnProperty(prop);
+        console.log(`Property '${prop}': ${hasProperty ? '✅ EXISTS' : '❌ MISSING'}`);
+        if (hasProperty) {
+            console.log(`  Value: ${JSON.stringify(questionnaire[prop])}`);
+            console.log(`  Type: ${typeof questionnaire[prop]}`);
+        }
+        expect(questionnaire, `Missing property: ${prop}`).toHaveProperty(prop);
     }
+    console.log('=== Schema Validation Complete ===');
 }
 
 export function expectQuestionnaireInitStateTypes(questionnaire: any) {
@@ -122,6 +136,13 @@ export function expectQuestionnaireIO(q: any, payload: any, guidRegex: RegExp) {
 
 // --- Question related validation functions ---
 export function expectQuestionSchema(question: any) {
+    // Add detailed logging
+    console.log('=== Question Schema Validation ===');
+    //console.log('Question object:', JSON.stringify(question, null, 2));
+    console.log('Question is null?', question === null);
+    console.log('Question is undefined?', question === undefined);
+    console.log('Question type:', typeof question);
+
     const expectedProps = [
         'id',
         'questionnaireId',
@@ -135,8 +156,15 @@ export function expectQuestionSchema(question: any) {
     ];
 
     for (const prop of expectedProps) {
-        expect(question, `Missing property:${prop}`).toHaveProperty((prop))
+        const hasProperty = question && question.hasOwnProperty(prop);
+        console.log(`Property '${prop}': ${hasProperty ? '✅ EXISTS' : '❌ MISSING'}`);
+        if (hasProperty) {
+            console.log(`  Value: ${JSON.stringify(question[prop])}`);
+            console.log(`  Type: ${typeof question[prop]}`);
+        }
+        expect(question, `Missing property: ${prop}`).toHaveProperty(prop);
     }
+    console.log('=== Schema Validation Complete ===');
 }
 
 export function expectQuestionTypes(question: any) {
@@ -176,15 +204,23 @@ export function expectQuestionIO(q: any, payload: any, guidRegex: RegExp) {
     expect(q.id).toMatch(guidRegex);
     expect(q.content).toBe(payload.content);
     expect(q.type).toBe(payload.type);
-    
+
     if (isEmpty(payload.description)) {
         expect(isEmpty(q.description)).toBeTruthy();
     } else {
         expect(q.description).toBe(payload.description);
     }
 }
+
 // --- Answer related validation functions ---
 export function expectAnswerSchema(answer: any) {
+    // Add detailed logging
+    console.log('=== Answer Schema Validation ===');
+    //console.log('Answer object:', JSON.stringify(answer, null, 2));
+    console.log('Answer is null?', answer === null);
+    console.log('Answer is undefined?', answer === undefined);
+    console.log('Answer type:', typeof answer);
+
     const expectedProps = [
         'id',
         'questionId',
@@ -198,10 +234,17 @@ export function expectAnswerSchema(answer: any) {
         'createdAt',
         'updatedAt'
     ];
-    
+
     for (const prop of expectedProps) {
-        expect(answer, `Missing property:${prop}`).toHaveProperty((prop))
+        const hasProperty = answer && answer.hasOwnProperty(prop);
+        console.log(`Property '${prop}': ${hasProperty ? '✅ EXISTS' : '❌ MISSING'}`);
+        if (hasProperty) {
+            console.log(`  Value: ${JSON.stringify(answer[prop])}`);
+            console.log(`  Type: ${typeof answer[prop]}`);
+        }
+        expect(answer, `Missing property: ${prop}`).toHaveProperty(prop);
     }
+    console.log('=== Schema Validation Complete ===');
 }
 
 export function expectAnswerTypes(answer: any) {
@@ -218,7 +261,6 @@ export function expectAnswerTypes(answer: any) {
     if (answer.destinationQuestionId !== null) {
         expect(typeof answer.destinationQuestionId).toBe('string');
     }
-
 }
 
 export function expectAnswerContent(a: any) {
@@ -242,7 +284,7 @@ export function expectAnswerContent(a: any) {
     if (a.destinationQuestionId !== null && a.destinationQuestionId !== undefined) {
         expect(a.destinationQuestionId.trim().length).toBeGreaterThan(0);
     }
-    
+
     //timestamp-sanity
     const c = new Date(a.createdAt).getTime();
     const u = new Date(a.updatedAt).getTime();
@@ -277,5 +319,4 @@ export function expectAnswerIO(a: any, payload: any, guidRegex: RegExp) {
         expect(a.destinationQuestionId).toBe(payload.destinationQuestionId);
         expect(a.destinationQuestionId).toMatch(guidRegex);
     }
-
 }

@@ -12,7 +12,7 @@ import {JwtHelper} from "../../helpers/JwtHelper";
 import {GUID_REGEX, AnswerDestinationType} from "../../constants/test-data-constants";
 
 test.describe('GET answers for a question', () => {
-    //need clarification
+    //need clarification, should we return empty list or some error message rather a bad request
     // test('Validate GET answers for question with no answers returns empty list', async ({ request }) => {
     //     const { questionnaire } = await createQuestionnaire(request);
     //     const { question } = await createQuestion(request, questionnaire.id);

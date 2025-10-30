@@ -173,7 +173,7 @@ export async function listAnswers(
 
 export async function updateAnswer(
     request: any,
-    answerId: number,
+    answerId: string,
     data: any,
     bearerToken?: string,
 ) {
@@ -185,11 +185,12 @@ export async function updateAnswer(
         }
     });
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to update answer: ${response.status()}`);
-    }
+    const responseBody = await safeParseBody(response);
 
-    return await response.json();
+    return {
+        updatedAnswerPostResponse: response,
+        updatedAnswer: responseBody
+    }
 }
 
 export async function deleteAnswer(

@@ -323,7 +323,7 @@ test.describe('POST answers', () => {
 
         // --- HTTP-level checks ---
         expect(answerPostResponse.ok()).toBeFalsy();
-        expect(answerPostResponse.status()).toBe(400);
+        expect(answerPostResponse.status()).toBe(400); //400 acceptable but ideally 409
     });
 
     test('Validate POST create answer for questionnaire user is not authorized for', async ({ request }) => {
@@ -544,7 +544,7 @@ test.describe('POST answers', () => {
 
         expectHttpStatusCode(questionPostResponse, 201);
 
-        // Create answer with exactly 250 characters (maximum allowed)
+        // Create an answer with exactly 250 characters (maximum allowed)
         const maxLengthContent = 'A'.repeat(250);
 
         const {
@@ -765,4 +765,47 @@ test.describe('POST answers', () => {
         expect(answerPostResponse.ok()).toBeFalsy();
         expect(answerPostResponse.status()).toBe(400);
     });
+    
+    //bug another 500 when exceeding the characters limit
+    // test('Validate POST create answer with destinationUrl exceeding maximum length (250 characters)', async ({ request }) => {
+    //     const {
+    //         questionnairePostResponse,
+    //         questionnaire,
+    //     } = await createQuestionnaire(request);
+    //
+    //     expectHttpStatusCode(questionnairePostResponse, 201);
+    //
+    //     const {
+    //         questionPostResponse,
+    //         question,
+    //     } = await createQuestion(request, questionnaire.id);
+    //
+    //     expectHttpStatusCode(questionPostResponse, 201);
+    //
+    //     // Attempt to create an answer with destinationUrl exceeding 250 characters (251 characters)
+    //     const exceedingLengthUrl = 'https://example.com/' + 'a'.repeat(232); // Total = 251 characters
+    //
+    //     const {
+    //         answerPostResponse,
+    //         answer,
+    //         payload
+    //     } = await createSingleAnswer(
+    //         request,
+    //         {
+    //             questionId: question.id,
+    //             questionnaireId: questionnaire.id,
+    //             content: 'Answer with exceeding URL length',
+    //             destinationUrl: exceedingLengthUrl,
+    //             destinationType: AnswerDestinationType.ExternalLink,
+    //         },
+    //     );
+    //
+    //     // --- HTTP-level checks ---
+    //     expect(answerPostResponse.ok()).toBeFalsy();
+    //     expect(answerPostResponse.status()).toBe(400);
+    //
+    //     // --- Business rule validation: Should fail due to URL length exceeding limit ---
+    //     expect(exceedingLengthUrl.length).toBe(251);
+    // });
+
 });
