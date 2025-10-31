@@ -3,13 +3,16 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.13.3 |
+| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | 2.7.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.45 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.29.0 |
+| <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 2.7.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.45 |
 
 ## Modules
 
@@ -19,67 +22,51 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_application_insights.application-insights](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights) | resource |
-| [azurerm_cdn_frontdoor_custom_domain.fd-custom-domain](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_custom_domain) | resource |
-| [azurerm_cdn_frontdoor_custom_domain_association.web-app-custom-domain](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_custom_domain_association) | resource |
-| [azurerm_cdn_frontdoor_endpoint.frontdoor-web-endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_endpoint) | resource |
-| [azurerm_cdn_frontdoor_firewall_policy.web_firewall_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_firewall_policy) | resource |
-| [azurerm_cdn_frontdoor_origin.frontdoor-web-origin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin) | resource |
-| [azurerm_cdn_frontdoor_origin_group.frontdoor-origin-group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin_group) | resource |
-| [azurerm_cdn_frontdoor_profile.frontdoor-web-profile](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_profile) | resource |
-| [azurerm_cdn_frontdoor_route.frontdoor-web-route](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_route) | resource |
-| [azurerm_cdn_frontdoor_rule.security_headers_rule](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_rule) | resource |
-| [azurerm_cdn_frontdoor_rule.security_txt_rule](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_rule) | resource |
-| [azurerm_cdn_frontdoor_rule.thanks_txt_rule](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_rule) | resource |
-| [azurerm_cdn_frontdoor_rule_set.security_headers](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_rule_set) | resource |
-| [azurerm_cdn_frontdoor_rule_set.security_redirects](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_rule_set) | resource |
-| [azurerm_cdn_frontdoor_security_policy.frontdoor-web-security-policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_security_policy) | resource |
-| [azurerm_key_vault.key-vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) | resource |
-| [azurerm_key_vault_access_policy.github-kv-access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_access_policy) | resource |
-| [azurerm_key_vault_access_policy.web-app-kv-access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_access_policy) | resource |
-| [azurerm_key_vault_access_policy.web-app-staging-kv-access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_access_policy) | resource |
-| [azurerm_key_vault_secret.application-insights-connection-string](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
-| [azurerm_key_vault_secret.azure-translation-access-key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
-| [azurerm_key_vault_secret.contentful-delivery-api-key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
-| [azurerm_key_vault_secret.contentful-management-api-key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
-| [azurerm_key_vault_secret.contentful-preview-api-key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
-| [azurerm_key_vault_secret.contentful-space-id](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
-| [azurerm_key_vault_secret.pdf-generation-api-key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
-| [azurerm_key_vault_secret.redis-cache-connection-string](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
-| [azurerm_linux_web_app.web-app-service](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_web_app) | resource |
-| [azurerm_linux_web_app_slot.web-app-service-staging](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_web_app_slot) | resource |
-| [azurerm_log_analytics_workspace.log-analytics-workspace](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
-| [azurerm_redis_cache.redis-cache](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/redis_cache) | resource |
-| [azurerm_resource_group.caching-rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
-| [azurerm_resource_group.core-rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
-| [azurerm_resource_group.web-rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
-| [azurerm_service_plan.web-app-service-plan](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/service_plan) | resource |
-| [azurerm_client_config.client](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+| [azapi_resource.gettoananswer_main_subnet](https://registry.terraform.io/providers/Azure/azapi/2.7.0/docs/resources/resource) | resource |
+| [azurerm_app_service_virtual_network_swift_connection.admin_app_vn_conn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_service_virtual_network_swift_connection) | resource |
+| [azurerm_app_service_virtual_network_swift_connection.api_app_vn_conn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_service_virtual_network_swift_connection) | resource |
+| [azurerm_app_service_virtual_network_swift_connection.frontend_app_vn_conn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_service_virtual_network_swift_connection) | resource |
+| [azurerm_container_registry.gettoananswer-registry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) | resource |
+| [azurerm_linux_web_app.gettoananswer-admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_web_app) | resource |
+| [azurerm_linux_web_app.gettoananswer-api](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_web_app) | resource |
+| [azurerm_linux_web_app.gettoananswer-frontend](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_web_app) | resource |
+| [azurerm_mssql_database.gettoananswer_mssql_db](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) | resource |
+| [azurerm_mssql_server.gettoananswer_mssql_server](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) | resource |
+| [azurerm_mssql_virtual_network_rule.mssql_vnet_rule](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_virtual_network_rule) | resource |
+| [azurerm_network_security_group.gettoananswer-nsg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
+| [azurerm_private_dns_zone.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_resource_group.gettoananswer-rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+| [azurerm_service_plan.gettoananswer-web-asp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/service_plan) | resource |
+| [azurerm_virtual_network.gettoananswer_vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_aspnetcore_environment"></a> [aspnetcore\_environment](#input\_aspnetcore\_environment) | ASP.NET Core environment | `string` | n/a | yes |
-| <a name="input_azure_frontdoor_scale"></a> [azure\_frontdoor\_scale](#input\_azure\_frontdoor\_scale) | Azure Front Door Scale | `string` | `"Standard_AzureFrontDoor"` | no |
-| <a name="input_azure_translation_access_key"></a> [azure\_translation\_access\_key](#input\_azure\_translation\_access\_key) | Azure Translation Access Key | `string` | `""` | no |
-| <a name="input_azure_translation_document_endpoint"></a> [azure\_translation\_document\_endpoint](#input\_azure\_translation\_document\_endpoint) | Azure Document Translation Endpoint | `string` | `""` | no |
-| <a name="input_caching_type"></a> [caching\_type](#input\_caching\_type) | Caching type | `string` | n/a | yes |
-| <a name="input_cip_environment"></a> [cip\_environment](#input\_cip\_environment) | The CIP environment to match subscription (e.g. Dev) | `string` | n/a | yes |
-| <a name="input_contentful_delivery_api_key"></a> [contentful\_delivery\_api\_key](#input\_contentful\_delivery\_api\_key) | Contentful Delivery API Key | `string` | n/a | yes |
-| <a name="input_contentful_environment"></a> [contentful\_environment](#input\_contentful\_environment) | Contentful Environment | `string` | n/a | yes |
-| <a name="input_contentful_management_api_key"></a> [contentful\_management\_api\_key](#input\_contentful\_management\_api\_key) | Contentful Management API Key | `string` | n/a | yes |
-| <a name="input_contentful_preview_api_key"></a> [contentful\_preview\_api\_key](#input\_contentful\_preview\_api\_key) | Contentful Preview API Key | `string` | n/a | yes |
-| <a name="input_contentful_space_id"></a> [contentful\_space\_id](#input\_contentful\_space\_id) | Contentful Space ID | `string` | n/a | yes |
-| <a name="input_contentful_use_preview_api"></a> [contentful\_use\_preview\_api](#input\_contentful\_use\_preview\_api) | Use Contentful Preview API? | `bool` | n/a | yes |
-| <a name="input_custom_domain"></a> [custom\_domain](#input\_custom\_domain) | Custom front-door domain | `string` | `""` | no |
-| <a name="input_environment_prefix"></a> [environment\_prefix](#input\_environment\_prefix) | Environment prefix (e.g. d01) | `string` | n/a | yes |
-| <a name="input_pdf_generation_api_key"></a> [pdf\_generation\_api\_key](#input\_pdf\_generation\_api\_key) | PDF Generation API Key | `string` | n/a | yes |
-| <a name="input_pdf_generation_use_sandbox"></a> [pdf\_generation\_use\_sandbox](#input\_pdf\_generation\_use\_sandbox) | Generate PDFs in Sandbox Mode? | `bool` | n/a | yes |
-| <a name="input_rebrand"></a> [rebrand](#input\_rebrand) | Force DfE Rebrand before 25th June 2025 | `bool` | `false` | no |
-| <a name="input_scripts_clarity"></a> [scripts\_clarity](#input\_scripts\_clarity) | Clarity code | `string` | n/a | yes |
+| <a name="input_admin_image_name"></a> [admin\_image\_name](#input\_admin\_image\_name) | The repository name and tag for the admin container. | `string` | n/a | yes |
+| <a name="input_api_image_name"></a> [api\_image\_name](#input\_api\_image\_name) | The repository name and tag for the API container. | `string` | n/a | yes |
+| <a name="input_env"></a> [env](#input\_env) | Environment (dev, test, prod) | `string` | n/a | yes |
+| <a name="input_frontend_image_name"></a> [frontend\_image\_name](#input\_frontend\_image\_name) | The repository name and tag for the frontend container. | `string` | n/a | yes |
+| <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | `"uksouth"` | no |
+| <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix for resource names | `string` | `"s213"` | no |
+| <a name="input_product"></a> [product](#input\_product) | Name of the project | `string` | `"Find Education and Training"` | no |
+| <a name="input_sql_admin_password"></a> [sql\_admin\_password](#input\_sql\_admin\_password) | The administrator password of the SQL logical server. | `string` | `null` | no |
+| <a name="input_sql_admin_username"></a> [sql\_admin\_username](#input\_sql\_admin\_username) | The administrator username of the SQL logical server. | `string` | `"azureadmin"` | no |
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_admin_url"></a> [admin\_url](#output\_admin\_url) | n/a |
+| <a name="output_api_url"></a> [api\_url](#output\_api\_url) | n/a |
+| <a name="output_azurerm_network_security_group"></a> [azurerm\_network\_security\_group](#output\_azurerm\_network\_security\_group) | Network security group name |
+| <a name="output_azurerm_private_dns_zone"></a> [azurerm\_private\_dns\_zone](#output\_azurerm\_private\_dns\_zone) | Private DNS Zone name |
+| <a name="output_azurerm_private_dns_zone_virtual_network_link"></a> [azurerm\_private\_dns\_zone\_virtual\_network\_link](#output\_azurerm\_private\_dns\_zone\_virtual\_network\_link) | Private DNS Zone Virtual Network Link name |
+| <a name="output_azurerm_subnet"></a> [azurerm\_subnet](#output\_azurerm\_subnet) | Subnet name |
+| <a name="output_azurerm_virtual_network"></a> [azurerm\_virtual\_network](#output\_azurerm\_virtual\_network) | Virtual network name |
+| <a name="output_frontend_url"></a> [frontend\_url](#output\_frontend\_url) | n/a |
+| <a name="output_mssql_database_name"></a> [mssql\_database\_name](#output\_mssql\_database\_name) | The name of the SQL Database |
+| <a name="output_mssql_server_fqdn"></a> [mssql\_server\_fqdn](#output\_mssql\_server\_fqdn) | The fully qualified domain name of the SQL Server |
+| <a name="output_mssql_server_name"></a> [mssql\_server\_name](#output\_mssql\_server\_name) | The name of the SQL Server |
 <!-- END_TF_DOCS -->

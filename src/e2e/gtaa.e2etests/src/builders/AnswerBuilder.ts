@@ -7,7 +7,7 @@ export class AnswerBuilder {
     private _content: string;
     private _description: string;
     private _destinationUrl: string;
-    private _destinationType: AnswerDestinationType;
+    private _destinationType?: AnswerDestinationType;
     private _destinationQuestionId: string;
     private _score: number;
 
@@ -18,7 +18,7 @@ export class AnswerBuilder {
         this._content = `Default answer content - ${timestamp}`;
         this._description = `Default answer description - ${timestamp}`;
         this._destinationUrl = `https://example.com/destination-url-${timestamp}`;
-        this._destinationType = AnswerDestinationType.Question; //set to default
+        this._destinationType = undefined; // this and '_destinationQuestionId' need to both be defined
         this._destinationQuestionId = '';
         this._score = 0.0; //set to default
     }
@@ -65,7 +65,7 @@ export class AnswerBuilder {
             content: this._content,
             description: this._description,
             destinationUrl: this._destinationUrl,
-            destinationType: this._destinationType,
+            destinationType: this._destinationType!,
             score: this._score
         };
 

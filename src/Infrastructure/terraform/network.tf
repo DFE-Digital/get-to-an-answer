@@ -3,7 +3,7 @@ resource "azurerm_virtual_network" "gettoananswer_vnet" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   address_space       = ["10.0.0.0/16"]
-  
+
   lifecycle {
     ignore_changes = [tags]
   }
@@ -37,7 +37,7 @@ resource "azapi_resource" "gettoananswer_main_subnet" {
   name      = "${var.prefix}subnet-uks-gtaa"
   parent_id = azurerm_virtual_network.gettoananswer_vnet.id
 
-  body =  {
+  body = {
     properties = {
       addressPrefixes = ["10.0.1.0/24"]
       delegations = [{

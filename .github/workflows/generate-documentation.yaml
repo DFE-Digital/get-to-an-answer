@@ -28,11 +28,11 @@ jobs:
 
       - name: Terraform fmt
         id: fmt
-        working-directory: ./src/infrastructure/terraform
+        working-directory: ./src/Infrastructure/terraform
         run: terraform fmt -recursive
 
       - name: Generate TF Documentation
-        run: terraform-docs markdown table src/infrastructure/terraform --output-file ../../../docs/architecture/Terraform.md
+        run: terraform-docs markdown table src/Infrastructure/terraform --output-file ../../../docs/architecture/Terraform.md
 
       - name: Commit and Push Documentation
         run: |

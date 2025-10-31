@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using Api.Services;
 using Common.Infrastructure.Persistence;
 using Common.Local;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,6 +23,12 @@ builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
 { 
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<IQuestionnaireService, QuestionnaireService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<IAnswerService, AnswerService>();
+builder.Services.AddScoped<IQuestionnaireRunnerService, QuestionnaireRunnerService>();
+builder.Services.AddScoped<IQuestionnaireVersionService, QuestionnaireVersionService>();
 
 builder.Services.AddControllers()
     .AddDataAnnotationsLocalization();

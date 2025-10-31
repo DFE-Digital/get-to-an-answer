@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Api.Controllers;
+using Api.Services;
 using Common.Domain.Request.Create;
 using Common.Infrastructure.Persistence;
 using FluentAssertions;
@@ -21,7 +22,7 @@ public class AuthorizationTests
     {
         using var db = Db(nameof(CreateQuestionnaire_Unauthenticated_Returns_Unauthorized_When_Policy_Enforced));
 
-        var controller = new QuestionnaireController(db)
+        var controller = new QuestionnaireController(new QuestionnaireService(db))
         {
             ControllerContext = new ControllerContext
             {
@@ -44,7 +45,7 @@ public class AuthorizationTests
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, "test"));
         var http = new DefaultHttpContext { User = principal };
 
-        var controller = new QuestionnaireController(db)
+        var controller = new QuestionnaireController(new QuestionnaireService(db))
         {
             ControllerContext = new ControllerContext { HttpContext = http }
         };
