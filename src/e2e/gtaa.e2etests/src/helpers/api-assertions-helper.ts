@@ -12,11 +12,11 @@ export function expect200HttpStatusCode(response: APIResponse, expectedStatus: n
 // --- Questionnaire related validation functions ---
 export function expectQuestionnaireSchema(questionnaire: any) {
     // Add detailed logging
-    console.log('=== Questionnaire Schema Validation ===');
+    //console.log('=== Questionnaire Schema Validation ===');
     //console.log('Questionnaire object:', JSON.stringify(questionnaire, null, 2));
-    console.log('Questionnaire is null?', questionnaire === null);
-    console.log('Questionnaire is undefined?', questionnaire === undefined);
-    console.log('Questionnaire type:', typeof questionnaire);
+    //console.log('Questionnaire is null?', questionnaire === null);
+    //console.log('Questionnaire is undefined?', questionnaire === undefined);
+    //console.log('Questionnaire type:', typeof questionnaire);
 
     const expectedProps = [
         'id',
@@ -32,14 +32,14 @@ export function expectQuestionnaireSchema(questionnaire: any) {
 
     for (const prop of expectedProps) {
         const hasProperty = questionnaire && questionnaire.hasOwnProperty(prop);
-        console.log(`Property '${prop}': ${hasProperty ? '✅ EXISTS' : '❌ MISSING'}`);
+        //console.log(`Property '${prop}': ${hasProperty ? '✅ EXISTS' : '❌ MISSING'}`);
         if (hasProperty) {
-            console.log(`  Value: ${JSON.stringify(questionnaire[prop])}`);
-            console.log(`  Type: ${typeof questionnaire[prop]}`);
+            //console.log(`  Value: ${JSON.stringify(questionnaire[prop])}`);
+            //console.log(`  Type: ${typeof questionnaire[prop]}`);
         }
         expect(questionnaire, `Missing property: ${prop}`).toHaveProperty(prop);
     }
-    console.log('=== Schema Validation Complete ===');
+    //console.log('=== Schema Validation Complete ===');
 }
 
 export function expectQuestionnaireInitStateTypes(questionnaire: any) {
@@ -138,11 +138,11 @@ export function expectQuestionnaireIO(q: any, payload: any, guidRegex: RegExp) {
 // --- Question related validation functions ---
 export function expectQuestionSchema(question: any) {
     // Add detailed logging
-    console.log('=== Question Schema Validation ===');
+    //console.log('=== Question Schema Validation ===');
     //console.log('Question object:', JSON.stringify(question, null, 2));
-    console.log('Question is null?', question === null);
-    console.log('Question is undefined?', question === undefined);
-    console.log('Question type:', typeof question);
+    //console.log('Question is null?', question === null);
+    //console.log('Question is undefined?', question === undefined);
+    //console.log('Question type:', typeof question);
 
     const expectedProps = [
         'id',
@@ -158,14 +158,14 @@ export function expectQuestionSchema(question: any) {
 
     for (const prop of expectedProps) {
         const hasProperty = question && question.hasOwnProperty(prop);
-        console.log(`Property '${prop}': ${hasProperty ? '✅ EXISTS' : '❌ MISSING'}`);
+        //console.log(`Property '${prop}': ${hasProperty ? '✅ EXISTS' : '❌ MISSING'}`);
         if (hasProperty) {
-            console.log(`  Value: ${JSON.stringify(question[prop])}`);
-            console.log(`  Type: ${typeof question[prop]}`);
+            //console.log(`  Value: ${JSON.stringify(question[prop])}`);
+            //console.log(`  Type: ${typeof question[prop]}`);
         }
         expect(question, `Missing property: ${prop}`).toHaveProperty(prop);
     }
-    console.log('=== Schema Validation Complete ===');
+    //console.log('=== Schema Validation Complete ===');
 }
 
 export function expectQuestionTypes(question: any) {
@@ -216,11 +216,11 @@ export function expectQuestionIO(q: any, payload: any, guidRegex: RegExp) {
 // --- Answer related validation functions ---
 export function expectAnswerSchema(answer: any) {
     // Add detailed logging
-    console.log('=== Answer Schema Validation ===');
+    //console.log('=== Answer Schema Validation ===');
     //console.log('Answer object:', JSON.stringify(answer, null, 2));
-    console.log('Answer is null?', answer === null);
-    console.log('Answer is undefined?', answer === undefined);
-    console.log('Answer type:', typeof answer);
+    //console.log('Answer is null?', answer === null);
+    //console.log('Answer is undefined?', answer === undefined);
+    //console.log('Answer type:', typeof answer);
 
     const expectedProps = [
         'id',
@@ -238,14 +238,14 @@ export function expectAnswerSchema(answer: any) {
 
     for (const prop of expectedProps) {
         const hasProperty = answer && answer.hasOwnProperty(prop);
-        console.log(`Property '${prop}': ${hasProperty ? '✅ EXISTS' : '❌ MISSING'}`);
+        //console.log(`Property '${prop}': ${hasProperty ? '✅ EXISTS' : '❌ MISSING'}`);
         if (hasProperty) {
-            console.log(`  Value: ${JSON.stringify(answer[prop])}`);
-            console.log(`  Type: ${typeof answer[prop]}`);
+            //console.log(`  Value: ${JSON.stringify(answer[prop])}`);
+            //console.log(`  Type: ${typeof answer[prop]}`);
         }
         expect(answer, `Missing property: ${prop}`).toHaveProperty(prop);
     }
-    console.log('=== Schema Validation Complete ===');
+    //console.log('=== Schema Validation Complete ===');
 }
 
 export function expectAnswerTypes(answer: any) {
