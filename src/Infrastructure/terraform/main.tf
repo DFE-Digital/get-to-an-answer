@@ -36,7 +36,7 @@ resource "azurerm_log_analytics_workspace" "log-analytics-workspace" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   retention_in_days   = 180
-  tags = {
+  tags                = {
     Environment = var.env
     Product     = var.product
   }
@@ -48,7 +48,7 @@ resource "azurerm_application_insights" "application-insights" {
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   application_type    = "web"
   workspace_id        = azurerm_log_analytics_workspace.log-analytics-workspace.id
-  tags = {
+  tags                = {
     Environment = var.env
     Product     = var.product
   }
