@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Api.Services;
 using Common.Infrastructure.Persistence;
 using Common.Local;
+using Common.Logging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -32,6 +33,8 @@ builder.Services.AddScoped<IQuestionnaireVersionService, QuestionnaireVersionSer
 
 builder.Services.AddControllers()
     .AddDataAnnotationsLocalization();
+
+builder.AddLogging();
 
 builder.Services.ConfigureHttpJsonOptions(o =>
 {
