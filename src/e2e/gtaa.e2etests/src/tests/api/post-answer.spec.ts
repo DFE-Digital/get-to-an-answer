@@ -693,41 +693,40 @@ test.describe('POST answers', () => {
         expect(answer.destinationUrl).toBe(externalUrl);
     });
     
-    //should I be able to create and answer without destinationQuestionId? Need clarification
-    // test('Validate POST create answer with destination type Question without destinationQuestionId', async ({ request }) => {
-    //     const {
-    //         questionnairePostResponse,
-    //         questionnaire,
-    //     } = await createQuestionnaire(request);
-    //
-    //     expect200HttpStatusCode(questionnairePostResponse, 201);
-    //
-    //     const {
-    //         questionPostResponse,
-    //         question,
-    //     } = await createQuestion(request, questionnaire.id);
-    //
-    //     expect200HttpStatusCode(questionPostResponse, 201);
-    //
-    //     // Create an answer with destination-type as Question but no destinationQuestionId
-    //     const {
-    //         answerPostResponse,
-    //         answer,
-    //     } = await createSingleAnswer(
-    //         request,
-    //         {
-    //             questionId: question.id,
-    //             questionnaireId: questionnaire.id,
-    //             content: 'Answer with invalid destination',
-    //             destinationType: AnswerDestinationType.Question,
-    //             // destinationQuestionId is missing
-    //         },
-    //     );
-    //
-    //     // --- HTTP-level checks ---
-    //     expect(answerPostResponse.ok()).toBeTruthy();
-    //     expect(answerPostResponse.status()).toBe(200);
-    // });
+    test('Validate POST create answer with destination type Question without destinationQuestionId', async ({ request }) => {
+        const {
+            questionnairePostResponse,
+            questionnaire,
+        } = await createQuestionnaire(request);
+
+        expect200HttpStatusCode(questionnairePostResponse, 201);
+
+        const {
+            questionPostResponse,
+            question,
+        } = await createQuestion(request, questionnaire.id);
+
+        expect200HttpStatusCode(questionPostResponse, 201);
+
+        // Create an answer with destination-type as Question but no destinationQuestionId
+        const {
+            answerPostResponse,
+            answer,
+        } = await createSingleAnswer(
+            request,
+            {
+                questionId: question.id,
+                questionnaireId: questionnaire.id,
+                content: 'Answer with invalid destination',
+                destinationType: AnswerDestinationType.Question,
+                // destinationQuestionId is missing
+            },
+        );
+
+        // --- HTTP-level checks ---
+        expect(answerPostResponse.ok()).toBeFalsy();
+        expect(answerPostResponse.status()).toBe(400);
+    });
 
     test('Validate POST create answer with invalid URL format in destinationUrl', async ({ request }) => {
         const {
@@ -807,5 +806,4 @@ test.describe('POST answers', () => {
     //     // --- Business rule validation: Should fail due to URL length exceeding limit ---
     //     expect(exceedingLengthUrl.length).toBe(251);
     // });
-
 });
