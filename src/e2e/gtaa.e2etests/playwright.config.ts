@@ -1,13 +1,17 @@
-import * as dotenv from 'dotenv';
-dotenv.config({ path: '.env' });
-
 import {defineConfig, devices} from '@playwright/test';
+import { loadEnvConfig } from './src/config/environment-config';
+
+// Choose an environment: 'local' or 'test'
+const ENV_NAME: 'local' | 'test' = 'local'; //default local
+
+process.env.ENV_NAME = ENV_NAME;
+const EnvConfig = loadEnvConfig(ENV_NAME);
 
 const healthBase = {
     testDir: './src/tests/health',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: process.env.API_URL || 'http://localhost:5042',
+        baseURL: EnvConfig.API_URL,
     },
 } as const;
 
@@ -15,7 +19,7 @@ const apiBase = {
     testDir: './src/tests/api',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: process.env.API_URL || 'http://localhost:5042',
+        baseURL: EnvConfig.API_URL,
     },
 } as const;
 
@@ -23,7 +27,7 @@ const feBase = {
     testDir: './src/tests/fe',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: process.env.FE_URL || 'https://www.google.co.uk/',
+        baseURL: EnvConfig.FE_URL,
     },
 } as const;
 
@@ -31,7 +35,7 @@ const adminBase = {
     testDir: './src/tests/admin',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: process.env.ADMIN_URL || 'https://www.github.com/',
+        baseURL: EnvConfig.ADMIN_URL,
     },
 } as const;
 
@@ -42,7 +46,7 @@ export default defineConfig({
     expect: {
         timeout: 5000,
     },
-    
+
     fullyParallel: true,
     retries: 1,
     workers: 4,
@@ -57,9 +61,9 @@ export default defineConfig({
 
     projects: [
         {
-          name: 'health',
-          ...healthBase,
-          use: {...healthBase.use},  
+            name: 'health',
+            ...healthBase,
+            use: {...healthBase.use},
         },
         {
             name: 'api',

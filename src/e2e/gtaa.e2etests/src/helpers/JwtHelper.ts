@@ -1,4 +1,5 @@
 import * as jwt from 'jsonwebtoken';
+import {EnvType, loadEnvConfig} from "../config/environment-config";
 
 export class SimpleDate extends Date {
     constructor() {
