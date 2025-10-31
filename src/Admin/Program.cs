@@ -23,11 +23,24 @@ if (!builderIsLocalEnvironment)
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+
+app.MapStaticAssets();
+
+//TODO: do we need?
+// app.UseStaticFiles(new StaticFileOptions()
+// {
+//     OnPrepareResponse = ctx =>
+//     {
+//         ctx.Context.Response.Headers.Append(
+//             "Cache-Control", $"public, max-age={FromDays(31).TotalSeconds}");
+//     }
+// });
+
 app.UseRouting();
 
 app.UseAuthorization();
-
-app.MapStaticAssets();
 
 app.MapControllerRoute(
         name: "default",
