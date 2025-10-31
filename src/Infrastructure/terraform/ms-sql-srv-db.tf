@@ -17,17 +17,17 @@ resource "azurerm_mssql_server" "gettoananswer_mssql_server" {
 }
 
 resource "azurerm_mssql_database" "gettoananswer_mssql_db" {
-  name       = "${var.prefix}db-uks-gtaa01"
-  server_id  = azurerm_mssql_server.gettoananswer_mssql_server.id
-  sku_name   = "S0"
+  name      = "${var.prefix}db-uks-gtaa01"
+  server_id = azurerm_mssql_server.gettoananswer_mssql_server.id
+  sku_name  = "S0"
 
-  max_size_gb                 = 2
+  max_size_gb = 2
 
   tags = {
     Environment = var.env
     Product     = var.product
   }
-  
+
   lifecycle {
     ignore_changes = [tags]
   }

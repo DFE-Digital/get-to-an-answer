@@ -203,7 +203,7 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
 
   app_settings = {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
-    AppSettings__BaseUrl = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
+    AppSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
   }
 
   https_only = true
@@ -226,14 +226,14 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
     }
     minimum_tls_version = "1.2"
   }
-  
+
   lifecycle {
     ignore_changes = [tags, app_settings, sticky_settings]
   }
 
   app_settings = {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
-    AppSettings__BaseUrl = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
+    AppSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
   }
 
   https_only = true
