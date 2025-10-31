@@ -1,5 +1,5 @@
 import {defineConfig, devices} from '@playwright/test';
-import { loadEnvConfig } from './src/config/environment-config';
+import {loadEnvConfig} from './src/config/environment-config';
 
 // Choose an environment: 'local' or 'test'
 const ENV_NAME: 'local' | 'test' = 'local'; //default local
@@ -11,7 +11,7 @@ const healthBase = {
     testDir: './src/tests/health',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: EnvConfig.API_URL,
+        baseURL: process.env.API_URL || EnvConfig.API_URL,
     },
 } as const;
 
