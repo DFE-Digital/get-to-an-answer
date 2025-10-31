@@ -1,6 +1,11 @@
 import {expect, test} from "@playwright/test";
 import {JwtHelper} from "../../helpers/JwtHelper";
-import {createQuestionnaire, updateQuestionnaire} from "../../test-data-seeder/questionnaire-data";
+import {
+    createQuestionnaire,
+    deleteQuestionnaire,
+    getQuestionnaire,
+    updateQuestionnaire
+} from "../../test-data-seeder/questionnaire-data";
 import {createQuestion, updateQuestion, getQuestion} from "../../test-data-seeder/question-data";
 import {
     expect200HttpStatusCode, expectQuestionContent, expectQuestionIO, expectQuestionSchema, expectQuestionTypes
@@ -29,13 +34,13 @@ test.describe('PUT Update question api request', () => {
 
         // Verify update by fetching the question
         const {questionGetBody} = await getQuestion(request, question.id);
-        
-         // --- Schema-level checks ---
-         expectQuestionSchema(questionGetBody);
 
-         // --- Type sanity checks ---
-         expectQuestionTypes(questionGetBody);
-        
+        // --- Schema-level checks ---
+        expectQuestionSchema(questionGetBody);
+
+        // --- Type sanity checks ---
+        expectQuestionTypes(questionGetBody);
+
         // --- Basic content sanity ---
         expectQuestionContent(questionGetBody);
 
@@ -164,7 +169,7 @@ test.describe('PUT Update question api request', () => {
             content: null as any
         };
 
-        const {updatedQuestionPostResponse} = await updateQuestion(
+        const {updatedQuestionPostResponse, UpdatedQuestion} = await updateQuestion(
             request,
             question.id,
             updatePayload
@@ -172,6 +177,13 @@ test.describe('PUT Update question api request', () => {
 
         expect(updatedQuestionPostResponse.ok()).toBeFalsy();
         expect(updatedQuestionPostResponse.status()).toBe(400);
+
+        // And error message to display
+        if (UpdatedQuestion) {
+            expect(UpdatedQuestion).toBeDefined();
+            const parsedError = JSON.parse(UpdatedQuestion)
+            expect(parsedError.errors.Content[0]).toBeDefined();
+        }
     });
 
     test('Validate PUT update question with empty content', async ({request}) => {
@@ -237,7 +249,7 @@ test.describe('PUT Update question api request', () => {
 
         const duplicateContent = 'What is your age?';
 
-        // Create first question with specific content
+        // Create a first question with specific content
         const {question: question1} = await createQuestion(
             request,
             questionnaireId,
@@ -247,7 +259,7 @@ test.describe('PUT Update question api request', () => {
             'First question description'
         );
 
-        // Create second question with different content initially
+        // Create a second question with different content initially
         const {question: question2} = await createQuestion(
             request,
             questionnaireId,
@@ -293,5 +305,57 @@ test.describe('PUT Update question api request', () => {
         // Additional validation: Verify they are distinct questions
         expect(updatedQuestion2.description).toBe('Second question description');
         expect(unchangedQuestion1.description).toBe('First question description');
+    });
+
+    test('Validate PUT update question with invalid questionnaire id', async ({request}) => {
+        const {questionnaire} = await createQuestionnaire(request);
+        const {question} = await createQuestion(request, questionnaire.id);
+
+        // Attempt to update with a non-existent questionnaire ID
+        const invalidQuestionnaireId = '00000000-0000-0000-0000-000000000000';
+        const updatePayload = {
+            ...question,
+            questionnaireId: invalidQuestionnaireId,
+            content: 'Updated content'
+        };
+
+        const {updatedQuestionPostResponse} = await updateQuestion(
+            request,
+            invalidQuestionnaireId,
+            updatePayload
+        );
+
+        // --- HTTP-level checks ---
+        expect(updatedQuestionPostResponse.ok()).toBeFalsy();
+        expect(updatedQuestionPostResponse.status()).toBe(404);
+    });
+
+    test('Validate PUT update question with soft deleted questionnaire id', async ({request}) => {
+        const {questionnaire} = await createQuestionnaire(request);
+        const {question} = await createQuestion(request, questionnaire.id);
+
+        // Soft delete the questionnaire using the delete endpoint
+        const {deleteQuestionnaireResponse} = await deleteQuestionnaire(request, questionnaire.id);
+        expect([200, 204]).toContain(deleteQuestionnaireResponse.status());
+
+        // Verify questionnaire is soft-deleted (should return 404)
+        const {questionnaireGetResponse} = await getQuestionnaire(request, questionnaire.id);
+        expect(questionnaireGetResponse.status()).toBe(404);
+
+        // Attempt to update the question that belongs to the soft-deleted questionnaire
+        const updatePayload = {
+            ...question,
+            content: 'Updated content',
+        };
+
+        const {updatedQuestionPostResponse} = await updateQuestion(
+            request,
+            question.id,
+            updatePayload
+        );
+
+        // --- HTTP-level checks ---
+        expect(updatedQuestionPostResponse.ok()).toBeFalsy();
+        expect([400, 404]).toContain(updatedQuestionPostResponse.status());
     });
 });

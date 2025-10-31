@@ -1,5 +1,5 @@
 import {expect, test} from "@playwright/test";
-import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
+import {createQuestionnaire, listQuestionnaires} from "../../test-data-seeder/questionnaire-data";
 import {
     expect200HttpStatusCode, expectQuestionContent, expectQuestionIO, expectQuestionSchema, expectQuestionTypes
 } from "../../helpers/api-assertions-helper";
@@ -196,18 +196,18 @@ test.describe('GET all questions api tests', () => {
         expect(response.questionGetResponse.ok()).toBeFalsy();
         expect(response.questionGetResponse.status()).toBe(400);
     });
+    
+    test('Validate GET questions for a questionnaire that has no questions returns an empty list', async ({ request }) => {
+        const token = JwtHelper.NoRecordsToken();
+        
+        const { questionnaire } = await createQuestionnaire(request, token);
 
-    //Need clarification
-    // test('Validate GET questions for a questionnaire that has no questions returns an empty list', async ({ request }) => {
-    //     const { questionnaire } = await createQuestionnaire(request);
-    //    
-    //     // Get answers for a question that has no answers
-    //     const response = await listQuestions(request, questionnaire.id);
-    //
-    //     // --- Verify empty list ---
-    //     expect(Array.isArray(response.questionGetResponse)).toBeTruthy();
-    //     const list: any[] = response.questionGetBody;
-    //     expect(Array.isArray(list)).toBe(true);
-    //     expect(list.length).toBe(0);
-    // });
+        // Get questions for the questionnaire that has no questions
+        const response = await listQuestions(request, questionnaire.id, token);
+
+        // --- Verify empty list ---
+        const list: any[] = response.questionGetBody;
+        expect(Array.isArray(list)).toBe(true);
+        expect(list.length).toBe(0);
+    });
 });

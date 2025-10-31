@@ -12,20 +12,20 @@ import {JwtHelper} from "../../helpers/JwtHelper";
 import {GUID_REGEX, AnswerDestinationType} from "../../constants/test-data-constants";
 
 test.describe('GET answers for a question', () => {
-    //need clarification
-    // test('Validate GET answers for question with no answers returns empty list', async ({ request }) => {
-    //     const { questionnaire } = await createQuestionnaire(request);
-    //     const { question } = await createQuestion(request, questionnaire.id);
-    //
-    //     // Get answers for a question that has no answers
-    //     const response = await listAnswers(request, question.id);
-    //
-    //     // --- Verify empty list ---
-    //     expect(Array.isArray(response.answersGetResponse)).toBeTruthy();
-    //     const list: any[] = response.answers;
-    //     expect(Array.isArray(list)).toBe(true);
-    //     expect(list.length).toBe(0);
-    // });
+    test('Validate GET answers for question with no answers returns empty list', async ({request}) => {
+        const token = JwtHelper.NoRecordsToken();
+
+        const {questionnaire} = await createQuestionnaire(request, token);
+        const {question} = await createQuestion(request, questionnaire.id, token);
+
+        // Get answers for a question that has no answers
+        const response = await listAnswers(request, question.id, token);
+
+        // --- Verify empty list ---
+        const list: any[] = response.answers;
+        expect(Array.isArray(list)).toBe(true);
+        expect(list.length).toBe(0);
+    });
 
     test('Validate GET answers with invalid JWT token', async ({request}) => {
         const {questionnaire} = await createQuestionnaire(request);

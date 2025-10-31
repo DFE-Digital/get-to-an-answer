@@ -54,7 +54,7 @@ test.describe('DELETE Question API request', () => {
         const ownerToken = JwtHelper.ValidToken;
         const unauthorizedToken = JwtHelper.UnauthorizedToken;
 
-        // Create questionnaire and question with owner token
+        // Create a questionnaire and question with an owner token
         const {questionnaire} = await createQuestionnaire(request, ownerToken);
         const {question} = await createQuestion(
             request,

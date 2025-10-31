@@ -323,7 +323,7 @@ test.describe('POST answers', () => {
 
         // --- HTTP-level checks ---
         expect(answerPostResponse.ok()).toBeFalsy();
-        expect(answerPostResponse.status()).toBe(400);
+        expect(answerPostResponse.status()).toBe(400); //400 acceptable but ideally 409
     });
 
     test('Validate POST create answer for questionnaire user is not authorized for', async ({ request }) => {
@@ -544,7 +544,7 @@ test.describe('POST answers', () => {
 
         expect200HttpStatusCode(questionPostResponse, 201);
 
-        // Create answer with exactly 250 characters (maximum allowed)
+        // Create an answer with exactly 250 characters (maximum allowed)
         const maxLengthContent = 'A'.repeat(250);
 
         const {
@@ -693,41 +693,40 @@ test.describe('POST answers', () => {
         expect(answer.destinationUrl).toBe(externalUrl);
     });
     
-    //should I be able to create and answer without destinationQuestionId? Need clarification
-    // test('Validate POST create answer with destination type Question without destinationQuestionId', async ({ request }) => {
-    //     const {
-    //         questionnairePostResponse,
-    //         questionnaire,
-    //     } = await createQuestionnaire(request);
-    //
-    //     expect200HttpStatusCode(questionnairePostResponse, 201);
-    //
-    //     const {
-    //         questionPostResponse,
-    //         question,
-    //     } = await createQuestion(request, questionnaire.id);
-    //
-    //     expect200HttpStatusCode(questionPostResponse, 201);
-    //
-    //     // Create an answer with destination-type as Question but no destinationQuestionId
-    //     const {
-    //         answerPostResponse,
-    //         answer,
-    //     } = await createSingleAnswer(
-    //         request,
-    //         {
-    //             questionId: question.id,
-    //             questionnaireId: questionnaire.id,
-    //             content: 'Answer with invalid destination',
-    //             destinationType: AnswerDestinationType.Question,
-    //             // destinationQuestionId is missing
-    //         },
-    //     );
-    //
-    //     // --- HTTP-level checks ---
-    //     expect(answerPostResponse.ok()).toBeTruthy();
-    //     expect(answerPostResponse.status()).toBe(200);
-    // });
+    test('Validate POST create answer with destination type Question without destinationQuestionId', async ({ request }) => {
+        const {
+            questionnairePostResponse,
+            questionnaire,
+        } = await createQuestionnaire(request);
+
+        expect200HttpStatusCode(questionnairePostResponse, 201);
+
+        const {
+            questionPostResponse,
+            question,
+        } = await createQuestion(request, questionnaire.id);
+
+        expect200HttpStatusCode(questionPostResponse, 201);
+
+        // Create an answer with destination-type as Question but no destinationQuestionId
+        const {
+            answerPostResponse,
+            answer,
+        } = await createSingleAnswer(
+            request,
+            {
+                questionId: question.id,
+                questionnaireId: questionnaire.id,
+                content: 'Answer with invalid destination',
+                destinationType: AnswerDestinationType.Question,
+                // destinationQuestionId is missing
+            },
+        );
+
+        // --- HTTP-level checks ---
+        expect(answerPostResponse.ok()).toBeFalsy();
+        expect(answerPostResponse.status()).toBe(400);
+    });
 
     test('Validate POST create answer with invalid URL format in destinationUrl', async ({ request }) => {
         const {
@@ -765,4 +764,46 @@ test.describe('POST answers', () => {
         expect(answerPostResponse.ok()).toBeFalsy();
         expect(answerPostResponse.status()).toBe(400);
     });
+    
+    //bug another 500 when exceeding the characters limit
+    // test('Validate POST create answer with destinationUrl exceeding maximum length (250 characters)', async ({ request }) => {
+    //     const {
+    //         questionnairePostResponse,
+    //         questionnaire,
+    //     } = await createQuestionnaire(request);
+    //
+    //     expectHttpStatusCode(questionnairePostResponse, 201);
+    //
+    //     const {
+    //         questionPostResponse,
+    //         question,
+    //     } = await createQuestion(request, questionnaire.id);
+    //
+    //     expectHttpStatusCode(questionPostResponse, 201);
+    //
+    //     // Attempt to create an answer with destinationUrl exceeding 250 characters (251 characters)
+    //     const exceedingLengthUrl = 'https://example.com/' + 'a'.repeat(232); // Total = 251 characters
+    //
+    //     const {
+    //         answerPostResponse,
+    //         answer,
+    //         payload
+    //     } = await createSingleAnswer(
+    //         request,
+    //         {
+    //             questionId: question.id,
+    //             questionnaireId: questionnaire.id,
+    //             content: 'Answer with exceeding URL length',
+    //             destinationUrl: exceedingLengthUrl,
+    //             destinationType: AnswerDestinationType.ExternalLink,
+    //         },
+    //     );
+    //
+    //     // --- HTTP-level checks ---
+    //     expect(answerPostResponse.ok()).toBeFalsy();
+    //     expect(answerPostResponse.status()).toBe(400);
+    //
+    //     // --- Business rule validation: Should fail due to URL length exceeding limit ---
+    //     expect(exceedingLengthUrl.length).toBe(251);
+    // });
 });
