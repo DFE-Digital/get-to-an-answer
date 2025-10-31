@@ -19,7 +19,7 @@ const apiBase = {
     testDir: './src/tests/api',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: EnvConfig.API_URL,
+        baseURL: process.env.API_URL || EnvConfig.API_URL,
     },
 } as const;
 
@@ -27,7 +27,7 @@ const feBase = {
     testDir: './src/tests/fe',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: EnvConfig.FE_URL,
+        baseURL: process.env.API_URL || EnvConfig.FE_URL,
     },
 } as const;
 
@@ -35,7 +35,7 @@ const adminBase = {
     testDir: './src/tests/admin',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: EnvConfig.ADMIN_URL,
+        baseURL: process.env.API_URL || EnvConfig.ADMIN_URL,
     },
 } as const;
 
