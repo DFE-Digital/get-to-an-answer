@@ -8,16 +8,25 @@ public sealed class GdsTitleAttribute : ValidationAttribute
     public int MinLength { get; init; } = 1;
     public int MaxLength { get; init; } = 500;
 
+    public bool IsRequired { get; init; } = true;
+
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        var s = value as string;
+        if (value is null)
+        {
+            return IsRequired ? new ValidationResult(ErrorMessage ?? $"{validationContext.DisplayName} is required.") :
+                ValidationResult.Success;
+        }
 
-        // Required
-        if (string.IsNullOrWhiteSpace(s))
-            return new ValidationResult("Title is required and cannot be blank or whitespace.");
-
+        if (value is not string valAsString)
+            return new ValidationResult(ErrorMessage ?? $"{validationContext.DisplayName} must be a valid data type.");
+        
+        // Reject whitespace-only strings
+        if (string.IsNullOrWhiteSpace(valAsString))
+            return new ValidationResult(ErrorMessage ?? $"{validationContext.DisplayName} must not be empty or whitespace.");
+        
         // Trim for checks but do not alter model value here
-        var trimmed = s.Trim();
+        var trimmed = valAsString.Trim();
 
         // Length
         if (trimmed.Length < MinLength)
