@@ -2,6 +2,7 @@ import {AnswerBuilder} from '../builders/AnswerBuilder';
 import {AnswerDestinationType} from '../constants/test-data-constants'
 import {JwtHelper} from "../helpers/JwtHelper";
 import {APIResponse} from "@playwright/test";
+import {parseBody} from "../helpers/ParseBody";
 
 //to parse response-body correctly - json body can be json, text or empty string
 //duplicate - to be fixed later
@@ -195,7 +196,7 @@ export async function updateAnswer(
 
 export async function deleteAnswer(
     request: any,
-    answerId: number,
+    answerId: string,
     bearerToken?: string,
 ) {
     const response = await request.delete(`/api/answers/${answerId}`, {
@@ -205,9 +206,10 @@ export async function deleteAnswer(
         }
     });
 
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to delete answer: ${response.status()}`);
-    }
+    const responseBody = await parseBody(response);
 
-    return await response.json();
+    return {
+        deleteAnswerResponse: response,
+        deleteAnswerBody: responseBody,
+    }
 }
