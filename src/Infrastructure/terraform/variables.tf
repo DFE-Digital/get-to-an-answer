@@ -90,7 +90,7 @@ variable "alerting" {
     })
   }))
   default = {
-    d01 = {
+    s263d01 = {
       name                 = "Test"
       alerts_enabled       = false
       email_alerts_enabled = false
@@ -102,7 +102,7 @@ variable "alerting" {
         error        = 5
       }
     }
-    t01 = {
+    s263t01 = {
       name                 = "Staging"
       alerts_enabled       = true
       email_alerts_enabled = false
@@ -114,7 +114,7 @@ variable "alerting" {
         error        = 1
       }
     }
-    p01 = {
+    s263p01 = {
       name                 = "Production"
       alerts_enabled       = true
       email_alerts_enabled = true
