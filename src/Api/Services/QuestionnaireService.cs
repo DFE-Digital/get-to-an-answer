@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Common.Domain;
@@ -159,7 +160,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db) : AbstractService, 
         if (questionnaire == null)
             return NotFound();
 
-        var branchingHealth = IsHealthyBranching(questionnaire);
+        var branchingHealth = IsBranchingHealthy(questionnaire);
 
         if (branchingHealth != BranchingHealthType.Ok)
         {
@@ -169,13 +170,13 @@ public class QuestionnaireService(GetToAnAnswerDbContext db) : AbstractService, 
         return await UpdateQuestionnaireStatus(email, id, EntityStatus.Published);
     }
 
-    private BranchingHealthType IsHealthyBranching(QuestionnaireEntity current)
+    internal static BranchingHealthType IsBranchingHealthy(QuestionnaireEntity current)
     {
         var questionMap = current.Questions.ToDictionary(q => q.Id, q => q);
         
         foreach (var question in current.Questions)
         {
-            var branchingHealth = IsHealthyBranching(question, new Dictionary<Guid, bool>(), questionMap);
+            var branchingHealth = IsBranchingHealthy(question, new Dictionary<Guid, bool>(), questionMap);
             
             if (branchingHealth != BranchingHealthType.Ok)
                 return branchingHealth;
@@ -184,27 +185,36 @@ public class QuestionnaireService(GetToAnAnswerDbContext db) : AbstractService, 
         return BranchingHealthType.Ok;
     }
 
-    private BranchingHealthType IsHealthyBranching(
+    // make visible for unit testing
+    
+    internal static BranchingHealthType IsBranchingHealthy(
         QuestionEntity current, 
         Dictionary<Guid, bool> visited, 
         Dictionary<Guid, QuestionEntity> questionMap)
     {
+        if (visited.ContainsKey(current.Id))
+        {
+            return BranchingHealthType.Cyclic;
+        }
+        
+        var visitedList = new Dictionary<Guid, bool>(visited) { { current.Id, true } };
+
         foreach (var answer in current.Answers)
         {
             if (answer is { DestinationType: DestinationType.Question, DestinationQuestionId: { } id })
             {
-                var type = IsHealthyBranching(questionMap[id], 
-                    new Dictionary<Guid, bool>(visited), questionMap);
+                var type = IsBranchingHealthy(questionMap[id], 
+                    new Dictionary<Guid, bool>(visitedList), questionMap);
                 
                 if (type != BranchingHealthType.Ok)
                     return type;
             }
-            else if (answer.DestinationType is null && current.Order == questionMap.Count)
+            else if (answer.DestinationType != DestinationType.ExternalLink && current.Order == questionMap.Count)
             {
                 // if is the last question and the answer has not destination,
                 // then it's a broken branching
                 return BranchingHealthType.Broken; 
-            }
+            }    
         }
 
         return BranchingHealthType.Ok;
