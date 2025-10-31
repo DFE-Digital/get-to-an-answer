@@ -67,7 +67,7 @@ variable "frontend_custom_domain" {
 variable "azure_frontdoor_scale" {
   description = "Azure Front Door Scale"
   type        = string
-  default     = "Standard_AzureFrontDoor"
+  default     = "Standard"
 }
 
 variable "support_alert_email" {
