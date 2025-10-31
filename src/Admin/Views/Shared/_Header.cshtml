@@ -1,0 +1,66 @@
+@using Common.Configuration
+@using Microsoft.Extensions.Options
+@inject IWebHostEnvironment WebHostEnvironment
+@inject IOptions<ScriptOptions> ScriptOptions
+
+@{
+    var languageCode = Context.Request.RouteValues["languageCode"]?.ToString();
+}
+
+@if (WebHostEnvironment?.IsProduction() != true)
+{
+    <div class="environment-banner">
+        <div class="govuk-body-s"><strong>ATTENTION!</strong> This is the <strong>@WebHostEnvironment?.EnvironmentName</strong> version of @Model.ServiceName website.</div>
+    </div>
+}
+
+@if (ScriptOptions.Value.ShowCookieBanner && !Model.IsError)
+{
+    <partial name="_CookieConsentPartial" model="@Model"/>
+}
+
+<div class="govuk-width-container">
+    <div class="govuk-phase-banner">
+        <div class="govuk-phase-banner__content">
+            <strong class="govuk-phase-banner__content__tag govuk-tag">
+                @Model.Phase.ToString()
+            </strong>
+            <span class="govuk-phase-banner__text">
+                This is a new service.
+                @if (!string.IsNullOrEmpty(Model.FeedbackText) && Model.ShowNavigation)
+                {
+                    <text>
+                        Help us improve it and <a class="govuk-link" href="@Model.FeedbackUrl" target="_blank" rel="nofollow">
+                            @Model.FeedbackText (opens in new tab)</a>. 
+                    </text>
+                }
+            </span>
+        </div>
+    </div>
+</div>
+
+@if (SiteConfiguration.Rebrand)
+{
+    <header class="govuk-header" data-module="govuk-header">
+        <div class="govuk-header__container govuk-width-container">
+            <div class="govuk-header__logo">
+                <a class="govuk-header__link govuk-header__link--homepage" href="#" aria-label="@Model.ServiceName homepage">
+                    <img src="/assets/department-for-education_white.png" alt="@Model.ServiceName homepage" class="govuk-header__logotype">
+                </a>
+            </div>
+        </div>
+    </header>
+}
+else
+{
+    <header class="dfe-header" role="banner">
+        <div class="dfe-width-container dfe-header__container">
+            <div class="dfe-header__logo">
+                <a class="dfe-header__link dfe-header__link--service " href="#" aria-label="@Model.ServiceName homepage">
+                    <img src="~/assets/dfe-logo.png" class="dfe-logo" alt="@Model.ServiceName homepage">
+                    <img src="~/assets/dfe-logo-alt.png" class="dfe-logo-hover" alt="@Model.ServiceName homepage">
+                </a>
+            </div>
+        </div>
+    </header>
+}
