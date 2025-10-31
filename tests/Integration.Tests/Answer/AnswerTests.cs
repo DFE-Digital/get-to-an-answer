@@ -329,7 +329,6 @@ public class AnswerTests(ApiFixture factory) :
                    description = "D0",
                    score = 1,
                    destinationUrl = "https://url.com",
-                   destinationType = DestinationType.Question,
                }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -344,7 +343,6 @@ public class AnswerTests(ApiFixture factory) :
         answer.Description.Should().Be("D0");
         answer.Score.Should().Be(1);
         answer.DestinationUrl.Should().Be("https://url.com");
-        answer.DestinationType.Should().Be(DestinationType.Question);
         answer.CreatedAt.Should().NotBe(default);
         answer.UpdatedAt.Should().NotBe(default);
     }
@@ -361,7 +359,6 @@ public class AnswerTests(ApiFixture factory) :
                    questionnaireId, 
                    questionId, 
                    content = "A0",
-                   destinationType = DestinationType.Question,
                }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.OK);

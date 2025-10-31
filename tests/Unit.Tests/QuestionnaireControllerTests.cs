@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Api.Controllers;
+using Api.Services;
 using Common.Domain;
 using Common.Domain.Request.Create;
 using Common.Infrastructure.Persistence;
@@ -29,7 +30,7 @@ public class QuestionnaireControllerTests
 
     private static QuestionnaireController CreateController(GetToAnAnswerDbContext db, ClaimsPrincipal? user = null)
     {
-        var controller = new QuestionnaireController(db);
+        var controller = new QuestionnaireController(new QuestionnaireService(db));
 
         var httpContext = new DefaultHttpContext();
         if (user is not null)

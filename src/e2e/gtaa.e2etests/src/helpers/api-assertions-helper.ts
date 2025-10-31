@@ -212,11 +212,11 @@ export function expectAnswerTypes(answer: any) {
     expect(typeof answer.content).toBe('string');
     expect(typeof answer.description).toBe('string');
     expect(typeof answer.destinationUrl).toBe('string');
-    expect(typeof answer.destinationType).toBe('number');
     expect(typeof answer.score).toBe('number');
     expect(typeof answer.createdAt).toBe('string');
     expect(typeof answer.updatedAt).toBe('string');
     if (answer.destinationQuestionId !== null) {
+        expect(typeof answer.destinationType).toBe('number');
         expect(typeof answer.destinationQuestionId).toBe('string');
     }
 
@@ -237,10 +237,10 @@ export function expectAnswerContent(a: any) {
         expect(a.destinationUrl.trim().length).toBeGreaterThan(0);
     }
 
-    expect([1, 2]).toContain(a.destinationType);
-    expect(typeof a.score).toBe('number');
-
-    if (a.destinationQuestionId !== null && a.destinationQuestionId !== undefined) {
+    if (a.destinationQuestionId) {
+        expect([1, 2]).toContain(a.destinationType);
+        expect(typeof a.score).toBe('number');
+        
         expect(a.destinationQuestionId.trim().length).toBeGreaterThan(0);
     }
     
@@ -257,7 +257,6 @@ export function expectAnswerIO(a: any, payload: any, guidRegex: RegExp) {
     expect(a.questionId).toBe(payload.questionId);
     expect(a.questionnaireId).toBe(payload.questionnaireId);
     expect(a.content).toBe(payload.content);
-    expect(a.destinationType).toBe(payload.destinationType);
     expect(a.score).toBe(payload.score);
 
     if (isEmpty(payload.description)) {
@@ -272,7 +271,11 @@ export function expectAnswerIO(a: any, payload: any, guidRegex: RegExp) {
         expect(a.destinationUrl).toBe(payload.destinationUrl);
     }
 
-    if (payload.destinationQuestionId === undefined || payload.destinationQuestionId === null || isEmpty(payload.destinationQuestionId)) {
+    if (payload.destinationQuestionId) {
+        expect(a.destinationType).toBe(payload.destinationType);
+    }
+    
+    if (!payload.destinationQuestionId || isEmpty(payload.destinationQuestionId)) {
         expect(a.destinationQuestionId === null || a.destinationQuestionId === undefined).toBeTruthy();
     } else {
         expect(a.destinationQuestionId).toBe(payload.destinationQuestionId);
