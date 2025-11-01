@@ -29,7 +29,7 @@ public class AnswerContent
     public string? Description { get; set; }
     public DestinationType? DestinationType { get; set; }
     
-    public string? Destination { get; set; }
+    public string? DestinationUrl { get; set; }
     
     public int? DestinationQuestionId { get; set; }
     

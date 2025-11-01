@@ -30,6 +30,7 @@ builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
 builder.Services.AddScoped<IQuestionnaireRunnerService, QuestionnaireRunnerService>();
 builder.Services.AddScoped<IQuestionnaireVersionService, QuestionnaireVersionService>();
+builder.Services.AddScoped<IContentService, ContentService>();
 
 builder.Services.AddControllers()
     .AddDataAnnotationsLocalization();

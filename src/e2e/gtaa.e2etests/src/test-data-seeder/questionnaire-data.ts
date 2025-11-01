@@ -95,23 +95,36 @@ export async function updateQuestionnaire(
     }
 }
 
-export async function updateQuestionnaireStatus(
+export async function publishQuestionnaire(
     request: APIRequestContext,
     questionnaireId: number | string,
-    data: any,
     bearerToken?: string
 ) {
-    const response = await request.put(`/api/questionnaires/${questionnaireId}/status`, {
-        data,
+    const response = await request.put(`/api/questionnaires/${questionnaireId}/publish`, {
+        data: {},
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to update questionnaire status: ${response.status()}`);
-    }
-    return await response.json();
+    
+    return { response };
+}
+
+export async function unpublishQuestionnaire(
+    request: APIRequestContext,
+    questionnaireId: number | string,
+    bearerToken?: string
+) {
+    const response = await request.put(`/api/questionnaires/${questionnaireId}/unpublish`, {
+        data: {},
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
+        }
+    });
+
+    return { response };
 }
 
 export async function cloneQuestionnaire(
@@ -162,39 +175,13 @@ export async function listQuestionnaireVersions(
     const response = await request.get(`/api/questionnaires/${questionnaireId}/versions`, {
         headers: {'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`}
     });
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to list questionnaire versions: ${response.status()}`);
+    
+    let versions = []
+    
+    if (response.ok()) {
+        versions = await response.json();
     }
-    return await response.json();
-}
-
-export async function getQuestionnaireVersion(
-    request: APIRequestContext,
-    questionnaireId: number | string,
-    versionNumber: number,
-    bearerToken?: string
-) {
-    const response = await request.get(`/api/questionnaires/${questionnaireId}/versions/${versionNumber}`, {
-        headers: {'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`}
-    });
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to get questionnaire version: ${response.status()}`);
-    }
-    return await response.json();
-}
-
-export async function getLatestQuestionnaireVersion(
-    request: APIRequestContext,
-    questionnaireId: number | string,
-    bearerToken?: string
-) {
-    const response = await request.get(`/api/questionnaires/${questionnaireId}/versions/current`, {
-        headers: {'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`}
-    });
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to get latest questionnaire version: ${response.status()}`);
-    }
-    return await response.json();
+    return { response, versions};
 }
 
 // Runner
@@ -239,7 +226,7 @@ export async function addSelfToQuestionnaireContributors(
     questionnaireId: number | string,
     bearerToken?: string
 ) {
-    const response = await request.put(`/api/questionnaires/${questionnaireId}/contributors`, {
+    const response = await request.put(`/api/questionnaires/${questionnaireId}/contributors/self`, {
         headers: {
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }

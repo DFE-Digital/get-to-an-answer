@@ -101,7 +101,7 @@ test.describe('DELETE Question API request', () => {
             invalidQuestionId
         );
 
-        expect(deleteQuestionResponse.status()).toBe(400);
+        expect(deleteQuestionResponse.status()).toBe(404);
 
         // And error message to display
         if (deleteQuestionBody) {

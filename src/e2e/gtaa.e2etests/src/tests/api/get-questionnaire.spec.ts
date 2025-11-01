@@ -70,7 +70,7 @@ test.describe('GET questionnaire api tests', () => {
 
         // --- HTTP-level checks ---
         expect(response.questionnaireGetResponse.ok()).toBeFalsy();
-        expect(response.questionnaireGetResponse.status()).toBe(400);
+        expect(response.questionnaireGetResponse.status()).toBe(404);
     });
 
     test('Validate GET for a deleted questionnaire ', async ({request}) => {

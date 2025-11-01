@@ -69,7 +69,7 @@ public class BranchingHealthTests
     [Fact]
     public async Task Questionnaire_Has_Broken_Branching_Health()
     {
-        await using var db = TestUtils.CreateInMemoryDb(nameof(Questionnaire_Has_Cyclic_Branching_Health));
+        await using var db = TestUtils.CreateInMemoryDb(nameof(Questionnaire_Has_Broken_Branching_Health));
         var questionnaireService = new QuestionnaireService(db);
         var questionService = new QuestionService(db);
         var answerService = new AnswerService(db);
@@ -99,21 +99,21 @@ public class BranchingHealthTests
         
         question2.Should().NotBeNull();
         
-        var question1Answer = (await answerService.CreateAnswer(UserEmail, new CreateAnswerRequestDto
+        await answerService.CreateAnswer(UserEmail, new CreateAnswerRequestDto
         {
             QuestionnaireId = questionnaire.Id,
             QuestionId = question1.Id,
             Content = "Test",
             DestinationType = DestinationType.Question,
             DestinationQuestionId = question2.Id,
-        })).Value as AnswerDto;
+        });
         
-        var question2Answer = (await answerService.CreateAnswer(UserEmail, new CreateAnswerRequestDto
+        await answerService.CreateAnswer(UserEmail, new CreateAnswerRequestDto
         {
             QuestionnaireId = questionnaire.Id,
             QuestionId = question2.Id,
             Content = "Test",
-        })).Value as AnswerDto;
+        });
 
         var result = QuestionnaireService.IsBranchingHealthy(db.Questionnaires.First());
         result.Should().Be(BranchingHealthType.Broken);

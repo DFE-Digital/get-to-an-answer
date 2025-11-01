@@ -30,6 +30,10 @@ public class QuestionEntity
 
     public bool IsDeleted { get; set; }
     
+    [Required]
+    [MaxLength(500)]
+    public string CreatedBy { get; set; }
+    
     public DateTime CreatedAt { get; set; }
     
     public DateTime UpdatedAt { get; set; }

@@ -23,23 +23,7 @@ namespace Api.Controllers;
 public class QuestionnaireVersionController(IQuestionnaireVersionService questionnaireVersionService) : ControllerBase
 {
     
-    [HttpGet("questionnaires/{questionnaireId}/versions/current")]
-    public async Task<IActionResult> GetLatestQuestionnaireVersion(Guid questionnaireId)
-    {
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
-
-        return (await questionnaireVersionService.GetLatestQuestionnaireVersion(email, questionnaireId)).ToActionResult();
-    }
-    
-    [HttpGet("questionnaires/{questionnaireId}/versions/{versionNumber}")]
-    public async Task<IActionResult> GetQuestionnaireVersion(Guid questionnaireId, int versionNumber)
-    {
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
-
-        return (await questionnaireVersionService.GetQuestionnaireVersion(email, questionnaireId, versionNumber)).ToActionResult();
-    }
-    
-    [HttpGet("questionnaires/{questionnaireId}/versions")]
+   [HttpGet("questionnaires/{questionnaireId:guid}/versions")]
     public async Task<IActionResult> GetQuestionnaireVersions(Guid questionnaireId)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;

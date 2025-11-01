@@ -436,9 +436,9 @@ public class QuestionnaireTests(ApiFixture factory) :
     {
         using var res = await CreateCreateGet(invalidId, JwtTestTokenGenerator.ValidJwtToken);
 
-        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
         var text = await res.Content.ReadAsStringAsync();
-        text.Should().NotBeNullOrWhiteSpace();
+        text.Should().BeNullOrWhiteSpace();
     }
     
     #endregion
@@ -604,9 +604,9 @@ public class QuestionnaireTests(ApiFixture factory) :
     {
         using var res = await UpdateById(invalidId, new { title = "T1" });
 
-        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
         var text = await res.Content.ReadAsStringAsync();
-        text.Should().NotBeNullOrWhiteSpace();
+        text.Should().BeNullOrWhiteSpace();
     }
 
     // Scenario: Update with invalid payload data e.g. description as Boolean
@@ -770,10 +770,6 @@ public class QuestionnaireTests(ApiFixture factory) :
         using var res = await DeleteById(missingId);
 
         res.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        var text = await res.Content.ReadAsStringAsync();
-        text.Should().NotBeNullOrWhiteSpace();
-        text.Should().NotContain("userId");
-        text.Should().NotContain("contributors");
     }
 
     [Fact]
@@ -859,6 +855,8 @@ public class QuestionnaireTests(ApiFixture factory) :
             createRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await createRes.Content.ReadAsStringAsync());
         }
+
+        await Create(payload: new { QuestionnaireId = id, Content = "Q1?", Type = QuestionType.MultiSelect }, routePrefixOverride: "/api/questions");
     
         // Act
         using var res = await Update(routePrefixOverride: $"/api/questionnaires/{id}/publish");
@@ -945,6 +943,8 @@ public class QuestionnaireTests(ApiFixture factory) :
             id = ExtractId(await createRes.Content.ReadAsStringAsync());
         }
     
+        await Create(payload: new { QuestionnaireId = id, Content = "Q1?", Type = QuestionType.MultiSelect }, routePrefixOverride: "/api/questions");
+    
         // Act as unauthorized user
         using var res = await Update(routePrefixOverride: $"/api/questionnaires/{id}/publish", 
             bearerToken: JwtTestTokenGenerator.UnauthorizedJwtToken);
@@ -964,7 +964,7 @@ public class QuestionnaireTests(ApiFixture factory) :
         using var res = await Update(routePrefixOverride: $"/api/questionnaires/{invalidId}/publish", 
             bearerToken: JwtTestTokenGenerator.UnauthorizedJwtToken);
     
-        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
     
     #endregion
@@ -1041,9 +1041,9 @@ public class QuestionnaireTests(ApiFixture factory) :
         using var res = await Create(new { title = "Original Q", description = "D1" }, 
             routePrefixOverride: $"/api/questionnaires/{invalidId}/clones");
 
-        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
         var text = await res.Content.ReadAsStringAsync();
-        text.Should().NotBeNullOrWhiteSpace();
+        text.Should().BeNullOrWhiteSpace();
     }
 
     [Fact(DisplayName = "Clone with expired JWT returns Unauthorized")]

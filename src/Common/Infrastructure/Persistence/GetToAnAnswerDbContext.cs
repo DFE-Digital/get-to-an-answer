@@ -11,6 +11,7 @@ public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> opt
     public DbSet<QuestionnaireEntity> Questionnaires { get; set; }
     
     public DbSet<QuestionnaireVersionEntity> QuestionnaireVersions { get; set; }
+    public DbSet<ContentEntity> Contents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,6 +55,20 @@ public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> opt
                     .Select(qq => new { IsContributor = qq.Contributors.Contains(email) }).FirstOrDefault())
                 .FirstOrDefault();
 
+            return access is null
+                ? EntityAccess.NotFound
+                : (access.IsContributor ? EntityAccess.Allow : EntityAccess.Deny);
+        }
+
+        if (typeof(TEntityType) == typeof(ContentEntity))
+        {
+            var access = Contents
+                .Where(q => q.Id == id && !q.IsDeleted)
+                .Select(q => Questionnaires
+                    .Where(qq => qq.Id == q.QuestionnaireId)
+                    .Select(qq => new { IsContributor = qq.Contributors.Contains(email) }).FirstOrDefault())
+                .FirstOrDefault();
+            
             return access is null
                 ? EntityAccess.NotFound
                 : (access.IsContributor ? EntityAccess.Allow : EntityAccess.Deny);
