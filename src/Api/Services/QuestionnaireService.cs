@@ -2,10 +2,12 @@ using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Common.Domain;
+using Common.Domain.Admin;
 using Common.Domain.Request.Add;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Common.Enum;
+using Common.Extensions;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
 using Common.Local;
@@ -31,6 +33,7 @@ public interface IQuestionnaireService
     Task<ServiceResult> GetContributors(string email, Guid questionnaireId);
     Task<ServiceResult> AddContributor(string email, Guid id, AddContributorRequestDto request);
     Task<ServiceResult> RemoveContributor(string email, Guid id, string contributorEmail);
+    Task<ServiceResult> GetBranchingMap(string email, Guid questionnaireId);
 }
 
 public class QuestionnaireService(GetToAnAnswerDbContext db) : AbstractService, IQuestionnaireService
@@ -159,6 +162,12 @@ public class QuestionnaireService(GetToAnAnswerDbContext db) : AbstractService, 
 
         if (questionnaire == null)
             return NotFound();
+        
+        if (questionnaire.Questions.Count == 0)
+            return BadRequest("The questionnaire has no questions");
+
+        if (questionnaire.Status == EntityStatus.Published)
+            return BadRequest("The questionnaire is already published");
 
         var branchingHealth = IsBranchingHealthy(questionnaire);
 
@@ -309,6 +318,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db) : AbstractService, 
                 Description = question.Description,
                 Type = question.Type,
                 Order = question.Order,
+                CreatedBy = email,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             };
@@ -340,6 +350,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db) : AbstractService, 
                     DestinationQuestionId = answer.DestinationQuestionId,
                     DestinationType = answer.DestinationType,
                     Score = answer.Score,
+                    CreatedBy = email,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                 };
@@ -466,7 +477,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db) : AbstractService, 
 
         var changeMap = VersionDiffRenderer.RenderCompare(previousVersion.QuestionnaireJson, json);
 
-        var newChangeMap = changeMap?.FilterChangesForSide(true).Values.ToJson() ?? string.Empty;
+        var newChangeMap = changeMap?.Values.ToJson() ?? string.Empty;
 
         snapshot.ChangeLog = newChangeMap;
         
@@ -571,5 +582,38 @@ public class QuestionnaireService(GetToAnAnswerDbContext db) : AbstractService, 
         db.QuestionnaireVersions.Remove(version);
         
         await db.SaveChangesAsync();
+    }
+    
+    public async Task<ServiceResult> GetBranchingMap(string email, Guid questionnaireId)
+    {
+        var access = db.HasAccessToEntity<QuestionnaireEntity>(email, questionnaireId);
+        
+        if (access == EntityAccess.NotFound)
+            return NotFound();
+        
+        if (access == EntityAccess.Deny)
+            return Forbid();
+
+        var questionnaire = await db.Questionnaires
+            .AsNoTracking()    
+            .Where(q => q.Id == questionnaireId)
+            .Include(q => q.Questions.Where(a => !a.IsDeleted))
+            .ThenInclude(qq => qq.Answers.Where(a => !a.IsDeleted))
+            .FirstOrDefaultAsync();
+
+        if (questionnaire == null)
+            return NotFound();
+
+        var contentMap = await db.Contents
+            .AsNoTracking()
+            .Where(x => x.QuestionnaireId == questionnaireId)
+            .ToDictionaryAsync(c => c.Id, c => c.Title);
+        
+        return Ok(new QuestionnaireBranchingMap
+        {
+            QuestionnaireId = questionnaire.Id,
+            QuestionnaireTitle = questionnaire.Title,
+            Source = questionnaire.ToMermaidDiagram(contentMap)
+        });
     }
 }

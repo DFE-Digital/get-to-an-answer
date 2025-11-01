@@ -1,12 +1,9 @@
-using System.Security.Claims;
 using Common.Domain;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Services;
 
@@ -46,6 +43,7 @@ public class AnswerService(GetToAnAnswerDbContext db) : AbstractService, IAnswer
         {
             case DestinationType.Question when request.DestinationQuestionId == null:
             case DestinationType.ExternalLink when request.DestinationUrl == null:
+            case DestinationType.CustomContent when request.DestinationContentId == null:
                 return BadRequest();
         }
 
@@ -79,6 +77,7 @@ public class AnswerService(GetToAnAnswerDbContext db) : AbstractService, IAnswer
             DestinationUrl = request.DestinationUrl,
             DestinationQuestionId = request.DestinationQuestionId,
             DestinationType = request.DestinationType,
+            CreatedBy = email,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
@@ -142,6 +141,14 @@ public class AnswerService(GetToAnAnswerDbContext db) : AbstractService, IAnswer
         
         if (answer == null)
             return NotFound();
+
+        switch (request.DestinationType)
+        {
+            case DestinationType.Question when request.DestinationQuestionId == null:
+            case DestinationType.ExternalLink when request.DestinationUrl == null:
+            case DestinationType.CustomContent when request.DestinationContentId == null:
+                return BadRequest();
+        }
 
         if (request is { DestinationType: DestinationType.Question, DestinationQuestionId: not null })
         {

@@ -47,34 +47,6 @@ public static class VersionDiffRenderer
         return JsonSerializer.Serialize(map, options);
     }
     
-    public static ChangeMap FilterChangesForSide(this ChangeMap all, bool forNewSide)
-    {
-        var filtered = new ChangeMap();
-        foreach (var (key, value) in all)
-        {
-            var include = value?.Kind == ChangeKind.Modified
-                          || (forNewSide && value?.Kind == ChangeKind.Added)
-                          || (!forNewSide && value?.Kind == ChangeKind.Removed);
-            if (include)
-            {
-                filtered[key] = new ChangeData
-                {
-                    Path = value?.Path,
-                    ThisValue = value?.ThisValue,
-                    ThatValue = value?.ThatValue,
-                    Kind = value?.Kind switch
-                    {
-                        ChangeKind.Added when forNewSide => ChangeKind.Added,
-                        ChangeKind.Removed when !forNewSide => ChangeKind.Removed,
-                        ChangeKind.Modified => ChangeKind.Modified,
-                        _ => ChangeKind.Unchanged
-                    }
-                };
-            }
-        }
-        return filtered;
-    }
-    
     static ChangeMap BuildChangeMap(JsonNode? oldN, JsonNode? newN)
     {
         var map = new ChangeMap();
@@ -88,7 +60,7 @@ public static class VersionDiffRenderer
 
             if (a is null)
             {
-                MarkAll(b, a, path, terminalNode, ChangeKind.Added, m); 
+                MarkAll(a, b, path, terminalNode, ChangeKind.Added, m); 
                 return;
             }
 
@@ -151,7 +123,10 @@ public static class VersionDiffRenderer
 
         static void MarkAll(JsonNode? thisNode, JsonNode? thatNode, string path, object terminalNode, ChangeKind kind, ChangeMap m)
         {
-            if (thisNode is JsonValue)
+            if (thisNode is null && thatNode is null)
+                return;
+            
+            if (thisNode is JsonValue || thatNode is JsonValue)
             {
                 m[path] = new ChangeData
                 {
@@ -164,20 +139,24 @@ public static class VersionDiffRenderer
                 }; 
                 return;
             }
-            if (thisNode is JsonArray arr)
+            if (thisNode is JsonArray || thatNode is JsonArray)
             {
+                var arr = thisNode as JsonArray;
                 var thatArr = thatNode as JsonArray;
                 
-                for (int i = 0; i < arr.Count; i++)
-                    MarkAll(arr[i], thatArr?[i], $"{path}[{i}]", i, kind, m);
+                for (int i = 0; i < (arr ?? thatArr ?? []).Count; i++)
+                    MarkAll(arr?[i], thatArr?[i], $"{path}[{i}]", i, kind, m);
                 return;
             }
-            if (thisNode is JsonObject obj)
+            if (thisNode is JsonObject || thatNode is JsonObject)
             {
+                var obj = thisNode as JsonObject;
                 var thatObj = thatNode as JsonObject;
                 
-                foreach (var (key, value) in obj)
-                    MarkAll(value, thatObj?[key],$"{path}.{key}", key, kind, m);
+                var jObj = obj ?? thatObj ?? new JsonObject();
+                
+                foreach (var (key, value) in jObj)
+                    MarkAll(obj?[key], thatObj?[key],$"{path}.{key}", key, kind, m);
             }
         }
     }

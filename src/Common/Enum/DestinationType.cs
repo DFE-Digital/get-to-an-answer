@@ -3,5 +3,6 @@ namespace Common.Enum;
 public enum DestinationType
 {
     Question = 1,
-    ExternalLink = 2
+    ExternalLink = 2,
+    CustomContent = 3
 }

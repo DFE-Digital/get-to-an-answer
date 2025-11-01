@@ -41,6 +41,7 @@ public class QuestionService(GetToAnAnswerDbContext db) : AbstractService, IQues
             Type = request.Type,
             Order = db.Questions.Count(x => x.QuestionnaireId == request.QuestionnaireId
                                             && !x.IsDeleted) + 1,
+            CreatedBy = email,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
@@ -170,7 +171,7 @@ public class QuestionService(GetToAnAnswerDbContext db) : AbstractService, IQues
         if (access == EntityAccess.Deny)
             return Forbid();
         
-        var question = db.Questions.FirstOrDefault(q => q.Id == id);
+        var question = db.Questions.FirstOrDefault(q => q.Id == id && !q.IsDeleted);
         
         if (question == null)
             return NotFound();

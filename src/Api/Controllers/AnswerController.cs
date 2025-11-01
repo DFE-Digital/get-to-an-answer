@@ -25,7 +25,7 @@ public class AnswerController(IAnswerService answerService) : Controller
         return (await answerService.CreateAnswer(email, request)).ToActionResult();
     }
     
-    [HttpGet("answers/{id}")]
+    [HttpGet("answers/{id:guid}")]
     public IActionResult GetAnswer(Guid id)
     {
         // Extract user and tenant from claims
@@ -34,7 +34,7 @@ public class AnswerController(IAnswerService answerService) : Controller
         return answerService.GetAnswer(email, id).ToActionResult();
     }
     
-    [HttpGet("questions/{questionId}/answers")]
+    [HttpGet("questions/{questionId:guid}/answers")]
     public IActionResult GetAnswers(Guid questionId)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -42,7 +42,7 @@ public class AnswerController(IAnswerService answerService) : Controller
         return answerService.GetAnswers(email, questionId).ToActionResult();
     }
 
-    [HttpPut("answers/{id}")]
+    [HttpPut("answers/{id:guid}")]
     public async Task<IActionResult> UpdateAnswer(Guid id, UpdateAnswerRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -50,7 +50,7 @@ public class AnswerController(IAnswerService answerService) : Controller
         return (await answerService.UpdateAnswer(email, id, request)).ToActionResult();
     }
 
-    [HttpDelete("answers/{id}")]
+    [HttpDelete("answers/{id:guid}")]
     public async Task<IActionResult> DeleteAnswer(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;

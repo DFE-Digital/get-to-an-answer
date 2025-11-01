@@ -22,4 +22,5 @@ public class CreateAnswerRequestDto
     public string? DestinationUrl { get; set; }
     
     public Guid? DestinationQuestionId { get; set; }
+    public Guid? DestinationContentId { get; set; }
 }

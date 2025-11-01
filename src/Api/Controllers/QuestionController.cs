@@ -26,7 +26,7 @@ public class QuestionController(IQuestionService questionService) : Controller
         return (await questionService.CreateQuestion(email, request)).ToActionResult();
     }
     
-    [HttpGet("questions/{id}")]
+    [HttpGet("questions/{id:guid}")]
     public IActionResult GetQuestion(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -34,7 +34,7 @@ public class QuestionController(IQuestionService questionService) : Controller
         return questionService.GetQuestion(email, id).ToActionResult();
     }
 
-    [HttpGet("questionnaires/{questionnaireId}/questions")]
+    [HttpGet("questionnaires/{questionnaireId:guid}/questions")]
     public IActionResult GetQuestions(Guid questionnaireId)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -42,7 +42,7 @@ public class QuestionController(IQuestionService questionService) : Controller
         return questionService.GetQuestions(email, questionnaireId).ToActionResult();
     }
 
-    [HttpPut("questions/{id}")]
+    [HttpPut("questions/{id:guid}")]
     public async Task<IActionResult> UpdateQuestion(Guid id, UpdateQuestionRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -50,7 +50,7 @@ public class QuestionController(IQuestionService questionService) : Controller
         return (await questionService.UpdateQuestion(email, id, request)).ToActionResult();
     }
 
-    [HttpDelete("questions/{id}")]
+    [HttpDelete("questions/{id:guid}")]
     public async Task<IActionResult> DeleteQuestion(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -58,7 +58,7 @@ public class QuestionController(IQuestionService questionService) : Controller
         return (await questionService.DeleteQuestion(email, id)).ToActionResult();
     }
     
-    [HttpPatch("questionnaires/{questionnaireId}/questions/{id}/move-down")]
+    [HttpPatch("questionnaires/{questionnaireId:guid}/questions/{id:guid}/move-down")]
     public async Task<IActionResult> MoveQuestionDownOne(Guid questionnaireId, Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -66,7 +66,7 @@ public class QuestionController(IQuestionService questionService) : Controller
         return (await questionService.MoveQuestionDownOne(email, questionnaireId, id)).ToActionResult();
     }
     
-    [HttpPatch("questionnaires/{questionnaireId}/questions/{id}/move-up")]
+    [HttpPatch("questionnaires/{questionnaireId:guid}/questions/{id:guid}/move-up")]
     public async Task<IActionResult> MoveQuestionUpOne(Guid questionnaireId, Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;

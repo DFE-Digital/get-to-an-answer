@@ -9,10 +9,10 @@ using Integration.Tests.Fake;
 using Integration.Tests.Fixture;
 using Integration.Tests.Util;
 
-namespace Integration.Tests.Question;
+namespace Integration.Tests.Content;
 
 public class QuestionTests(ApiFixture factory) : 
-    ControllerTests(factory, "/api/questions")
+    ControllerTests(factory, "/api/contents")
 {
     private static void AssertNoSensitiveUserData(string responseBody)
     {
@@ -21,18 +21,18 @@ public class QuestionTests(ApiFixture factory) :
         responseBody.Should().NotContain("contributors");
     }
     
-    #region Create Question Endpoint Tests
+    #region Create Content Endpoint Tests
 
     [Fact]
-    public async Task Create_With_Content_Only_Returns201_And_Dto_Without_Sensitive_Data()
+    public async Task Create_With_Title_And_Content_Returns201_And_Dto_Has_Inputted_Values()
     {
         var questionnaireId = await CreateQuestionnaire();
         
         var payload = new
         {
             questionnaireId,
-            content = "My Question",
-            type = QuestionType.DropdownSelect,
+            title = "T1",
+            content = "D1"
         };
 
         using var res = await Create(payload);
@@ -40,66 +40,37 @@ public class QuestionTests(ApiFixture factory) :
         Assert.Equal(HttpStatusCode.Created, res.StatusCode);
 
         var responseBody = await res.Content.ReadAsStringAsync();
-        var dto = responseBody.Deserialize<QuestionDto>()!;
-
+        var dto = responseBody.Deserialize<ContentDto>()!;
+        
         dto.QuestionnaireId.Should().Be(questionnaireId);
-        dto.Id.Should().NotBeEmpty(because: "id should be auto-generated");
-        dto.Content.Should().Be("My Question");
-        dto.CreatedAt.Should().NotBe(default);
-        dto.UpdatedAt.Should().NotBe(default);
-
+        dto.Title.Should().Be("T1");
+        dto.Content.Should().Be("D1");
         AssertNoSensitiveUserData(responseBody);
     }
 
     [Fact]
-    public async Task Create_With_Content_And_Description_Returns201_And_Dto_Has_Inputted_Values()
+    public async Task Create_With_Duplicate_Title_Still_Creates_New_Id()
     {
         var questionnaireId = await CreateQuestionnaire();
         
         var payload = new
         {
             questionnaireId,
-            content = "T1",
-            description = "D1",
-            type = QuestionType.SingleSelect
-        };
-
-        using var res = await Create(payload);
-
-        Assert.Equal(HttpStatusCode.Created, res.StatusCode);
-
-        var responseBody = await res.Content.ReadAsStringAsync();
-        var dto = responseBody.Deserialize<QuestionDto>()!;
-        
-        dto.QuestionnaireId.Should().Be(questionnaireId);
-        dto.Content.Should().Be("T1");
-        dto.Description.Should().Be("D1");
-        AssertNoSensitiveUserData(responseBody);
-    }
-
-    [Fact]
-    public async Task Create_With_Duplicate_Content_Still_Creates_New_Id()
-    {
-        var questionnaireId = await CreateQuestionnaire();
-        
-        var payload = new
-        {
-            questionnaireId,
-            content = "Duplicate Content",
-            type = QuestionType.MultiSelect
+            title = "Duplicate title",
+            content = "Some content"
         };
 
         using var res1 = await Create(payload);
         Assert.Equal(HttpStatusCode.Created, res1.StatusCode);
         
         var res1Body = await res1.Content.ReadAsStringAsync();
-        var dto1 = res1Body.Deserialize<QuestionDto>()!;
+        var dto1 = res1Body.Deserialize<ContentDto>()!;
 
         using var res2 = await Create(payload);
         Assert.Equal(HttpStatusCode.Created, res2.StatusCode);
         
         var res2Body = await res2.Content.ReadAsStringAsync();
-        var dto2 = res2Body.Deserialize<QuestionDto>()!;
+        var dto2 = res2Body.Deserialize<ContentDto>()!;
 
         dto1.QuestionnaireId.Should().Be(questionnaireId);
         dto1.QuestionnaireId.Should().Be(questionnaireId);
@@ -109,12 +80,12 @@ public class QuestionTests(ApiFixture factory) :
     }
 
     [Fact]
-    public async Task Create_Missing_Content_Returns400_With_Validation_Error_No_Creation()
+    public async Task Create_Missing_Title_Returns400_With_Validation_Error_No_Creation()
     {
         var payload = new
         {
             // content missing
-            description = "Some description"
+            content = "Some description"
         };
 
         using var res = await Create(payload);
@@ -122,7 +93,7 @@ public class QuestionTests(ApiFixture factory) :
         Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
 
         var text = await res.Content.ReadAsStringAsync();
-        text.Should().Contain("content");
+        text.Should().Contain("title");
         text.Should().NotContain("createdBy");
     }
 
@@ -153,38 +124,6 @@ public class QuestionTests(ApiFixture factory) :
     }
 
     [Fact]
-    public async Task Create_Multiple_Question_Questionnaire_Returns_Ordered_List_Of_Questions()
-    {
-        var questionnaireId = await CreateQuestionnaire();
-
-        var typeList = GeneralExtensions.ToList<QuestionType>(2);
-
-        foreach (var type in typeList) 
-        {
-            var payload = new
-            {
-                questionnaireId,
-                content = "Any",
-                type
-            };
-
-            await Create(payload);
-        }
-        
-        var questions = await GetAll<List<QuestionDto>>(routePrefixOverride: 
-            $"/api/questionnaires/{questionnaireId}/questions");
-        
-        questions.Should().NotBeEmpty();
-        questions.Should().HaveCount(typeList.Count);
-
-        for (var i = 0; i < typeList.Count; i++)
-        {
-            questions[i].Type.Should().Be(typeList[i]);
-            questions[i].Order.Should().Be(i+1);
-        }
-    }
-
-    [Fact]
     public async Task Post_NotAuthorized_For_Specific_Resource_Returns_403_Or_401_No_Creation()
     {
         var payload = new { content = "Any" };
@@ -202,8 +141,8 @@ public class QuestionTests(ApiFixture factory) :
     {
         var payload = new
         {
-            content = 12345,
-            description = new { inner = "value" }
+            title = 12345,
+            content = new { inner = "value" }
         };
 
         using var res = await Create(payload);
@@ -219,11 +158,11 @@ public class QuestionTests(ApiFixture factory) :
     [InlineData("😀✨💥", true, "emojis allowed?")]
     [InlineData("\t\r\n", false, "control characters")]
     [InlineData("A", true, "lower length")]
-    public async Task Content_Business_Rules(string content, bool expectedSuccess, string scenario)
+    public async Task Title_Business_Rules(string title, bool expectedSuccess, string scenario)
     {
         var questionnaireId = await CreateQuestionnaire();
         
-        var payload = new { questionnaireId, content, type = QuestionType.MultiSelect };
+        var payload = new { questionnaireId, title, content = "Some description" };
 
         using var res = await Create(payload);
 
@@ -232,20 +171,19 @@ public class QuestionTests(ApiFixture factory) :
     }
 
     [Theory]
-    [InlineData("   ", true, "description may allow whitespace?")]
+    [InlineData("   ", false, "content may not allow whitespace?")]
     [InlineData("😀✨💥", true, "emojis")]
-    [InlineData("\t\r\n", true, "control chars?")]
+    [InlineData("\t\r\n", false, "control chars?")]
     [InlineData("A", true, "min")]
-    public async Task Description_Business_Rules(string description, bool expectedSuccess, string scenario)
+    public async Task Content_Business_Rules(string content, bool expectedSuccess, string scenario)
     {
         var questionnaireId = await CreateQuestionnaire();
         
         var payload = new
         {
             questionnaireId, 
-            content = "Valid Content", 
-            description,
-            type = QuestionType.MultiSelect,
+            title = "Valid Content", 
+            content
         };
 
         using var res = await Create(payload);
@@ -256,45 +194,45 @@ public class QuestionTests(ApiFixture factory) :
     
     #endregion
     
-    // === Tests for the Get questions endpoint ===
+    // === Tests for the Get contents endpoint ===
     
     #region Get All Questions Endpoint Tests
 
-    [Fact(DisplayName = "Get all questions for me returns 200 and only my accessible items")]
+    [Fact(DisplayName = "Get all contents for me returns 200 and only my accessible items")]
     public async Task Get_All_For_Current_User_Only()
     {
         var questionnaireId = await CreateQuestionnaire();
         
-        // Seed: create two questions for current user
-        using (var res = await Create(new { questionnaireId, content = "Q1", description = "D1", type = QuestionType.MultiSelect })) 
+        // Seed: create two contents for current user
+        using (var res = await Create(new { questionnaireId, title = "T1", content = "C1" })) 
         { Assert.Equal(HttpStatusCode.Created, res.StatusCode); }
-        using (var res = await Create(new { questionnaireId, content = "Q2", type = QuestionType.SingleSelect }))
+        using (var res = await Create(new { questionnaireId, title = "T2", content = "C2" }))
         { Assert.Equal(HttpStatusCode.Created, res.StatusCode); }
 
-        // Seed: create a question as a different user (unauthorised for current user)
+        // Seed: create a content as a different user (unauthorised for current user)
         using (var res = await Create(new
                {
                    questionnaireId = await CreateQuestionnaire(JwtTestTokenGenerator.UnauthorizedJwtToken), 
-                   content = "OtherUser-NotVisible", 
-                   type = QuestionType.DropdownSelect
+                   title = "OtherUser-NotVisible", 
+                   content = "OtherUser-NotVisible"
                }, JwtTestTokenGenerator.UnauthorizedJwtToken))
         { Assert.Equal(HttpStatusCode.Created, res.StatusCode); }
 
         // Act
         using var getRes = await GetAll(routePrefixOverride: 
-            $"/api/questionnaires/{questionnaireId}/questions");
+            $"/api/questionnaires/{questionnaireId}/contents");
         
         // Assert
         Assert.Equal(HttpStatusCode.OK, getRes.StatusCode);
 
         var responseBody = await getRes.Content.ReadAsStringAsync();
-        var questions = responseBody.Deserialize<List<QuestionDto>>();
+        var contents = responseBody.Deserialize<List<ContentDto>>();
 
-        Assert.NotNull(questions);
+        Assert.NotNull(contents);
         
-        Assert.Equal(2, questions.Count);
+        Assert.Equal(2, contents.Count);
 
-        foreach (var q in questions)
+        foreach (var q in contents)
         {
             Assert.NotEqual("OtherUser-NotVisible", q.Content); // shouldn't include others
         }
@@ -306,7 +244,7 @@ public class QuestionTests(ApiFixture factory) :
         var questionnaireId = await CreateQuestionnaire();
         
         using var res = await GetAll(JwtTestTokenGenerator.InvalidAudJwtToken, routePrefixOverride: 
-            $"/api/questionnaires/{questionnaireId}/questions");
+            $"/api/questionnaires/{questionnaireId}/contents");
 
         Assert.Equal(HttpStatusCode.Unauthorized, res.StatusCode);
 
@@ -321,7 +259,7 @@ public class QuestionTests(ApiFixture factory) :
         var questionnaireId = await CreateQuestionnaire();
         
         using var res = await GetAll(JwtTestTokenGenerator.ExpiredJwtToken, routePrefixOverride: 
-            $"/api/questionnaires/{questionnaireId}/questions");
+            $"/api/questionnaires/{questionnaireId}/contents");
 
         Assert.Equal(HttpStatusCode.Unauthorized, res.StatusCode);
 
@@ -335,14 +273,14 @@ public class QuestionTests(ApiFixture factory) :
     {
         var questionnaireId = await CreateQuestionnaire(JwtTestTokenGenerator.NewUserJwtToken);
         
-        // Use a token that has no created questions
+        // Use a token that has no created contents
         using var res = await GetAll(JwtTestTokenGenerator.NewUserJwtToken, routePrefixOverride: 
-            $"/api/questionnaires/{questionnaireId}/questions");
+            $"/api/questionnaires/{questionnaireId}/contents");
 
         Assert.Equal(HttpStatusCode.OK, res.StatusCode);
 
         var responseBody = await res.Content.ReadAsStringAsync();
-        var list = responseBody.Deserialize<List<QuestionDto>>();
+        var list = responseBody.Deserialize<List<ContentDto>>();
         
         list.Should().NotBeNull();
         list.Should().BeEmpty();
@@ -350,25 +288,24 @@ public class QuestionTests(ApiFixture factory) :
     
     #endregion
     
-    // === Tests for the Get specific question endpoint ===
+    // === Tests for the Get specific content endpoint ===
     
-    #region Get Specific Question Endpoint Tests
+    #region Get Specific Content Endpoint Tests
 
     private static string ExtractId(string json)
         => JsonDocument.Parse(json).RootElement.GetProperty("id").GetString()!;
 
-    // Scenario: Retrieve an existing question
-    [Fact(DisplayName = "GET /questions/{id} returns 200 with DTO and system-managed fields; no sensitive user data")]
+    // Scenario: Retrieve an existing content
+    [Fact(DisplayName = "GET /contents/{id} returns 200 with DTO and system-managed fields; no sensitive user data")]
     public async Task Get_By_Id_Succeeds_With_Dto_And_No_Sensitive_Data()
     {
-        // Arrange: create a question as current user
+        // Arrange: create a content as current user
         var questionnaireId = await CreateQuestionnaire();;
         
         var createPayload = new { 
             questionnaireId, 
-            content = "My Q", 
-            description = "Desc",
-            type = QuestionType.MultiSelect, 
+            title = "My Q", 
+            content = "Desc"
         };
         using (var postRes = await Create(createPayload))
         {
@@ -382,34 +319,34 @@ public class QuestionTests(ApiFixture factory) :
             getRes.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var responseBody = await getRes.Content.ReadAsStringAsync();
-            var question = responseBody.Deserialize<QuestionDto>();
+            var content = responseBody.Deserialize<ContentDto>();
 
-            question.Should().NotBeNull();
+            content.Should().NotBeNull();
             
-            question.QuestionnaireId.Should().Be(questionnaireId);
-            question.Id.ToString().Should().Be(id);
-            question.Content.Should().Be("My Q");
-            question.Description.Should().Be("Desc");
+            content.QuestionnaireId.Should().Be(questionnaireId);
+            content.Id.ToString().Should().Be(id);
+            content.Title.Should().Be("My Q");
+            content.Content.Should().Be("Desc");
 
-            question.CreatedAt.Should().NotBe(default);
-            question.UpdatedAt.Should().NotBe(default);
+            content.CreatedAt.Should().NotBe(default);
+            content.UpdatedAt.Should().NotBe(default);
             
             // No sensitive user data
             AssertNoSensitiveUserData(responseBody);
         }
     }
 
-    // Scenario: Access to question not permitted
-    [Fact(DisplayName = "GET /questions/{id} unauthorized user gets 401/403 without existence leak")]
+    // Scenario: Access to content not permitted
+    [Fact(DisplayName = "GET /contents/{id} unauthorized user gets 401/403 without existence leak")]
     public async Task Get_By_Id_Unauthorized_User_Fails_Without_Leak()
     {
         // Arrange: create as authorized user
-        var questionnaireId = await CreateQuestionnaire();;
+        var questionnaireId = await CreateQuestionnaire();
         
         var createPayload = new { 
             questionnaireId, 
-            content = "Private Q",
-            type = QuestionType.MultiSelect, 
+            title = "Private Q",
+            content = "content"
         };
         using (var postRes = await Create(createPayload))
         {
@@ -428,8 +365,8 @@ public class QuestionTests(ApiFixture factory) :
         }
     }
 
-    // Scenario: Question does not exist or is deleted
-    [Fact(DisplayName = "GET missing/deleted question returns 404 Not Found")]
+    // Scenario: Content does not exist or is deleted
+    [Fact(DisplayName = "GET missing/deleted content returns 404 Not Found")]
     public async Task Get_By_Id_Missing_Or_Deleted_Returns_404()
     {
         // Arrange: random id that won't exist
@@ -445,11 +382,11 @@ public class QuestionTests(ApiFixture factory) :
         text.Should().NotContain("contributors");
     }
 
-    // Scenario: Get the specific question you created or were invited to contribute
-    [Fact(DisplayName = "GET /questions/{id} returns only the requested question with expected fields")]
+    // Scenario: Get the specific content you created or were invited to contribute
+    [Fact(DisplayName = "GET /contents/{id} returns only the requested content with expected fields")]
     public async Task Get_By_Id_Returns_Correct_Fields_Only()
     {
-        // Arrange: create two questions as current user; we will fetch only one
+        // Arrange: create two contents as current user; we will fetch only one
         var questionnaireId = await CreateQuestionnaire();;
         
         string idToFetch;
@@ -457,9 +394,8 @@ public class QuestionTests(ApiFixture factory) :
             using var res1 = await Create(new
             {
                 questionnaireId, 
-                content = "Q1", 
-                description = "D1",
-                type = QuestionType.MultiSelect,
+                title = "Q1", 
+                content = "D1",
             });
             res1.StatusCode.Should().Be(HttpStatusCode.Created);
             idToFetch = ExtractId(await res1.Content.ReadAsStringAsync());
@@ -468,9 +404,8 @@ public class QuestionTests(ApiFixture factory) :
             using var res2 = await Create(new
             {
                 questionnaireId, 
-                content = "Q2", 
-                description = "D2",
-                type = QuestionType.SingleSelect,
+                title = "Q2", 
+                content = "D2",
             });
             res2.StatusCode.Should().Be(HttpStatusCode.Created);
         }
@@ -481,14 +416,14 @@ public class QuestionTests(ApiFixture factory) :
         // Assert
         res.StatusCode.Should().Be(HttpStatusCode.OK);
         var responseBody = await res.Content.ReadAsStringAsync();
-        var question = responseBody.Deserialize<QuestionDto>();
+        var content = responseBody.Deserialize<ContentDto>();
 
-        question.Should().NotBeNull();
+        content.Should().NotBeNull();
         
-        question.QuestionnaireId.Should().Be(questionnaireId);
-        question.Id.ToString().Should().Be(idToFetch);
-        question.Content.Should().Be("Q1");
-        question.Description.Should().Be("D1");
+        content.QuestionnaireId.Should().Be(questionnaireId);
+        content.Id.ToString().Should().Be(idToFetch);
+        content.Title.Should().Be("Q1");
+        content.Content.Should().Be("D1");
 
         AssertNoSensitiveUserData(responseBody);
     }
@@ -497,15 +432,15 @@ public class QuestionTests(ApiFixture factory) :
     [Fact(DisplayName = "GET with expired JWT returns 401 and no sensitive data")]
     public async Task Get_By_Id_Expired_Token_Returns_401_No_Leak()
     {
-        // Arrange: create a question to target
+        // Arrange: create a content to target
         var questionnaireId = await CreateQuestionnaire();
         
         string id;
         using (var postRes = await Create(new
                {
                    questionnaireId,
+                   title = "Any",
                    content = "Any",
-                   type = QuestionType.MultiSelect,
                }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -526,15 +461,15 @@ public class QuestionTests(ApiFixture factory) :
     [Fact(DisplayName = "GET with invalid JWT returns 401 and no sensitive data")]
     public async Task Get_By_Id_Invalid_Token_Returns_401_No_Leak()
     {
-        // Arrange: create a question to target
+        // Arrange: create a content to target
         var questionnaireId = await CreateQuestionnaire();;
         
         string id;
         using (var postRes = await Create(new
                {
                    questionnaireId,
+                   title = "Any",
                    content = "Any",
-                   type = QuestionType.MultiSelect,
                }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -551,8 +486,8 @@ public class QuestionTests(ApiFixture factory) :
         AssertNoSensitiveUserData(text);
     }
 
-    // Scenario: Error when invalid question id is passed
-    [Theory(DisplayName = "GET with invalid question id returns 400 Bad Request")]
+    // Scenario: Error when invalid content id is passed
+    [Theory(DisplayName = "GET with invalid content id returns 400 Bad Request")]
     [InlineData("not-a-guid")]
     [InlineData("123")]
     public async Task Get_By_Id_Invalid_Id_Returns_400(string invalidId)
@@ -566,12 +501,12 @@ public class QuestionTests(ApiFixture factory) :
 
     #endregion
     
-    // === Tests for the Update questions endpoint ===
+    // === Tests for the Update contents endpoint ===
     
-    #region Update Question Endpoint Tests
+    #region Update Content Endpoint Tests
 
     [Fact]
-    public async Task Update_Content_Only_NoContent_And_Description_Unchanged()
+    public async Task Update_Title_Only_NoContent_And_Content_Unchanged()
     {
         // Arrange
         var questionnaireId = await CreateQuestionnaire();
@@ -581,9 +516,8 @@ public class QuestionTests(ApiFixture factory) :
         using (var postRes = await Create(new
                {
                    questionnaireId, 
-                   content = "T0", 
-                   description = originalDesc, 
-                   type = QuestionType.MultiSelect
+                   title = "T0", 
+                   content = originalDesc
                }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -591,26 +525,26 @@ public class QuestionTests(ApiFixture factory) :
         }
 
         // Act
-        using var res = await UpdateById(id, new { content = "T1" });
+        using var res = await UpdateById(id, new { title = "T1" });
 
         // Assert 204, then GET to verify
         res.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-        var question = await GetById<QuestionDto>(id);
-        question.Content.Should().Be("T1");
-        question.Description.Should().Be(originalDesc);
-        question.CreatedAt.Should().NotBe(default);
-        question.UpdatedAt.Should().NotBe(default);
+        var content = await GetById<ContentDto>(id);
+        content.Title.Should().Be("T1");
+        content.Content.Should().Be(originalDesc);
+        content.CreatedAt.Should().NotBe(default);
+        content.UpdatedAt.Should().NotBe(default);
     }
 
     [Fact(DisplayName = "Update with missing content returns 400 Bad Request")]
-    public async Task Update_Missing_Content_BadRequest_NoContent_Not_Used()
+    public async Task Update_Missing_Title_BadRequest_NoContent_Not_Used()
     {
         // Arrange
         var questionnaireId = await CreateQuestionnaire();
         
         string id;
-        using (var postRes = await Create(new { questionnaireId, content = "T0", description = "D0", type = QuestionType.MultiSelect }))
+        using (var postRes = await Create(new { questionnaireId, title = "T0", content = "D0" }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
@@ -621,64 +555,36 @@ public class QuestionTests(ApiFixture factory) :
 
         res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var text = await res.Content.ReadAsStringAsync();
-        text.Should().Contain("content");
         text.Should().NotContain("userId");
         text.Should().NotContain("userEmail");
 
         // Verify nothing changed
-        var question = await GetById<QuestionDto>(id);
-        question.Content.Should().Be("T0");
-        question.Description.Should().Be("D0");
-    }
-    
-    [Fact(DisplayName = "Update with invalid question type returns 400 Bad Request")]
-    public async Task Update_Invalid_Question_Type_BadRequest()
-    {
-        // Arrange
-        var questionnaireId = await CreateQuestionnaire();
-        
-        string id;
-        using (var postRes = await Create(new { questionnaireId, content = "T0", description = "D0", type = QuestionType.MultiSelect }))
-        {
-            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
-            id = ExtractId(await postRes.Content.ReadAsStringAsync());
-        }
-
-        // Act
-        using var res = await UpdateById(id, new { content = "T0", type = (QuestionType)123 });
-
-        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        var text = await res.Content.ReadAsStringAsync();
-        text.Should().NotContain("userId");
-        text.Should().NotContain("userEmail");
-
-        // Verify nothing changed
-        var question = await GetById<QuestionDto>(id);
-        question.Content.Should().Be("T0");
-        question.Description.Should().Be("D0");
+        var content = await GetById<ContentDto>(id);
+        content.Title.Should().Be("T0");
+        content.Content.Should().Be("D0");
     }
 
     [Fact(DisplayName = "Update content and description returns 204 and updates values")]
-    public async Task Update_Content_And_Description_NoContent_Then_Get()
+    public async Task Update_Title_And_Content_NoContent_Then_Get()
     {
         // Arrange
         var questionnaireId = await CreateQuestionnaire();;
         
         string id;
-        using (var postRes = await Create(new { questionnaireId, content = "T0", description = "D0", type = QuestionType.MultiSelect }))
+        using (var postRes = await Create(new { questionnaireId, title = "T0", content = "D0" }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
         // Act
-        using var res = await UpdateById(id, new { content = "T1", description = "D1", type = QuestionType.MultiSelect });
+        using var res = await UpdateById(id, new { title = "T1", content = "D1" });
 
         res.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-        var question = await GetById<QuestionDto>(id);
-        question.Content.Should().Be("T1");
-        question.Description.Should().Be("D1");
+        var content = await GetById<ContentDto>(id);
+        content.Title.Should().Be("T1");
+        content.Content.Should().Be("D1");
     }
 
     // Scenario: Error when invalid JWT bearer token (unauthorized access)
@@ -689,22 +595,22 @@ public class QuestionTests(ApiFixture factory) :
         var questionnaireId = await CreateQuestionnaire();;
         
         string id;
-        using (var postRes = await Create(new { questionnaireId, content = "Seed", description = "D0", type = QuestionType.MultiSelect }))
+        using (var postRes = await Create(new { questionnaireId, title = "Seed", content = "D0" }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
         // Act
-        using var res = await UpdateById(id, new { questionnaireId, content = "Changed", type = QuestionType.MultiSelect }, JwtTestTokenGenerator.InvalidAudJwtToken);
+        using var res = await UpdateById(id, new { questionnaireId, title = "Changed" }, JwtTestTokenGenerator.InvalidAudJwtToken);
 
         res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         var text = await res.Content.ReadAsStringAsync();
 
         // Verify unchanged
-        var question = await GetById<QuestionDto>(id);
-        question.Content.Should().Be("Seed");
-        question.Description.Should().Be("D0");
+        var content = await GetById<ContentDto>(id);
+        content.Title.Should().Be("Seed");
+        content.Content.Should().Be("D0");
     }
 
     // Scenario: Error when expired JWT bearer token (unauthorized access)
@@ -715,35 +621,35 @@ public class QuestionTests(ApiFixture factory) :
         var questionnaireId = await CreateQuestionnaire();
         
         string id;
-        using (var postRes = await Create(new { questionnaireId, content = "Seed", description = "D0", type = QuestionType.MultiSelect }))
+        using (var postRes = await Create(new { questionnaireId, title = "Seed", content = "D0" }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
         // Act
-        using var res = await UpdateById(id, new { content = "Changed" }, JwtTestTokenGenerator.ExpiredJwtToken);
+        using var res = await UpdateById(id, new { title = "Changed" }, JwtTestTokenGenerator.ExpiredJwtToken);
 
         res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
         // Verify unchanged
-        var question = await GetById<QuestionDto>(id);
-        question.Content.Should().Be("Seed");
-        question.Description.Should().Be("D0");
+        var content = await GetById<ContentDto>(id);
+        content.Title.Should().Be("Seed");
+        content.Content.Should().Be("D0");
     }
 
-    // Scenario: Question not found
+    // Scenario: Content not found
     [Fact]
     public async Task Update_NotFound_NoContent_Not_Returned()
     {
         var missingId = Guid.NewGuid().ToString("N");
 
-        using var res = await UpdateById(missingId, new { content = "T1" });
+        using var res = await UpdateById(missingId, new { title = "T1" });
 
         res.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    // Scenario: Access to question not permitted
+    // Scenario: Access to content not permitted
     [Fact]
     public async Task Update_Forbidden_No_Changes()
     {
@@ -751,30 +657,30 @@ public class QuestionTests(ApiFixture factory) :
         var questionnaireId = await CreateQuestionnaire();;
         
         string id;
-        using (var postRes = await Create(new { questionnaireId, content = "Private Q", description = "D0", type = QuestionType.MultiSelect }))
+        using (var postRes = await Create(new { questionnaireId, title = "Private Q", content = "D0" }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
         // Act as unauthorized user
-        using var res = await UpdateById(id, new { content = "Hack" }, JwtTestTokenGenerator.UnauthorizedJwtToken);
+        using var res = await UpdateById(id, new { title = "Hack" }, JwtTestTokenGenerator.UnauthorizedJwtToken);
 
         new[] { HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden }.Should().Contain(res.StatusCode);
 
         // Verify unchanged with authorized token
-        var question = await GetById<QuestionDto>(id);
-        question.Content.Should().Be("Private Q");
-        question.Description.Should().Be("D0");
+        var content = await GetById<ContentDto>(id);
+        content.Title.Should().Be("Private Q");
+        content.Content.Should().Be("D0");
     }
 
-    // Scenario: Error when invalid question id is passed
+    // Scenario: Error when invalid content id is passed
     [Theory]
     [InlineData("not-a-guid")]
     [InlineData("123")]
     public async Task Update_Invalid_Id_400_No_Changes(string invalidId)
     {
-        using var res = await UpdateById(invalidId, new { content = "T1" });
+        using var res = await UpdateById(invalidId, new { title = "T1" });
 
         res.StatusCode.Should().Be(HttpStatusCode.NotFound);
         var text = await res.Content.ReadAsStringAsync();
@@ -789,275 +695,61 @@ public class QuestionTests(ApiFixture factory) :
         var questionnaireId = await CreateQuestionnaire();
         
         string id;
-        using (var postRes = await Create(new { questionnaireId, content = "Seed", description = "D0", type = QuestionType.MultiSelect }))
+        using (var postRes = await Create(new { questionnaireId, title = "Seed", content = "D0" }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
         // Act: invalid type
-        using var res = await UpdateById(id, new { content = "T1", description = true });
+        using var res = await UpdateById(id, new { title = "T1", content = true });
 
         res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
         // Verify unchanged
-        var question = await GetById<QuestionDto>(id);
-        question.Content.Should().Be("Seed");
-        question.Description.Should().Be("D0");
+        var content = await GetById<ContentDto>(id);
+        content.Title.Should().Be("Seed");
+        content.Content.Should().Be("D0");
     }
 
-    // Scenario: Update a question with a matching Content to an existing question
+    // Scenario: Update a content with a matching Content to an existing content
     [Fact]
-    public async Task Update_With_Duplicate_Content_Still_Distinct_Ids()
+    public async Task Update_With_Duplicate_Title_Still_Distinct_Ids()
     {
-        // Seed two questions
+        // Seed two contents
         var questionnaireId = await CreateQuestionnaire();;
         
         string id1, id2;
-        using (var r1 = await Create(new { questionnaireId, content = "A", description = "D1", type = QuestionType.MultiSelect }))
+        using (var r1 = await Create(new { questionnaireId, title = "A", content = "D1" }))
         {
             r1.StatusCode.Should().Be(HttpStatusCode.Created);
             id1 = ExtractId(await r1.Content.ReadAsStringAsync());
         }
-        using (var r2 = await Create(new { questionnaireId, content = "B", description = "D2", type = QuestionType.MultiSelect }))
+        using (var r2 = await Create(new { questionnaireId, title = "B", content = "D2" }))
         {
             r2.StatusCode.Should().Be(HttpStatusCode.Created);
             id2 = ExtractId(await r2.Content.ReadAsStringAsync());
         }
 
         // Act: update second to duplicate content of first
-        using var res = await UpdateById(id2, new { content = "A" });
+        using var res = await UpdateById(id2, new { title = "A" });
 
         res.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
         // Verify via GETs: different IDs remain, contents reflect update
-        var q1 = await GetById<QuestionDto>(id1);
-        var q2 = await GetById<QuestionDto>(id2);
+        var q1 = await GetById<ContentDto>(id1);
+        var q2 = await GetById<ContentDto>(id2);
 
         q1.Id.Should().Be(id1);
         q2.Id.Should().Be(id2);
-        q2.Content.Should().Be("A");
+        q2.Title.Should().Be("A");
     }
     
     #endregion
+
+    // === Tests for the Delete content endpoint ===
     
-    // === Tests for the Move question order up endpoint ===
-    
-    #region Move Question Order Up Tests
-
-    [Fact]
-    public async Task MoveUp_Question_In_Middle_Position_Decrements_Order()
-    {
-        // Arrange: Create questionnaire with 3 questions
-        var questionnaireId = await CreateQuestionnaire();
-        var questions = new List<QuestionDto>();
-
-        for (var i = 0; i < 3; i++)
-        {
-            var payload = new
-            {
-                questionnaireId,
-                content = $"Q{i}",
-                type = QuestionType.MultiSelect
-            };
-
-            var question = await Create<QuestionDto>(payload);
-            questions.Add(question);
-        }
-
-        // Act: Move middle question up
-        using var moveRes = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{questions[1].Id}/move-up");
-
-        // Assert
-        moveRes.StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-        // Verify updated orders via GET
-        var updatedQuestions = await GetAll<List<QuestionDto>>(routePrefixOverride: 
-            $"/api/questionnaires/{questionnaireId}/questions");
-
-        updatedQuestions.Should().BeInAscendingOrder(q => q.Order);
-        updatedQuestions.Single(q => q.Id == questions[1].Id).Order.Should().Be(1);
-        updatedQuestions.Single(q => q.Id == questions[0].Id).Order.Should().Be(2);
-    }
-
-    [Fact] 
-    public async Task MoveUp_First_Question_Returns_BadRequest()
-    {
-        var questionnaireId = await CreateQuestionnaire();
-        var payload = new
-        {
-            questionnaireId,
-            content = "Q1",
-            type = QuestionType.MultiSelect
-        };
-
-        var question = await Create<QuestionDto>(payload);
-
-        using var moveRes = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}/move-up");
-
-        moveRes.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    }
-
-    [Fact]
-    public async Task MoveUp_Invalid_Id_Returns_NotFound()
-    {
-        var questionnaireId = await CreateQuestionnaire();
-        
-        var invalidId = Guid.NewGuid();
-        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{invalidId}/move-up");
-
-        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-
-    [Fact]
-    public async Task MoveUp_Invalid_Token_Returns_Unauthorized()
-    {
-        var questionnaireId = await CreateQuestionnaire();
-        var payload = new
-        {
-            questionnaireId,
-            content = "Q1",
-            type = QuestionType.MultiSelect
-        };
-
-        var question = await Create<QuestionDto>(payload);
-
-        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}/move-up",
-            bearerToken: JwtTestTokenGenerator.InvalidAudJwtToken);
-        res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-    }
-
-    [Fact]
-    public async Task MoveUp_Unauthorized_User_Returns_Forbidden()
-    {
-        var questionnaireId = await CreateQuestionnaire();
-        var payload = new
-        {
-            questionnaireId,
-            content = "Q1", 
-            type = QuestionType.MultiSelect
-        };
-
-        using var createRes = await Create(payload);
-        var question = (await createRes.Content.ReadAsStringAsync()).Deserialize<QuestionDto>()!;
-
-        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}/move-up",
-            bearerToken: JwtTestTokenGenerator.UnauthorizedJwtToken);
-        new[] { HttpStatusCode.Forbidden, HttpStatusCode.NotFound }.Should().Contain(res.StatusCode);
-    }
-    
-    #endregion
-    
-    // === Tests for the Move question order down endpoint ===
-    
-    #region Move Question Order Down Tests
-
-    [Fact]
-    public async Task MoveDown_Question_In_Middle_Position_Decrements_Order()
-    {
-        // Arrange: Create questionnaire with 3 questions
-        var questionnaireId = await CreateQuestionnaire();
-        var questions = new List<QuestionDto>();
-
-        for (var i = 0; i < 3; i++)
-        {
-            var payload = new
-            {
-                questionnaireId,
-                content = $"Q{i}",
-                type = QuestionType.MultiSelect
-            };
-
-            var question = await Create<QuestionDto>(payload);
-            questions.Add(question);
-        }
-
-        // Act: Move middle question up
-        using var moveRes = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{questions[1].Id}/move-down");
-
-        // Assert
-        moveRes.StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-        // Verify updated orders via GET
-        var updatedQuestions = await GetAll<List<QuestionDto>>(routePrefixOverride: 
-            $"/api/questionnaires/{questionnaireId}/questions");
-
-        updatedQuestions.Should().BeInAscendingOrder(q => q.Order);
-        updatedQuestions.Single(q => q.Id == questions[1].Id).Order.Should().Be(3);
-        updatedQuestions.Single(q => q.Id == questions[2].Id).Order.Should().Be(2);
-    }
-
-    [Fact] 
-    public async Task MoveDown_Last_Question_Returns_BadRequest()
-    {
-        var questionnaireId = await CreateQuestionnaire();
-        var payload = new
-        {
-            questionnaireId,
-            content = "Q1",
-            type = QuestionType.MultiSelect
-        };
-
-        var question = await Create<QuestionDto>(payload);
-
-        using var moveRes = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}/move-down");
-
-        moveRes.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    }
-
-    [Fact]
-    public async Task MoveDown_Invalid_Id_Returns_NotFound()
-    {
-        var questionnaireId = await CreateQuestionnaire();
-        
-        var invalidId = Guid.NewGuid();
-        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{invalidId}/move-down");
-
-        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-
-    [Fact]
-    public async Task MoveDown_Invalid_Token_Returns_Unauthorized()
-    {
-        var questionnaireId = await CreateQuestionnaire();
-        var payload = new
-        {
-            questionnaireId,
-            content = "Q1",
-            type = QuestionType.MultiSelect
-        };
-
-        var question = await Create<QuestionDto>(payload);
-
-        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}/move-down",
-            bearerToken: JwtTestTokenGenerator.InvalidAudJwtToken);
-        res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-    }
-
-    [Fact]
-    public async Task MoveDown_Unauthorized_User_Returns_Forbidden()
-    {
-        var questionnaireId = await CreateQuestionnaire();
-        var payload = new
-        {
-            questionnaireId,
-            content = "Q1", 
-            type = QuestionType.MultiSelect
-        };
-
-        using var createRes = await Create(payload);
-        var question = (await createRes.Content.ReadAsStringAsync()).Deserialize<QuestionDto>()!;
-
-        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}/move-down",
-            bearerToken: JwtTestTokenGenerator.UnauthorizedJwtToken);
-        new[] { HttpStatusCode.Forbidden, HttpStatusCode.NotFound }.Should().Contain(res.StatusCode);
-    }
-
-    #endregion
-
-    // === Tests for the Delete question endpoint ===
-    
-    #region Delete Question Endpoint Tests
+    #region Delete Content Endpoint Tests
 
     [Fact]
     public async Task Delete_Existing_Question_Succeeds_And_Is_SoftDeleted()
@@ -1068,9 +760,8 @@ public class QuestionTests(ApiFixture factory) :
         string id;
         using (var postRes = await Create(new { 
                    questionnaireId,
-                   content = "ToDelete", 
-                   description = "D0",
-                   type = QuestionType.MultiSelect, 
+                   title = "ToDelete", 
+                   content = "D0"
                }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -1090,7 +781,7 @@ public class QuestionTests(ApiFixture factory) :
         }
 
         // Verify it no longer appears in list
-        var list = await GetAll<List<QuestionDto>>(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions");
+        var list = await GetAll<List<ContentDto>>(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/contents");
         list.Should().BeEmpty();
     }
 
@@ -1104,9 +795,8 @@ public class QuestionTests(ApiFixture factory) :
         using (var postRes = await Create(new
                {
                    questionnaireId, 
-                   content = "Private Q", 
-                   description = "D0",
-                   type = QuestionType.MultiSelect,
+                   title = "Private Q", 
+                   content = "D0",
                }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -1145,9 +835,8 @@ public class QuestionTests(ApiFixture factory) :
         string id;
         using (var postRes = await Create(new { 
                    questionnaireId,
-                   content = "Seed", 
-                   description = "D0",
-                   type = QuestionType.MultiSelect, 
+                   title = "Seed", 
+                   content = "D0"
                }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -1174,9 +863,8 @@ public class QuestionTests(ApiFixture factory) :
         using (var postRes = await Create(new
                {
                    questionnaireId,
-                   content = "Seed", 
-                   description = "D0",
-                   type = QuestionType.MultiSelect,
+                   title = "Seed", 
+                   content = "D0",
                }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -1204,9 +892,8 @@ public class QuestionTests(ApiFixture factory) :
         using (var postRes = await Create(new
                {
                    questionnaireId,
-                   content = "SoftDelete", 
-                   description = "D0",
-                   type = QuestionType.MultiSelect,
+                   title = "SoftDelete", 
+                   content = "D0",
                }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
