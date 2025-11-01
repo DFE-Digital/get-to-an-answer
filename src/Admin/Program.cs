@@ -1,3 +1,10 @@
+using Azure.Monitor.OpenTelemetry.AspNetCore;
+using Common.Logging;
+using Common.Telemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
 
 const string localEnvironmentName = "Local";
@@ -11,6 +18,8 @@ if (builderIsLocalEnvironment)
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.AddLogging();
 
 var app = builder.Build();
 
