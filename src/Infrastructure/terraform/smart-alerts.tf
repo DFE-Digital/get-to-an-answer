@@ -14,11 +14,11 @@ resource "azurerm_monitor_smart_detector_alert_rule" "failure-anomalies-detector
   scope_resource_ids  = [azurerm_application_insights.application-insights.id]
   frequency           = local.smart_alert.frequency_minute
   detector_type       = "FailureAnomaliesDetector"
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
-  enabled             = var.alerting[var.prefix].smart_alerts_enabled
+  enabled = var.alerting[var.prefix].smart_alerts_enabled
 
   action_group {
     ids = [azurerm_monitor_action_group.service-support-action.id]
@@ -33,11 +33,11 @@ resource "azurerm_monitor_smart_detector_alert_rule" "request-performance-degrad
   scope_resource_ids  = [azurerm_application_insights.application-insights.id]
   frequency           = local.smart_alert.frequency_daily
   detector_type       = "RequestPerformanceDegradationDetector"
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
-  enabled             = var.alerting[var.prefix].smart_alerts_enabled
+  enabled = var.alerting[var.prefix].smart_alerts_enabled
 
   action_group {
     ids = [azurerm_monitor_action_group.service-support-action.id]
@@ -52,11 +52,11 @@ resource "azurerm_monitor_smart_detector_alert_rule" "dependency-performance-deg
   scope_resource_ids  = [azurerm_application_insights.application-insights.id]
   frequency           = local.smart_alert.frequency_daily
   detector_type       = "DependencyPerformanceDegradationDetector"
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
-  enabled             = var.alerting[var.prefix].smart_alerts_enabled
+  enabled = var.alerting[var.prefix].smart_alerts_enabled
 
   action_group {
     ids = [azurerm_monitor_action_group.service-support-action.id]
@@ -71,11 +71,11 @@ resource "azurerm_monitor_smart_detector_alert_rule" "exception-volume-changed-d
   scope_resource_ids  = [azurerm_application_insights.application-insights.id]
   frequency           = local.smart_alert.frequency_daily
   detector_type       = "ExceptionVolumeChangedDetector"
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
-  enabled             = var.alerting[var.prefix].smart_alerts_enabled
+  enabled = var.alerting[var.prefix].smart_alerts_enabled
 
   action_group {
     ids = [azurerm_monitor_action_group.service-support-action.id]
@@ -90,11 +90,11 @@ resource "azurerm_monitor_smart_detector_alert_rule" "trace-severity-detector" {
   scope_resource_ids  = [azurerm_application_insights.application-insights.id]
   frequency           = local.smart_alert.frequency_daily
   detector_type       = "TraceSeverityDetector"
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
-  enabled             = var.alerting[var.prefix].smart_alerts_enabled
+  enabled = var.alerting[var.prefix].smart_alerts_enabled
 
   action_group {
     ids = [azurerm_monitor_action_group.service-support-action.id]
@@ -109,11 +109,11 @@ resource "azurerm_monitor_smart_detector_alert_rule" "memory-leak-detector" {
   scope_resource_ids  = [azurerm_application_insights.application-insights.id]
   frequency           = local.smart_alert.frequency_daily
   detector_type       = "MemoryLeakDetector"
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
-  enabled             = var.alerting[var.prefix].smart_alerts_enabled
+  enabled = var.alerting[var.prefix].smart_alerts_enabled
 
   action_group {
     ids = [azurerm_monitor_action_group.service-support-action.id]

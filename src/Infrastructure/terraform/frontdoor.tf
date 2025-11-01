@@ -2,7 +2,7 @@ resource "azurerm_cdn_frontdoor_profile" "frontdoor-web-profile" {
   name                = "${var.prefix}fwb-uks-web"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   sku_name            = "${var.azure_frontdoor_scale}_AzureFrontDoor"
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
@@ -71,7 +71,7 @@ resource "azurerm_cdn_frontdoor_origin" "frontdoor-frontend-origin" {
 resource "azurerm_cdn_frontdoor_endpoint" "frontdoor-api-endpoint" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
   name                     = "${var.prefix}fde-uks-api"
-  tags                     = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
@@ -80,7 +80,7 @@ resource "azurerm_cdn_frontdoor_endpoint" "frontdoor-api-endpoint" {
 resource "azurerm_cdn_frontdoor_endpoint" "frontdoor-admin-endpoint" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
   name                     = "${var.prefix}fde-uks-admin"
-  tags                     = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
@@ -89,7 +89,7 @@ resource "azurerm_cdn_frontdoor_endpoint" "frontdoor-admin-endpoint" {
 resource "azurerm_cdn_frontdoor_endpoint" "frontdoor-frontend-endpoint" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
   name                     = "${var.prefix}fde-uks-frontend"
-  tags                     = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
@@ -202,7 +202,7 @@ resource "azurerm_cdn_frontdoor_rule_set" "security_headers" {
 
 resource "azurerm_cdn_frontdoor_rule" "security_headers_rule" {
   depends_on = [
-    azurerm_cdn_frontdoor_origin_group.frontdoor-origin-group, 
+    azurerm_cdn_frontdoor_origin_group.frontdoor-origin-group,
     azurerm_cdn_frontdoor_origin.frontdoor-api-origin,
     azurerm_cdn_frontdoor_origin.frontdoor-admin-origin,
     azurerm_cdn_frontdoor_origin.frontdoor-frontend-origin
@@ -235,7 +235,7 @@ resource "azurerm_cdn_frontdoor_rule_set" "security_redirects" {
 
 resource "azurerm_cdn_frontdoor_rule" "security_txt_rule" {
   depends_on = [
-    azurerm_cdn_frontdoor_origin_group.frontdoor-origin-group, 
+    azurerm_cdn_frontdoor_origin_group.frontdoor-origin-group,
     azurerm_cdn_frontdoor_origin.frontdoor-api-origin,
     azurerm_cdn_frontdoor_origin.frontdoor-admin-origin,
     azurerm_cdn_frontdoor_origin.frontdoor-frontend-origin
@@ -266,7 +266,7 @@ resource "azurerm_cdn_frontdoor_rule" "security_txt_rule" {
 
 resource "azurerm_cdn_frontdoor_rule" "thanks_txt_rule" {
   depends_on = [
-    azurerm_cdn_frontdoor_origin_group.frontdoor-origin-group, 
+    azurerm_cdn_frontdoor_origin_group.frontdoor-origin-group,
     azurerm_cdn_frontdoor_origin.frontdoor-api-origin,
     azurerm_cdn_frontdoor_origin.frontdoor-admin-origin,
     azurerm_cdn_frontdoor_origin.frontdoor-frontend-origin
@@ -352,16 +352,16 @@ resource "azurerm_cdn_frontdoor_custom_domain_association" "frontend-app-custom-
 resource "azurerm_cdn_frontdoor_firewall_policy" "web_firewall_policy" {
   name                = "webFirewallPolicy"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
-  mode                = "Prevention"
-  sku_name            = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.sku_name
-  redirect_url        = coalesce(
-      var.frontend_custom_domain != "" ? "https://${var.frontend_custom_domain}/en/service-unavailable" : null,
-      var.admin_custom_domain    != "" ? "https://${var.admin_custom_domain}/en/service-unavailable"    : null,
-      var.api_custom_domain      != "" ? "https://${var.api_custom_domain}/en/service-unavailable"      : null,
+  mode     = "Prevention"
+  sku_name = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.sku_name
+  redirect_url = coalesce(
+    var.frontend_custom_domain != "" ? "https://${var.frontend_custom_domain}/en/service-unavailable" : null,
+    var.admin_custom_domain != "" ? "https://${var.admin_custom_domain}/en/service-unavailable" : null,
+    var.api_custom_domain != "" ? "https://${var.api_custom_domain}/en/service-unavailable" : null,
     null
   )
 

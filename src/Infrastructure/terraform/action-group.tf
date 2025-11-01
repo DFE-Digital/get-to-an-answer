@@ -2,7 +2,7 @@ resource "azurerm_monitor_action_group" "service-support-action" {
   name                = "Service support"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   short_name          = "Support"
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
