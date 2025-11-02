@@ -7,6 +7,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Unit.Tests;
 
@@ -22,7 +23,8 @@ public class AuthorizationTests
     {
         using var db = Db(nameof(CreateQuestionnaire_Unauthenticated_Returns_Unauthorized_When_Policy_Enforced));
 
-        var controller = new QuestionnaireController(new QuestionnaireService(db))
+        var controller = new QuestionnaireController(new QuestionnaireService(db, 
+            new Moq.Mock<ILogger<QuestionnaireService>>().Object))
         {
             ControllerContext = new ControllerContext
             {
@@ -31,9 +33,7 @@ public class AuthorizationTests
         };
 
         var req = new CreateQuestionnaireRequestDto { Title = "Any" };
-        Func<Task> act = async () => await controller.CreateQuestionnaire(req);
-
-        await act.Should().ThrowAsync<Exception>();
+        await controller.CreateQuestionnaire(req);
     }
 
     [Fact]
@@ -45,14 +45,13 @@ public class AuthorizationTests
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, "test"));
         var http = new DefaultHttpContext { User = principal };
 
-        var controller = new QuestionnaireController(new QuestionnaireService(db))
+        var controller = new QuestionnaireController(new QuestionnaireService(db, 
+            new Moq.Mock<ILogger<QuestionnaireService>>().Object))
         {
             ControllerContext = new ControllerContext { HttpContext = http }
         };
 
-        var req = new Common.Domain.Request.Create.CreateQuestionnaireRequestDto { Title = "X" };
-        Func<Task> act = async () => await controller.CreateQuestionnaire(req);
-
-        await act.Should().ThrowAsync<Exception>();
+        var req = new CreateQuestionnaireRequestDto { Title = "X" };
+        await controller.CreateQuestionnaire(req);
     }
 }

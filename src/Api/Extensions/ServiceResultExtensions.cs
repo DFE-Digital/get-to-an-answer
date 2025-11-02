@@ -18,6 +18,7 @@ public static class ServiceResultExtensions
             ServiceResultType.NotFound => new NotFoundResult(),
             ServiceResultType.Forbidden => new ForbidResult(),
             ServiceResultType.Conflict => new ConflictResult(),
+            ServiceResultType.Problem => new ObjectResult(result.Value) { StatusCode = 500 },
             _ => throw new ArgumentOutOfRangeException()
         };
     }
