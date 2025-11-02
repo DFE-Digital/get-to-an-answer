@@ -1,5 +1,4 @@
 import * as jwt from 'jsonwebtoken';
-
 export class SimpleDate extends Date {
     constructor() {
         super();
