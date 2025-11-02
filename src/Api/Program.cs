@@ -73,6 +73,8 @@ builder.Services.AddOpenApi(options =>
 
 var app = builder.Build();
 
+app.UseLogEnrichment();
+
 var appIsLocalEnvironment = app.Environment.IsEnvironment(localEnvironmentName);
 
 // Configure the HTTP request pipeline.

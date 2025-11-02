@@ -23,6 +23,8 @@ builder.AddLogging();
 
 var app = builder.Build();
 
+app.UseLogEnrichment();
+
 // Configure the HTTP request pipeline.
 if (!builderIsLocalEnvironment)
 {

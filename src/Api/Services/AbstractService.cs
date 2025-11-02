@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Api.Services;
 
 public abstract class AbstractService
@@ -11,6 +13,34 @@ public abstract class AbstractService
     protected ServiceResult NotFound(object? value = null) => new (ServiceResultType.NotFound, value);
     protected ServiceResult Forbidden(object? value = null) => new (ServiceResultType.Forbidden, value);
     protected ServiceResult Conflict(object? value = null) => new (ServiceResultType.Conflict, value);
+    protected ServiceResult Problem(object? value = null) => new (ServiceResultType.Problem, value);
+    
+    // Build RFC7807 ProblemDetails-shaped object with ASP.NET Core's trace id extension
+    protected static object ProblemTrace(string detail, int status, string? type = null, string? title = null, string? instance = null)
+        => new
+        {
+            type = type ?? "about:blank",
+            title = title ?? (status == 400 ? "Bad Request" :
+                status == 403 ? "Forbidden" :
+                status == 404 ? "Not Found" :
+                status == 500 ? "Internal Server Error" : "Error"),
+            status,
+            detail,
+            instance,
+            traceId = Activity.Current?.TraceId.ToString() ?? System.Diagnostics.ActivityTraceId.CreateRandom().ToString()
+        };
+
+    // Build ValidationProblemDetails-shaped payload
+    protected static object ValidationProblemTrace(IDictionary<string, string[]> errors, string? instance = null)
+        => new
+        {
+            type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+            title = "One or more validation errors occurred.",
+            status = 400,
+            errors,
+            instance,
+            traceId = Activity.Current?.TraceId.ToString() ?? System.Diagnostics.ActivityTraceId.CreateRandom().ToString()
+        };
 }
 
 public enum ServiceResultType
@@ -23,7 +53,8 @@ public enum ServiceResultType
     BadRequest = 5,
     NotFound = 6,
     Forbidden = 7,
-    Conflict = 8
+    Conflict = 8,
+    Problem = 9
 }
 
 public sealed class ServiceResult(ServiceResultType resultType, object? value)
