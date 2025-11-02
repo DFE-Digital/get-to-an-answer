@@ -103,7 +103,7 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
   }
 
   app_settings = {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
     ApplicationInsights__ConnectionString = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.application-insights-connection-string.versionless_id})"
   }
 
@@ -133,8 +133,8 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
   }
 
   app_settings = {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
-    AppSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
+    AppSettings__BaseUrl                  = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
     ApplicationInsights__ConnectionString = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.application-insights-connection-string.versionless_id})"
   }
 
@@ -164,8 +164,8 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
   }
 
   app_settings = {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
-    AppSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
+    AppSettings__BaseUrl                  = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
     ApplicationInsights__ConnectionString = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.application-insights-connection-string.versionless_id})"
   }
 
