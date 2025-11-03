@@ -144,10 +144,10 @@ public static class LoggingConfigurationExtensions
             var activity = Activity.Current;
             var user = context.User;
 
-            string? oid = user.FindFirstValue("oid");
-            string? sub = user.FindFirstValue("sub");
-            string? tid = user.FindFirstValue("tid");
-            string? appid = user.FindFirstValue("appid"); // for app roles / client creds
+            var oid = user.FindFirstValue("oid");
+            var sub = user.FindFirstValue("sub");
+            var tid = user.FindFirstValue("tid");
+            var appid = user.FindFirstValue("appid"); // for app roles / client creds
 
             using (context.RequestServices.GetRequiredService<ILoggerFactory>()
                        .CreateLogger("LogEnrichment")
