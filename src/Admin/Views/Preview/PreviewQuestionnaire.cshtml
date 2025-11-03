@@ -59,9 +59,9 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    @if (Model.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
+    @if (Model.Destination is { Type: DestinationType.Question, Question: not null })
     {
-      <form action="/admin/questionnaires/@Model.Destination.Question.QuestionnaireId/Next/Preview" accept-charset="UTF-8" method="post">
+      <form action="/admin/questionnaires/@Model.Questionnaire?.Id/next/preview" accept-charset="UTF-8" method="post">
         <input type="hidden" name="CurrentQuestionId" value="@Model.Destination.Question.Id" autocomplete="off">
         <input type="hidden" name="CurrentQuestionOrder" value="@Model.Destination.Question.Order" autocomplete="off">
         <div class="govuk-form-group">

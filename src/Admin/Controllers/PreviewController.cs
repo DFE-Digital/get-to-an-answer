@@ -33,7 +33,7 @@ public class PreviewController(ILogger<HomeController> logger, IApiClient apiCli
         });
     }
     
-    [HttpPost("admin/questionnaires/{questionnaireId}/Next/Preview")]
+    [HttpPost("admin/questionnaires/{questionnaireId}/next/preview")]
     public async Task<IActionResult> GetNextStatePage(Guid questionnaireId, GetNextStateRequest request, 
         [FromForm(Name = "Scores")] Dictionary<Guid, float> scores)
     {
