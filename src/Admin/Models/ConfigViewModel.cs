@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
 namespace Admin.Models;
 
-public class ConfigViewModel
+public class ConfigViewModel : PageModel
 {
     public enum BannerPhase
     {

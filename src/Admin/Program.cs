@@ -18,6 +18,8 @@ if (builderIsLocalEnvironment)
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
 
 builder.AddLogging();
 
@@ -53,10 +55,12 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+app.MapRazorPages();
+
+// app.MapControllerRoute(
+//         name: "default",
+//         pattern: "{controller=Home}/{action=Index}/{id?}")
+//     .WithStaticAssets();
 
 
 app.Run();
