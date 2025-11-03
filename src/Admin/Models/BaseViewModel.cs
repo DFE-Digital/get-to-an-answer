@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Admin.Models;
 
-public class ConfigViewModel : PageModel
+public class BaseViewModel : PageModel
 {
     public enum BannerPhase
     {
@@ -11,6 +11,7 @@ public class ConfigViewModel : PageModel
         Live
     }
     
+    //TODO: Potentially move this to config or service if  not needed across all pages
     public static string ContentType { get; } = "configuration";
     
     public string ServiceName { get; set; } = "GetToAnAnswer";
