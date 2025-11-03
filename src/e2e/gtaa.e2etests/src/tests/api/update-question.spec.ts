@@ -157,7 +157,7 @@ test.describe('PUT Update question api request', () => {
         );
 
         expect(updatedQuestionPostResponse.ok()).toBeFalsy();
-        expect(updatedQuestionPostResponse.status()).toBe(400);
+        expect(updatedQuestionPostResponse.status()).toBe(404);
     });
 
     test('Validate PUT update question with missing content', async ({request}) => {

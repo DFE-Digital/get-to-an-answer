@@ -68,7 +68,7 @@ test.describe('GET all questions api tests', () => {
 
         // --- HTTP-level checks ---
         expect(response.questionGetResponse.ok()).toBeFalsy();
-        expect(response.questionGetResponse.status()).toBe(400);
+        expect(response.questionGetResponse.status()).toBe(404);
     });
 
     test('Validate GET list questions where questions belongs to this questionnaire only', async ({request}) => {
@@ -194,7 +194,7 @@ test.describe('GET all questions api tests', () => {
 
         // --- HTTP-level checks ---
         expect(response.questionGetResponse.ok()).toBeFalsy();
-        expect(response.questionGetResponse.status()).toBe(400);
+        expect(response.questionGetResponse.status()).toBe(404);
     });
     
     test('Validate GET questions for a questionnaire that has no questions returns an empty list', async ({ request }) => {

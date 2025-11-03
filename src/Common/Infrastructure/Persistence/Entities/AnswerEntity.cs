@@ -29,6 +29,12 @@ public class AnswerEntity
     
     public Guid? DestinationQuestionId { get; set; }
     
+    public Guid? DestinationContentId { get; set; }
+    
+    [Required]
+    [MaxLength(500)]
+    public string CreatedBy { get; set; }
+    
     public DateTime CreatedAt { get; set; }
     
     public DateTime UpdatedAt { get; set; }

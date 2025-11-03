@@ -35,7 +35,7 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.CreateQuestionnaire(email, request)).ToActionResult();
     }
     
-    [HttpGet("questionnaires/{id}")]
+    [HttpGet("questionnaires/{id:guid}")]
     public IActionResult GetQuestionnaire(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -51,7 +51,7 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return questionnaireService.GetQuestionnaires(email).ToActionResult();
     }
 
-    [HttpPut("questionnaires/{id}")]
+    [HttpPut("questionnaires/{id:guid}")]
     public async Task<IActionResult> UpdateQuestionnaire(Guid id, UpdateQuestionnaireRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -59,7 +59,7 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.UpdateQuestionnaire(email, id, request)).ToActionResult();
     }
 
-    [HttpPut("questionnaires/{id}/publish")]
+    [HttpPut("questionnaires/{id:guid}/publish")]
     public async Task<IActionResult> PublishQuestionnaire(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -67,7 +67,7 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.PublishQuestionnaire(email, id)).ToActionResult();
     }
 
-    [HttpDelete("questionnaires/{id}/unpublish")]
+    [HttpDelete("questionnaires/{id:guid}/unpublish")]
     public async Task<IActionResult> UnpublishQuestionnaire(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -75,7 +75,7 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.UnpublishQuestionnaire(email, id)).ToActionResult();
     }
 
-    [HttpDelete("questionnaires/{id}")]
+    [HttpDelete("questionnaires/{id:guid}")]
     public async Task<IActionResult> DeleteQuestionnaire(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -83,7 +83,7 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.DeleteQuestionnaire(email, id)).ToActionResult();
     }
     
-    [HttpPut("questionnaires/{id}/contributors/self")]
+    [HttpPut("questionnaires/{id:guid}/contributors/self")]
     public async Task<IActionResult> AddSelfToQuestionnaireContributors(Guid id)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -91,7 +91,7 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.AddSelfToQuestionnaireContributors(email, id)).ToActionResult();
     }
 
-    [HttpPost("questionnaires/{id}/clones")]
+    [HttpPost("questionnaires/{id:guid}/clones")]
     public async Task<IActionResult> CloneQuestionnaire(Guid id, CloneQuestionnaireRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -99,7 +99,7 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.CloneQuestionnaire(email, id, request)).ToActionResult();
     }
     
-    [HttpGet("questionnaires/{questionnaireId}/contributors")]
+    [HttpGet("questionnaires/{questionnaireId:guid}/contributors")]
     public async Task<IActionResult> GetContributors(Guid questionnaireId)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -107,7 +107,7 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.GetContributors(email, questionnaireId)).ToActionResult();
     }
 
-    [HttpPut("questionnaires/{id}/contributors")]
+    [HttpPut("questionnaires/{id:guid}/contributors")]
     public async Task<IActionResult> AddContributor(Guid id, AddContributorRequestDto request)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
@@ -115,7 +115,7 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.AddContributor(email, id, request)).ToActionResult();
     }
 
-    [HttpDelete("questionnaires/{id}/contributors/{email}")]
+    [HttpDelete("questionnaires/{id:guid}/contributors/{email}")]
     public async Task<IActionResult> RemoveContributor(Guid id, string email)
     {
         var currentUserEmail = User.FindFirstValue(ClaimTypes.Email)!;

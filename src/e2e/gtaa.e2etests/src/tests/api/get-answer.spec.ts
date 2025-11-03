@@ -129,7 +129,7 @@ test.describe('GET answers for a question', () => {
 
         // --- HTTP-level checks ---
         expect(response.answerGetResponse.ok()).toBeFalsy();
-        expect(response.answerGetResponse.status()).toBe(400);
+        expect(response.answerGetResponse.status()).toBe(404);
     });
 
     test('Validate GET answers returns multiple answers with correct schema and content', async ({request}) => {

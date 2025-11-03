@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Common.Domain;
+using Common.Domain.Admin;
 using Common.Domain.Frontend;
 using Common.Domain.Request.Add;
 using Common.Domain.Request.Create;
@@ -49,8 +50,15 @@ public interface IApiClient
     // === For Questionnaire Versions ===
     
     Task<List<QuestionnaireVersionDto>> GetQuestionnaireVersionsAsync(Guid questionnaireId);
-    Task<QuestionnaireVersionDto?> GetQuestionnaireVersionAsync(Guid questionnaireId, int versionNumber);
-    Task<QuestionnaireVersionDto?> GetLatestQuestionnaireVersion(Guid questionnaireId);
+    Task<QuestionnaireBranchingMap?> GetBranchingMap(Guid questionnaireId);
+    
+    // === For Content ===
+    
+    Task<ContentDto?> CreateContentAsync(CreateContentRequestDto request);
+    Task<string?> UpdateContentAsync(Guid questionnaireId, UpdateContentRequestDto request);
+    Task<string?> DeleteContentAsync(Guid contentId);
+    Task<ContentDto?> GetContentAsync(Guid contentId);
+    Task<List<ContentDto>> GetContentsAsync(Guid questionnaireId);
     
     // === For Service Users ===
     
@@ -306,12 +314,52 @@ public class ApiClient : IApiClient
         return await response.Content.ReadFromJsonAsync<QuestionnaireVersionDto?>();
     }
 
-    public async Task<QuestionnaireVersionDto?> GetLatestQuestionnaireVersion(Guid questionnaireId)
+    public async Task<QuestionnaireBranchingMap?> GetBranchingMap(Guid questionnaireId)
     {
-        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireId}/versions/current");
+        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireId}/branching-map");
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<QuestionnaireVersionDto?>();
+        return await response.Content.ReadFromJsonAsync<QuestionnaireBranchingMap?>();
+    }
+
+    public async Task<ContentDto?> CreateContentAsync(CreateContentRequestDto request)
+    {
+        var response = await _httpClient.PostAsJsonAsync($"contents", request);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<ContentDto?>();
+    }
+
+    public async Task<string?> UpdateContentAsync(Guid id, UpdateContentRequestDto request)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"contents/{id}", request);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string?>();
+    }
+
+    public async Task<string?> DeleteContentAsync(Guid contentId)
+    {
+        var response = await _httpClient.DeleteAsync($"contents/{contentId}");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<string?>();
+    }
+
+    public async Task<ContentDto?> GetContentAsync(Guid contentId)
+    {
+        var response = await _httpClient.GetAsync($"contents/{contentId}");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<ContentDto?>();
+    }
+
+    public async Task<List<ContentDto>> GetContentsAsync(Guid questionnaireId)
+    {
+        var response = await _httpClient.GetAsync($"questionnaires/{questionnaireId}/contents");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<List<ContentDto>>() ?? new ();
     }
 
     public async Task<QuestionDto?> GetInitialQuestion(Guid questionnaireId)
@@ -332,7 +380,7 @@ public class ApiClient : IApiClient
 
     public async Task<string?> AddSelfToQuestionnaireContributorAsync(Guid questionnaireId)
     {
-        var response = await _httpClient.PutAsync($"questionnaires/{questionnaireId}/contributors", null);
+        var response = await _httpClient.PutAsync($"questionnaires/{questionnaireId}/contributors/self", null);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<string>();

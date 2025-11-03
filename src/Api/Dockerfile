@@ -8,17 +8,14 @@ ARG BUILD_CONFIGURATION=Release
 # working directory in the container
 WORKDIR /src
 
-# copy to /src/Api and /src/Common
-COPY ["./src/Api/Api.csproj", "Api/"]
-COPY ["./src/Common/Common.csproj", "Common/"]
-    
-# Restore dependencies
-RUN dotnet restore "Api/Api.csproj"
-
 # Copy the rest of the source code
 COPY *.sln .
 COPY Directory.Packages.props .
-COPY ./src ./
+COPY ./src/Api ./Api
+COPY ./src/Common ./Common
+    
+# Restore dependencies
+RUN dotnet restore "Api/Api.csproj"
 
 WORKDIR "/src/Api"
 RUN dotnet build "./Api.csproj" -c $BUILD_CONFIGURATION  -o /app/build

@@ -22,6 +22,10 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       TF_VAR_sql_admin_username: ${{ secrets.SQL_ADMIN_USERNAME }}
       TF_VAR_sql_admin_password: ${{ secrets.SQL_ADMIN_PASSWORD }}
+      TF_VAR_api_custom_domain: ${{ vars.API_CUSTOM_DOMAIN }}
+      TF_VAR_admin_custom_domain: ${{ vars.ADMIN_CUSTOM_DOMAIN }}
+      TF_VAR_frontend_custom_domain: ${{ vars.FRONTEND_CUSTOM_DOMAIN }}
+      TF_VAR_support_alert_email: ${{ secrets.SUPPORT_ALERT_EMAIL }}
       ENVIRONMENT: ${{ github.event.inputs.environment }}
     environment: ${{ github.event.inputs.environment }}
     defaults:

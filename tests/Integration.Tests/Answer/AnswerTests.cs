@@ -290,10 +290,10 @@ public class AnswerTests(ApiFixture factory) :
     [Theory]
     [InlineData("not-a-guid")]
     [InlineData("123")]
-    public async Task Get_By_Id_Invalid_Id_Returns_400(string invalidId)
+    public async Task Get_By_Id_Invalid_Id_Returns_404(string invalidId)
     {
         using var res = await GetById(invalidId);
-        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -454,10 +454,10 @@ public class AnswerTests(ApiFixture factory) :
     [Theory]
     [InlineData("not-a-guid")]
     [InlineData("123")]
-    public async Task Update_Invalid_Id_400(string invalidId)
+    public async Task Update_Invalid_Id_404(string invalidId)
     {
         using var res = await UpdateById(invalidId, new { content = "X" });
-        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]

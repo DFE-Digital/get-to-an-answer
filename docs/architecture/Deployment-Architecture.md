@@ -42,6 +42,5 @@ E-->F["Route traffic to new version"]
 ## Operator guidance
 
 - Pick the correct environment in the Deploy workflow.
-- Clear caches only when necessary (e.g., schema/config changes).
 - Monitor workflow logs and application health endpoints after deployment.
 

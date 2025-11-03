@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Api.Services;
 using Common.Infrastructure.Persistence;
 using Common.Local;
+using Common.Logging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -29,9 +30,12 @@ builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
 builder.Services.AddScoped<IQuestionnaireRunnerService, QuestionnaireRunnerService>();
 builder.Services.AddScoped<IQuestionnaireVersionService, QuestionnaireVersionService>();
+builder.Services.AddScoped<IContentService, ContentService>();
 
 builder.Services.AddControllers()
     .AddDataAnnotationsLocalization();
+
+builder.AddLogging();
 
 builder.Services.ConfigureHttpJsonOptions(o =>
 {
@@ -68,6 +72,8 @@ builder.Services.AddOpenApi(options =>
 });
 
 var app = builder.Build();
+
+app.UseLogEnrichment();
 
 var appIsLocalEnvironment = app.Environment.IsEnvironment(localEnvironmentName);
 

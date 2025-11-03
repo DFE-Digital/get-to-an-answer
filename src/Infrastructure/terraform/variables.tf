@@ -48,3 +48,83 @@ variable "sql_admin_password" {
   sensitive   = true
   default     = null
 }
+
+variable "api_custom_domain" {
+  type        = string
+  description = "The public subdomain for the api service"
+}
+
+variable "admin_custom_domain" {
+  type        = string
+  description = "The public subdomain for the admin service"
+}
+
+variable "frontend_custom_domain" {
+  type        = string
+  description = "The public subdomain for the frontend service"
+}
+
+variable "azure_frontdoor_scale" {
+  description = "Azure Front Door Scale"
+  type        = string
+  default     = "Standard"
+}
+
+variable "support_alert_email" {
+  description = "Alert support email or group"
+  type        = string
+}
+
+variable "alerting" {
+  description = "Alerting configuration per environment"
+  type = map(object({
+    name                 = string
+    alerts_enabled       = bool
+    email_alerts_enabled = bool
+    smart_alerts_enabled = bool
+    thresholds = object({
+      availability = number
+      cpu          = number
+      memory       = number
+      error        = number
+    })
+  }))
+  default = {
+    s263d01 = {
+      name                 = "Test"
+      alerts_enabled       = false
+      email_alerts_enabled = false
+      smart_alerts_enabled = false
+      thresholds = {
+        availability = 90
+        cpu          = 95
+        memory       = 95
+        error        = 5
+      }
+    }
+    s263t01 = {
+      name                 = "Staging"
+      alerts_enabled       = true
+      email_alerts_enabled = false
+      smart_alerts_enabled = true
+      thresholds = {
+        availability = 99.9
+        cpu          = 85
+        memory       = 85
+        error        = 1
+      }
+    }
+    s263p01 = {
+      name                 = "Production"
+      alerts_enabled       = true
+      email_alerts_enabled = true
+      smart_alerts_enabled = true
+      thresholds = {
+        availability = 99.9
+        cpu          = 85
+        memory       = 85
+        error        = 1
+      }
+    }
+  }
+}

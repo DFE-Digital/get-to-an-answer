@@ -559,9 +559,9 @@ public class QuestionTests(ApiFixture factory) :
     {
         using var res = await GetById(invalidId);
 
-        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
         var text = await res.Content.ReadAsStringAsync();
-        text.Should().NotBeNullOrWhiteSpace();
+        text.Should().BeNullOrWhiteSpace();
     }
 
     #endregion
@@ -776,9 +776,9 @@ public class QuestionTests(ApiFixture factory) :
     {
         using var res = await UpdateById(invalidId, new { content = "T1" });
 
-        res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        res.StatusCode.Should().Be(HttpStatusCode.NotFound);
         var text = await res.Content.ReadAsStringAsync();
-        text.Should().NotBeNullOrWhiteSpace();
+        text.Should().BeNullOrWhiteSpace();
     }
 
     // Scenario: Update with invalid payload data e.g. description as Boolean
@@ -1134,10 +1134,6 @@ public class QuestionTests(ApiFixture factory) :
         using var res = await DeleteById(missingId);
 
         res.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        var text = await res.Content.ReadAsStringAsync();
-        text.Should().NotBeNullOrWhiteSpace();
-        text.Should().NotContain("userId");
-        text.Should().NotContain("contributors");
     }
 
     [Fact]

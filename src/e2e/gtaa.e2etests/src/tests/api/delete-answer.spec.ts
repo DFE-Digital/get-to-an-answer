@@ -124,7 +124,7 @@ test.describe('DELETE Answer API request', () => {
             invalidAnswerId
         );
 
-        expect(deleteAnswerResponse.status()).toBe(400);
+        expect(deleteAnswerResponse.status()).toBe(404);
 
         // And error message to display
         if (deleteAnswerBody) {

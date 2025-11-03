@@ -2,7 +2,9 @@ using Api.Services;
 using Common.Domain;
 using Common.Domain.Request.Create;
 using Common.Enum;
+using Common.Infrastructure.Persistence;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Unit.Tests.Util;
 
 namespace Unit.Tests;
@@ -15,9 +17,9 @@ public class BranchingHealthTests
     public async Task Questionnaire_Has_Cyclic_Branching_Health()
     {
         await using var db = TestUtils.CreateInMemoryDb(nameof(Questionnaire_Has_Cyclic_Branching_Health));
-        var questionnaireService = new QuestionnaireService(db);
-        var questionService = new QuestionService(db);
-        var answerService = new AnswerService(db);
+        var questionnaireService = CreateQuestionnaireService(db);
+        var questionService = CreateQuestionService(db);
+        var answerService = CreateAnswerService(db);
         
         var questionnaire = (await questionnaireService.CreateQuestionnaire(UserEmail, new CreateQuestionnaireRequestDto
         {
@@ -69,10 +71,10 @@ public class BranchingHealthTests
     [Fact]
     public async Task Questionnaire_Has_Broken_Branching_Health()
     {
-        await using var db = TestUtils.CreateInMemoryDb(nameof(Questionnaire_Has_Cyclic_Branching_Health));
-        var questionnaireService = new QuestionnaireService(db);
-        var questionService = new QuestionService(db);
-        var answerService = new AnswerService(db);
+        await using var db = TestUtils.CreateInMemoryDb(nameof(Questionnaire_Has_Broken_Branching_Health));
+        var questionnaireService = CreateQuestionnaireService(db);
+        var questionService = CreateQuestionService(db);
+        var answerService = CreateAnswerService(db);
         
         var questionnaire = (await questionnaireService.CreateQuestionnaire(UserEmail, new CreateQuestionnaireRequestDto
         {
@@ -99,21 +101,21 @@ public class BranchingHealthTests
         
         question2.Should().NotBeNull();
         
-        var question1Answer = (await answerService.CreateAnswer(UserEmail, new CreateAnswerRequestDto
+        await answerService.CreateAnswer(UserEmail, new CreateAnswerRequestDto
         {
             QuestionnaireId = questionnaire.Id,
             QuestionId = question1.Id,
             Content = "Test",
             DestinationType = DestinationType.Question,
             DestinationQuestionId = question2.Id,
-        })).Value as AnswerDto;
+        });
         
-        var question2Answer = (await answerService.CreateAnswer(UserEmail, new CreateAnswerRequestDto
+        await answerService.CreateAnswer(UserEmail, new CreateAnswerRequestDto
         {
             QuestionnaireId = questionnaire.Id,
             QuestionId = question2.Id,
             Content = "Test",
-        })).Value as AnswerDto;
+        });
 
         var result = QuestionnaireService.IsBranchingHealthy(db.Questionnaires.First());
         result.Should().Be(BranchingHealthType.Broken);
@@ -123,9 +125,9 @@ public class BranchingHealthTests
     public async Task Questionnaire_Has_Ok_Branching_Health()
     {
         await using var db = TestUtils.CreateInMemoryDb(nameof(Questionnaire_Has_Cyclic_Branching_Health));
-        var questionnaireService = new QuestionnaireService(db);
-        var questionService = new QuestionService(db);
-        var answerService = new AnswerService(db);
+        var questionnaireService = CreateQuestionnaireService(db);
+        var questionService = CreateQuestionService(db);
+        var answerService = CreateAnswerService(db);
         
         var questionnaire = (await questionnaireService.CreateQuestionnaire(UserEmail, new CreateQuestionnaireRequestDto
         {
@@ -172,5 +174,23 @@ public class BranchingHealthTests
 
         var result = QuestionnaireService.IsBranchingHealthy(db.Questionnaires.First());
         result.Should().Be(BranchingHealthType.Ok);
+    }
+
+    private AnswerService CreateAnswerService(GetToAnAnswerDbContext db)
+    {
+        var logger = new Moq.Mock<ILogger<AnswerService>>().Object;
+        return new AnswerService(db, logger);
+    }
+
+    private QuestionService CreateQuestionService(GetToAnAnswerDbContext db)
+    {
+        var logger = new Moq.Mock<ILogger<QuestionService>>().Object;
+        return new QuestionService(db, logger);
+    }
+
+    private QuestionnaireService CreateQuestionnaireService(GetToAnAnswerDbContext db)
+    {
+        var logger = new Moq.Mock<ILogger<QuestionnaireService>>().Object;
+        return new QuestionnaireService(db, logger);
     }
 }
