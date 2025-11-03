@@ -14,7 +14,6 @@ namespace Common.Client;
 public interface IApiClient
 {
     // === For Questionnaires ===
-    
     Task<QuestionnaireDto?> GetQuestionnaireAsync(Guid questionnaireId);
     Task<QuestionnaireInfoDto?> GetLastPublishedQuestionnaireInfoAsync(string questionnaireSlug);
     Task<List<QuestionnaireDto>> GetQuestionnairesAsync();

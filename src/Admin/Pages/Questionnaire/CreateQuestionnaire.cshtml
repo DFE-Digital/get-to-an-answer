@@ -9,11 +9,8 @@
   ViewData["Title"] = "Edit the questionnaire";
   
   var hasErrors = Model != null && !ViewData.ModelState.IsValid;
-  string? ErrorFor(string key) => ViewData.ModelState.ContainsKey(key) && ViewData.ModelState[key]?.Errors.Count > 0
-    ? ViewData.ModelState[key]!.Errors[0].ErrorMessage
-    : null;
-
-  var hasTitleError = Model != null && ErrorFor(nameof(Model)) != null;
+  
+  var hasTitleError = Model?.ErrorFor(nameof(Model)) != null;
 }
 
 @section BeforeContent
@@ -29,10 +26,9 @@
     </h2>
     <div class="govuk-error-summary__body">
       <ul class="govuk-list govuk-error-summary__list">
-        @foreach (var kvp in ViewData.ModelState.Where(ms => ms.Value!.Errors.Count > 0))
+        @foreach (var (fieldName, value) in ViewData.ModelState.Where(ms => ms.Value!.Errors.Count > 0))
         {
-          var fieldName = kvp.Key;
-          var message = kvp.Value!.Errors[0].ErrorMessage;
+          var message = value!.Errors[0].ErrorMessage;
           // The href should link to the input id for accessibility
           <li><a href="#@fieldName">@message</a></li>
         }
@@ -55,7 +51,7 @@
         @if (hasTitleError)
         {
           <p class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> @ErrorFor(nameof(Model.CreateQuestionnaire.Title))
+            <span class="govuk-visually-hidden">Error:</span> @Model?.ErrorFor(nameof(Model.CreateQuestionnaire.Title))
           </p>
         }
 
