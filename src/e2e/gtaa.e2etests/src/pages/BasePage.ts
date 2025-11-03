@@ -65,7 +65,7 @@ export class BasePage {
     }
 
     // Validate URL contains a specific path
-    async validateURLContains(path: string) {
+    async validateUrlContains(path: string) {
         await expect(this.page).toHaveURL(new RegExp(path));
     }
     

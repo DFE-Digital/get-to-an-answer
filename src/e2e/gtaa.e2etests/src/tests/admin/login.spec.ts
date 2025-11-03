@@ -1,17 +1,21 @@
 import {test} from "@playwright/test";
 import {SignInPage} from "../../pages/admin/SignInPage";
 
-test.describe('Care Terms Explained Page Tests', () => {
+test.describe('Get to an answer Sign in page', () => {
     let signInPage: SignInPage;
     
     test.beforeEach(async ({page}) => {
         signInPage = new SignInPage(page);
+        
         await signInPage.navigateTo('/');
         await signInPage.verifyOnSignInPage();
     });
 
     test('User can sign in with valid credentials', async ({page}) => {
-        //await signInPage.signIn('testuser', 'P@ssword123'); //TBC whether it's dynamic or pool of users
-        await signInPage.validateURLContains('/dashboard');
+        const username ='test'; //to be created dynamically
+        const password ='test'; //to be created dynamically
+        
+        await signInPage.signIn(username, password); 
+        await signInPage.validateUrlContains('admin/questionnaires');
     });
 });
