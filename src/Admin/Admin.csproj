@@ -16,6 +16,7 @@
 
     <ItemGroup>
       <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
+      <PackageReference Include="Microsoft.Identity.Web.UI" />
       <PackageReference Include="OpenTelemetry.Api" />
       <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
       <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />

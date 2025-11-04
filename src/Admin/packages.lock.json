@@ -15,6 +15,15 @@
           "OpenTelemetry.Instrumentation.Http": "1.12.0"
         }
       },
+      "Microsoft.Identity.Web.UI": {
+        "type": "Direct",
+        "requested": "[3.14.1, )",
+        "resolved": "3.14.1",
+        "contentHash": "cYOb9PYTyxOJKSeRO5Vk7tCD76011UTDlgNhy4fhi414Q7g1oa6UfJg2ZoDQvi3D/hxBRPSbLXWXuUI9cBc7gA==",
+        "dependencies": {
+          "Microsoft.Identity.Web": "3.14.1"
+        }
+      },
       "OpenTelemetry.Api": {
         "type": "Direct",
         "requested": "[1.13.1, )",
