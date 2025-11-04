@@ -46,11 +46,7 @@ var app = builder.Build();
 app.UseLogEnrichment();
 
 // Configure the HTTP request pipeline.
-if (builderIsLocalEnvironment)
-{
-    app.UseMockBearerIfMissing();
-}
-else
+if (!builderIsLocalEnvironment)
 {
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
@@ -75,8 +71,13 @@ app.MapStaticAssets();
 
 app.UseRouting();
 
-// app.UseAuthentication();
+app.UseAuthentication();
 app.UseAuthorization();
+
+if (builderIsLocalEnvironment)
+{
+    app.UseMockMvcDevEndpoints();
+}
 
 app.MapRazorPages();
 

@@ -93,20 +93,14 @@ internal sealed class MockAuthenticationHandler(
 internal sealed class MockBearerMiddleware(RequestDelegate next, IOptions<MockAzureAdOptions> options)
 {
     private const string HeaderName = "Authorization";
-    
-    private readonly string _mockToken = "Bearer " + MockJwtGenerator.Create(new Dictionary<string, object>
-    {
-        [ClaimTypes.Name] = options.Value.Name!,
-        [ClaimTypes.Email] = options.Value.Email!,
-        [ClaimTypes.Role] = options.Value.Roles.FirstOrDefault()!
-    }, TimeSpan.FromHours(1));
+    private const string MockToken = "Bearer mock-dev-token";
 
     public async Task Invoke(HttpContext context)
     {
         // If caller didn't pass any Authorization header, add a fake one to simulate bearer auth
         if (!context.Request.Headers.ContainsKey(HeaderName))
         {
-            context.Request.Headers[HeaderName] = _mockToken;
+            context.Request.Headers[HeaderName] = MockToken;
         }
         await next(context);
     }
@@ -124,7 +118,7 @@ public static class MockAzureAdExtensions
         {
             opts.Name = "Dev Admin";
             opts.Email = "dev.admin@example.test";
-            opts.Roles = new[] { "Admin" };
+            opts.Roles = ["Admin"];
         };
         
         services.Configure(configure);
