@@ -1,7 +1,8 @@
 import {Page} from '@playwright/test';
 import {SignInPage} from '../pages/admin/SignInPage';
 import {ViewQuestionnairePage} from '../pages/admin/ViewQuestionnairePage';
-import {NewQuestionnairePage} from '../pages/admin/NewQuestionnairePage';
+import {AddQuestionnairePage} from '../pages/admin/AddQuestionnairePage';
+import {EditQuestionnairePage} from "../pages/admin/EditQuestionnairePage";
 
 export async function doSignIn(page: Page, username: string, password: string): Promise<ViewQuestionnairePage> {
     const signInPage = new SignInPage(page);
@@ -15,12 +16,25 @@ export async function doSignIn(page: Page, username: string, password: string): 
     return viewQuestionnairePage;
 }
 
-export async function goToNewQuestionnairePage(page: Page): Promise<NewQuestionnairePage> {
+export async function goToNewQuestionnairePage(page: Page): Promise<AddQuestionnairePage> {
     const viewQuestionnairePage = new ViewQuestionnairePage(page);
-    const newQuestionnairePage = new NewQuestionnairePage(page);
+    const newQuestionnairePage = new AddQuestionnairePage(page);
 
     await viewQuestionnairePage.ClickCreateNewQuestionnaire();
     await newQuestionnairePage.verifyOnNewQuestionnairePage();
 
     return newQuestionnairePage;
+}
+
+export async function goToEditQuestionnairePage(page: Page): Promise<EditQuestionnairePage> {
+    const viewQuestionnairePage = new ViewQuestionnairePage(page);
+    const newQuestionnairePage = new AddQuestionnairePage(page);
+    const editQuestionnairePage = new EditQuestionnairePage(page);
+    
+    await viewQuestionnairePage.ClickCreateNewQuestionnaire();
+    await newQuestionnairePage.verifyOnNewQuestionnairePage();
+    await newQuestionnairePage.createNewQuestionnaire('Automation Questionnaire');
+    await editQuestionnairePage.validateUrlContains('/questionnaire/');
+
+    return editQuestionnairePage;
 }

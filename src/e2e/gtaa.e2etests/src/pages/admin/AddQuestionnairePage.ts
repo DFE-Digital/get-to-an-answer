@@ -1,7 +1,7 @@
 import { expect, Page } from '@playwright/test';
 import { BasePage } from '../BasePage';
 
-export class NewQuestionnairePage extends BasePage {
+export class AddQuestionnairePage extends BasePage {
     private mode: 'create' | 'edit' = 'create';
     
     // ===== Locators =====

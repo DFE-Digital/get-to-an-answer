@@ -1,18 +1,22 @@
 import {test} from "@playwright/test";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {doSignIn} from "../../helpers/admin-test-helper";
+import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
 
-test.describe('Get to an answer views questionnaire', () => {
+test.describe('Get to an answer create a new questionnaire', () => {
     let viewQuestionnairePage: ViewQuestionnairePage;
+    let viewQuestionPage: ViewQuestionPage;
 
     test.beforeEach(async ({page}) => {
         const username = 'test'; //to be created dynamically
         const password = 'test'; //to be created dynamically
 
+        // Create a new questionnaire with an api
         viewQuestionnairePage = await doSignIn(page, username, password);
+        // Click on questionnaire created by api or jump straight to view question page with url
     });
 
-    test('Verify questionnaires table on view page', async ({page}) => {
+    test('Verify question on view page table', async ({page}) => {
         await viewQuestionnairePage.verifyOnViewQuestionnairesPage();
 
         // Check if a questionnaire exists
