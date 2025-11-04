@@ -26,10 +26,6 @@ else
         .AddInMemoryTokenCaches();
 }
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
-
 var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
 var apiScopes = builder.Configuration.GetSection("ApiSettings:Scopes").Get<string[]>() ?? [];
 
@@ -38,8 +34,26 @@ builder.Services.AddTransient(sp =>
         sp.GetRequiredService<ITokenAcquisition>(),
         apiScopes));
 
-builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAddress = new Uri(apiBaseUrl); })
+// Register an HttpClient with a pre-configured base address
+builder.Services.AddHttpClient("ApiClient", client =>
+    {
+        client.BaseAddress = new Uri(apiBaseUrl);
+    })
     .AddHttpMessageHandler<BearerTokenHandler>();
+
+builder.Services.AddSingleton<IApiClient, ApiClient>(options =>
+{
+    var client = options.GetRequiredService<IHttpClientFactory>().CreateClient("ApiClient");
+    return new ApiClient(client);
+});
+
+
+// builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAddress = new Uri(apiBaseUrl); })
+//     .AddHttpMessageHandler<BearerTokenHandler>();
+
+// Add services to the container.
+builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI();
+builder.Services.AddRazorPages();
 
 builder.AddLogging();
 
@@ -59,7 +73,6 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
-app.MapStaticAssets();
 
 //TODO: do we need?
 // app.UseStaticFiles(new StaticFileOptions()
@@ -81,6 +94,7 @@ if (builderIsLocalEnvironment)
     app.UseMockMvcDevEndpoints();
 }
 
+app.MapStaticAssets();
 app.MapRazorPages();
 
 app.Run();
