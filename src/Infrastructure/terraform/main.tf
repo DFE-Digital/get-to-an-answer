@@ -80,98 +80,147 @@ resource "azurerm_container_registry" "gettoananswer-registry" {
   }
 }
 
-# Linux Web App - API
-resource "azurerm_linux_web_app" "gettoananswer-api" {
-  name                = "${var.prefix}app-uks-api"
-  location            = azurerm_resource_group.gettoananswer-rg.location
-  resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
-  virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
-
-  site_config {
-    application_stack {
-      docker_image_name        = var.api_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
-      docker_registry_username = azurerm_container_registry.gettoananswer-registry.admin_username
-      docker_registry_password = azurerm_container_registry.gettoananswer-registry.admin_password
-    }
-    # Enforce HTTPS only
-    minimum_tls_version = "1.2"
-  }
-
-  lifecycle {
-    ignore_changes = [tags, app_settings, sticky_settings]
-  }
-
-  app_settings = {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
-    ApplicationInsights__ConnectionString = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.application-insights-connection-string.versionless_id})"
-  }
-
-  https_only = true
-  depends_on = [azurerm_service_plan.gettoananswer-web-asp]
+# Container Apps Environment
+resource "azurerm_container_app_environment" "gettoananswer-cae" {
+  name                       = "${var.prefix}cae-uks-gtaa"
+  location                   = azurerm_resource_group.gettoananswer-rg.location
+  resource_group_name        = azurerm_resource_group.gettoananswer-rg.name
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.log-analytics-workspace.id
 }
 
-# Linux Web App - Admin
-resource "azurerm_linux_web_app" "gettoananswer-admin" {
-  name                = "${var.prefix}app-uks-admin"
-  location            = azurerm_resource_group.gettoananswer-rg.location
-  resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
-  virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
-
-  site_config {
-    application_stack {
-      docker_image_name        = var.admin_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
-      docker_registry_username = azurerm_container_registry.gettoananswer-registry.admin_username
-      docker_registry_password = azurerm_container_registry.gettoananswer-registry.admin_password
+# API Container App
+resource "azurerm_container_app" "gettoananswer-api" {
+  name                         = "${var.prefix}aca-uks-api"
+  container_app_environment_id = azurerm_container_app_environment.gettoananswer-cae.id
+  resource_group_name          = azurerm_resource_group.gettoananswer-rg.name
+  revision_mode                = "Single"
+  ingress {
+    external_enabled = true
+    target_port      = 8080
+    transport        = "auto"
+    traffic_weight {
+      percentage = 100
+      latest_revision = true
     }
-    minimum_tls_version = "1.2"
   }
-
-  lifecycle {
-    ignore_changes = [tags, app_settings, sticky_settings]
+  registry {
+    server               = azurerm_container_registry.gettoananswer-registry.login_server
+    username             = azurerm_container_registry.gettoananswer-registry.admin_username
+    password_secret_name = "acr-pwd"
   }
-
-  app_settings = {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
-    AppSettings__BaseUrl                  = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
-    ApplicationInsights__ConnectionString = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.application-insights-connection-string.versionless_id})"
+  secret {
+    name  = "acr-pwd"
+    value = azurerm_container_registry.gettoananswer-registry.admin_password
   }
-
-  https_only = true
-  depends_on = [azurerm_service_plan.gettoananswer-web-asp, azurerm_linux_web_app.gettoananswer-api]
+  template {
+    container {
+      name   = "api"
+      image  = "${azurerm_container_registry.gettoananswer-registry.login_server}/${var.api_image_name}"
+      cpu    = 0.5
+      memory = "1Gi"
+      env {
+        name  = "ASPNETCORE_URLS"
+        value = "http://0.0.0.0:8080"
+      }
+      env {
+        name  = "ApplicationInsights__ConnectionString"
+        value = azurerm_application_insights.application-insights.connection_string
+      }
+    }
+  }
+  depends_on = [azurerm_container_registry.gettoananswer-registry]
 }
 
-# Linux Web App - Frontend
-resource "azurerm_linux_web_app" "gettoananswer-frontend" {
-  name                = "${var.prefix}app-uks-frontend"
-  location            = azurerm_resource_group.gettoananswer-rg.location
-  resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
-  virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
-
-  site_config {
-    application_stack {
-      docker_image_name        = var.frontend_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
-      docker_registry_username = azurerm_container_registry.gettoananswer-registry.admin_username
-      docker_registry_password = azurerm_container_registry.gettoananswer-registry.admin_password
+# Admin Container App
+resource "azurerm_container_app" "gettoananswer-admin" {
+  name                         = "${var.prefix}aca-uks-admin"
+  container_app_environment_id = azurerm_container_app_environment.gettoananswer-cae.id
+  resource_group_name          = azurerm_resource_group.gettoananswer-rg.name
+  revision_mode                = "Single"
+  ingress {
+    external_enabled = true
+    target_port      = 8080
+    transport        = "auto"
+    traffic_weight {
+      percentage = 100
+      latest_revision = true
     }
-    minimum_tls_version = "1.2"
   }
-
-  lifecycle {
-    ignore_changes = [tags, app_settings, sticky_settings]
+  registry {
+    server               = azurerm_container_registry.gettoananswer-registry.login_server
+    username             = azurerm_container_registry.gettoananswer-registry.admin_username
+    password_secret_name = "acr-pwd"
   }
-
-  app_settings = {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
-    AppSettings__BaseUrl                  = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
-    ApplicationInsights__ConnectionString = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.application-insights-connection-string.versionless_id})"
+  secret {
+    name  = "acr-pwd"
+    value = azurerm_container_registry.gettoananswer-registry.admin_password
   }
+  template {
+    container {
+      name   = "admin"
+      image  = "${azurerm_container_registry.gettoananswer-registry.login_server}/${var.admin_image_name}"
+      cpu    = 0.5
+      memory = "1Gi"
+      env {
+        name  = "ASPNETCORE_URLS"
+        value = "http://0.0.0.0:8080"
+      }
+      env {
+        name  = "AppSettings__BaseUrl"
+        value = azurerm_container_app.gettoananswer-api.latest_revision_fqdn
+      }
+      env {
+        name  = "ApplicationInsights__ConnectionString"
+        value = azurerm_application_insights.application-insights.connection_string
+      }
+    }
+  }
+  depends_on = [azurerm_container_app.gettoananswer-api]
+}
 
-  https_only = true
-  depends_on = [azurerm_service_plan.gettoananswer-web-asp, azurerm_linux_web_app.gettoananswer-api]
+# Frontend Container App
+resource "azurerm_container_app" "gettoananswer-frontend" {
+  name                         = "${var.prefix}aca-uks-frontend"
+  container_app_environment_id = azurerm_container_app_environment.gettoananswer-cae.id
+  resource_group_name          = azurerm_resource_group.gettoananswer-rg.name
+  revision_mode                = "Single"
+  ingress {
+    external_enabled = true
+    target_port      = 8080
+    transport        = "auto"
+    traffic_weight {
+      percentage = 100
+      latest_revision = true
+    }
+  }
+  registry {
+    server               = azurerm_container_registry.gettoananswer-registry.login_server
+    username             = azurerm_container_registry.gettoananswer-registry.admin_username
+    password_secret_name = "acr-pwd"
+  }
+  secret {
+    name  = "acr-pwd"
+    value = azurerm_container_registry.gettoananswer-registry.admin_password
+  }
+  template {
+    container {
+      name   = "frontend"
+      image  = "${azurerm_container_registry.gettoananswer-registry.login_server}/${var.frontend_image_name}"
+      cpu    = 0.5
+      memory = "1Gi"
+      env {
+        name  = "ASPNETCORE_URLS"
+        value = "http://0.0.0.0:8080"
+      }
+      env {
+        name  = "AppSettings__BaseUrl"
+        value = azurerm_container_app.gettoananswer-api.latest_revision_fqdn
+      }
+      env {
+        name  = "ApplicationInsights__ConnectionString"
+        value = azurerm_application_insights.application-insights.connection_string
+      }
+    }
+  }
+  depends_on = [azurerm_container_app.gettoananswer-api]
 }
