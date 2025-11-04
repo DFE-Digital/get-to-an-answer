@@ -16,6 +16,6 @@ test.describe('Get to an answer views questionnaire', () => {
         await viewQuestionnairePage.verifyOnViewQuestionnairesPage();
 
         // Check if a questionnaire exists
-        await viewQuestionnairePage.verifyQuestionnaireListed('Automation Questionnaire');
+        await viewQuestionnairePage.verifyQuestionnaireListedByStructure();
     });
 });

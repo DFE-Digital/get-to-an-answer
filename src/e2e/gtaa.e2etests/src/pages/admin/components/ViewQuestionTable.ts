@@ -1,10 +1,10 @@
 import { expect, Locator, Page } from '@playwright/test';
 
 export class ViewQuestionTable {
-    private readonly list: Locator; // <dl class="govuk-summary-list">
-    private readonly rows: Locator;  // div.govuk-summary-list__row
-    private readonly keys: Locator; // dt.govuk-summary-list__key
-    private readonly values: Locator; // dd.govuk-summary-list__value
+    private readonly list: Locator; 
+    private readonly rows: Locator; 
+    private readonly keys: Locator; 
+    private readonly values: Locator; 
 
     constructor(private readonly page: Page) {
         // Scope to the list under the “Your questions” section

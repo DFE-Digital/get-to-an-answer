@@ -16,14 +16,14 @@ export async function doSignIn(page: Page, username: string, password: string): 
     return viewQuestionnairePage;
 }
 
-export async function goToNewQuestionnairePage(page: Page): Promise<AddQuestionnairePage> {
+export async function goToAddQuestionnairePage(page: Page): Promise<AddQuestionnairePage> {
     const viewQuestionnairePage = new ViewQuestionnairePage(page);
-    const newQuestionnairePage = new AddQuestionnairePage(page);
+    const addQuestionnairePage = new AddQuestionnairePage(page);
 
-    await viewQuestionnairePage.ClickCreateNewQuestionnaire();
-    await newQuestionnairePage.verifyOnNewQuestionnairePage();
+    await viewQuestionnairePage.clickCreateNewQuestionnaire();
+    await addQuestionnairePage.verifyOnAddQuestionnairePage();
 
-    return newQuestionnairePage;
+    return addQuestionnairePage;
 }
 
 export async function goToEditQuestionnairePage(page: Page): Promise<EditQuestionnairePage> {
@@ -31,8 +31,8 @@ export async function goToEditQuestionnairePage(page: Page): Promise<EditQuestio
     const newQuestionnairePage = new AddQuestionnairePage(page);
     const editQuestionnairePage = new EditQuestionnairePage(page);
     
-    await viewQuestionnairePage.ClickCreateNewQuestionnaire();
-    await newQuestionnairePage.verifyOnNewQuestionnairePage();
+    await viewQuestionnairePage.clickCreateNewQuestionnaire();
+    await newQuestionnairePage.verifyOnAddQuestionnairePage();
     await newQuestionnairePage.createNewQuestionnaire('Automation Questionnaire');
     await editQuestionnairePage.validateUrlContains('/questionnaire/');
 

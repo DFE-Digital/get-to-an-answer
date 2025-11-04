@@ -46,12 +46,10 @@ export class ViewQuestionnaireTable {
 
     // Optional: read fields from a row
     async getCreatedBy(name: string): Promise<string> {
-        // td[1] = Created by
         return this.rowByName(name).locator('td').nth(1).innerText();
     }
 
     async getStatus(name: string): Promise<string> {
-        // td[2] = Status (numeric-styled cell)
         return this.rowByName(name).locator('td').nth(2).innerText();
     }
 }

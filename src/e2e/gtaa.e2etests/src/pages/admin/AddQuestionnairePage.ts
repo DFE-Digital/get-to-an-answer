@@ -1,23 +1,32 @@
-import { expect, Page } from '@playwright/test';
-import { BasePage } from '../BasePage';
+import {expect, Page} from '@playwright/test';
+import {BasePage} from '../BasePage';
 
 export class AddQuestionnairePage extends BasePage {
-    private mode: 'create' | 'edit' = 'create';
-    
-    // ===== Locators =====
-    private titleInput = this.page.locator('[data-test="questionnaire-title"]');
-    private saveAndContinueButton = this.page.locator('[data-test="continue-button"]');
+    private readonly form = this.page.locator(
+        'form[action*="/questionnaires/"][action$="/edit"][method="post"]'
+    );
 
-    // These are for presence checks only (not validating text)
-    private questionLabel = this.page.locator('[data-test="questionnaire-question-label"]');
-    private supportiveText = this.page.locator('[data-test="questionnaire-supportive-text"]');
+    // Core controls
+    private readonly titleInput = this.form.locator(
+        'input#forms-name-input-name-field[name="Title"][type="text"]'
+    );
+    private readonly saveAndContinueButton = this.form.locator(
+        'button.govuk-button[type="submit"]'
+    );
 
-    constructor(page: Page, mode: 'create' | 'edit' = 'create') {
+    // Presence-only checks (no text validation)
+    private readonly titleLabel = this.page.locator(
+        'label[for="forms-name-input-name-field"]'
+    );
+    private readonly supportiveHint = this.page.locator(
+        '#forms-name-input-name-hint'
+    );
+
+    constructor(page: Page) {
         super(page);
-        this.mode = mode;
     }
 
-    // ===== Actions =====
+    // Actions
     async enterTitle(title: string): Promise<void> {
         await this.titleInput.fill(title);
     }
@@ -31,15 +40,16 @@ export class AddQuestionnairePage extends BasePage {
         await this.clickSaveAndContinue();
     }
 
-    // ===== Validations =====
-    async verifyOnNewQuestionnairePage(): Promise<void> {
-        await expect(this.page).toHaveURL(/.*new-questionnaire/i);
+    // Validations (structure only)
+    async verifyOnAddQuestionnairePage(): Promise<void> {
+        await expect(this.page).toHaveURL(/\/questionnaires\/[^/]+\/edit/);
+        await expect(this.form).toBeVisible();
         await expect(this.titleInput).toBeVisible();
         await expect(this.saveAndContinueButton).toBeVisible();
     }
 
-    async verifyQuestionAndSupportiveTextPresent(): Promise<void> {
-        await expect(this.questionLabel).toBeVisible();
-        await expect(this.supportiveText).toBeVisible();
+    async verifyLabelAndHintPresent(): Promise<void> {
+        await expect(this.titleLabel).toBeVisible();
+        await expect(this.supportiveHint).toBeVisible();
     }
 }

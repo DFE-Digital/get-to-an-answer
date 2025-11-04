@@ -1,6 +1,6 @@
 import {test} from "@playwright/test";
 import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
-import {goToNewQuestionnairePage, doSignIn} from '../../helpers/admin-test-helper';
+import {goToAddQuestionnairePage, doSignIn} from '../../helpers/admin-test-helper';
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 
@@ -16,7 +16,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
     });
 
     test('Validate presence of question and supportive text on new questionnaire page', async ({page}) => {
-        newQuestionnairePage = await goToNewQuestionnairePage(page);
+        newQuestionnairePage = await goToAddQuestionnairePage(page);
         await newQuestionnairePage.createNewQuestionnaire('Automation Questionnaire');
         
         editQuestionnairePage = new EditQuestionnairePage(page);

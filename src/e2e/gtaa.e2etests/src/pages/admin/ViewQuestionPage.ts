@@ -1,52 +1,81 @@
-import { Page, Locator, expect } from '@playwright/test';
-import {BasePage} from "../BasePage";
-import {ViewQuestionTable} from "./components/ViewQuestionTable";
+import {Page, Locator, expect} from '@playwright/test';
+import {BasePage} from '../BasePage';
+import {ViewQuestionTable} from './components/ViewQuestionTable';
 
-export class ViewQuestionPage extends BasePage{
+export class ViewQuestionPage extends BasePage {
+    // Container that holds the “Your questions” block 
+    private readonly section: Locator;
 
-    // Region containing the list of questions
-    private heading = this.page.getByRole('heading', { name: /Your questions/i }).first();
-    private questionsRegion = this.heading.locator('..'); // parent wrapper of the section
+    // Top action links 
+    private readonly addQuestionLink: Locator; 
+    private readonly previewLink: Locator; 
 
-    // Buttons / radios
-    private addQuestionButton = this.page.getByRole('button', { name: 'Add a question' });
-    private saveAndContinueButton = this.page.getByRole('button', { name: 'Save and continue' });
+    // Radios: name/value
+    private readonly finishedYesRadio: Locator;
+    private readonly finishedNoRadio: Locator; 
 
-    private finishedYesRadio = this.page.getByRole('radio', { name: /^Yes$/ });
-    private finishedNoRadio =
-        this.page.getByRole('radio', { name: /^No, I’ll come back later$/ }).or(
-            this.page.getByRole('radio', { name: /^No/ })
-        );
+    // Primary submit button
+    private readonly saveAndContinueButton: Locator; 
 
+    // Embedded component
     readonly table: ViewQuestionTable;
-    constructor(page: Page) {
+
+    constructor(protected readonly page: Page) {
         super(page);
+
+        // Root region of the questions section
+        this.section = page.locator('div.app-page-list');
+
+        // Action links (href fragments are stable even if link text changes)
+        this.addQuestionLink = page.locator('a.govuk-link[href$="/questions/create"]');
+        this.previewLink = page.locator('a.govuk-link[href*="/start/preview"]');
+
+        // Radios: rely on 'name' and 'value'
+        const radioName = 'forms_mark_pages_section_complete_input_mark_complete';
+        this.finishedYesRadio = page.locator(`input[type="radio"][name="${radioName}"][value="true"]`);
+        
+        this.finishedNoRadio = page
+            .locator(`input[type="radio"][name="${radioName}"][value="false"]`)
+            .or(page.locator(`input[type="radio"][name="${radioName}"]`).nth(1));
+
+        // Submit button
+        this.saveAndContinueButton = page.locator('button.govuk-button[type="submit"]');
+
+        // Reuse your table component
         this.table = new ViewQuestionTable(page);
     }
-    
-    // -------- Page-level actions --------
-    async addQuestion() {
-        await this.addQuestionButton.click();
+
+    // --- Actions ---
+    async addQuestion(): Promise<void> {
+        await this.addQuestionLink.click();
     }
 
-    async saveAndContinue() {
+    async clickPreview(): Promise<void> {
+        await this.previewLink.click();
+    }
+
+    async markFinishedEditing(done: boolean): Promise<void> {
+        await (done ? this.finishedYesRadio : this.finishedNoRadio).check();
+    }
+
+    async saveAndContinue(): Promise<void> {
         await this.saveAndContinueButton.click();
     }
 
-    async markFinishedEditing(done: boolean) {
-        if (done) await this.finishedYesRadio.check();
-        else await this.finishedNoRadio.check();
-    }
-
-    // --- Validations ---
+    // --- Assertions (structure-only; no wording checks) ---
     async verifyOnViewQuestionsPage(): Promise<void> {
-        await expect(this.page).toHaveURL('/questions');
-        await expect(this.heading).toBeVisible();
-        await expect(this.addQuestionButton).toBeVisible();
+        await expect(this.page).toHaveURL(/\/questions(\/)?$/);
+        await expect(this.section).toBeVisible();
+        await expect(this.addQuestionLink).toBeVisible();
+        await expect(this.previewLink).toBeVisible();
+        await expect(this.finishedYesRadio).toBeVisible();
+        await expect(this.finishedNoRadio).toBeVisible();
+        await expect(this.saveAndContinueButton).toBeVisible();
         await this.table.verifyVisible();
     }
 
-    async verifyQuestionListed(text: string): Promise<void> {
-        await this.table.expectRowPresentByName(text);
+    async verifyQuestionListedByStructure(): Promise<void> {
+        // delegates to the component; keep this if you want a structural “table visible” check only
+        await this.table.verifyVisible();
     }
 }

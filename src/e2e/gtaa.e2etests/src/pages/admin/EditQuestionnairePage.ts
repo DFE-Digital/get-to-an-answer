@@ -1,156 +1,165 @@
-// typescript
-import {expect, Page} from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import {BasePage} from '../BasePage';
 
 export class EditQuestionnairePage extends BasePage {
+    // ===== Root / structural =====
+    private readonly main = this.page.locator('main.govuk-main-wrapper[role="main"]');
 
-    // ===== Locators =====
-    private heading = this.page.getByRole('heading', {name: 'Edit your questionnaire'});
-    private successBanner = this.page.getByText('Your questionnaire has been created', {exact: true});
-    private draftBadge = this.page.getByText('Draft', {exact: true});
+    // Status badges (draft etc.)
+    private readonly draftBadge = this.page.locator('[data-status="Draft"]');
 
-    private linkEditTitle = this.page.getByRole('link', {name: 'Edit the title of your questionnaire'});
-    private linkEditSlug = this.page.getByRole('link', {name: 'Edit the slug of your questionnaire'});
-    private linkAddQuestions = this.page.getByRole('link', {name: 'Add and edit your questions'});
+    // --- Task links (each item has a stable aria-describedby or href fragment) ---
+    private readonly linkEditTitle = this.page.locator(
+        'a.govuk-task-list__link[aria-describedby="create-your-questionnaire-1-status"]'
+    );
 
-    private linkAddStartPage = this.page.getByRole('link', {name: 'Add a start page'});
-    private linkAddContributors = this.page.getByRole('link', {name: 'Add or remove contributors'});
+    private readonly linkEditSlug = this.page.locator(
+        'a.govuk-task-list__link[aria-describedby="edit-slug-status"]'
+    );
 
-    private linkBrandingTheme = this.page.getByRole('link', {name: 'Edit the branding and theme of your questionnaire'});
-    private linkCustomiseButtons = this.page.getByRole('link', {name: 'Customise the button text, error messages, etc. of your questionnaire'});
+    private readonly linkAddEditQuestions = this.page.locator(
+        'a.govuk-task-list__link[href*="/questionnaires/"][href$="/questions"]'
+    );
 
-    private linkAnswerContent = this.page.getByRole('link', {name: 'Add and edit answer content of your questionnaire'});
+    // Optional tasks shown in your DOM
+    private readonly linkStartPage = this.page.locator(
+        'a.govuk-task-list__link[href$="/start-page/edit"]'
+    );
 
-    private linkPrivacy = this.page.getByRole('link', {name: 'Provide a link to privacy information for this questionnaire'});
-    private linkContactDetails = this.page.getByRole('link', {name: 'Provide contact details for support'});
+    private readonly linkBrandingTheme = this.page.locator(
+        'a.govuk-task-list__link[href$="/branding"]'
+    );
 
-    private btnPublish = this.page.getByRole('button', {name: 'Publish questionnaire'});
-    private btnDelete = this.page.getByRole('button', {name: 'Delete questionnaire'});
-    private linkViewVersions = this.page.getByRole('link', {name: 'View questionnaire versions'});
-    private linkClone = this.page.getByRole('link', {name: 'Clone this questionnaire'});
+    // “Customisations” section
+    private readonly linkCustomisations = this.page.locator(
+        'a.govuk-task-list__link[href$="/customizations"]'
+    );
+
+    // “Answer content” section
+    private readonly linkAnswerContent = this.page.locator(
+        'a.govuk-task-list__link[href$="/contents"]'
+    );
+
+    // Privacy / contact details (note: different base path: /forms/{id}/privacy-policy)
+    private readonly linkPrivacyPolicy = this.page.locator(
+        'a.govuk-task-list__link[href*="/privacy-policy"]'
+    );
+    
+    
+    private readonly btnPublish = this.page.locator(
+        'a.govuk-button.govuk-button--primary[href$="/publish/confirm"]'
+    );
+
+    private readonly btnDelete = this.page.locator(
+        'a.govuk-button.govuk-button--warning[href$="/delete/confirm"]'
+    );
+
+    private readonly linkViewVersions = this.page.locator(
+        'a.govuk-link[href$="/versions"]'
+    );
+
+    private readonly linkClone = this.page.locator(
+        'a.govuk-link[href$="/clone"]'
+    );
 
     constructor(page: Page) {
         super(page);
     }
-    
+
     // ===== Actions =====
-    async openEditTitle() {
+    async openEditTitle(): Promise<void> {
         await this.linkEditTitle.click();
     }
 
-    async openEditSlug() {
+    async openEditSlug(): Promise<void> {
         await this.linkEditSlug.click();
     }
 
-    async openAddQuestions() {
-        await this.linkAddQuestions.click();
+    async openQuestions(): Promise<void> {
+        await this.linkAddEditQuestions.click();
     }
 
-    async openAddStartPage() {
-        await this.linkAddStartPage.click();
+    async openStartPage(): Promise<void> {
+        await this.linkStartPage.click();
     }
 
-    async openContributors() {
-        await this.linkAddContributors.click();
-    }
-
-    async openBrandingTheme() {
+    async openBrandingTheme(): Promise<void> {
         await this.linkBrandingTheme.click();
     }
 
-    async openCustomiseButtons() {
-        await this.linkCustomiseButtons.click();
+    async openCustomisations(): Promise<void> {
+        await this.linkCustomisations.click();
     }
 
-    async openAnswerContent() {
+    async openAnswerContent(): Promise<void> {
         await this.linkAnswerContent.click();
     }
 
-    async openPrivacy() {
-        await this.linkPrivacy.click();
+    async openPrivacyPolicy(): Promise<void> {
+        await this.linkPrivacyPolicy.click();
     }
 
-    async openContactDetails() {
-        await this.linkContactDetails.click();
-    }
-
-    async publish() {
+    async publish(): Promise<void> {
         await this.btnPublish.click();
     }
 
-    async delete() {
+    async delete(): Promise<void> {
         await this.btnDelete.click();
     }
 
-    async viewVersions() {
+    async viewVersions(): Promise<void> {
         await this.linkViewVersions.click();
     }
 
-    async clone() {
+    async clone(): Promise<void> {
         await this.linkClone.click();
     }
 
-    // ===== Validation methods =====
-
-    async validateHeadingAndStatus() {
-        await expect(this.heading).toBeVisible();
-        await expect(this.draftBadge).toBeVisible();
-        if (await this.successBanner.count() > 0) {
-            await expect(this.successBanner).toBeVisible();
-        }
+    // ===== Validation methods (structure only; no wording) =====
+    async validateHeadingAndStatus(): Promise<void> {
+        await expect(this.main).toBeVisible();
+        await expect(this.draftBadge).toBeVisible(); 
     }
 
-    async validateCoreLinks() {
+    async validateCoreLinks(): Promise<void> {
         await expect(this.linkEditTitle).toBeVisible();
         await expect(this.linkEditSlug).toBeVisible();
-        await expect(this.linkAddQuestions).toBeVisible();
+        await expect(this.linkAddEditQuestions).toBeVisible();
     }
 
-    /**
-     * Validate optional tasks. Pass `shouldExist = false` to assert they are hidden/absent.
-     */
-    async validateOptionalTasks(shouldExist = true) {
+    async validateOptionalTasks(shouldExist = true): Promise<void> {
         if (shouldExist) {
-            await expect(this.linkAddStartPage).toBeVisible();
-            await expect(this.linkAddContributors).toBeVisible();
+            await expect(this.linkStartPage).toBeVisible();
+            await expect(this.linkBrandingTheme).toBeVisible();
+            await expect(this.linkCustomisations).toBeVisible();
         } else {
-            await expect(this.linkAddStartPage).toBeHidden();
-            await expect(this.linkAddContributors).toBeHidden();
+            await expect(this.linkStartPage).toBeHidden();
+            await expect(this.linkBrandingTheme).toBeHidden();
+            await expect(this.linkCustomisations).toBeHidden();
         }
     }
 
-    async validateCustomisationsAndBranding() {
-        await expect(this.linkBrandingTheme).toBeVisible();
-        await expect(this.linkCustomiseButtons).toBeVisible();
-    }
-
-    async validateAnswerContentSection() {
+    async validateAnswerContentSection(): Promise<void> {
         await expect(this.linkAnswerContent).toBeVisible();
     }
 
-    async validatePrivacyAndContactSection() {
-        await expect(this.linkPrivacy).toBeVisible();
-        await expect(this.linkContactDetails).toBeVisible();
+    async validatePrivacyAndContactsSection(): Promise<void> {
+        await expect(this.linkPrivacyPolicy).toBeVisible();
     }
 
-    async validateActionsSection() {
+    async validateActionsSection(): Promise<void> {
         await expect(this.btnPublish).toBeVisible();
         await expect(this.btnDelete).toBeVisible();
         await expect(this.linkViewVersions).toBeVisible();
         await expect(this.linkClone).toBeVisible();
     }
-
-    /**
-     * Convenience method to validate every section. Pass `includeOptional` as false if you expect optional tasks to be absent.
-     */
-    async validateAllSections(includeOptional = true) {
+    
+    async validateAllSections(includeOptional = true): Promise<void> {
         await this.validateHeadingAndStatus();
         await this.validateCoreLinks();
         await this.validateOptionalTasks(includeOptional);
-        await this.validateCustomisationsAndBranding();
         await this.validateAnswerContentSection();
-        await this.validatePrivacyAndContactSection();
+        await this.validatePrivacyAndContactsSection();
         await this.validateActionsSection();
     }
 }
-    

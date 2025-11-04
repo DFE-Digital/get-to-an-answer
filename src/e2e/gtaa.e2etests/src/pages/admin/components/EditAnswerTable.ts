@@ -8,9 +8,9 @@ export class EditAnswersTable {
     constructor(private readonly page: Page) {
         // Scope to the summary card headed "Answers"
         const title = page.getByRole('heading', { level: 2, name: 'Answers' });
-        this.card  = title.locator('..').locator('..'); // title wrapper -> card
+        this.card = title.locator('..').locator('..'); // title wrapper -> card
         this.table = this.card.getByRole('table');
-        this.rows  = this.table.locator('tbody tr');
+        this.rows = this.table.locator('tbody tr');
     }
 
     // --- validations ---
