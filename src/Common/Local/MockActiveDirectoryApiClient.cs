@@ -32,7 +32,7 @@ public sealed class MockAzureAdOptions
 {
     public string? Name { get; set; } = "Dev User";
     public string? Email { get; set; } = "dev.user@example.test";
-    public string[] Roles { get; set; } = new[] { "Admin" };
+    public string[] Roles { get; set; } = ["Admin"];
 }
 
 // Authentication handler that always authenticates a mock user
@@ -90,25 +90,25 @@ internal sealed class MockAuthenticationHandler(
 }
 
 // Middleware that injects a fake JWT bearer for API requests if none provided
-internal sealed class MockBearerMiddleware
+internal sealed class MockBearerMiddleware(RequestDelegate next, IOptions<MockAzureAdOptions> options)
 {
-    private readonly RequestDelegate _next;
-    private readonly string _headerName = "Authorization";
-    private readonly string _mockToken = "Bearer mock-dev-token";
-
-    public MockBearerMiddleware(RequestDelegate next)
+    private const string HeaderName = "Authorization";
+    
+    private readonly string _mockToken = "Bearer " + MockJwtGenerator.Create(new Dictionary<string, object>
     {
-        _next = next;
-    }
+        [ClaimTypes.Name] = options.Value.Name!,
+        [ClaimTypes.Email] = options.Value.Email!,
+        [ClaimTypes.Role] = options.Value.Roles.FirstOrDefault()!
+    }, TimeSpan.FromHours(1));
 
     public async Task Invoke(HttpContext context)
     {
         // If caller didn't pass any Authorization header, add a fake one to simulate bearer auth
-        if (!context.Request.Headers.ContainsKey(_headerName))
+        if (!context.Request.Headers.ContainsKey(HeaderName))
         {
-            context.Request.Headers[_headerName] = _mockToken;
+            context.Request.Headers[HeaderName] = _mockToken;
         }
-        await _next(context);
+        await next(context);
     }
 }
 

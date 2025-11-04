@@ -1,13 +1,8 @@
-using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Common.Client;
 using Common.Local;
 using Common.Logging;
-using Common.Telemetry;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,15 +75,9 @@ app.MapStaticAssets();
 
 app.UseRouting();
 
-app.UseAuthentication();
+// app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-
-// app.MapControllerRoute(
-//         name: "default",
-//         pattern: "{controller=Home}/{action=Index}/{id?}")
-//     .WithStaticAssets();
-
 
 app.Run();
