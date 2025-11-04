@@ -8,7 +8,7 @@ export class ViewQuestionTable {
     constructor(private page: Page) {
         this.root = page.locator('table');
         this.headers = this.root.locator('thead th');
-        //this.rows = this.root.locator('tbody tr');
+        //this.rows = this.root.locator('tbody tr'); //or use rows()
         
     }
     
