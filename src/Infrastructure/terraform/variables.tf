@@ -1,19 +1,19 @@
 variable "ad_tenant_id" {
   description = "Tenant ID"
   type        = string
-  sensitive   = true
+  sensitive = true
 }
 
 variable "ad_client_id" {
   description = "Azure Active Directory App Client Id"
   type        = string
-  sensitive   = true
+  sensitive = true
 }
 
 variable "ad_client_secret" {
   description = "Azure Active Directory App Client Secret"
   type        = string
-  sensitive   = true
+  sensitive = true
 }
 
 variable "env" {
