@@ -1,6 +1,8 @@
 import {expect, Locator, Page} from '@playwright/test';
 import {BasePage} from '../BasePage';
 
+type Mode = 'create' | 'edit';
+
 export enum QuestionType {
     SingleSelectShort = 'SingleSelect',
     SingleSelectLong = 'SingleSelectLong',
@@ -22,9 +24,10 @@ export class AddQuestionPage extends BasePage {
     // actions
     private readonly saveButton: Locator;
 
-    constructor(page: Page) {
-        super(page);
 
+    constructor(page: Page, mode: Mode = 'create') {
+        super(page);
+        
         // The add-question form
         this.form = page.locator('form[action$="/questions/create"][method="post"]');
 

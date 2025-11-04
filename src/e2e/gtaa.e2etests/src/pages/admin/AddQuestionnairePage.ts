@@ -1,6 +1,8 @@
 import {expect, Page} from '@playwright/test';
 import {BasePage} from '../BasePage';
 
+type Mode = 'create' | 'edit';
+
 export class AddQuestionnairePage extends BasePage {
     private readonly form = this.page.locator(
         'form[action*="/questionnaires/"][action$="/edit"][method="post"]'
@@ -22,7 +24,7 @@ export class AddQuestionnairePage extends BasePage {
         '#forms-name-input-name-hint'
     );
 
-    constructor(page: Page) {
+    constructor(page: Page, mode: Mode = 'create') {
         super(page);
     }
 

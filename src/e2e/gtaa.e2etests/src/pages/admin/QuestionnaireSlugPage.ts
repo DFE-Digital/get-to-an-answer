@@ -25,7 +25,7 @@ export class QuestionnaireSlugPage extends BasePage {
         '#forms-name-input-name-hint'
     );
 
-    constructor(page: Page, private readonly mode: Mode = 'create') {
+    constructor(page: Page, mode: Mode = 'create') {
         super(page);
     }
 
