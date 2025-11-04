@@ -44,7 +44,6 @@ export class ViewQuestionPage extends BasePage{
         await expect(this.heading).toBeVisible();
         await expect(this.addQuestionButton).toBeVisible();
         await this.table.verifyVisible();
-        await this.table.verifyHeaders();
     }
 
     async verifyQuestionListed(text: string): Promise<void> {

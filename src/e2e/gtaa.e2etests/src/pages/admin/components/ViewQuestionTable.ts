@@ -1,88 +1,88 @@
-import {Locator, expect, Page} from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 
 export class ViewQuestionTable {
-    readonly root: Locator;
-    private headers: Locator;
-    //private rows: Locator;
-    
-    constructor(private page: Page) {
-        this.root = page.locator('table');
-        this.headers = this.root.locator('thead th');
-        //this.rows = this.root.locator('tbody tr'); //or use rows()
-        
+    private readonly list: Locator; // <dl class="govuk-summary-list">
+    private readonly rows: Locator;  // div.govuk-summary-list__row
+    private readonly keys: Locator; // dt.govuk-summary-list__key
+    private readonly values: Locator; // dd.govuk-summary-list__value
+
+    constructor(private readonly page: Page) {
+        // Scope to the list under the “Your questions” section
+        const section = page.getByRole('heading', { level: 2, name: 'Your questions' }).locator('..'); // parent
+        this.list = section.locator('dl.govuk-summary-list');
+        this.rows = this.list.locator('div.govuk-summary-list__row');
+        this.keys = this.rows.locator('dt.govuk-summary-list__key');
+        this.values = this.rows.locator('dd.govuk-summary-list__value');
     }
-    
-    private rows(): Locator {
-        return this.root.locator('ol li, ul li, .govuk-summary-list__row');
+
+    // ---- basics ----
+    async verifyVisible(): Promise<void> {
+        await expect(this.list).toBeVisible();
     }
-    
+
     async count(): Promise<number> {
-        return this.rows().count();
+        return this.rows.count();
     }
 
+    // ---- text helpers ----
     async textByIndex(index: number): Promise<string> {
-        return (await this.rows().nth(index - 1).innerText()).trim();
+        // 1-based index, returns the key text (e.g. “question 1”)
+        return (await this.keys.nth(index - 1).innerText()).trim();
     }
 
-    async allTexts(): Promise<string[]> {
-        const rows = this.rows();
-        const n = await rows.count();
+    async allText(): Promise<string[]> {
+        const n = await this.count();
         const out: string[] = [];
-        for (let i = 0; i < n; i++) out.push((await rows.nth(i).innerText()).trim());
+        for (let i = 0; i < n; i++) {
+            out.push((await this.keys.nth(i).innerText()).trim());
+        }
         return out;
     }
 
-    // ---------- Row-scoped actions ----------
-    async clickEditByIndex(index: number) {
-        await this.rows().nth(index - 1).getByRole('link', {name: /^Edit$/}).click();
+    // ---- row finders ----
+    private rowByIndex(index: number): Locator {
+        return this.rows.nth(index - 1);
     }
 
-    async clickEditByText(partialText: string) {
-        await this.rows()
-            .filter({hasText: partialText})
-            .first()
-            .getByRole('link', {name: /^Edit$/})
-            .click();
+    private rowByName(partialText: string): Locator {
+        // Matches by the key/value text contained in the row
+        return this.rows.filter({ hasText: partialText }).first();
     }
 
-    async moveUpByIndex(index: number) {
-        const link = this.rows().nth(index - 1).getByRole('link', {name: /^Move up$/});
+    // ---- actions by index ----
+    async clickEditByIndex(index: number): Promise<void> {
+        const link = this.rowByIndex(index).getByRole('link', { name: /Edit/i });
         await expect(link).toBeVisible();
         await link.click();
     }
 
-    async moveDownByIndex(index: number) {
-        const link = this.rows().nth(index - 1).getByRole('link', {name: /^Move down$/});
+    async moveUpByIndex(index: number): Promise<void> {
+        const link = this.rowByIndex(index).getByRole('link', { name: /Move up/i });
         await expect(link).toBeVisible();
         await link.click();
     }
 
-    async moveByText(direction: 'up' | 'down', partialText: string) {
-        const row = this.rows().filter({hasText: partialText}).first();
-        const name = direction === 'up' ? /^Move up$/ : /^Move down$/;
-        const link = row.getByRole('link', {name});
+    async moveDownByIndex(index: number): Promise<void> {
+        const link = this.rowByIndex(index).getByRole('link', { name: /Move down/i });
         await expect(link).toBeVisible();
         await link.click();
     }
 
-    async verifyVisible(): Promise<void> {
-        await expect(this.root).toBeVisible();
-    }
-
-    async verifyHeaders(): Promise<void> {
-        // just verifies header presence, not text
-        await expect(this.headers).toHaveCount(3);
-        for (let i = 0; i < 3; i++) {
-            await expect(this.headers.nth(i)).toBeVisible();
-        }
+    // ---- actions by name (partial match) ----
+    async moveByName(direction: 'up' | 'down', partialText: string): Promise<void> {
+        const row = this.rowByName(partialText);
+        await expect(row).toBeVisible();
+        const link = row.getByRole('link', { name: direction === 'up' ? /Move up/i : /Move down/i });
+        await expect(link).toBeVisible();
+        await link.click();
     }
 
     async expectRowPresentByName(name: string): Promise<void> {
-        const row = this.rows().filter({hasText: name}).first();
-        await expect(row).toBeVisible();
+        await expect(this.rowByName(name)).toBeVisible();
     }
 
-    async getRowCount(): Promise<number> {
-        return this.rows().count();
+    // Optional getters if you need values
+    async valueTextByIndex(index: number): Promise<string> {
+        return (await this.values.nth(index - 1).innerText()).trim();
     }
 }

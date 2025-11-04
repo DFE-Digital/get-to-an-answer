@@ -1,54 +1,60 @@
-import {expect, Locator, Page} from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 
-export class EditAnswerTable {
-    private readonly root: Locator;
-    private readonly section: Locator;
-    private readonly editLink: Locator;
+export class EditAnswersTable {
+    private readonly card: Locator; // summary card titled "Answers"
+    private readonly table: Locator; // the govuk table inside the card
+    private readonly rows: Locator;  // tbody rows
 
-    constructor(private page: Page) {
-        // Scope: the "Answers" section only
-        this.root = page.locator('table');
-        this.section = this.page.getByRole('region', {name: 'Answers'});
-        this.editLink = this.section.getByRole('link', {name: 'Edit'});
+    constructor(private readonly page: Page) {
+        // Scope to the summary card headed "Answers"
+        const title = page.getByRole('heading', { level: 2, name: 'Answers' });
+        this.card  = title.locator('..').locator('..'); // title wrapper -> card
+        this.table = this.card.getByRole('table');
+        this.rows  = this.table.locator('tbody tr');
     }
 
-    // --- Validations ---
+    // --- validations ---
     async assertLoaded(): Promise<void> {
-        await expect(this.section).toBeVisible();
-        await expect(this.root).toBeVisible();
-        await expect(this.root.getByRole('columnheader', {name: 'Answer'})).toBeVisible();
-        await expect(this.root.getByRole('columnheader', {name: 'Score'})).toBeVisible();
-        await expect(this.root.getByRole('columnheader', {name: 'Target Type'})).toBeVisible();
+        await expect(this.card).toBeVisible();
+        await expect(this.table).toBeVisible();
+        await expect(this.table.getByRole('columnheader', { name: 'Answer' })).toBeVisible();
+        await expect(this.table.getByRole('columnheader', { name: 'Score' })).toBeVisible();
+        await expect(this.table.getByRole('columnheader', { name: 'Target Type' })).toBeVisible();
     }
 
     async verifyVisible(): Promise<void> {
-        await expect(this.root).toBeVisible();
+        await expect(this.table).toBeVisible();
     }
-    
-    // --- Helpers for rows/cells ---
+
+    // --- row helpers ---
     private rowByAnswer(answer: string): Locator {
-        return this.root.getByRole('row', {name: new RegExp(`^${answer}\\b`, 'i')});
+        // match a row that contains a cell with the exact answer text
+        return this.rows.filter({
+            has: this.page.getByRole('cell', { name: answer, exact: true }),
+        }).first();
     }
 
     async getRowCount(): Promise<number> {
-        return await this.root.getByRole('row').filter({has: this.root.getByRole('cell')}).count();
+        return this.rows.count();
     }
 
     async assertRowPresent(answer: string): Promise<void> {
         await expect(this.rowByAnswer(answer)).toBeVisible();
     }
 
-    async getCellText(answer: string, column: 'Answer' | 'Score' | 'Target Type'): Promise<string> {
+    async getCellText(
+        answer: string,
+        column: 'Answer' | 'Score' | 'Target Type'
+    ): Promise<string> {
         const row = this.rowByAnswer(answer);
-        const cell =
-            column === 'Answer'
-                ? row.getByRole('cell').first()
-                : row.getByRole('cell', {name: /\S/}).nth(column === 'Score' ? 1 : 2);
-        return (await cell.textContent())?.trim() ?? '';
+        const colIndex = column === 'Answer' ? 0 : column === 'Score' ? 1 : 2;
+        return (await row.locator('td').nth(colIndex).innerText()).trim();
     }
 
-    // --- Actions inside the table section ---
+    // --- actions ---
     async openEdit(): Promise<void> {
-        await this.editLink.click();
+        const editLink = this.card.getByRole('link', { name: 'Edit' });
+        await expect(editLink).toBeVisible();
+        await editLink.click();
     }
 }
