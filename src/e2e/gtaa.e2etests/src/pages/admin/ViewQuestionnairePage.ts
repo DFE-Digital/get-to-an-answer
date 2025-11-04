@@ -1,4 +1,3 @@
-// ViewQuestionnairePage.ts
 import { expect, Page } from '@playwright/test';
 import {BasePage} from '../BasePage';
 import { ViewQuestionnaireTable } from './components/ViewQuestionnaireTable';
