@@ -9,12 +9,15 @@ terraform {
       source  = "Azure/azapi"
       version = "2.7.0"
     }
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "3.4.0"
+    }
   }
   backend "azurerm" {}
 }
 
-provider "azapi" {
-}
+provider "azapi" {}
 
 provider "azurerm" {
   features {}
@@ -112,6 +115,10 @@ resource "azurerm_container_app" "gettoananswer-api" {
     name  = "acr-pwd"
     value = azurerm_container_registry.gettoananswer-registry.admin_password
   }
+  secret {
+    name  = "aad-client-secret"
+    value = var.ad_client_secret
+  }
   template {
     container {
       name   = "api"
@@ -119,12 +126,40 @@ resource "azurerm_container_app" "gettoananswer-api" {
       cpu    = 0.5
       memory = "1Gi"
       env {
+        name = "ASPNETCORE_ENVIRONMENT"
+        value = var.asp_env
+      }
+      env {
         name  = "ASPNETCORE_URLS"
         value = "http://0.0.0.0:8080"
       }
       env {
         name  = "ApplicationInsights__ConnectionString"
         value = azurerm_application_insights.application-insights.connection_string
+      }
+      env {
+        name = "ConnectionStrings__DefaultConnection"
+        value = "Server=tcp:${azurerm_mssql_server.gettoananswer_mssql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.gettoananswer_mssql_db.name};Persist Security Info=False;User ID=${azurerm_mssql_server.gettoananswer_mssql_server.administrator_login};Password=${var.sql_admin_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+      }
+      env {
+        name  = "AzureAd__Domain"
+        value = "Educationgovuk.onmicrosoft.com"
+      }
+      env {
+        name  = "AzureAd__TenantId"
+        value = var.ad_tenant_id
+      }
+      env {
+        name  = "AzureAd__ClientId"
+        value = var.ad_client_id
+      }
+      env {
+        name  = "AzureAd__Audience"
+        value = "api://${var.prefix}gettoananswer"
+      }
+      env {
+        name  = "AzureAd__ClientSecret"
+        value = "aad-client-secret"
       }
     }
   }
@@ -155,12 +190,20 @@ resource "azurerm_container_app" "gettoananswer-admin" {
     name  = "acr-pwd"
     value = azurerm_container_registry.gettoananswer-registry.admin_password
   }
+  secret {
+    name  = "aad-client-secret"
+    value = var.ad_client_secret
+  }
   template {
     container {
       name   = "admin"
       image  = "${azurerm_container_registry.gettoananswer-registry.login_server}/${var.admin_image_name}"
       cpu    = 0.5
       memory = "1Gi"
+      env {
+        name = "ASPNETCORE_ENVIRONMENT"
+        value = var.asp_env
+      }
       env {
         name  = "ASPNETCORE_URLS"
         value = "http://0.0.0.0:8080"
@@ -173,9 +216,29 @@ resource "azurerm_container_app" "gettoananswer-admin" {
         name  = "ApplicationInsights__ConnectionString"
         value = azurerm_application_insights.application-insights.connection_string
       }
+      env {
+        name  = "AzureAd__Domain"
+        value = "Educationgovuk.onmicrosoft.com"
+      }
+      env {
+        name  = "AzureAd__TenantId"
+        value = var.ad_tenant_id
+      }
+      env {
+        name  = "AzureAd__ClientId"
+        value = var.ad_client_id
+      }
+      env {
+        name  = "AzureAd__Audience"
+        value = "api://${var.prefix}gettoananswer"
+      }
+      env {
+        name  = "AzureAd__ClientSecret"
+        value = "aad-client-secret"
+      }
     }
   }
-  depends_on = [azurerm_container_app.gettoananswer-api]
+  depends_on = [azurerm_container_app.gettoananswer-api, ]
 }
 
 # Frontend Container App
@@ -208,6 +271,10 @@ resource "azurerm_container_app" "gettoananswer-frontend" {
       image  = "${azurerm_container_registry.gettoananswer-registry.login_server}/${var.frontend_image_name}"
       cpu    = 0.5
       memory = "1Gi"
+      env {
+        name = "ASPNETCORE_ENVIRONMENT"
+        value = var.asp_env
+      }
       env {
         name  = "ASPNETCORE_URLS"
         value = "http://0.0.0.0:8080"

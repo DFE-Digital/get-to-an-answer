@@ -50,6 +50,9 @@ resource "azapi_resource" "gettoananswer_main_subnet" {
         {
           service   = "Microsoft.Sql"
           locations = [azurerm_resource_group.gettoananswer-rg.location]
+        },
+        {
+          service = "Microsoft.KeyVault"
         }
       ]
       networkSecurityGroup = {

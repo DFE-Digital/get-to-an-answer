@@ -67,21 +67,24 @@ jobs:
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+          fi    
 
-      - name: Update Container App image and env
-        if: steps.check_aca.outputs.exists == 'true'
+      - name: Remove MSAL cache to prevent deserialization error
         run: |
-          az containerapp update \
-            --name "$API_NAME" \
-            --resource-group "$RESOURCE_GROUP" \
-            --image "$ACR_LOGIN_SERVER/gtaa-api:${{ github.sha }}" \
-            --set-env-vars \
-              ConnectionStrings__DefaultConnection='${{ secrets.SQL_CONNECTION_STRING }}' \
-              ASPNETCORE_ENVIRONMENT='${{ github.event.inputs.environment }}' \
-              DOTNET_gcServer='1' \
-              DOTNET_ReadyToRun='0' \
-              WEBSITES_ENABLE_APP_SERVICE_STORAGE='false' \
-            --registry-server "$ACR_LOGIN_SERVER" \
-            --registry-username "$ACR_USERNAME" \
-            --registry-password "$ACR_PASSWORD"
+          CACHE_FILE="$HOME/.azure/msal_http_cache.bin"
+          if [ -f "$CACHE_FILE" ]; then
+            echo "Removing MSAL cache file..."
+            rm "$CACHE_FILE"
+          fi
+      
+      - name: Update Container App image and env
+        uses: azure/cli@v2
+        if: steps.check_aca.outputs.exists == 'true'
+        with:
+          inlineScript: |
+            az login --service-principal -u ${{ env.ARM_CLIENT_ID }} -p ${{ env.ARM_CLIENT_SECRET }} --tenant ${{ env.ARM_TENANT_ID }}
+            
+            az containerapp update \
+              --name "$API_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              --image "$ACR_LOGIN_SERVER/gtaa-api:${{ github.sha }}"
