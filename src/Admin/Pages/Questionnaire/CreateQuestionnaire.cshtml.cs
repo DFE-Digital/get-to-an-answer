@@ -1,12 +1,14 @@
 using Admin.Models;
 using Common.Client;
 using Common.Domain.Request.Create;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Admin.Pages.Questionnaire;
 
+[Authorize]
 public class CreateQuestionnaire(IApiClient apiClient) : QuestionnaireViewModel
 {
     [BindProperty] public string Title { get; set; } = string.Empty;
