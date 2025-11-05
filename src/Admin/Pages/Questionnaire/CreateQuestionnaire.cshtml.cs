@@ -28,12 +28,12 @@ public class CreateQuestionnaire(IApiClient apiClient) : QuestionnaireViewModel
                 return Page();
             } 
             
-            await apiClient.CreateQuestionnaireAsync(new CreateQuestionnaireRequestDto
+            var response = await apiClient.CreateQuestionnaireAsync(new CreateQuestionnaireRequestDto
             {
                 Title = Title
             });
 
-            return Page();
+            return Redirect($"/admin/questionnaires/{response?.Id}/track");
         }
         catch (Exception e)
         {

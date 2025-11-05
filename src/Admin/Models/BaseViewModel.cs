@@ -18,7 +18,7 @@ public class BaseViewModel : PageModel
             : null;
     }
 
-    //TODO: Potentially move this to config or service if  not needed across all pages
+    //TODO: Potentially move this to config or service if not needed across all pages
     public static string ContentType { get; } = "configuration";
 
     public string ServiceName { get; set; } = "GetToAnAnswer";
