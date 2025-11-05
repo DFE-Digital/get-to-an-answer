@@ -64,9 +64,14 @@ export class BasePage {
         await expect(this.page).toHaveURL(pattern);
     }
 
-    // Validate URL contains a specific path
-    async validateUrlContains(path: string) {
-        await expect(this.page).toHaveURL(new RegExp(path));
+    protected escapeRegexExpression(s: string): string {
+        return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    
+    // Validate URL contains the expected substring 
+    async validatePartialUrlMatches(url: string) {
+        const escaped = this.escapeRegexExpression(url);
+        await expect(this.page).toHaveURL(new RegExp(escaped));
     }
     
     // Wait for the page to load

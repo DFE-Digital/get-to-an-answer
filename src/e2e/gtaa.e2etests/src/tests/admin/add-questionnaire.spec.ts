@@ -1,4 +1,4 @@
-import {test} from "@playwright/test";
+import {test, expect} from "@playwright/test";
 import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {goToAddQuestionnairePage, doSignIn} from '../../helpers/admin-test-helper';
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
@@ -15,11 +15,21 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await doSignIn(page, username, password);
     });
 
+    test('Scenario: Successful submit posts to create endpoint - enter valid title and submit lands on EditQuestionnairePage', async ({ page }) => {
+        
+        const addQuestionnairePage = await goToAddQuestionnairePage(page);
+        await addQuestionnairePage.createNewQuestionnaire('Automation Questionnaire');
+
+        editQuestionnairePage = new EditQuestionnairePage(page);
+        await editQuestionnairePage.validatePartialUrlMatches('admin/questionnaire/');
+        
+    });
+
     test('Validate presence of question and supportive text on new questionnaire page', async ({page}) => {
         newQuestionnairePage = await goToAddQuestionnairePage(page);
         await newQuestionnairePage.createNewQuestionnaire('Automation Questionnaire');
         
         editQuestionnairePage = new EditQuestionnairePage(page);
-        await editQuestionnairePage.validateUrlContains('/questionnaire/');
+        await editQuestionnairePage.validatePartialUrlMatches('/questionnaire/');
     });
 });

@@ -12,7 +12,7 @@ export async function doSignIn(page: Page, username: string, password: string): 
     await signInPage.verifyOnSignInPage();
     await signInPage.signIn(username, password);
 
-    await viewQuestionnairePage.validateUrlContains('/admin/questionnaires');
+    await viewQuestionnairePage.validatePartialUrlMatches('/admin/questionnaires');
     return viewQuestionnairePage;
 }
 
@@ -34,7 +34,7 @@ export async function goToEditQuestionnairePage(page: Page): Promise<EditQuestio
     await viewQuestionnairePage.clickCreateNewQuestionnaire();
     await newQuestionnairePage.verifyOnAddQuestionnairePage();
     await newQuestionnairePage.createNewQuestionnaire('Automation Questionnaire');
-    await editQuestionnairePage.validateUrlContains('/questionnaire/');
+    await editQuestionnairePage.validatePartialUrlMatches('/questionnaire/');
 
     return editQuestionnairePage;
 }
