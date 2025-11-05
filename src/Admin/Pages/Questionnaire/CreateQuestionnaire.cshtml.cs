@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Admin.Models;
+using Admin.Models.ViewModels;
 using Common.Client;
 using Common.Domain.Request.Create;
 using Microsoft.AspNetCore.Authorization;
@@ -33,7 +34,7 @@ public class CreateQuestionnaire(IApiClient apiClient) : QuestionnairePageModel
                 Title = Title
             });
 
-            TempData["JustCreated"] = true; 
+            TempData["QuestionnairesViewModel"] = new QuestionnairesViewModel { JustCreated = true };
             
             return Redirect($"/admin/questionnaires/{response?.Id}/track");
         }
