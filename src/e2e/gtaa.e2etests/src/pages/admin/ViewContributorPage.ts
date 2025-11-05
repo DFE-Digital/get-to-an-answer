@@ -1,31 +1,24 @@
 import {Page, Locator, expect} from '@playwright/test';
 import {ViewContributorTable} from './components/ViewContributorTable';
+import {BasePage} from "../BasePage";
 
-export class AddContributorPage {
+export class AddContributorPage extends BasePage{
+    // ===== Locators =====
+    private readonly section=this.page.locator('main[role="main"]');
+    private readonly backLink=this.section.locator('a.govuk-back-link');
+    private readonly h1=this.section.locator('h1');
+    private readonly addContributorLink=this.section.locator('a[role="button"][href$="/contributors/new"]');
+    private readonly tableRegion=this.section.locator('table.govuk-table');
+
     // ===== Embedded component =====
     readonly table: ViewContributorTable;
 
-    // ===== Locators (declared) =====
-    private readonly page: Page;
-    private readonly section: Locator;
-    private readonly backLink: Locator;
-    private readonly h1: Locator;
-    private readonly addContributorLink: Locator;
-    private readonly tableRegion: Locator;
-
-    // ===== Constructor (init locators & component) =====
-    constructor(protected readonly p: Page) {
-        this.page = p;
-
-        this.section = this.page.locator('main[role="main"]');
-        this.backLink = this.section.locator('a.govuk-back-link');
-        this.h1 = this.section.locator('h1');
-        this.addContributorLink = this.section.locator('a[role="button"][href$="/contributors/new"]');
-        this.tableRegion = this.section.locator('table.govuk-table');
-
-        this.table = new ViewContributorTable(this.page);
+    // ===== Constructor =====
+    constructor(page: Page) {
+        super(page);
+        this.table = new ViewContributorTable(page);
     }
-
+    
     // ===== Actions =====
     async clickAddContributor(): Promise<void> {
         await this.addContributorLink.click();

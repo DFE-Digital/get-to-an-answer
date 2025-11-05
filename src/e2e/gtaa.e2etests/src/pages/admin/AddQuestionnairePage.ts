@@ -1,14 +1,14 @@
 import {expect, Page} from '@playwright/test';
 import {BasePage} from '../BasePage';
 
-type Mode = 'create' | 'edit' |'clone';
+type Mode = 'create' | 'edit' | 'clone';
 
 export class AddQuestionnairePage extends BasePage {
+    // ===== Locators =====
     private readonly form = this.page.locator(
         'form[action*="/questionnaires/"][action$="/edit"][method="post"]'
     );
 
-    // Core controls
     private readonly titleInput = this.form.locator(
         'input#forms-name-input-name-field[name="Title"][type="text"]'
     );
@@ -16,7 +16,6 @@ export class AddQuestionnairePage extends BasePage {
         'button.govuk-button[type="submit"]'
     );
 
-    // Presence-only checks (no text validation)
     private readonly titleLabel = this.page.locator(
         'label[for="forms-name-input-name-field"]'
     );
@@ -24,11 +23,12 @@ export class AddQuestionnairePage extends BasePage {
         '#forms-name-input-name-hint'
     );
 
+    // ===== Constructor =====
     constructor(page: Page, mode: Mode = 'create') {
         super(page);
     }
 
-    // Actions
+    // ===== Actions =====
     async enterTitle(title: string): Promise<void> {
         await this.titleInput.fill(title);
     }

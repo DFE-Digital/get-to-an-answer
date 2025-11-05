@@ -1,19 +1,21 @@
-import { expect, Page } from '@playwright/test';
+import {expect, Page} from '@playwright/test';
 import {BasePage} from '../BasePage';
-import { ViewQuestionnaireTable } from './components/ViewQuestionnaireTable';
+import {ViewQuestionnaireTable} from './components/ViewQuestionnaireTable';
 
 export class ViewQuestionnairePage extends BasePage {
     // ===== Locators  =====
     private readonly section = this.page.locator(
         'div.app-scrolling-wrapper[role="region"]'
     );
-    
+
     private readonly createNewQuestionnaireButton = this.page.locator(
         'a.govuk-button.govuk-button--start[href$="/questionnaires/create"]'
     );
-    
+
+    // ===== Embedded component =====
     readonly table: ViewQuestionnaireTable;
 
+    // ===== Constructor =====
     constructor(page: Page) {
         super(page);
         this.table = new ViewQuestionnaireTable(page);

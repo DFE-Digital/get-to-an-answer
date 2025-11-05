@@ -10,50 +10,29 @@ export enum QuestionType {
 }
 
 export class AddQuestionPage extends BasePage {
-    // ----- form scope -----
-    private readonly form: Locator;
+    private readonly radioName = 'Type';
+    // ===== Locators =====
+    private readonly form = this.page.locator('form[action$="/questions/create"][method="post"]');
+    private readonly questionInput = this.form.locator('input[name="content"][type="text"]');
+    private readonly hintTextarea = this.form.locator('textarea[name="description"]');
 
-    // fields
-    private readonly questionInput: Locator;
-    private readonly hintTextarea: Locator;
-    private readonly typeSingleShort: Locator;
-    private readonly typeSingleLong: Locator;
-    private readonly typeMulti: Locator;
-    private readonly radios: Locator;
+    private readonly typeSingleShort = this.form
+        .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionType.SingleSelectShort}"]`)
+        .or(this.form.locator(`input[type="radio"][name="${this.radioName}"]`).nth(0));
 
-    // actions
-    private readonly saveButton: Locator;
+    private readonly typeSingleLong = this.form
+        .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionType.SingleSelectLong}"]`)
+        .or(this.form.locator(`input[type="radio"][name="${this.radioName}"]`).nth(1));
+    private readonly typeMulti = this.form
+        .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionType.MultiSelect}"]`)
+        .or(this.form.locator(`input[type="radio"][name="${this.radioName}"]`).last());
 
+    private readonly saveButton = this.form.locator('button.govuk-button[type="submit"]');
+    private readonly radios = this.form.locator('input[type="radio"][name="Type"]');
 
+    // ===== Constructor =====
     constructor(page: Page, mode: Mode = 'create') {
         super(page);
-        
-        // The add-question form
-        this.form = page.locator('form[action$="/questions/create"][method="post"]');
-
-        // Inputs
-        this.questionInput = this.form.locator('input[name="content"][type="text"]');
-        this.hintTextarea = this.form.locator('textarea[name="description"]');
-
-        // Radios 
-        const radioName = 'Type';
-        this.typeSingleShort = this.form
-            .locator(`input[type="radio"][name="${radioName}"][value="${QuestionType.SingleSelectShort}"]`)
-            .or(this.form.locator(`input[type="radio"][name="${radioName}"]`).nth(0));
-
-        this.typeSingleLong = this.form
-            .locator(`input[type="radio"][name="${radioName}"][value="${QuestionType.SingleSelectLong}"]`)
-            .or(this.form.locator(`input[type="radio"][name="${radioName}"]`).nth(1));
-
-        this.typeMulti = this.form
-            .locator(`input[type="radio"][name="${radioName}"][value="${QuestionType.MultiSelect}"]`)
-            .or(this.form.locator(`input[type="radio"][name="${radioName}"]`).last());
-
-        // Save
-        this.saveButton = this.form.locator('button.govuk-button[type="submit"]');
-
-        // Radios count
-        this.radios = this.form.locator('input[type="radio"][name="Type"]');
     }
 
     // ===== Validations (structure-only) =====
