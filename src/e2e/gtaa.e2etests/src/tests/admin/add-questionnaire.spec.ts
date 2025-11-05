@@ -16,7 +16,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await doSignIn(page, username, password);
     });
 
-    test('Add a mew questionnaire successfully and lands on Edit Questionnaire Page', async ({ page }) => {
+    test('Add a new questionnaire successfully and lands on Edit Questionnaire Page', async ({ page }) => {
         addQuestionnairePage = await AddQuestionnairePage.create(page);
         await addQuestionnairePage.addQuestionnaire();
 
