@@ -11,6 +11,8 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
 const string localEnvironmentName = "Local";
 var builderIsLocalEnvironment = builder.Environment.IsEnvironment(localEnvironmentName);
 
@@ -22,7 +24,8 @@ if (builderIsLocalEnvironment)
 
 builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
 { 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? 
+                         builder.Configuration["ConnectionStrings:DefaultConnection"]);
 });
 
 builder.Services.AddScoped<IQuestionnaireService, QuestionnaireService>();
@@ -103,8 +106,12 @@ else
 
 app.MapControllers();
 
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
 using (var scope = app.Services.CreateScope())
 {
+    logger.LogInformation("ConnectionString" + builder.Configuration["ConnectionStrings:DefaultConnection"]);
+    
     var dbContext = scope.ServiceProvider.GetRequiredService<GetToAnAnswerDbContext>();
     await dbContext.Database.EnsureCreatedAsync();
 }
