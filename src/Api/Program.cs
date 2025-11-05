@@ -5,9 +5,11 @@ using Common.Infrastructure.Persistence;
 using Common.Local;
 using Common.Logging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Scalar.AspNetCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,16 +37,42 @@ builder.Services.AddScoped<IQuestionnaireRunnerService, QuestionnaireRunnerServi
 builder.Services.AddScoped<IQuestionnaireVersionService, QuestionnaireVersionService>();
 builder.Services.AddScoped<IContentService, ContentService>();
 
+#region Setup security and headers
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedFor;
+    options.KnownProxies.Clear();
+    options.KnownNetworks.Clear();
+    options.AllowedHosts = new List<string>
+    {
+        "*.azurewebsites.net",
+        "*.azurefd.net",
+        "*.get-to-an-answer.education.gov.uk"
+    };
+});
+    
+#endregion
+
+#region HTTP Context and Healthchecks
+    
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHealthChecks();
+    
+#endregion
+
 builder.Services.AddControllers()
     .AddDataAnnotationsLocalization();
 
-builder.AddLogging();
+if (builderIsLocalEnvironment) 
+{
+    builder.AddLogging();
+}
 
 builder.Services.ConfigureHttpJsonOptions(o =>
 {
     o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
-
 
 if (builderIsLocalEnvironment)
 {
@@ -56,6 +84,9 @@ else
     builder.Services
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+    
+    // AllowWebApiToBeAuthorizedByACL is an AzureAd setting in the appsettings.json
+    // This avoids needing the jwt token from needing a role or scope
 }
 
 
@@ -76,7 +107,10 @@ builder.Services.AddOpenApi(options =>
 
 var app = builder.Build();
 
-app.UseLogEnrichment();
+if (builderIsLocalEnvironment)
+{
+    app.UseLogEnrichment();
+}
 
 var appIsLocalEnvironment = app.Environment.IsEnvironment(localEnvironmentName);
 
@@ -116,7 +150,8 @@ using (var scope = app.Services.CreateScope())
 
 if (!appIsLocalEnvironment)
 {
-    app.UseHttpsRedirection();
+    //app.UseHttpsRedirection();
+    app.UseForwardedHeaders();
 }
 
 app.UseAuthentication();

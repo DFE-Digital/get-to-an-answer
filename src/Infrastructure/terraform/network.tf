@@ -39,7 +39,13 @@ resource "azapi_resource" "gettoananswer_main_subnet" {
 
   body = {
     properties = {
-      addressPrefixes = ["10.0.0.0/23"]
+      addressPrefixes = ["10.0.1.0/24"]
+      delegations = [{
+        name = "asp-delegation"
+        properties = {
+          serviceName = "Microsoft.Web/serverFarms"
+        }
+      }]
       serviceEndpoints = [
         {
           service   = "Microsoft.Sql"
@@ -88,13 +94,4 @@ resource "azurerm_mssql_virtual_network_rule" "mssql_vnet_rule" {
   name      = "${var.prefix}sql-uks-mssql-vnet-rule"
   server_id = azurerm_mssql_server.gettoananswer_mssql_server.id
   subnet_id = azapi_resource.gettoananswer_main_subnet.id
-  
 }
-
-resource "azurerm_mssql_firewall_rule" "mssql_aca_rule" {
-  name             = "${var.prefix}sql-uks-mssql-aca-rule"
-  server_id        = azurerm_mssql_server.gettoananswer_mssql_server.id
-  start_ip_address = azurerm_container_app_environment.gettoananswer-cae.static_ip_address
-  end_ip_address   = azurerm_container_app_environment.gettoananswer-cae.static_ip_address
-}
-
