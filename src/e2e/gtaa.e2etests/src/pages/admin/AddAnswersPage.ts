@@ -29,8 +29,7 @@ export class CreateAnswerOptionsPage extends BasePage {
         return this.page.locator(`ul.app-select-options__list > li.app-select-options__item >> nth=${i}`)
             .locator(`button[name="remove"]`);
     }
-
-    // ---- Global controls ----
+    
     private addAnotherOptionBtn(): Locator {
         return this.page.locator(`button.govuk-button.govuk-button--secondary[name="AddEmptyAnswerOption"]`);
     }
@@ -47,7 +46,7 @@ export class CreateAnswerOptionsPage extends BasePage {
         super(page);
     }
 
-    // ---- Actions ----
+    // ===== Actions =====
     async expectOnPage() {
         await expect(this.page.getByRole('heading', {name: 'Create a list of answer options'})).toBeVisible();
     }
