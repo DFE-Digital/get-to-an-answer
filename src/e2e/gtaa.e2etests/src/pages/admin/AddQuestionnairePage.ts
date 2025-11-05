@@ -1,7 +1,7 @@
 import {expect, Page} from '@playwright/test';
 import {BasePage} from '../BasePage';
 
-type Mode = 'create' | 'edit';
+type Mode = 'create' | 'edit' |'clone';
 
 export class AddQuestionnairePage extends BasePage {
     private readonly form = this.page.locator(

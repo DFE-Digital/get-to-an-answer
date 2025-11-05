@@ -1,6 +1,7 @@
 import { expect, Page } from '@playwright/test';
 import {BasePage} from '../BasePage';
 
+type Mode = 'create' | 'edit' |'clone';
 export class EditQuestionnairePage extends BasePage {
     // ===== Root / structural =====
     private readonly main = this.page.locator('main.govuk-main-wrapper[role="main"]');
@@ -62,7 +63,7 @@ export class EditQuestionnairePage extends BasePage {
         'a.govuk-link[href$="/clone"]'
     );
 
-    constructor(page: Page) {
+    constructor(page: Page, mode: Mode = 'create') {
         super(page);
     }
 
