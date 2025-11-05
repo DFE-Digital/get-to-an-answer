@@ -1,7 +1,31 @@
+variable "ad_tenant_id" {
+  description = "Tenant ID"
+  type        = string
+  sensitive = true
+}
+
+variable "ad_client_id" {
+  description = "Azure Active Directory App Client Id"
+  type        = string
+  sensitive = true
+}
+
+variable "ad_client_secret" {
+  description = "Azure Active Directory App Client Secret"
+  type        = string
+  sensitive = true
+}
+
 variable "env" {
   description = "Environment (dev, test, prod)"
   type        = string
 }
+
+variable "asp_env" {
+  description = "Environment (dev, test, prod)"
+  type        = string
+}
+
 
 variable "product" {
   description = "Name of the project"

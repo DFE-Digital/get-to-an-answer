@@ -50,6 +50,9 @@ resource "azapi_resource" "gettoananswer_main_subnet" {
         {
           service   = "Microsoft.Sql"
           locations = [azurerm_resource_group.gettoananswer-rg.location]
+        },
+        {
+          service = "Microsoft.KeyVault"
         }
       ]
       networkSecurityGroup = {
@@ -97,25 +100,25 @@ resource "azurerm_mssql_virtual_network_rule" "mssql_vnet_rule" {
 }
 
 # API VNet Integration
-resource "azurerm_app_service_virtual_network_swift_connection" "api_app_vn_conn" {
-  app_service_id = azurerm_linux_web_app.gettoananswer-api.id
-  subnet_id      = azapi_resource.gettoananswer_main_subnet.id
-
-  depends_on = [azurerm_linux_web_app.gettoananswer-api, azapi_resource.gettoananswer_main_subnet]
-}
-
-# Admin VNet Integration
-resource "azurerm_app_service_virtual_network_swift_connection" "admin_app_vn_conn" {
-  app_service_id = azurerm_linux_web_app.gettoananswer-admin.id
-  subnet_id      = azapi_resource.gettoananswer_main_subnet.id
-
-  depends_on = [azurerm_linux_web_app.gettoananswer-admin, azapi_resource.gettoananswer_main_subnet]
-}
-
-# Website VNet Integration
-resource "azurerm_app_service_virtual_network_swift_connection" "frontend_app_vn_conn" {
-  app_service_id = azurerm_linux_web_app.gettoananswer-frontend.id
-  subnet_id      = azapi_resource.gettoananswer_main_subnet.id
-
-  depends_on = [azurerm_linux_web_app.gettoananswer-frontend, azapi_resource.gettoananswer_main_subnet]
-}
+# resource "azurerm_app_service_virtual_network_swift_connection" "api_app_vn_conn" {
+#   app_service_id = azurerm_linux_web_app.gettoananswer-api.id
+#   subnet_id      = azapi_resource.gettoananswer_main_subnet.id
+# 
+#   depends_on = [azurerm_linux_web_app.gettoananswer-api, azapi_resource.gettoananswer_main_subnet]
+# }
+# 
+# # Admin VNet Integration
+# resource "azurerm_app_service_virtual_network_swift_connection" "admin_app_vn_conn" {
+#   app_service_id = azurerm_linux_web_app.gettoananswer-admin.id
+#   subnet_id      = azapi_resource.gettoananswer_main_subnet.id
+# 
+#   depends_on = [azurerm_linux_web_app.gettoananswer-admin, azapi_resource.gettoananswer_main_subnet]
+# }
+# 
+# # Website VNet Integration
+# resource "azurerm_app_service_virtual_network_swift_connection" "frontend_app_vn_conn" {
+#   app_service_id = azurerm_linux_web_app.gettoananswer-frontend.id
+#   subnet_id      = azapi_resource.gettoananswer_main_subnet.id
+# 
+#   depends_on = [azurerm_linux_web_app.gettoananswer-frontend, azapi_resource.gettoananswer_main_subnet]
+# }
