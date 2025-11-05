@@ -35,10 +35,7 @@ builder.Services.AddTransient(sp =>
         apiScopes));
 
 // Register an HttpClient with a pre-configured base address
-builder.Services.AddHttpClient("ApiClient", client =>
-    {
-        client.BaseAddress = new Uri(apiBaseUrl);
-    })
+builder.Services.AddHttpClient("ApiClient", client => { client.BaseAddress = new Uri(apiBaseUrl); })
     .AddHttpMessageHandler<BearerTokenHandler>();
 
 builder.Services.AddSingleton<IApiClient, ApiClient>(options =>

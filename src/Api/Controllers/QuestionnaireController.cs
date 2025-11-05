@@ -24,7 +24,7 @@ namespace Api.Controllers;
 [Authorize]
 public class QuestionnaireController(IQuestionnaireService questionnaireService) : ControllerBase
 {
-    [HttpPost("")]
+    [HttpPost]
     public async Task<IActionResult> CreateQuestionnaire(CreateQuestionnaireRequestDto request)
     {
         if (!ModelState.IsValid) 
