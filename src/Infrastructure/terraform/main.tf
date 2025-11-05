@@ -89,7 +89,38 @@ resource "azurerm_container_app_environment" "gettoananswer-cae" {
   location                   = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name        = azurerm_resource_group.gettoananswer-rg.name
   log_analytics_workspace_id = azurerm_log_analytics_workspace.log-analytics-workspace.id
+#  infrastructure_subnet_id   = azapi_resource.gettoananswer_main_subnet.id
+  
+  tags = {
+    Environment = var.env
+    Product     = var.product
+  }
 }
+
+# resource "azapi_resource" "gettoananswer-cae" {
+#   type = "Microsoft.App/managedEnvironments@2024-03-01"
+#   name = "${var.prefix}cae-uks-gtaa"
+#   parent_id = azurerm_resource_group.gettoananswer-rg.id
+#   location = azurerm_resource_group.gettoananswer-rg.location
+#   
+#   body = {
+#     properties = {
+#       appLogsConfiguration = {
+#         destination: "log-analytics",
+#         logAnalyticsConfiguration = {
+#           customerId = azurerm_log_analytics_workspace.log-analytics-workspace.workspace_id,
+#           sharedKey = azurerm_log_analytics_workspace.log-analytics-workspace.primary_shared_key
+#         }
+#       },
+#       vnetConfiguration = {
+#         internal = true,
+#         infrastructureSubnetId = azapi_resource.gettoananswer_main_subnet.id
+#       }
+#     }
+#   }
+#   
+#   depends_on = [azurerm_log_analytics_workspace.log-analytics-workspace, azapi_resource.gettoananswer_main_subnet]
+# }
 
 # API Container App
 resource "azurerm_container_app" "gettoananswer-api" {

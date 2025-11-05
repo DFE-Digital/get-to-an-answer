@@ -39,20 +39,11 @@ resource "azapi_resource" "gettoananswer_main_subnet" {
 
   body = {
     properties = {
-      addressPrefixes = ["10.0.1.0/24"]
-      delegations = [{
-        name = "asp-delegation"
-        properties = {
-          serviceName = "Microsoft.Web/serverFarms"
-        }
-      }]
+      addressPrefixes = ["10.0.0.0/23"]
       serviceEndpoints = [
         {
           service   = "Microsoft.Sql"
           locations = [azurerm_resource_group.gettoananswer-rg.location]
-        },
-        {
-          service = "Microsoft.KeyVault"
         }
       ]
       networkSecurityGroup = {
@@ -97,28 +88,13 @@ resource "azurerm_mssql_virtual_network_rule" "mssql_vnet_rule" {
   name      = "${var.prefix}sql-uks-mssql-vnet-rule"
   server_id = azurerm_mssql_server.gettoananswer_mssql_server.id
   subnet_id = azapi_resource.gettoananswer_main_subnet.id
+  
 }
 
-# API VNet Integration
-# resource "azurerm_app_service_virtual_network_swift_connection" "api_app_vn_conn" {
-#   app_service_id = azurerm_linux_web_app.gettoananswer-api.id
-#   subnet_id      = azapi_resource.gettoananswer_main_subnet.id
-# 
-#   depends_on = [azurerm_linux_web_app.gettoananswer-api, azapi_resource.gettoananswer_main_subnet]
-# }
-# 
-# # Admin VNet Integration
-# resource "azurerm_app_service_virtual_network_swift_connection" "admin_app_vn_conn" {
-#   app_service_id = azurerm_linux_web_app.gettoananswer-admin.id
-#   subnet_id      = azapi_resource.gettoananswer_main_subnet.id
-# 
-#   depends_on = [azurerm_linux_web_app.gettoananswer-admin, azapi_resource.gettoananswer_main_subnet]
-# }
-# 
-# # Website VNet Integration
-# resource "azurerm_app_service_virtual_network_swift_connection" "frontend_app_vn_conn" {
-#   app_service_id = azurerm_linux_web_app.gettoananswer-frontend.id
-#   subnet_id      = azapi_resource.gettoananswer_main_subnet.id
-# 
-#   depends_on = [azurerm_linux_web_app.gettoananswer-frontend, azapi_resource.gettoananswer_main_subnet]
-# }
+resource "azurerm_mssql_firewall_rule" "mssql_aca_rule" {
+  name             = "${var.prefix}sql-uks-mssql-aca-rule"
+  server_id        = azurerm_mssql_server.gettoananswer_mssql_server.id
+  start_ip_address = azurerm_container_app_environment.gettoananswer-cae.static_ip_address
+  end_ip_address   = azurerm_container_app_environment.gettoananswer-cae.static_ip_address
+}
+

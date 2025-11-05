@@ -110,8 +110,6 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
 using (var scope = app.Services.CreateScope())
 {
-    logger.LogInformation("ConnectionString" + builder.Configuration["ConnectionStrings:DefaultConnection"]);
-    
     var dbContext = scope.ServiceProvider.GetRequiredService<GetToAnAnswerDbContext>();
     await dbContext.Database.EnsureCreatedAsync();
 }
