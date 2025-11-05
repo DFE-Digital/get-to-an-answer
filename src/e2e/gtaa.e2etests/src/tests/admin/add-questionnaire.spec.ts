@@ -13,7 +13,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
         const username = 'test'; //to be created dynamically
         const password = 'test'; //to be created dynamically
 
-        viewQuestionnairePage = await doSignIn(page, username, password);
+        await doSignIn(page, username, password);
     });
 
     test('Add a mew questionnaire successfully and lands on Edit Questionnaire Page', async ({ page }) => {
