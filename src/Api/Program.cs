@@ -11,6 +11,8 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
 const string localEnvironmentName = "Local";
 var builderIsLocalEnvironment = builder.Environment.IsEnvironment(localEnvironmentName);
 
@@ -22,7 +24,8 @@ if (builderIsLocalEnvironment)
 
 builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? 
+                         builder.Configuration["ConnectionStrings:DefaultConnection"]);
 });
 
 builder.Services.AddScoped<IQuestionnaireService, QuestionnaireService>();
@@ -37,7 +40,10 @@ builder.Services.AddControllers()
 
 builder.AddLogging();
 
-builder.Services.ConfigureHttpJsonOptions(o => { o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
+builder.Services.ConfigureHttpJsonOptions(o =>
+{
+    o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 
 if (builderIsLocalEnvironment)
@@ -51,6 +57,7 @@ else
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 }
+
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -78,7 +85,7 @@ if (appIsLocalEnvironment)
 {
     // Serve OpenAPI JSON at /openapi/v1.json
     app.MapOpenApi();
-    app.MapScalarApiReference(options =>
+    app.MapScalarApiReference(options => 
     {
         options.WithTitle("My API");
         options.WithTheme(ScalarTheme.BluePlanet);
@@ -92,29 +99,29 @@ if (appIsLocalEnvironment)
 else
 {
     app.MapGroup("/openapi")
-        .RequireAuthorization()
-        .MapOpenApi();
+       .RequireAuthorization()
+       .MapOpenApi();
     app.MapScalarApiReference(); // TODO: Add config
 }
 
 app.MapControllers();
 
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
 using (var scope = app.Services.CreateScope())
 {
+    logger.LogInformation("ConnectionString" + builder.Configuration["ConnectionStrings:DefaultConnection"]);
+    
     var dbContext = scope.ServiceProvider.GetRequiredService<GetToAnAnswerDbContext>();
     await dbContext.Database.EnsureCreatedAsync();
 }
 
-if (appIsLocalEnvironment)
-{
-    app.UseMockBearerIfMissing();
-}
-else
+if (!appIsLocalEnvironment)
 {
     app.UseHttpsRedirection();
 }
 
-// app.UseAuthentication();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.Run();
@@ -122,7 +129,5 @@ app.Run();
 [ExcludeFromCodeCoverage]
 public partial class Program
 {
-    protected Program()
-    {
-    }
+    protected Program() { }
 }

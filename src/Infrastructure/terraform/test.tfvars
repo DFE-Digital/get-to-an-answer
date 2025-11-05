@@ -1,4 +1,5 @@
 env                 = "Test"
+asp_env             = "Test"
 product             = "Get-To-An-Answer"
 prefix              = "s263t01"
 location            = "uksouth"
