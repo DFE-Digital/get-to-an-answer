@@ -3,19 +3,13 @@ import {Page, Locator, expect, BrowserContext, Cookie} from '@playwright/test';
 export class BasePage {
     protected readonly page: Page;
 
-    // Locator for the Website Title navigation Link
+    //Locators for web page Header
     public readonly WebsiteNameLink: Locator;
-
-    // Locator for the admin name Link
-    public readonly AdminNameLink: Locator;
-
-    // Locator for the sign-out Link
+    public readonly WebsiteAdminName: Locator;
     public readonly SignOutLink: Locator;
-
-    // Locators for the logo link and logo images
-    public logoLink: Locator;
-    public defaultLogo: Locator;
-
+    public readonly defaultLogo: Locator;
+    public readonly logoLink: Locator;
+    
     // Locators for cookie banner and buttons - TBC
     public readonly cookieBanner: Locator;
     public readonly acceptButton: Locator;
@@ -27,28 +21,29 @@ export class BasePage {
     public readonly cookiePolicyLinkInFooter: Locator;
     public readonly licenceLogo: Locator;
 
+    // ===== Constructor =====
     constructor(page: Page) {
         this.page = page;
-
-        // Title locator
-        this.WebsiteNameLink = page.locator('');
-
-        // Admin name locator
-        this.AdminNameLink = page.locator('');
-
-        // Sign out locator
-        this.SignOutLink = page.locator('');
         
-        // Logo locators
-        this.logoLink = page.locator('');
-        this.defaultLogo = page.locator('');
-
         // Locators for cookie banner and buttons - TBC
         this.cookieBanner = page.locator('');
         this.acceptButton = page.locator('');
         this.rejectButton = page.locator('');
 
-        // Locators for web page Footers
+        // ===== Locators for web page header =====
+        this.logoLink = page.locator('');
+        this.defaultLogo = page.locator('');
+
+        // Title locator
+        this.WebsiteNameLink = page.locator('');
+
+        // Admin name locator
+        this.WebsiteAdminName = page.locator('');
+
+        // Sign out locator
+        this.SignOutLink = page.locator('');
+
+        // ===== Locators for web page Footers =====
         this.footer = page.locator('footer');
         this.footerLinks = page.locator('footer a');
         this.cookiePolicyLinkInFooter = page.locator('');
@@ -58,21 +53,19 @@ export class BasePage {
     async navigateTo(url: string) {
         await this.page.goto(url, {waitUntil: 'networkidle'});
     }
-    
-    //Validate URL matches with expected-pattern (RegExp characters replaced in expected Url)  
-    async validateURLMatches(pattern: RegExp) {
-        await expect(this.page).toHaveURL(pattern);
-    }
 
     protected escapeRegexExpression(s: string): string {
         return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
-    
-    // Validate URL contains the expected substring 
-    async validatePartialUrlMatches(url: string) {
-        const escaped = this.escapeRegexExpression(url);
-        await expect(this.page).toHaveURL(new RegExp(escaped));
+
+    async validateUrlMatches(patternOrFragment: string | RegExp): Promise<void> {
+        const pattern = typeof patternOrFragment === 'string'
+            ? new RegExp(this.escapeRegexExpression(patternOrFragment))
+            : patternOrFragment;
+        await expect(this.page).toHaveURL(pattern);
     }
+    
+    // ===== Actions =====
     
     // Wait for the page to load
     async waitForPageLoad() {
@@ -92,13 +85,21 @@ export class BasePage {
         await expect(this.cookieBanner).not.toBeVisible();
     }
     
-    // Verify logo presence
-    async verifyLogoPresence() {
+    // ===== Verify header Links are visible =====
+    async verifyHeaderLinks() {
+        await expect(this.WebsiteNameLink).toHaveText(/Support for/i);
+        await expect(this.WebsiteNameLink).toBeVisible();
+        
+        await expect(this.WebsiteAdminName).toBeVisible();
+        
         await expect(this.logoLink).toBeVisible();
         await expect(this.defaultLogo).toBeVisible();
-    }
 
-    // Verify footer Links are visible
+        await expect(this.SignOutLink).toHaveText(/Support for/i);
+        await expect(this.SignOutLink).toBeVisible();
+    }
+    
+    // ===== Verify footer Links are visible =====
     async verifyFooterLinks() {
         //Ensure the footer is visible 
         await expect(this.footer).toBeVisible();
@@ -124,5 +125,14 @@ export class BasePage {
             const href = await link.getAttribute('href');
             expect(href).not.toBeNull();
         }
+    }
+
+    static async create<T extends BasePage>(
+        this: new (page: Page) => T,
+        page: Page
+    ): Promise<T> {
+        const instance = new this(page);
+        await instance.waitForPageLoad();
+        return instance;
     }
 }

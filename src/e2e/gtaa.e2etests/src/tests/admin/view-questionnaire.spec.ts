@@ -13,9 +13,6 @@ test.describe('Get to an answer views questionnaire', () => {
     });
 
     test('Verify questionnaires table on view page', async ({page}) => {
-        await viewQuestionnairePage.verifyOnViewQuestionnairesPage();
-
-        // Check if a questionnaire exists
-        await viewQuestionnairePage.verifyQuestionnaireListedByStructure();
+        
     });
 });

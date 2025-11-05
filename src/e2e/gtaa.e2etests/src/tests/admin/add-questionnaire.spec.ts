@@ -5,31 +5,28 @@ import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 
 test.describe('Get to an answer create a new questionnaire', () => {
-    let newQuestionnairePage: AddQuestionnairePage;
+    let viewQuestionnairePage: ViewQuestionnairePage;
+    let addQuestionnairePage: AddQuestionnairePage;
     let editQuestionnairePage: EditQuestionnairePage;
 
     test.beforeEach(async ({page}) => {
         const username = 'test'; //to be created dynamically
         const password = 'test'; //to be created dynamically
 
-        await doSignIn(page, username, password);
+        viewQuestionnairePage = await doSignIn(page, username, password);
     });
 
-    test('Scenario: Successful submit posts to create endpoint - enter valid title and submit lands on EditQuestionnairePage', async ({ page }) => {
-        
-        const addQuestionnairePage = await goToAddQuestionnairePage(page);
-        await addQuestionnairePage.createNewQuestionnaire('Automation Questionnaire');
+    test('Add a mew questionnaire successfully and lands on Edit Questionnaire Page', async ({ page }) => {
+        addQuestionnairePage = await AddQuestionnairePage.create(page);
+        await addQuestionnairePage.addQuestionnaire();
 
-        editQuestionnairePage = new EditQuestionnairePage(page);
-        await editQuestionnairePage.validatePartialUrlMatches('admin/questionnaire/');
-        
+        editQuestionnairePage = await EditQuestionnairePage.create(page);
+        await editQuestionnairePage.expectUrlOnPage();
+        await editQuestionnairePage.expectSuccessBannerVisible();
     });
 
-    test('Validate presence of question and supportive text on new questionnaire page', async ({page}) => {
-        newQuestionnairePage = await goToAddQuestionnairePage(page);
-        await newQuestionnairePage.createNewQuestionnaire('Automation Questionnaire');
-        
-        editQuestionnairePage = new EditQuestionnairePage(page);
-        await editQuestionnairePage.validatePartialUrlMatches('/questionnaire/');
+    test('Validate presence of elements on add new questionnaire page', async ({page}) => {
+        addQuestionnairePage = await goToAddQuestionnairePage(page);
+        await addQuestionnairePage.assertPageElements();
     });
 });

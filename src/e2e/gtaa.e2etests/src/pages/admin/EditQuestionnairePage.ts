@@ -4,7 +4,12 @@ import {BasePage} from '../BasePage';
 type Mode = 'create' | 'edit' | 'clone';
 
 export class EditQuestionnairePage extends BasePage {
+    private static readonly EDIT_URL: RegExp =
+        /\/admin\/questionnaires\/[0-9a-f-]+\/track\/?$/i;
+
     // ===== Locators =====
+    private readonly banner = this.page.locator('div.govuk-notification-banner--success[role="alert"]');
+    private readonly heading = this.banner.locator('.govuk-notification-banner__heading');
     private readonly main = this.page.locator('main.govuk-main-wrapper[role="main"]');
 
     // Status badges (draft etc.)
@@ -65,6 +70,13 @@ export class EditQuestionnairePage extends BasePage {
     }
 
     // ===== Actions =====
+    async expectSuccessBannerVisible(): Promise<void> {
+        await expect(this.banner).toBeVisible();
+        await expect(this.heading).toBeVisible();
+
+        const text = await this.heading.textContent();
+        expect(text?.trim().length).toBeGreaterThan(0);
+    }
     async openEditTitle(): Promise<void> {
         await this.linkEditTitle.click();
     }
@@ -113,7 +125,11 @@ export class EditQuestionnairePage extends BasePage {
         await this.linkClone.click();
     }
 
-    // ===== Validation methods (structure only; no wording) =====
+    // ===== Validation methods (structure only; not content) =====
+    async expectUrlOnPage(): Promise<void> {
+        await this.validateUrlMatches(EditQuestionnairePage.EDIT_URL);
+    }
+
     async validateHeadingAndStatus(): Promise<void> {
         await expect(this.main).toBeVisible();
         await expect(this.draftBadge).toBeVisible();
@@ -156,6 +172,18 @@ export class EditQuestionnairePage extends BasePage {
         await this.validateHeadingAndStatus();
         await this.validateCoreLinks();
         await this.validateOptionalTasks(includeOptional);
+        await this.validateAnswerContentSection();
+        await this.validatePrivacyAndContactsSection();
+        await this.validateActionsSection();
+    }
+
+    async assertPageElements() {
+        await this.expectUrlOnPage();
+        await this.verifyHeaderLinks()
+        await this.verifyFooterLinks();
+        await this.validateAllSections();
+        await this.validateCoreLinks();
+        await this.validateOptionalTasks();
         await this.validateAnswerContentSection();
         await this.validatePrivacyAndContactsSection();
         await this.validateActionsSection();
