@@ -1,4 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,89 +19,92 @@ namespace Common.Local;
 
 public static class MockActiveDirectoryApiClient
 {
-    public static void Deconstruct<T>(this T[] array, out T? first, out T? second)
-    {
-        first = array.Length > 0 ? array[0] : default;
-        second = array.Length > 1 ? array[1] : default;
-    }
+    
 }
 
 // Simple options for the mock user
 public sealed class MockAzureAdOptions
 {
+    public string AuthenticationType { get; set; } = "MockAzureAD";
+    public string? GivenName { get; set; } = "Dev";
+    public string? SurName { get; set; } = "User";
     public string? Name { get; set; } = "Dev User";
     public string? Email { get; set; } = "dev.user@example.test";
-    public string[] Roles { get; set; } = ["Admin"];
+    public string? ObjectId { get; set; } = "11111111-2222-3333-4444-555555555555";
+    public string? TenantId { get; set; } = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+    public string[] Roles { get; set; } = new[] { "Admin" };
+    public string? PreferredUsername { get; set; } = "dev.user@example.test";
+    public string? NameIdentifier { get; set; } // if null, will use ObjectId
 }
 
 // Authentication handler that always authenticates a mock user
-internal sealed class MockAuthenticationHandler(
-    IOptionsMonitor<AuthenticationSchemeOptions> options,
-    ILoggerFactory logger,
-    UrlEncoder encoder,
-    ISystemClock clock,
-    IOptions<MockAzureAdOptions> mockOptions)
-    : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder, clock)
+internal sealed class MockAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
+    private readonly IOptions<MockAzureAdOptions> _mockOptions;
+
+    public MockAuthenticationHandler(
+        IOptionsMonitor<AuthenticationSchemeOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder,
+        ISystemClock clock,
+        IOptions<MockAzureAdOptions> mockOptions)
+        : base(options, logger, encoder, clock)
+    {
+        _mockOptions = mockOptions;
+    }
+
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        Request.Headers.TryGetValue("Authorization", out var authHeader);
-        
-        var (scheme, token) = authHeader.ToString().Split(" ");
+        var o = _mockOptions.Value;
 
-        if (scheme != "Bearer" || string.IsNullOrWhiteSpace(token))
+        var claims = new List<Claim>
         {
-            return Task.FromResult(AuthenticateResult.Fail("invalid auth header"));
+            new(ClaimTypes.GivenName, o.GivenName ?? "Dev"),
+            new(ClaimTypes.Surname, o.SurName ?? "User"),
+            new(ClaimTypes.Name, o.Name ?? "Dev User"),
+            new(ClaimTypes.Email, o.Email ?? "dev.user@example.test"),
+            new("tid", "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"),
+            new("oid", "11111aaa-22bb-c33c-dd44-eeeee5555ee5"),
+            new(ClaimTypes.NameIdentifier, o.NameIdentifier ?? o.ObjectId ?? Guid.NewGuid().ToString()),
+            new("http://schemas.microsoft.com/identity/claims/objectidentifier", o.ObjectId ?? Guid.NewGuid().ToString()),
+            new("http://schemas.microsoft.com/identity/claims/tenantid", o.TenantId ?? "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"),
+            new("preferred_username", o.PreferredUsername ?? o.Email ?? "dev.user@example.test"),
+        };
+
+        foreach (var role in o.Roles)
+        {
+            if (!string.IsNullOrWhiteSpace(role))
+                claims.Add(new(ClaimTypes.Role, role));
         }
 
-        try
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadJwtToken(token);
+        var identity = new ClaimsIdentity(claims, o.AuthenticationType);
+        var principal = new ClaimsPrincipal(identity);
 
-            var claims = jwtToken.Claims.ToDictionary(claim => claim.Type, claim => claim.Value );
-
-            var expiration = claims[ClaimTypes.Expiration];
-            
-            // if expiration is in the future, it's not valid'
-            Console.WriteLine($"Expiration: {DateTimeOffset.Parse(expiration)}");
-            Console.WriteLine($"Now: {DateTimeOffset.UtcNow}");
-            
-            if (DateTimeOffset.Parse(expiration) < DateTimeOffset.UtcNow)
-                return Task.FromResult(AuthenticateResult.Fail("token expired"));
-            
-            foreach (var (type, value) in claims)
-            {
-                Console.WriteLine($"{type}: {value}");
-            }
-            
-            var identity = new ClaimsIdentity(jwtToken.Claims, "MockAzureAD");
-            var principal = new ClaimsPrincipal(identity);
-
-            var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), Scheme.Name);
-            return Task.FromResult(AuthenticateResult.Success(ticket));
-        }
-        catch (Exception ex)
-        {
-            return Task.FromResult(AuthenticateResult.Fail(ex));
-        }
+        var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), Scheme.Name);
+        return Task.FromResult(AuthenticateResult.Success(ticket));
     }
 }
 
 // Middleware that injects a fake JWT bearer for API requests if none provided
-internal sealed class MockBearerMiddleware(RequestDelegate next, IOptions<MockAzureAdOptions> options)
+internal sealed class MockBearerMiddleware
 {
-    private const string HeaderName = "Authorization";
-    private const string MockToken = "Bearer mock-dev-token";
+    private readonly RequestDelegate _next;
+    private readonly string _headerName = "Authorization";
+    private readonly string _mockToken = "Bearer mock-dev-token";
+
+    public MockBearerMiddleware(RequestDelegate next)
+    {
+        _next = next;
+    }
 
     public async Task Invoke(HttpContext context)
     {
         // If caller didn't pass any Authorization header, add a fake one to simulate bearer auth
-        if (!context.Request.Headers.ContainsKey(HeaderName))
+        if (!context.Request.Headers.ContainsKey(_headerName))
         {
-            context.Request.Headers[HeaderName] = MockToken;
+            context.Request.Headers[_headerName] = _mockToken;
         }
-        await next(context);
+        await _next(context);
     }
 }
 
@@ -118,7 +120,7 @@ public static class MockAzureAdExtensions
         {
             opts.Name = "Dev Admin";
             opts.Email = "dev.admin@example.test";
-            opts.Roles = ["Admin"];
+            opts.Roles = new[] { "Admin" };
         };
         
         services.Configure(configure);
