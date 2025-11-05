@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Admin.Pages.Questionnaire;
 
-public class TackQuestionnaire(IApiClient apiClient) : QuestionnaireViewModel
+public class TackQuestionnaire(IApiClient apiClient) : QuestionnairePageModel
 {
+    [FromRoute(Name = "questionnaireId")] 
+    public new Guid? QuestionnaireId { get; set; }
+    
     public async Task<IActionResult> OnGet()
     {
         try

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Admin.Models;
 
-public class BaseViewModel : PageModel
+public class BasePageModel : PageModel
 {
     public enum BannerPhase
     {

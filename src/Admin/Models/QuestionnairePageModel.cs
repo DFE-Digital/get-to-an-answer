@@ -5,7 +5,7 @@ using Common.Domain.Request.Update;
 
 namespace Admin.Models;
 
-public class QuestionnaireViewModel : BaseViewModel
+public class QuestionnairePageModel : BasePageModel
 {
     public List<QuestionnaireDto>? Questionnaires { get; set; }
     public QuestionnaireDto? Questionnaire { get; set; }

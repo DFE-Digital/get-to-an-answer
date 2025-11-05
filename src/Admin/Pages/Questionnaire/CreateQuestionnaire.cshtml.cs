@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Admin.Pages.Questionnaire;
 
 [Authorize]
-public class CreateQuestionnaire(IApiClient apiClient) : QuestionnaireViewModel
+public class CreateQuestionnaire(IApiClient apiClient) : QuestionnairePageModel
 {
     [BindProperty]
     [Required]
@@ -33,6 +33,8 @@ public class CreateQuestionnaire(IApiClient apiClient) : QuestionnaireViewModel
                 Title = Title
             });
 
+            TempData["JustCreated"] = true; 
+            
             return Redirect($"/admin/questionnaires/{response?.Id}/track");
         }
         catch (Exception e)
