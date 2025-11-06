@@ -3,7 +3,7 @@ using Common.Domain.Frontend;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 
-namespace Admin.Models;
+namespace Admin.Models.PageModels;
 
 public class QuestionnairePageModel : BasePageModel
 {

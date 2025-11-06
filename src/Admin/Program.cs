@@ -35,18 +35,8 @@ builder.Services.AddTransient(sp =>
         apiScopes));
 
 // Register an HttpClient with a pre-configured base address
-builder.Services.AddHttpClient("ApiClient", client => { client.BaseAddress = new Uri(apiBaseUrl); })
+builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAddress = new Uri(apiBaseUrl); })
     .AddHttpMessageHandler<BearerTokenHandler>();
-
-builder.Services.AddSingleton<IApiClient, ApiClient>(options =>
-{
-    var client = options.GetRequiredService<IHttpClientFactory>().CreateClient("ApiClient");
-    return new ApiClient(client);
-});
-
-
-// builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAddress = new Uri(apiBaseUrl); })
-//     .AddHttpMessageHandler<BearerTokenHandler>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI();
@@ -61,7 +51,7 @@ app.UseLogEnrichment();
 // Configure the HTTP request pipeline.
 if (!builderIsLocalEnvironment)
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
@@ -69,17 +59,6 @@ if (!builderIsLocalEnvironment)
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-
-
-//TODO: do we need?
-// app.UseStaticFiles(new StaticFileOptions()
-// {
-//     OnPrepareResponse = ctx =>
-//     {
-//         ctx.Context.Response.Headers.Append(
-//             "Cache-Control", $"public, max-age={FromDays(31).TotalSeconds}");
-//     }
-// });
 
 app.UseRouting();
 

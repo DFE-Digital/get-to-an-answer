@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Admin.Models;
+using Admin.Models.PageModels;
 using Admin.Models.ViewModels;
 using Common.Client;
 using Common.Domain.Request.Create;
@@ -10,7 +11,7 @@ using Newtonsoft.Json;
 namespace Admin.Pages.Questionnaire;
 
 [Authorize]
-public class CreateQuestionnaire(IApiClient apiClient) : QuestionnairePageModel
+public class CreateQuestionnaire(IApiClient apiClient, ILogger<CreateQuestionnaire> logger) : QuestionnairePageModel
 {
     [BindProperty] [Required] public string Title { get; set; } = string.Empty;
 
@@ -39,8 +40,8 @@ public class CreateQuestionnaire(IApiClient apiClient) : QuestionnairePageModel
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            logger.LogError(e, "Error creating questionnaire. Error: {EMessage}", e.Message);
+            return RedirectToPage("/Error");
         }
     }
 }

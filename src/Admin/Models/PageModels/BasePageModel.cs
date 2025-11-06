@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Admin.Models;
+namespace Admin.Models.PageModels;
 
 public class BasePageModel : PageModel
 {

@@ -33,4 +33,8 @@
       <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <AdditionalFiles Include="Pages\Error.cshtml" />
+    </ItemGroup>
+
 </Project>
