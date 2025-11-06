@@ -115,7 +115,7 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
     AzureAd__Domain = "Educationgovuk.onmicrosoft.com"
     AzureAd__TenantId = var.ad_tenant_id
     AzureAd__ClientId = var.ad_client_id
-    AzureAd__Audience = "api://${var.prefix}gettoananswer"
+    AzureAd__Audience = "api://${var.ad_client_id}"
     AzureAd__ClientSecret = var.ad_client_secret
   }
 
