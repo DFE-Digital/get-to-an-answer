@@ -1,16 +1,16 @@
 output "api_url" {
-  value = "https://${azurerm_container_app.gettoananswer-api.latest_revision_fqdn}"
+  value = azurerm_linux_web_app.gettoananswer-api.default_hostname
 }
 
 output "admin_url" {
-  value = "https://${azurerm_container_app.gettoananswer-admin.latest_revision_fqdn}"
+  value = azurerm_linux_web_app.gettoananswer-admin.default_hostname
 }
 
 output "frontend_url" {
-  value = "https://${azurerm_container_app.gettoananswer-frontend.latest_revision_fqdn}"
+  value = azurerm_linux_web_app.gettoananswer-frontend.default_hostname
 }
 
-# Virtual network-related outputs
+// Virtual network-related outputs
 output "azurerm_virtual_network" {
   value       = azurerm_virtual_network.gettoananswer_vnet.name
   description = "Virtual network name"

@@ -9,10 +9,6 @@ terraform {
       source  = "Azure/azapi"
       version = "2.7.0"
     }
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "3.4.0"
-    }
   }
   backend "azurerm" {}
 }
@@ -39,7 +35,7 @@ resource "azurerm_log_analytics_workspace" "log-analytics-workspace" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   retention_in_days   = 180
-  tags = {
+  tags                = {
     Environment = var.env
     Product     = var.product
   }
@@ -51,7 +47,7 @@ resource "azurerm_application_insights" "application-insights" {
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   application_type    = "web"
   workspace_id        = azurerm_log_analytics_workspace.log-analytics-workspace.id
-  tags = {
+  tags                = {
     Environment = var.env
     Product     = var.product
   }
@@ -77,217 +73,120 @@ resource "azurerm_container_registry" "gettoananswer-registry" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   sku                 = "Basic"
   admin_enabled       = true
+  
+  
 
   lifecycle {
     ignore_changes = [tags]
   }
 }
 
-# Container Apps Environment
-resource "azurerm_container_app_environment" "gettoananswer-cae" {
-  name                       = "${var.prefix}cae-uks-gtaa"
-  location                   = azurerm_resource_group.gettoananswer-rg.location
-  resource_group_name        = azurerm_resource_group.gettoananswer-rg.name
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.log-analytics-workspace.id
+# Linux Web App - API
+resource "azurerm_linux_web_app" "gettoananswer-api" {
+  name                = "${var.prefix}app-uks-api"
+  location            = azurerm_resource_group.gettoananswer-rg.location
+  resource_group_name = azurerm_resource_group.gettoananswer-rg.name
+  service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
+  virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
+
+  site_config {
+    application_stack {
+      docker_image_name        = var.api_image_name
+      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_registry_username = azurerm_container_registry.gettoananswer-registry.admin_username
+      docker_registry_password = azurerm_container_registry.gettoananswer-registry.admin_password
+    }
+    # Enforce HTTPS only
+    minimum_tls_version = "1.2"
+
+    health_check_path                 = "/health"
+    health_check_eviction_time_in_min = 5
+  }
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
+  app_settings = {
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
+    ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
+    ConnectionStrings__DefaultConnection = "Server=tcp:${azurerm_mssql_server.gettoananswer_mssql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.gettoananswer_mssql_db.name};Persist Security Info=False;User ID=${azurerm_mssql_server.gettoananswer_mssql_server.administrator_login};Password=${var.sql_admin_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    SQLSERVER_SA_PASSWORD = var.sql_admin_password
+    AzureAd__Domain = "Educationgovuk.onmicrosoft.com"
+    AzureAd__TenantId = var.ad_tenant_id
+    AzureAd__ClientId = var.ad_client_id
+    AzureAd__Audience = "api://${var.prefix}gettoananswer"
+    AzureAd__ClientSecret = var.ad_client_secret
+  }
+
+  https_only = true
+  depends_on = [azurerm_service_plan.gettoananswer-web-asp]
 }
 
-# API Container App
-resource "azurerm_container_app" "gettoananswer-api" {
-  name                         = "${var.prefix}aca-uks-api"
-  container_app_environment_id = azurerm_container_app_environment.gettoananswer-cae.id
-  resource_group_name          = azurerm_resource_group.gettoananswer-rg.name
-  revision_mode                = "Single"
-  ingress {
-    external_enabled = true
-    target_port      = 8080
-    transport        = "auto"
-    traffic_weight {
-      percentage      = 100
-      latest_revision = true
+# Linux Web App - Admin
+resource "azurerm_linux_web_app" "gettoananswer-admin" {
+  name                = "${var.prefix}app-uks-admin"
+  location            = azurerm_resource_group.gettoananswer-rg.location
+  resource_group_name = azurerm_resource_group.gettoananswer-rg.name
+  service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
+  virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
+
+  site_config {
+    application_stack {
+      docker_image_name        = var.admin_image_name
+      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_registry_username = azurerm_container_registry.gettoananswer-registry.admin_username
+      docker_registry_password = azurerm_container_registry.gettoananswer-registry.admin_password
     }
+    minimum_tls_version = "1.2"
+
+    health_check_path                 = "/health"
+    health_check_eviction_time_in_min = 5
   }
-  registry {
-    server               = azurerm_container_registry.gettoananswer-registry.login_server
-    username             = azurerm_container_registry.gettoananswer-registry.admin_username
-    password_secret_name = "acr-pwd"
+
+  lifecycle {
+    ignore_changes = [tags, app_settings, sticky_settings]
   }
-  secret {
-    name  = "acr-pwd"
-    value = azurerm_container_registry.gettoananswer-registry.admin_password
+
+  app_settings = {
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
+    AppSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
   }
-  secret {
-    name  = "aad-client-secret"
-    value = var.ad_client_secret
-  }
-  template {
-    container {
-      name   = "api"
-      image  = "${azurerm_container_registry.gettoananswer-registry.login_server}/${var.api_image_name}"
-      cpu    = 0.5
-      memory = "1Gi"
-      env {
-        name  = "ASPNETCORE_ENVIRONMENT"
-        value = var.asp_env
-      }
-      env {
-        name  = "ASPNETCORE_URLS"
-        value = "http://0.0.0.0:8080"
-      }
-      env {
-        name  = "ApplicationInsights__ConnectionString"
-        value = azurerm_application_insights.application-insights.connection_string
-      }
-      env {
-        name  = "ConnectionStrings__DefaultConnection"
-        value = "Server=tcp:${azurerm_mssql_server.gettoananswer_mssql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.gettoananswer_mssql_db.name};Persist Security Info=False;User ID=${azurerm_mssql_server.gettoananswer_mssql_server.administrator_login};Password=${var.sql_admin_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-      }
-      env {
-        name  = "AzureAd__Domain"
-        value = "Educationgovuk.onmicrosoft.com"
-      }
-      env {
-        name  = "AzureAd__TenantId"
-        value = var.ad_tenant_id
-      }
-      env {
-        name  = "AzureAd__ClientId"
-        value = var.ad_client_id
-      }
-      env {
-        name  = "AzureAd__Audience"
-        value = "api://${var.prefix}gettoananswer"
-      }
-      env {
-        name  = "AzureAd__ClientSecret"
-        value = "aad-client-secret"
-      }
-    }
-  }
-  depends_on = [azurerm_container_registry.gettoananswer-registry]
+
+  https_only = true
+  depends_on = [azurerm_service_plan.gettoananswer-web-asp, azurerm_linux_web_app.gettoananswer-api]
 }
 
-# Admin Container App
-resource "azurerm_container_app" "gettoananswer-admin" {
-  name                         = "${var.prefix}aca-uks-admin"
-  container_app_environment_id = azurerm_container_app_environment.gettoananswer-cae.id
-  resource_group_name          = azurerm_resource_group.gettoananswer-rg.name
-  revision_mode                = "Single"
-  ingress {
-    external_enabled = true
-    target_port      = 8080
-    transport        = "auto"
-    traffic_weight {
-      percentage      = 100
-      latest_revision = true
-    }
-  }
-  registry {
-    server               = azurerm_container_registry.gettoananswer-registry.login_server
-    username             = azurerm_container_registry.gettoananswer-registry.admin_username
-    password_secret_name = "acr-pwd"
-  }
-  secret {
-    name  = "acr-pwd"
-    value = azurerm_container_registry.gettoananswer-registry.admin_password
-  }
-  secret {
-    name  = "aad-client-secret"
-    value = var.ad_client_secret
-  }
-  template {
-    container {
-      name   = "admin"
-      image  = "${azurerm_container_registry.gettoananswer-registry.login_server}/${var.admin_image_name}"
-      cpu    = 0.5
-      memory = "1Gi"
-      env {
-        name  = "ASPNETCORE_ENVIRONMENT"
-        value = var.asp_env
-      }
-      env {
-        name  = "ASPNETCORE_URLS"
-        value = "http://0.0.0.0:8080"
-      }
-      env {
-        name  = "AppSettings__BaseUrl"
-        value = azurerm_container_app.gettoananswer-api.latest_revision_fqdn
-      }
-      env {
-        name  = "ApplicationInsights__ConnectionString"
-        value = azurerm_application_insights.application-insights.connection_string
-      }
-      env {
-        name  = "AzureAd__Domain"
-        value = "Educationgovuk.onmicrosoft.com"
-      }
-      env {
-        name  = "AzureAd__TenantId"
-        value = var.ad_tenant_id
-      }
-      env {
-        name  = "AzureAd__ClientId"
-        value = var.ad_client_id
-      }
-      env {
-        name  = "AzureAd__Audience"
-        value = "api://${var.prefix}gettoananswer"
-      }
-      env {
-        name  = "AzureAd__ClientSecret"
-        value = "aad-client-secret"
-      }
-    }
-  }
-  depends_on = [azurerm_container_app.gettoananswer-api, ]
-}
+# Linux Web App - Frontend
+resource "azurerm_linux_web_app" "gettoananswer-frontend" {
+  name                = "${var.prefix}app-uks-frontend"
+  location            = azurerm_resource_group.gettoananswer-rg.location
+  resource_group_name = azurerm_resource_group.gettoananswer-rg.name
+  service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
+  virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
 
-# Frontend Container App
-resource "azurerm_container_app" "gettoananswer-frontend" {
-  name                         = "${var.prefix}aca-uks-frontend"
-  container_app_environment_id = azurerm_container_app_environment.gettoananswer-cae.id
-  resource_group_name          = azurerm_resource_group.gettoananswer-rg.name
-  revision_mode                = "Single"
-  ingress {
-    external_enabled = true
-    target_port      = 8080
-    transport        = "auto"
-    traffic_weight {
-      percentage      = 100
-      latest_revision = true
+  site_config {
+    application_stack {
+      docker_image_name        = var.frontend_image_name
+      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_registry_username = azurerm_container_registry.gettoananswer-registry.admin_username
+      docker_registry_password = azurerm_container_registry.gettoananswer-registry.admin_password
     }
+    minimum_tls_version = "1.2"
+
+    health_check_path                 = "/health"
+    health_check_eviction_time_in_min = 5
   }
-  registry {
-    server               = azurerm_container_registry.gettoananswer-registry.login_server
-    username             = azurerm_container_registry.gettoananswer-registry.admin_username
-    password_secret_name = "acr-pwd"
+
+  lifecycle {
+    ignore_changes = [tags, app_settings, sticky_settings]
   }
-  secret {
-    name  = "acr-pwd"
-    value = azurerm_container_registry.gettoananswer-registry.admin_password
+
+  app_settings = {
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
+    AppSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
   }
-  template {
-    container {
-      name   = "frontend"
-      image  = "${azurerm_container_registry.gettoananswer-registry.login_server}/${var.frontend_image_name}"
-      cpu    = 0.5
-      memory = "1Gi"
-      env {
-        name  = "ASPNETCORE_ENVIRONMENT"
-        value = var.asp_env
-      }
-      env {
-        name  = "ASPNETCORE_URLS"
-        value = "http://0.0.0.0:8080"
-      }
-      env {
-        name  = "AppSettings__BaseUrl"
-        value = azurerm_container_app.gettoananswer-api.latest_revision_fqdn
-      }
-      env {
-        name  = "ApplicationInsights__ConnectionString"
-        value = azurerm_application_insights.application-insights.connection_string
-      }
-    }
-  }
-  depends_on = [azurerm_container_app.gettoananswer-api]
+
+  https_only = true
+  depends_on = [azurerm_service_plan.gettoananswer-web-asp, azurerm_linux_web_app.gettoananswer-api]
 }
