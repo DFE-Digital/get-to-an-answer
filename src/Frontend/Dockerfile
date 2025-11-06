@@ -24,6 +24,8 @@ FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src/Frontend
 RUN dotnet publish "./Frontend.csproj" -c $BUILD_CONFIGURATION -o /app/publish
+RUN mkdir /app/https
+RUN dotnet dev-certs https -ep /app/https/aspnetapp.pfx -p e2e
 
 FROM base AS final
 WORKDIR /app
