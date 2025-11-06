@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace Admin.Pages.Questionnaire;
 
-public class TackQuestionnaires(IApiClient apiClient, ILogger<TackQuestionnaires> logger) : QuestionnairesPageModel
+public class TrackQuestionnaires(IApiClient apiClient, ILogger<TrackQuestionnaires> logger) : QuestionnairesPageModel
 {
     [FromRoute(Name = "questionnaireId")] 
     public new Guid? QuestionnaireId { get; set; }
