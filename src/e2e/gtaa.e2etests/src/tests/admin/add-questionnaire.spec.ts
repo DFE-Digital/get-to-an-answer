@@ -37,7 +37,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
 
         viewQuestionnairePage = await ViewQuestionnairePage.create(page);
         await viewQuestionnairePage.expectUrlOnPage();
-        await viewQuestionnairePage.expectTitleLabelOnPage();
+        await viewQuestionnairePage.expectQuestionnaireHeadingOnPage();
     });
 
     test('Submit a new questionnaire with missing title', async ({page}) => {
