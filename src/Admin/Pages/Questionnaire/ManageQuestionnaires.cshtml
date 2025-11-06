@@ -1,10 +1,11 @@
 @page "/admin/questionnaires"
-@model Admin.Pages.Questionnaire.ManageQuestionnaireses
+@model Admin.Pages.Questionnaire.ManageQuestionnaires
 
 @using Common.Extensions
 
 @{
   ViewData["Title"] = "Home Page";
+  var questionnaires = Model.ViewModel.Questionnaires;
 }
 
 @section BeforeContainer
@@ -21,7 +22,7 @@
   </section>
 }
 
-@if (Model.ViewModel.JustDeleted)
+@if (Model.ViewModel.QuestionnaireState is { JustDeleted: true })
 {
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -66,7 +67,8 @@
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    @if (Model.Questionnaires is {} questionnaires)
+    
+    @if (questionnaires != null)
     {
       @foreach (var questionnaire in questionnaires)
       {

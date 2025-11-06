@@ -7,18 +7,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Admin.Pages.Questionnaire;
 
-public class ManageQuestionnaireses(IApiClient apiClient) : QuestionnairesPageModel
+public class ManageQuestionnaires(IApiClient apiClient, ILogger<ManageQuestionnaires> logger) : QuestionnairesPageModel
 {
     public async Task<IActionResult> OnGet()
     {
         try
         {
-            Questionnaires = await apiClient.GetQuestionnairesAsync();
+            ViewModel.Questionnaires = await apiClient.GetQuestionnairesAsync();
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            logger.LogError(e, "Error creating questionnaire. Error: {EMessage}", e.Message);
+            return RedirectToPage("/Error");
         }
         
         return Page();

@@ -32,10 +32,6 @@ public class TackQuestionnaires(IApiClient apiClient, ILogger<TackQuestionnaires
                 
                 ViewModel.QuestionnaireState = deserialized;
             }
-            else
-            {
-                throw new KeyNotFoundException("QuestionnaireState not found in TempData.");
-            }
         }
         catch (Exception e)
         {
@@ -43,6 +39,6 @@ public class TackQuestionnaires(IApiClient apiClient, ILogger<TackQuestionnaires
             return RedirectToPage("/Error");
         }
 
-        return Page();
+        return Page(); 
     }
 }
