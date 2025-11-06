@@ -1,14 +1,8 @@
-using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Common.Client;
 using Common.Local;
-using Common.Logging;
-using Common.Telemetry;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,9 +27,12 @@ else
 var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
 var apiScopes = builder.Configuration.GetSection("ApiSettings:Scopes").Get<string[]>() ?? [];
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddTransient(sp =>
     new BearerTokenHandler(
         sp.GetRequiredService<ITokenAcquisition>(),
+        sp.GetRequiredService<IHttpContextAccessor>(),
         apiScopes));
 
 // Register an HttpClient with a pre-configured base address

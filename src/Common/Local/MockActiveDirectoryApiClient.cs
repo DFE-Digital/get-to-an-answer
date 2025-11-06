@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Encodings.Web;
@@ -15,6 +16,7 @@ using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.TokenCacheProviders;
 using Microsoft.Identity.Web.TokenCacheProviders.InMemory;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Common.Local;
 
@@ -340,7 +342,34 @@ public sealed class MockTokenAcquisition : ITokenAcquisition
 
     public Task<string> GetAccessTokenForUserAsync(IEnumerable<string> scopes, string? authenticationScheme, string? tenantId = null,
         string? userFlow = null, ClaimsPrincipal? user = null, TokenAcquisitionOptions? tokenAcquisitionOptions = null)
-        => Task.FromResult("mock-user-access-token");
+    {
+        if (user?.Claims == null)
+            return Task.FromResult(String.Empty);
+            
+        var claims = user.Claims; // copy or map as needed
+
+        var secret = "use-a-64-byte-minimum-secret-string................................"; // >=64 bytes
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+
+        claims = claims.Select(c =>
+        {
+            if (c.Type == "aud")
+            {
+                return new Claim(c.Type, "api://client-id/.default");
+            }
+            
+            return new Claim(c.Type, c.Value);
+        });
+        
+        var jwt = new JwtSecurityToken(
+            issuer: "rando-issuer",
+            claims: claims,
+            notBefore: DateTime.UtcNow,
+            expires: DateTime.UtcNow.AddHours(8),
+            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha512));
+
+        return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(jwt));
+    }
 
     public Task<AuthenticationResult> GetAuthenticationResultForUserAsync(IEnumerable<string> scopes,
         string? authenticationScheme, string? tenantId = null,
