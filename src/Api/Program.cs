@@ -25,7 +25,7 @@ if (builderIsLocalEnvironment)
 }
 
 builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
-{ 
+{
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? 
                          builder.Configuration["ConnectionStrings:DefaultConnection"]);
 });
