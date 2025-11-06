@@ -38,6 +38,7 @@ public sealed class MockAzureAdOptions
 // Authentication handler that always authenticates a mock user
 internal sealed class MockAuthenticationHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
+    IOptionsMonitor<CookieAuthenticationOptions> cookieOptions,
     ILoggerFactory logger,
     UrlEncoder encoder,
     ISystemClock clock,
@@ -46,9 +47,27 @@ internal sealed class MockAuthenticationHandler(
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        Request.Cookies.TryGetValue(".MockAuth", out var cookie);
+
+        // Gets the cookie from the browser and extracts the ticket
+        var t = new MockAzureAdExtensions.PlainTextTicketFormat().Unprotect(cookie);
+
+        if (t?.Principal.Identity?.IsAuthenticated ?? false)
+        {
+            return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(t.Principal, new AuthenticationProperties(), Scheme.Name)));
+        }
+        
         Request.Headers.TryGetValue("Authorization", out var authHeader);
         
         var (scheme, token) = authHeader.ToString().Split(" ");
+        
+        if (scheme is null || token is null)
+        {
+            Request.Query.TryGetValue("jt", out var jwtTokenString);
+            
+            scheme = "Bearer";
+            token = jwtTokenString;
+        }
 
         if (scheme != "Bearer" || string.IsNullOrWhiteSpace(token))
         {
@@ -128,7 +147,7 @@ public static class MockAzureAdExtensions
         };
         
         services.Configure(configure);
-
+        
         services
             .AddAuthentication(options =>
             {
@@ -136,8 +155,19 @@ public static class MockAzureAdExtensions
                 options.DefaultAuthenticateScheme = MockScheme;
                 options.DefaultChallengeScheme = MockScheme;
                 options.DefaultSignInScheme = MockCookieScheme;
+
             })
-            .AddScheme<AuthenticationSchemeOptions, MockAuthenticationHandler>(MockScheme, _ => { });
+            .AddScheme<AuthenticationSchemeOptions, MockAuthenticationHandler>(MockScheme, _ => { })
+            .AddCookie(MockCookieScheme, cookie =>
+            {
+                cookie.TicketDataFormat = new PlainTextTicketFormat();
+                cookie.LoginPath = "/dev/login";
+                cookie.LogoutPath = "/dev/logout";
+                cookie.Cookie.Name = ".MockAuth";
+                cookie.SlidingExpiration = true;
+                cookie.ExpireTimeSpan = TimeSpan.FromHours(8);
+                cookie.DataProtectionProvider = null;
+            });
         
         services.AddSingleton<ITokenAcquisition, MockTokenAcquisition>();
         
@@ -154,6 +184,27 @@ public static class MockAzureAdExtensions
         });
 
         return services;
+    }
+    
+    public sealed class PlainTextTicketFormat : ISecureDataFormat<AuthenticationTicket>
+    {
+        public string Protect(AuthenticationTicket data)
+            => Convert.ToBase64String(
+                TicketSerializer.Default.Serialize(data));
+
+        public string Protect(AuthenticationTicket data, string? purpose) => Protect(data);
+
+        public AuthenticationTicket? Unprotect(string? protectedText)
+        {
+            if (protectedText == null)
+                return null;
+
+            var plainText = Convert.FromBase64String(protectedText);
+            
+            return TicketSerializer.Default.Deserialize(plainText);
+        }
+
+        public AuthenticationTicket? Unprotect(string? protectedText, string? purpose) => Unprotect(protectedText);
     }
 
     // For API app: adds a mock bearer scheme that always authenticates
@@ -192,11 +243,14 @@ public static class MockAzureAdExtensions
 
         app.UseRouting();
 
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapGet("/dev/login", async context =>
             {
-                // Force authenticate using the mock scheme and issue a cookie
+                // Authenticate using the mock scheme to build a principal
                 var result = await context.AuthenticateAsync(MockScheme);
                 if (!result.Succeeded || result.Principal == null)
                 {
@@ -205,9 +259,14 @@ public static class MockAzureAdExtensions
                     return;
                 }
 
-                await context.SignInAsync(MockCookieScheme, result.Principal);
+                // Issue cookie
+                await context.SignInAsync(MockCookieScheme, result.Principal, new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8),
+                });
                 context.Response.Redirect("/");
-            });
+            }).AllowAnonymous();
 
             endpoints.MapGet("/dev/logout", async context =>
             {
@@ -230,6 +289,23 @@ public static class MockAzureAdExtensions
         });
 
         return app;
+    }
+
+    private static ClaimsPrincipal? ToClaims(string jwtTokenString)
+    {
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(jwtTokenString);
+
+            var identity = new ClaimsIdentity(jwtToken.Claims, "MockAzureAD");
+            return new ClaimsPrincipal(identity);
+            
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
     }
 
     // For API: inject a mock bearer if none present

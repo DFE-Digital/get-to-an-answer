@@ -89,7 +89,6 @@ else
     // This avoids needing the jwt token from needing a role or scope
 }
 
-
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi(options =>
