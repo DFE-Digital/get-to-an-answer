@@ -7,9 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Admin.Pages.Questionnaire;
 
-public class ManageQuestionnaires(IApiClient apiClient) : QuestionnairePageModel
+public class ManageQuestionnaireses(IApiClient apiClient) : QuestionnairesPageModel
 {
-    
     public async Task<IActionResult> OnGet()
     {
         try

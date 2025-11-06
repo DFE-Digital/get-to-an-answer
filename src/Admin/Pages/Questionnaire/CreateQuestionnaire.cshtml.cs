@@ -11,9 +11,9 @@ using Newtonsoft.Json;
 namespace Admin.Pages.Questionnaire;
 
 [Authorize]
-public class CreateQuestionnaire(IApiClient apiClient, ILogger<CreateQuestionnaire> logger) : QuestionnairePageModel
+public class CreateQuestionnaires(IApiClient apiClient, ILogger<CreateQuestionnaires> logger) : QuestionnairesPageModel
 {
-    [BindProperty] [Required] public string Title { get; set; } = string.Empty;
+    [BindProperty] public required CreateQuestionnaireRequestDto CreateQuestionnaire { get; set; }
 
     public IActionResult OnGet()
     {
@@ -31,11 +31,12 @@ public class CreateQuestionnaire(IApiClient apiClient, ILogger<CreateQuestionnai
 
             var response = await apiClient.CreateQuestionnaireAsync(new CreateQuestionnaireRequestDto
             {
-                Title = Title
+                Title = CreateQuestionnaire.Title
             });
 
-            TempData[nameof(QuestionnairesViewModel)] = JsonConvert.SerializeObject(new QuestionnairesViewModel { JustCreated = true });
-            
+            TempData[nameof(QuestionnaireState)] =
+                JsonConvert.SerializeObject(new QuestionnaireState { JustCreated = true });
+
             return Redirect($"/admin/questionnaires/{response?.Id}/track");
         }
         catch (Exception e)

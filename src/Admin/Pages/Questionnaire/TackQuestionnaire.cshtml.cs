@@ -8,11 +8,10 @@ using Newtonsoft.Json;
 
 namespace Admin.Pages.Questionnaire;
 
-public class TackQuestionnaire(IApiClient apiClient) : QuestionnairePageModel
+public class TackQuestionnaires(IApiClient apiClient, ILogger<TackQuestionnaires> logger) : QuestionnairesPageModel
 {
-    [FromRoute(Name = "questionnaireId")] public new Guid? QuestionnaireId { get; set; }
-
-    public QuestionnairesViewModel QuestionnairesViewModel { get; set; } = new();
+    [FromRoute(Name = "questionnaireId")] 
+    public new Guid? QuestionnaireId { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
@@ -21,17 +20,27 @@ public class TackQuestionnaire(IApiClient apiClient) : QuestionnairePageModel
             if (QuestionnaireId == null)
                 return Page();
 
-            Questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId.Value);
+            ViewModel.Questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId.Value);
+            
+            var stateFound = TempData.TryGetValue(nameof(QuestionnaireState), out var value);
 
-            QuestionnairesViewModel = TempData.TryGetValue(nameof(QuestionnairesViewModel), out var value)
-                ? JsonConvert.DeserializeObject<QuestionnairesViewModel>(value?.ToString() ?? string.Empty) ??
-                  new QuestionnairesViewModel()
-                : new QuestionnairesViewModel();
+            if (stateFound)
+            {
+                var deserialized = JsonConvert.DeserializeObject<QuestionnaireState>(value?.ToString() ?? string.Empty);
+                if (deserialized == null)
+                    logger.LogError("Failed to deserialize QuestionnaireState from TempData.");
+                
+                ViewModel.QuestionnaireState = deserialized;
+            }
+            else
+            {
+                throw new KeyNotFoundException("QuestionnaireState not found in TempData.");
+            }
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            logger.LogError(e, "Error creating questionnaire. Error: {EMessage}", e.Message);
+            return RedirectToPage("/Error");
         }
 
         return Page();

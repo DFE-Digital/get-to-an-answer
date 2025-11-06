@@ -1,9 +1,11 @@
 @page "/admin/questionnaires/{questionnaireId:guid}/track"
-@model Admin.Pages.Questionnaire.TackQuestionnaire
+@model Admin.Pages.Questionnaire.TackQuestionnaires
 @using Common.Enum
 
 @{
   ViewData["Title"] = "Home Page";
+
+  var questionnaireViewModel = Model.ViewModel;
 }
 
 @section BeforeContent
@@ -11,7 +13,7 @@
   <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires">Back to questionnaires</a>
 }
 
-@if (Model.QuestionnairesViewModel.InviteAccepted)
+@if (questionnaireViewModel.InviteAccepted)
 {
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -31,7 +33,7 @@
     </div>
   </div>
 } 
-else if (Model.QuestionnairesViewModel.JustCreated)
+else if (questionnaireViewModel.JustCreated)
 {
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -50,7 +52,7 @@ else if (Model.QuestionnairesViewModel.JustCreated)
     </div>
   </div>
 }
-else if (Model.QuestionnairesViewModel.JustUpdated)
+else if (questionnaireViewModel.JustUpdated)
 {
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -69,7 +71,7 @@ else if (Model.QuestionnairesViewModel.JustUpdated)
     </div>
   </div>
 }
-else if (Model.QuestionnairesViewModel.JustCloned)
+else if (questionnaireViewModel.JustCloned)
 {
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -88,7 +90,7 @@ else if (Model.QuestionnairesViewModel.JustCloned)
   </div>
 </div>
 }
-else if (Model.QuestionnairesViewModel.JustPublished)
+else if (questionnaireViewModel.JustPublished)
 {
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -107,7 +109,7 @@ else if (Model.QuestionnairesViewModel.JustPublished)
     </div>
   </div>
 }
-else if (Model.QuestionnairesViewModel.JustUnpublished)
+else if (questionnaireViewModel.JustUnpublished)
 {
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -130,23 +132,23 @@ else if (Model.QuestionnairesViewModel.JustUnpublished)
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
-      <span class="govuk-caption-l">@Model.Questionnaire?.Title</span><span class="govuk-visually-hidden"> - </span>
+      <span class="govuk-caption-l">@Model.ViewModel.Questionnaire?.Title</span><span class="govuk-visually-hidden"> - </span>
       Edit your questionnaire
     </h1>
     <dl class="govuk-!-margin-bottom-7">
       <dt class="govuk-visually-hidden">Status</dt>
-      <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model.Questionnaire?.Status">@Model.Questionnaire?.Status</strong>
+      <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model.ViewModel.Questionnaire?.Status">@Model.ViewModel.Questionnaire?.Status</strong>
       </dd>
     </dl>
     <div class="govuk-!-margin-bottom-9">
       <p>
-        <a class="govuk-link" href="/admin/questionnaires/@Model.Questionnaire?.Id/start/preview" target="_blank">Preview this questionnaire</a>
+        <a class="govuk-link" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/start/preview" target="_blank">Preview this questionnaire</a>
       </p>
       <p>
-        <a class="govuk-link" href="/admin/questionnaires/@Model.Questionnaire?.Id/deployment" target="_blank">How to deploy questionnaire</a>
+        <a class="govuk-link" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/deployment" target="_blank">How to deploy questionnaire</a>
       </p>
       <p>
-        <a class="govuk-link" href="/admin/questionnaires/@Model.Questionnaire?.Id/branching-map" target="_blank" rel="noopener">View branching map</a>
+        <a class="govuk-link" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/branching-map" target="_blank" rel="noopener">View branching map</a>
       </p>
     </div>
     <p class="app-task-list__summary">
@@ -158,15 +160,15 @@ else if (Model.QuestionnairesViewModel.JustUnpublished)
       </h2>
       <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@Model.Questionnaire?.Id/edit">Edit the title of your questionnaire</a></div>
+          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/edit">Edit the title of your questionnaire</a></div>
           <div class="govuk-task-list__status" id="create-your-questionnaire-1-status">Completed</div>
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="edit-slug-status" href="/admin/questionnaires/@Model.Questionnaire?.Id/slug/edit">Edit the slug of your questionnaire</a></div>
+          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="edit-slug-status" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/slug/edit">Edit the slug of your questionnaire</a></div>
           <div class="govuk-task-list__status" id="edit-slug-status"><strong class="govuk-tag govuk-tag--light-blue">In progress</strong></div>
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-2-status" href="/admin/questionnaires/@Model.Questionnaire?.Id/questions">Add and edit your questions</a></div>
+          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-2-status" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/questions">Add and edit your questions</a></div>
           <div class="govuk-task-list__status" id="create-your-questionnaire-2-status"><strong class="govuk-tag govuk-tag--light-blue">In progress</strong></div>
         </li>
       </ul>
@@ -174,7 +176,7 @@ else if (Model.QuestionnairesViewModel.JustUnpublished)
       <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="optional-task-1-status" href="/admin/questionnaires/@Model.Questionnaire?.Id/start-page/edit">
+            <a class="govuk-link govuk-task-list__link" aria-describedby="optional-task-1-status" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/start-page/edit">
               Add a start page
             </a>
           </div>
@@ -184,7 +186,7 @@ else if (Model.QuestionnairesViewModel.JustUnpublished)
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="optional-task-1-status" href="/admin/questionnaires/@Model.Questionnaire?.Id/contributors">
+            <a class="govuk-link govuk-task-list__link" aria-describedby="optional-task-1-status" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/contributors">
               Add or remove contributors
             </a>
           </div>
@@ -198,11 +200,11 @@ else if (Model.QuestionnairesViewModel.JustUnpublished)
       </h2>
       <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@Model.Questionnaire?.Id/branding">Edit the branding and theme of your questionnaire</a></div>
+          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/branding">Edit the branding and theme of your questionnaire</a></div>
           <div class="govuk-task-list__status" id="create-your-questionnaire-1-status">Completed</div>
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@Model.Questionnaire?.Id/customizations">Customise the button text, error messages, etc. of your questionnaire</a></div>
+          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/customizations">Customise the button text, error messages, etc. of your questionnaire</a></div>
           <div class="govuk-task-list__status" id="create-your-questionnaire-1-status">Completed</div>
         </li>
       </ul>
@@ -211,7 +213,7 @@ else if (Model.QuestionnairesViewModel.JustUnpublished)
       </h2>
       <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@Model.Questionnaire?.Id/contents">Add and edit answer content of your questionnaire</a></div>
+          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/contents">Add and edit answer content of your questionnaire</a></div>
           <div class="govuk-task-list__status" id="create-your-questionnaire-1-status">Completed</div>
         </li>
       </ul>
@@ -238,21 +240,21 @@ else if (Model.QuestionnairesViewModel.JustUnpublished)
       </ul>
     </div>
     <div class="govuk-button-group">
-      @if (Model.Questionnaire?.Status == EntityStatus.Draft)
+      @if (Model.ViewModel.Questionnaire?.Status == EntityStatus.Draft)
       {
-        <a class="govuk-button govuk-button--primary" data-module="govuk-button" href="/admin/questionnaires/@Model.Questionnaire.Id/publish/confirm" data-govuk-button-init="">Publish questionnaire</a>
+        <a class="govuk-button govuk-button--primary" data-module="govuk-button" href="/admin/questionnaires/@Model.ViewModel.Questionnaire.Id/publish/confirm" data-govuk-button-init="">Publish questionnaire</a>
       } 
-      else if (Model.Questionnaire?.Status == EntityStatus.Published)
+      else if (Model.ViewModel.Questionnaire?.Status == EntityStatus.Published)
       {
-        <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="/admin/questionnaires/@Model.Questionnaire.Id/unpublish/confirm" data-govuk-button-init="">Unpublish questionnaire</a>
+        <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="/admin/questionnaires/@Model.ViewModel.Questionnaire.Id/unpublish/confirm" data-govuk-button-init="">Unpublish questionnaire</a>
       }
-      <a class="govuk-button govuk-button--warning" data-module="govuk-button" href="/admin/questionnaires/@Model.Questionnaire?.Id/delete/confirm" data-govuk-button-init="">Delete questionnaire</a>
+      <a class="govuk-button govuk-button--warning" data-module="govuk-button" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/delete/confirm" data-govuk-button-init="">Delete questionnaire</a>
     </div>
     <p>
-      <a class="govuk-link" href="/admin/questionnaires/@Model.Questionnaire?.Id/versions">View questionnaire versions</a>
+      <a class="govuk-link" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/versions">View questionnaire versions</a>
     </p>
     <p>
-      <a class="govuk-link" href="/admin/questionnaires/@Model.Questionnaire?.Id/clone">Clone this questionnaire</a>
+      <a class="govuk-link" href="/admin/questionnaires/@Model.ViewModel.Questionnaire?.Id/clone">Clone this questionnaire</a>
     </p>
   </div>
 </div>

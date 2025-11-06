@@ -1,5 +1,5 @@
 @page "/admin/questionnaires"
-@model Admin.Pages.Questionnaire.ManageQuestionnaires
+@model Admin.Pages.Questionnaire.ManageQuestionnaireses
 
 @using Common.Extensions
 
@@ -21,7 +21,7 @@
   </section>
 }
 
-@if (Model.JustDeleted)
+@if (Model.ViewModel.JustDeleted)
 {
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
