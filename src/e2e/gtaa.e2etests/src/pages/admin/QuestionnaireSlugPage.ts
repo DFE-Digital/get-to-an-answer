@@ -4,6 +4,7 @@ import {BasePage} from '../BasePage';
 type Mode = 'create' | 'edit';
 
 export class QuestionnaireSlugPage extends BasePage {
+    // ===== Locators =====
     private readonly form = this.page.locator(
         'form[action*="/questionnaires/"][method="post"]'
     );
@@ -25,6 +26,7 @@ export class QuestionnaireSlugPage extends BasePage {
         '#forms-name-input-name-hint'
     );
 
+    // ===== Constructor =====
     constructor(page: Page, mode: Mode = 'create') {
         super(page);
     }
@@ -45,8 +47,8 @@ export class QuestionnaireSlugPage extends BasePage {
 
     // ----- Validations (structure-only) -----
     async verifyOnQuestionnaireSlugPage(): Promise<void> {
-        
-        // URL structure; no wording assumptions
+
+        // URL structure; no wording validation
         await expect(this.page).toHaveURL(/\/questionnaires\/[^/]+\/edit/);
 
         await expect(this.form).toBeVisible();

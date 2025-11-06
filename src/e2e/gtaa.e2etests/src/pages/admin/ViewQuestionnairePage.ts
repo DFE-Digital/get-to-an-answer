@@ -1,19 +1,22 @@
-import { expect, Page } from '@playwright/test';
+import {expect, Page} from '@playwright/test';
 import {BasePage} from '../BasePage';
-import { ViewQuestionnaireTable } from './components/ViewQuestionnaireTable';
+import {ViewQuestionnaireTable} from './components/ViewQuestionnaireTable';
 
 export class ViewQuestionnairePage extends BasePage {
+    private static readonly VIEW_URL = '/admin/questionnaires';
     // ===== Locators  =====
     private readonly section = this.page.locator(
         'div.app-scrolling-wrapper[role="region"]'
     );
-    
+
     private readonly createNewQuestionnaireButton = this.page.locator(
         'a.govuk-button.govuk-button--start[href$="/questionnaires/create"]'
     );
-    
+
+    // ===== Embedded component =====
     readonly table: ViewQuestionnaireTable;
 
+    // ===== Constructor =====
     constructor(page: Page) {
         super(page);
         this.table = new ViewQuestionnaireTable(page);
@@ -25,20 +28,23 @@ export class ViewQuestionnairePage extends BasePage {
     }
 
     // ===== Validations (structure-only) =====
-    async verifyOnViewQuestionnairesPage(): Promise<void> {
-        // URL-only check; no heading text assumptions
-        await expect(this.page).toHaveURL(/\/questionnaires(\/)?$/);
+    async expectUrlOnPage(): Promise<void> {
+        await this.validateUrlMatches(ViewQuestionnairePage.VIEW_URL);
+    }
+    
+    // Optional: expose a structural check that the table exists
+    async verifyQuestionnaireListedByStructure(): Promise<void> {
+        await this.table.verifyVisible();
+    }
 
-        // Section, CTA, and table present
+    async assertPageElements() {
+        await this.expectUrlOnPage();
+        await this.verifyHeaderLinks()
+        await this.verifyFooterLinks();
         await expect(this.section).toBeVisible();
         await expect(this.createNewQuestionnaireButton).toBeVisible();
 
         // Delegate structural visibility of the table to the component
-        await this.table.verifyVisible();
-    }
-
-    // Optional: expose a structural check that the table exists
-    async verifyQuestionnaireListedByStructure(): Promise<void> {
         await this.table.verifyVisible();
     }
 }

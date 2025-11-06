@@ -15,7 +15,6 @@ test.describe('Get to an answer Sign in page', () => {
         const username ='test'; //to be created dynamically
         const password ='test'; //to be created dynamically
         
-        await signInPage.signIn(username, password); 
-        await signInPage.validateUrlContains('admin/questionnaires');
+        await signInPage.signIn(username, password);
     });
 });

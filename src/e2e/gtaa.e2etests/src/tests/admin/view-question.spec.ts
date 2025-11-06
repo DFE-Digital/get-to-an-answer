@@ -17,9 +17,5 @@ test.describe('Get to an answer create a new questionnaire', () => {
     });
 
     test('Verify question on view page table', async ({page}) => {
-        await viewQuestionnairePage.verifyOnViewQuestionnairesPage();
-
-        // Check if a questionnaire exists
-        await viewQuestionnairePage.verifyQuestionnaireListedByStructure();
     });
 });

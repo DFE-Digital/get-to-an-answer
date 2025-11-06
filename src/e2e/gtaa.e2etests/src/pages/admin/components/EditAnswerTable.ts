@@ -1,19 +1,20 @@
 import { expect, Locator, Page } from '@playwright/test';
 
 export class EditAnswersTable {
-    private readonly card: Locator; // summary card titled "Answers"
-    private readonly table: Locator; // the govuk table inside the card
-    private readonly rows: Locator;  // tbody rows
+    // ===== Locators =====
+    private readonly card: Locator; 
+    private readonly table: Locator;
+    private readonly rows: Locator;
 
+    // ===== Constructor =====
     constructor(private readonly page: Page) {
-        // Scope to the summary card headed "Answers"
         const title = page.getByRole('heading', { level: 2, name: 'Answers' });
         this.card = title.locator('..').locator('..'); // title wrapper -> card
         this.table = this.card.getByRole('table');
         this.rows = this.table.locator('tbody tr');
     }
 
-    // --- validations ---
+    // ===== Validations =====
     async assertLoaded(): Promise<void> {
         await expect(this.card).toBeVisible();
         await expect(this.table).toBeVisible();
@@ -26,7 +27,7 @@ export class EditAnswersTable {
         await expect(this.table).toBeVisible();
     }
 
-    // --- row helpers ---
+    // ===== Row helpers =====
     private rowByAnswer(answer: string): Locator {
         // match a row that contains a cell with the exact answer text
         return this.rows.filter({
@@ -51,7 +52,7 @@ export class EditAnswersTable {
         return (await row.locator('td').nth(colIndex).innerText()).trim();
     }
 
-    // --- actions ---
+    // ===== Actions =====
     async openEdit(): Promise<void> {
         const editLink = this.card.getByRole('link', { name: 'Edit' });
         await expect(editLink).toBeVisible();
