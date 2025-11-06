@@ -3,6 +3,7 @@ using Admin.Models.ViewModels;
 using Common.Client;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Newtonsoft.Json;
 
 namespace Admin.Pages.Questionnaire;
 
@@ -21,8 +22,10 @@ public class TackQuestionnaire(IApiClient apiClient) : QuestionnairePageModel
 
             Questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId.Value);
 
-            QuestionnairesViewModel = TempData["QuestionnairesViewModel"] as QuestionnairesViewModel ??
-                                      new QuestionnairesViewModel();
+            QuestionnairesViewModel = TempData.TryGetValue(nameof(QuestionnairesViewModel), out var value)
+                ? JsonConvert.DeserializeObject<QuestionnairesViewModel>(value?.ToString() ?? string.Empty) ??
+                  new QuestionnairesViewModel()
+                : new QuestionnairesViewModel();
         }
         catch (Exception e)
         {
