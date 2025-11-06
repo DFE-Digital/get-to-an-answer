@@ -63,4 +63,11 @@ test.describe('Get to an answer create a new questionnaire', () => {
 
         await addQuestionnairePage.expectTitleAriaDescribedByIncludesHintAndError();
     });
+
+    test('should prevent double submission for a questionnaire', async ({ page }) => {
+        addQuestionnairePage = new AddQuestionnairePage(page);
+        await addQuestionnairePage.enterTitle('Double click prevention test');
+        
+        await addQuestionnairePage.submitFormAndCheckNoDoubleSubmit();
+    });
 });
