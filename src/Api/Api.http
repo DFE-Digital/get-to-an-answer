@@ -1,23 +1,44 @@
-@Api_HostAddress = http://localhost:5042
+@tenant_id={{tenant_id}}
+@client_id={{client_id}}
+@client_secret={{client_secret}}
+@api_scope={{api_scope}}
 
-POST {{Api_HostAddress}}/api/questionnaires
-Accept: application/json
+@name=getToken
+POST https://login.microsoftonline.com/{{tenant_id}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id={{client_id}}&client_secret={{client_secret}}&scope={{api_scope}}
+
+> {%
+    // Response Handler Script
+    const tokenRes = response.body;
+    
+    console.log(tokenRes);
+
+    client.global.set("access_token", tokenRes.access_token)
+%}
+
+###
+
+@Api_Dev_HostAddress = {{Api_Dev_HostAddress}}
+# @Api_Dev_HostAddress = https://localhost:7243
+
+GET {{Api_Dev_HostAddress}}/api/questionnaires
+Authorization: Bearer {{access_token}}
+
+###
+
+POST {{Api_Dev_HostAddress}}/api/questionnaires
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-    "title": "London Survey",
-    "slug": "",
-    "description": "Description of London Survey"
+    "title": "My first questionnaire"
 }
 
 ###
 
-PUT {{Api_HostAddress}}/api/questionnaires/41f65c55-5c01-4851-8769-16cb40ed4f61
-Accept: application/json
-
-{
-    "title": "London Survey",
-    "description": "Description of London Survey"
-}
+GET {{Api_Dev_HostAddress}}/api/questionnaires
+Authorization: Bearer {{access_token}}
 
 ###

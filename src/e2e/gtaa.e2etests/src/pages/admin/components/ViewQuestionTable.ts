@@ -1,13 +1,14 @@
 import { expect, Locator, Page } from '@playwright/test';
 
 export class ViewQuestionTable {
+    // ===== Locators =====
     private readonly list: Locator; 
     private readonly rows: Locator; 
     private readonly keys: Locator; 
-    private readonly values: Locator; 
+    private readonly values: Locator;
 
+    // ===== Constructor =====
     constructor(private readonly page: Page) {
-        // Scope to the list under the “Your questions” section
         const section = page.getByRole('heading', { level: 2, name: 'Your questions' }).locator('..'); // parent
         this.list = section.locator('dl.govuk-summary-list');
         this.rows = this.list.locator('div.govuk-summary-list__row');
@@ -15,7 +16,7 @@ export class ViewQuestionTable {
         this.values = this.rows.locator('dd.govuk-summary-list__value');
     }
 
-    // ---- basics ----
+    // ===== Basic validation =====
     async verifyVisible(): Promise<void> {
         await expect(this.list).toBeVisible();
     }
@@ -24,7 +25,7 @@ export class ViewQuestionTable {
         return this.rows.count();
     }
 
-    // ---- text helpers ----
+    // ===== Text helpers =====
     async textByIndex(index: number): Promise<string> {
         // 1-based index, returns the key text (e.g. “question 1”)
         return (await this.keys.nth(index - 1).innerText()).trim();
@@ -39,7 +40,7 @@ export class ViewQuestionTable {
         return out;
     }
 
-    // ---- row finders ----
+    // ===== Row finders =====
     private rowByIndex(index: number): Locator {
         return this.rows.nth(index - 1);
     }
@@ -49,7 +50,7 @@ export class ViewQuestionTable {
         return this.rows.filter({ hasText: partialText }).first();
     }
 
-    // ---- actions by index ----
+    // ===== Actions =====
     async clickEditByIndex(index: number): Promise<void> {
         const link = this.rowByIndex(index).getByRole('link', { name: /Edit/i });
         await expect(link).toBeVisible();
@@ -67,8 +68,7 @@ export class ViewQuestionTable {
         await expect(link).toBeVisible();
         await link.click();
     }
-
-    // ---- actions by name (partial match) ----
+    
     async moveByName(direction: 'up' | 'down', partialText: string): Promise<void> {
         const row = this.rowByName(partialText);
         await expect(row).toBeVisible();

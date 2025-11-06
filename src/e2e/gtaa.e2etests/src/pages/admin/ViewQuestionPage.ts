@@ -3,49 +3,30 @@ import {BasePage} from '../BasePage';
 import {ViewQuestionTable} from './components/ViewQuestionTable';
 
 export class ViewQuestionPage extends BasePage {
-    // Container that holds the “Your questions” block 
-    private readonly section: Locator;
+    private readonly radioName = 'forms_mark_pages_section_complete_input_mark_complete';
+    // ===== Locators  ===== 
+    private readonly section = this.page.locator('div.app-page-list');
 
-    // Top action links 
-    private readonly addQuestionLink: Locator; 
-    private readonly previewLink: Locator; 
+    private readonly addQuestionLink = this.page.locator('a.govuk-link[href$="/questions/create"]');
+    private readonly previewLink = this.page.locator('a.govuk-link[href*="/start/preview"]');
 
-    // Radios: name/value
-    private readonly finishedYesRadio: Locator;
-    private readonly finishedNoRadio: Locator; 
+    private readonly finishedYesRadio = this.page.locator(`input[type="radio"][name="${this.radioName}"][value="true"]`);
+    private readonly finishedNoRadio = this.page
+        .locator(`input[type="radio"][name="${this.radioName}"][value="false"]`)
+        .or(this.page.locator(`input[type="radio"][name="${this.radioName}"]`).nth(1));
 
-    // Primary submit button
-    private readonly saveAndContinueButton: Locator; 
+    private readonly saveAndContinueButton = this.page.locator('button.govuk-button[type="submit"]');
 
-    // Embedded component
+    // ===== Embedded component =====
     readonly table: ViewQuestionTable;
 
-    constructor(protected readonly page: Page) {
+    // ===== Constructor =====
+    constructor(page: Page) {
         super(page);
-
-        // Root region of the questions section
-        this.section = page.locator('div.app-page-list');
-
-        // Action links (href fragments are stable even if link text changes)
-        this.addQuestionLink = page.locator('a.govuk-link[href$="/questions/create"]');
-        this.previewLink = page.locator('a.govuk-link[href*="/start/preview"]');
-
-        // Radios: rely on 'name' and 'value'
-        const radioName = 'forms_mark_pages_section_complete_input_mark_complete';
-        this.finishedYesRadio = page.locator(`input[type="radio"][name="${radioName}"][value="true"]`);
-        
-        this.finishedNoRadio = page
-            .locator(`input[type="radio"][name="${radioName}"][value="false"]`)
-            .or(page.locator(`input[type="radio"][name="${radioName}"]`).nth(1));
-
-        // Submit button
-        this.saveAndContinueButton = page.locator('button.govuk-button[type="submit"]');
-
-        // Reuse your table component
         this.table = new ViewQuestionTable(page);
     }
 
-    // --- Actions ---
+    // ===== Actions =====
     async addQuestion(): Promise<void> {
         await this.addQuestionLink.click();
     }

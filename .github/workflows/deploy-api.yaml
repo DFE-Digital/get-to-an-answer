@@ -25,12 +25,14 @@ jobs:
       ACR_USERNAME: ${{ secrets.AZURE_ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
       RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
-      API_NAME: ${{ vars.GTAA_PREFIX }}aca-uks-api
+      API_NAME: ${{ vars.GTAA_PREFIX }}app-uks-api
     environment: ${{ github.event.inputs.environment }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
 
       - name: Azure Login
         uses: azure/login@v2
@@ -59,32 +61,20 @@ jobs:
             ${{ env.ACR_LOGIN_SERVER }}/gtaa-api:${{ github.sha }}
             ${{ env.ACR_LOGIN_SERVER }}/gtaa-api:latest
 
-      - name: Check if Container App exists
-        id: check_aca
-        shell: bash
+      - name: Configure App Settings
         run: |
-          if az containerapp show --name "$API_NAME" --resource-group "$RESOURCE_GROUP" >/dev/null 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi    
+          az webapp config appsettings set \
+            --name "$API_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --settings \
+              ASPNETCORE_ENVIRONMENT="${{ github.event.inputs.environment }}"
 
-      - name: Remove MSAL cache to prevent deserialization error
+      - name: Update API App Service
         run: |
-          CACHE_FILE="$HOME/.azure/msal_http_cache.bin"
-          if [ -f "$CACHE_FILE" ]; then
-            echo "Removing MSAL cache file..."
-            rm "$CACHE_FILE"
-          fi
-      
-      - name: Update Container App image and env
-        uses: azure/cli@v2
-        if: steps.check_aca.outputs.exists == 'true'
-        with:
-          inlineScript: |
-            az login --service-principal -u ${{ env.ARM_CLIENT_ID }} -p ${{ env.ARM_CLIENT_SECRET }} --tenant ${{ env.ARM_TENANT_ID }}
-            
-            az containerapp update \
-              --name "$API_NAME" \
-              --resource-group "$RESOURCE_GROUP" \
-              --image "$ACR_LOGIN_SERVER/gtaa-api:${{ github.sha }}"
+          az webapp config container set \
+            --name "$API_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --docker-custom-image-name "$ACR_LOGIN_SERVER/gtaa-api:${{ github.sha }}" \
+            --docker-registry-server-url "https://$ACR_LOGIN_SERVER" \
+            --docker-registry-server-user "$ACR_USERNAME" \
+            --docker-registry-server-password "$ACR_PASSWORD"

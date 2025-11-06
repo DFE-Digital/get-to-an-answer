@@ -28,9 +28,9 @@ resource "azurerm_monitor_metric_alert" "availability-alert" {
 
 # CPU for Container Apps Environment
 resource "azurerm_monitor_metric_alert" "cpu_alert" {
-  name                = "containerapps-cpu-alert"
+  name                = "web-app-cpu-alert"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  scopes              = [azurerm_container_app_environment.gettoananswer-cae.id]
+  scopes              = [azurerm_service_plan.gettoananswer-web-asp.id]
   description         = "Alert if CPU utilisation exceeds ${var.alerting[var.prefix].thresholds.cpu}% for more than 5 minutes"
   severity            = 2
   frequency           = "PT1M"
@@ -42,8 +42,8 @@ resource "azurerm_monitor_metric_alert" "cpu_alert" {
   }
 
   criteria {
-    metric_namespace = "Microsoft.App/containerApps"
-    metric_name      = "CpuUsagePercentage"
+    metric_namespace = "Microsoft.Web/serverfarms"
+    metric_name      = "CpuPercentage"
     aggregation      = "Average"
     operator         = "GreaterThan"
     threshold        = var.alerting[var.prefix].thresholds.cpu
@@ -54,15 +54,10 @@ resource "azurerm_monitor_metric_alert" "cpu_alert" {
   }
 }
 
-# Memory for Container Apps (per app)
 resource "azurerm_monitor_metric_alert" "memory_alert" {
-  name                = "containerapps-memory-alert"
+  name                = "web-app-memory-alert"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  scopes              = [
-    azurerm_container_app.gettoananswer-api.id,
-    azurerm_container_app.gettoananswer-admin.id,
-    azurerm_container_app.gettoananswer-frontend.id
-  ]
+  scopes              = [azurerm_service_plan.gettoananswer-web-asp.id]
   description         = "Alert if memory utilisation exceeds ${var.alerting[var.prefix].thresholds.memory}% for more than 5 minutes"
   severity            = 2
   frequency           = "PT1M"
@@ -74,8 +69,8 @@ resource "azurerm_monitor_metric_alert" "memory_alert" {
   }
 
   criteria {
-    metric_namespace = "Microsoft.App/containerApps"
-    metric_name      = "MemoryWorkingSetPercentage"
+    metric_namespace = "Microsoft.Web/serverfarms"
+    metric_name      = "MemoryPercentage"
     aggregation      = "Average"
     operator         = "GreaterThan"
     threshold        = var.alerting[var.prefix].thresholds.memory
@@ -86,11 +81,10 @@ resource "azurerm_monitor_metric_alert" "memory_alert" {
   }
 }
 
-# HTTP 5xx per Container App - API
 resource "azurerm_monitor_metric_alert" "api_app_error_alert" {
-  name                = "aca-api-http5xx-alert"
+  name                = "api-app-error-alert"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  scopes              = [azurerm_container_app.gettoananswer-api.id]
+  scopes              = [azurerm_linux_web_app.gettoananswer-api.id]
   description         = "Alert if HTTP 5xx error count exceeds ${var.alerting[var.prefix].thresholds.error}"
   severity            = 0
   frequency           = "PT1M"
@@ -102,7 +96,7 @@ resource "azurerm_monitor_metric_alert" "api_app_error_alert" {
   }
 
   criteria {
-    metric_namespace = "Microsoft.App/containerApps"
+    metric_namespace = "Microsoft.Web/sites"
     metric_name      = "Http5xx"
     aggregation      = "Total"
     operator         = "GreaterThan"
@@ -114,11 +108,10 @@ resource "azurerm_monitor_metric_alert" "api_app_error_alert" {
   }
 }
 
-# HTTP 5xx per Container App - Admin
 resource "azurerm_monitor_metric_alert" "admin_app_error_alert" {
-  name                = "aca-admin-http5xx-alert"
+  name                = "admin-app-error-alert"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  scopes              = [azurerm_container_app.gettoananswer-admin.id]
+  scopes              = [azurerm_linux_web_app.gettoananswer-admin.id]
   description         = "Alert if HTTP 5xx error count exceeds ${var.alerting[var.prefix].thresholds.error}"
   severity            = 0
   frequency           = "PT1M"
@@ -130,7 +123,7 @@ resource "azurerm_monitor_metric_alert" "admin_app_error_alert" {
   }
 
   criteria {
-    metric_namespace = "Microsoft.App/containerApps"
+    metric_namespace = "Microsoft.Web/sites"
     metric_name      = "Http5xx"
     aggregation      = "Total"
     operator         = "GreaterThan"
@@ -142,11 +135,10 @@ resource "azurerm_monitor_metric_alert" "admin_app_error_alert" {
   }
 }
 
-# HTTP 5xx per Container App - Frontend
 resource "azurerm_monitor_metric_alert" "frontend_app_error_alert" {
-  name                = "aca-frontend-http5xx-alert"
+  name                = "frontend-app-error-alert"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  scopes              = [azurerm_container_app.gettoananswer-frontend.id]
+  scopes              = [azurerm_linux_web_app.gettoananswer-frontend.id]
   description         = "Alert if HTTP 5xx error count exceeds ${var.alerting[var.prefix].thresholds.error}"
   severity            = 0
   frequency           = "PT1M"
@@ -158,7 +150,7 @@ resource "azurerm_monitor_metric_alert" "frontend_app_error_alert" {
   }
 
   criteria {
-    metric_namespace = "Microsoft.App/containerApps"
+    metric_namespace = "Microsoft.Web/sites"
     metric_name      = "Http5xx"
     aggregation      = "Total"
     operator         = "GreaterThan"

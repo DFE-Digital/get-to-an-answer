@@ -1,11 +1,13 @@
 import { expect, Locator, Page } from '@playwright/test';
 
 export class ViewQuestionnaireTable {
+    // ===== Locators =====
     private readonly section: Locator;
     private readonly table: Locator;
     private readonly headers: Locator;
     private readonly rows: Locator;
 
+    // ===== Constructor =====
     constructor(private readonly page: Page) {
         this.section = page.getByRole('region', { name: 'questionnaires' });
         this.table = this.section.getByRole('table', { name: 'questionnaires' });
@@ -13,13 +15,13 @@ export class ViewQuestionnaireTable {
         this.rows = this.table.locator('tbody tr');
     }
 
-    // --- Basic visibility ---
+    // ===== Basic visibility =====
     async verifyVisible(): Promise<void> {
         await expect(this.section).toBeVisible();
         await expect(this.table).toBeVisible();
     }
 
-    // --- Header checks ---
+    // ===== Header checks =====
     async verifyHeaders(): Promise<void> {
         await expect(this.headers).toHaveCount(3);
         await expect(this.table.getByRole('columnheader', { name: 'Name' })).toBeVisible();
@@ -27,19 +29,19 @@ export class ViewQuestionnaireTable {
         await expect(this.table.getByRole('columnheader', { name: 'Status' })).toBeVisible();
     }
 
-    // --- Row helpers ---
+    // ===== Row helpers =====
     private rowByName(name: string): Locator {
         // Row that contains the questionnaire link with the given name
         const linkInRow = this.table.getByRole('link', { name });
         return this.rows.filter({ has: linkInRow }).first();
     }
 
-    // Presence / visibility of a row
+    // ===== Presence / visibility of a row =====
     async expectRowPresentByName(name: string): Promise<void> {
         await expect(this.rowByName(name)).toBeVisible();
     }
 
-    // Count of data rows
+    // ===== Count of data rows =====
     async getRowCount(): Promise<number> {
         return this.rows.count();
     }

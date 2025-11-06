@@ -1,14 +1,20 @@
-import { expect, Page } from '@playwright/test';
+import {expect, Page} from '@playwright/test';
 import {BasePage} from '../BasePage';
 
+type Mode = 'create' | 'edit' | 'clone';
+
 export class EditQuestionnairePage extends BasePage {
-    // ===== Root / structural =====
+    private static readonly EDIT_URL: RegExp =
+        /\/admin\/questionnaires\/[0-9a-f-]+\/track\/?$/i;
+
+    // ===== Locators =====
+    private readonly banner = this.page.locator('div.govuk-notification-banner--success[role="alert"]');
+    private readonly heading = this.banner.locator('.govuk-notification-banner__heading');
     private readonly main = this.page.locator('main.govuk-main-wrapper[role="main"]');
 
     // Status badges (draft etc.)
     private readonly draftBadge = this.page.locator('[data-status="Draft"]');
 
-    // --- Task links (each item has a stable aria-describedby or href fragment) ---
     private readonly linkEditTitle = this.page.locator(
         'a.govuk-task-list__link[aria-describedby="create-your-questionnaire-1-status"]'
     );
@@ -20,8 +26,7 @@ export class EditQuestionnairePage extends BasePage {
     private readonly linkAddEditQuestions = this.page.locator(
         'a.govuk-task-list__link[href*="/questionnaires/"][href$="/questions"]'
     );
-
-    // Optional tasks shown in your DOM
+    
     private readonly linkStartPage = this.page.locator(
         'a.govuk-task-list__link[href$="/start-page/edit"]'
     );
@@ -29,23 +34,20 @@ export class EditQuestionnairePage extends BasePage {
     private readonly linkBrandingTheme = this.page.locator(
         'a.govuk-task-list__link[href$="/branding"]'
     );
-
-    // “Customisations” section
+    
     private readonly linkCustomisations = this.page.locator(
         'a.govuk-task-list__link[href$="/customizations"]'
     );
-
-    // “Answer content” section
+    
     private readonly linkAnswerContent = this.page.locator(
         'a.govuk-task-list__link[href$="/contents"]'
     );
 
-    // Privacy / contact details (note: different base path: /forms/{id}/privacy-policy)
     private readonly linkPrivacyPolicy = this.page.locator(
         'a.govuk-task-list__link[href*="/privacy-policy"]'
     );
-    
-    
+
+
     private readonly btnPublish = this.page.locator(
         'a.govuk-button.govuk-button--primary[href$="/publish/confirm"]'
     );
@@ -62,11 +64,19 @@ export class EditQuestionnairePage extends BasePage {
         'a.govuk-link[href$="/clone"]'
     );
 
-    constructor(page: Page) {
+    // ===== Constructor =====
+    constructor(page: Page, mode: Mode = 'create') {
         super(page);
     }
 
     // ===== Actions =====
+    async expectSuccessBannerVisible(): Promise<void> {
+        await expect(this.banner).toBeVisible();
+        await expect(this.heading).toBeVisible();
+
+        const text = await this.heading.textContent();
+        expect(text?.trim().length).toBeGreaterThan(0);
+    }
     async openEditTitle(): Promise<void> {
         await this.linkEditTitle.click();
     }
@@ -115,10 +125,14 @@ export class EditQuestionnairePage extends BasePage {
         await this.linkClone.click();
     }
 
-    // ===== Validation methods (structure only; no wording) =====
+    // ===== Validation methods (structure only; not content) =====
+    async expectUrlOnPage(): Promise<void> {
+        await this.validateUrlMatches(EditQuestionnairePage.EDIT_URL);
+    }
+
     async validateHeadingAndStatus(): Promise<void> {
         await expect(this.main).toBeVisible();
-        await expect(this.draftBadge).toBeVisible(); 
+        await expect(this.draftBadge).toBeVisible();
     }
 
     async validateCoreLinks(): Promise<void> {
@@ -153,11 +167,23 @@ export class EditQuestionnairePage extends BasePage {
         await expect(this.linkViewVersions).toBeVisible();
         await expect(this.linkClone).toBeVisible();
     }
-    
+
     async validateAllSections(includeOptional = true): Promise<void> {
         await this.validateHeadingAndStatus();
         await this.validateCoreLinks();
         await this.validateOptionalTasks(includeOptional);
+        await this.validateAnswerContentSection();
+        await this.validatePrivacyAndContactsSection();
+        await this.validateActionsSection();
+    }
+
+    async assertPageElements() {
+        await this.expectUrlOnPage();
+        await this.verifyHeaderLinks()
+        await this.verifyFooterLinks();
+        await this.validateAllSections();
+        await this.validateCoreLinks();
+        await this.validateOptionalTasks();
         await this.validateAnswerContentSection();
         await this.validatePrivacyAndContactsSection();
         await this.validateActionsSection();
