@@ -1,5 +1,6 @@
 ﻿@using System.Globalization
 @using System.Security.Claims
+@using Admin.Models.ViewModels
 @using Common.Configuration
 
 @inject IWebHostEnvironment WebHostEnvironment
@@ -12,6 +13,8 @@
     }
 
     ViewBag.FullName = User.FindFirst(ClaimTypes.Name)?.Value;
+
+    var configViewModel = new ConfigViewModel();
 }
 
 <!DOCTYPE html>
@@ -63,7 +66,7 @@
 
 <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
 @{
-    await Html.RenderPartialAsync("_Header");
+    await Html.RenderPartialAsync("_Header", configViewModel);
 }
 
 <div class="govuk-service-navigation app-service-navigation" data-module="govuk-service-navigation" data-govuk-service-navigation-init="">
@@ -114,7 +117,7 @@
 }
 
 @{
-    await Html.RenderPartialAsync("_Footer");
+    await Html.RenderPartialAsync("_Footer", configViewModel);
 }
 
 <script asp-add-nonce="true" src="/js/step-by-step-navigation.js"></script>

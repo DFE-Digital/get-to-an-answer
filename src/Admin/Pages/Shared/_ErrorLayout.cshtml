@@ -1,6 +1,7 @@
 ﻿@using System.Globalization
 @using Admin.Models
 @using Admin.Models.PageModels
+@using Admin.Models.ViewModels
 @using Common.Configuration
 @using Microsoft.Extensions.Options
 
@@ -8,9 +9,8 @@
 
 @{
     var scriptConfig = ScriptOptions.Value;
-    var configViewModel = new QuestionnairesPageModel()
+    var configViewModel = new ConfigViewModel
     {
-        ServiceName = "Support for care leavers",
         TranslationEnabled = false,
         IsError = true
     };
