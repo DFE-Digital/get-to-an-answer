@@ -39,7 +39,7 @@ resource "azurerm_log_analytics_workspace" "log-analytics-workspace" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   retention_in_days   = 180
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
@@ -51,7 +51,7 @@ resource "azurerm_application_insights" "application-insights" {
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   application_type    = "web"
   workspace_id        = azurerm_log_analytics_workspace.log-analytics-workspace.id
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
@@ -102,7 +102,7 @@ resource "azurerm_container_app" "gettoananswer-api" {
     target_port      = 8080
     transport        = "auto"
     traffic_weight {
-      percentage = 100
+      percentage      = 100
       latest_revision = true
     }
   }
@@ -126,7 +126,7 @@ resource "azurerm_container_app" "gettoananswer-api" {
       cpu    = 0.5
       memory = "1Gi"
       env {
-        name = "ASPNETCORE_ENVIRONMENT"
+        name  = "ASPNETCORE_ENVIRONMENT"
         value = var.asp_env
       }
       env {
@@ -138,7 +138,7 @@ resource "azurerm_container_app" "gettoananswer-api" {
         value = azurerm_application_insights.application-insights.connection_string
       }
       env {
-        name = "ConnectionStrings__DefaultConnection"
+        name  = "ConnectionStrings__DefaultConnection"
         value = "Server=tcp:${azurerm_mssql_server.gettoananswer_mssql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.gettoananswer_mssql_db.name};Persist Security Info=False;User ID=${azurerm_mssql_server.gettoananswer_mssql_server.administrator_login};Password=${var.sql_admin_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
       }
       env {
@@ -177,7 +177,7 @@ resource "azurerm_container_app" "gettoananswer-admin" {
     target_port      = 8080
     transport        = "auto"
     traffic_weight {
-      percentage = 100
+      percentage      = 100
       latest_revision = true
     }
   }
@@ -201,7 +201,7 @@ resource "azurerm_container_app" "gettoananswer-admin" {
       cpu    = 0.5
       memory = "1Gi"
       env {
-        name = "ASPNETCORE_ENVIRONMENT"
+        name  = "ASPNETCORE_ENVIRONMENT"
         value = var.asp_env
       }
       env {
@@ -252,7 +252,7 @@ resource "azurerm_container_app" "gettoananswer-frontend" {
     target_port      = 8080
     transport        = "auto"
     traffic_weight {
-      percentage = 100
+      percentage      = 100
       latest_revision = true
     }
   }
@@ -272,7 +272,7 @@ resource "azurerm_container_app" "gettoananswer-frontend" {
       cpu    = 0.5
       memory = "1Gi"
       env {
-        name = "ASPNETCORE_ENVIRONMENT"
+        name  = "ASPNETCORE_ENVIRONMENT"
         value = var.asp_env
       }
       env {
