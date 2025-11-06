@@ -33,5 +33,34 @@ test.describe('Get to an answer create a new questionnaire', () => {
 
     test('click back to questionnaire link on add new questionnaire page', async ({page}) => {
         addQuestionnairePage = await AddQuestionnairePage.create(page);
+        await addQuestionnairePage.ClickBackToQuestionnaireLink();
+
+        viewQuestionnairePage = await ViewQuestionnairePage.create(page);
+        await viewQuestionnairePage.expectUrlOnPage();
+        await viewQuestionnairePage.expectTitleLabelOnPage();
+    });
+
+    test('Submit a new questionnaire with missing title', async ({page}) => {
+        addQuestionnairePage = await AddQuestionnairePage.create(page);
+        await addQuestionnairePage.enterTitle(''); 
+        await addQuestionnairePage.clickSaveAndContinue();
+        
+        await addQuestionnairePage.validateMissingTitleMessageFlow();
+    });
+
+    test('Submit a new questionnaire with invalid title', async ({page}) => {
+        addQuestionnairePage = await AddQuestionnairePage.create(page);
+        await addQuestionnairePage.enterTitle('@@@+++###~~~');
+        await addQuestionnairePage.clickSaveAndContinue();
+
+        await addQuestionnairePage.validateInvalidTitleMessageFlow();
+    });
+
+    test('Submit a new questionnaire with invalid title to validate aria-describedby', async ({page}) => {
+        addQuestionnairePage = await AddQuestionnairePage.create(page);
+        await addQuestionnairePage.enterTitle('@@@+++###~~~');
+        await addQuestionnairePage.clickSaveAndContinue();
+
+        await addQuestionnairePage.expectTitleAriaDescribedByIncludesHintAndError();
     });
 });

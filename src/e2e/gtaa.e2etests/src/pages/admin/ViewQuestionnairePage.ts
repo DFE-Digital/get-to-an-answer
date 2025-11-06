@@ -31,6 +31,10 @@ export class ViewQuestionnairePage extends BasePage {
     async expectUrlOnPage(): Promise<void> {
         await this.validateUrlMatches(ViewQuestionnairePage.VIEW_URL);
     }
+
+    async expectTitleLabelOnPage(): Promise<void> {
+        await expect(this.createNewQuestionnaireButton).toBeVisible();
+    }
     
     // Optional: expose a structural check that the table exists
     async verifyQuestionnaireListedByStructure(): Promise<void> {
