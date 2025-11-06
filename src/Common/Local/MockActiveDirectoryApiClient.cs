@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,69 +20,91 @@ namespace Common.Local;
 
 public static class MockActiveDirectoryApiClient
 {
-    
+    public static void Deconstruct<T>(this T[] array, out T? first, out T? second)
+    {
+        first = array.Length > 0 ? array[0] : default;
+        second = array.Length > 1 ? array[1] : default;
+    }
 }
 
 // Simple options for the mock user
 public sealed class MockAzureAdOptions
 {
-    public string AuthenticationType { get; set; } = "MockAzureAD";
-    public string? GivenName { get; set; } = "Dev";
-    public string? SurName { get; set; } = "User";
     public string? Name { get; set; } = "Dev User";
     public string? Email { get; set; } = "dev.user@example.test";
-    public string? ObjectId { get; set; } = "11111111-2222-3333-4444-555555555555";
-    public string? TenantId { get; set; } = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
     public string[] Roles { get; set; } = new[] { "Admin" };
-    public string? PreferredUsername { get; set; } = "dev.user@example.test";
-    public string? NameIdentifier { get; set; } // if null, will use ObjectId
 }
 
 // Authentication handler that always authenticates a mock user
-internal sealed class MockAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+internal sealed class MockAuthenticationHandler(
+    IOptionsMonitor<AuthenticationSchemeOptions> options,
+    IOptionsMonitor<CookieAuthenticationOptions> cookieOptions,
+    ILoggerFactory logger,
+    UrlEncoder encoder,
+    ISystemClock clock,
+    IOptions<MockAzureAdOptions> mockOptions)
+    : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder, clock)
 {
-    private readonly IOptions<MockAzureAdOptions> _mockOptions;
-
-    public MockAuthenticationHandler(
-        IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder,
-        ISystemClock clock,
-        IOptions<MockAzureAdOptions> mockOptions)
-        : base(options, logger, encoder, clock)
-    {
-        _mockOptions = mockOptions;
-    }
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var o = _mockOptions.Value;
+        Request.Cookies.TryGetValue(".MockAuth", out var cookie);
 
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.GivenName, o.GivenName ?? "Dev"),
-            new(ClaimTypes.Surname, o.SurName ?? "User"),
-            new(ClaimTypes.Name, o.Name ?? "Dev User"),
-            new(ClaimTypes.Email, o.Email ?? "dev.user@example.test"),
-            new("tid", "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"),
-            new("oid", "11111aaa-22bb-c33c-dd44-eeeee5555ee5"),
-            new(ClaimTypes.NameIdentifier, o.NameIdentifier ?? o.ObjectId ?? Guid.NewGuid().ToString()),
-            new("http://schemas.microsoft.com/identity/claims/objectidentifier", o.ObjectId ?? Guid.NewGuid().ToString()),
-            new("http://schemas.microsoft.com/identity/claims/tenantid", o.TenantId ?? "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"),
-            new("preferred_username", o.PreferredUsername ?? o.Email ?? "dev.user@example.test"),
-        };
+        // Gets the cookie from the browser and extracts the ticket
+        var t = new MockAzureAdExtensions.PlainTextTicketFormat().Unprotect(cookie);
 
-        foreach (var role in o.Roles)
+        if (t?.Principal.Identity?.IsAuthenticated ?? false)
         {
-            if (!string.IsNullOrWhiteSpace(role))
-                claims.Add(new(ClaimTypes.Role, role));
+            return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(t.Principal, new AuthenticationProperties(), Scheme.Name)));
+        }
+        
+        Request.Headers.TryGetValue("Authorization", out var authHeader);
+        
+        var (scheme, token) = authHeader.ToString().Split(" ");
+        
+        if (scheme is null || token is null)
+        {
+            Request.Query.TryGetValue("jt", out var jwtTokenString);
+            
+            scheme = "Bearer";
+            token = jwtTokenString;
         }
 
-        var identity = new ClaimsIdentity(claims, o.AuthenticationType);
-        var principal = new ClaimsPrincipal(identity);
+        if (scheme != "Bearer" || string.IsNullOrWhiteSpace(token))
+        {
+            return Task.FromResult(AuthenticateResult.Fail("invalid auth header"));
+        }
 
-        var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), Scheme.Name);
-        return Task.FromResult(AuthenticateResult.Success(ticket));
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
+            var claims = jwtToken.Claims.ToDictionary(claim => claim.Type, claim => claim.Value );
+
+            var expiration = claims[ClaimTypes.Expiration];
+            
+            // if expiration is in the future, it's not valid'
+            Console.WriteLine($"Expiration: {DateTimeOffset.Parse(expiration)}");
+            Console.WriteLine($"Now: {DateTimeOffset.UtcNow}");
+            
+            if (DateTimeOffset.Parse(expiration) < DateTimeOffset.UtcNow)
+                return Task.FromResult(AuthenticateResult.Fail("token expired"));
+            
+            foreach (var (type, value) in claims)
+            {
+                Console.WriteLine($"{type}: {value}");
+            }
+            
+            var identity = new ClaimsIdentity(jwtToken.Claims, "MockAzureAD");
+            var principal = new ClaimsPrincipal(identity);
+
+            var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), Scheme.Name);
+            return Task.FromResult(AuthenticateResult.Success(ticket));
+        }
+        catch (Exception ex)
+        {
+            return Task.FromResult(AuthenticateResult.Fail(ex));
+        }
     }
 }
 
@@ -124,7 +147,7 @@ public static class MockAzureAdExtensions
         };
         
         services.Configure(configure);
-
+        
         services
             .AddAuthentication(options =>
             {
@@ -132,8 +155,19 @@ public static class MockAzureAdExtensions
                 options.DefaultAuthenticateScheme = MockScheme;
                 options.DefaultChallengeScheme = MockScheme;
                 options.DefaultSignInScheme = MockCookieScheme;
+
             })
-            .AddScheme<AuthenticationSchemeOptions, MockAuthenticationHandler>(MockScheme, _ => { });
+            .AddScheme<AuthenticationSchemeOptions, MockAuthenticationHandler>(MockScheme, _ => { })
+            .AddCookie(MockCookieScheme, cookie =>
+            {
+                cookie.TicketDataFormat = new PlainTextTicketFormat();
+                cookie.LoginPath = "/dev/login";
+                cookie.LogoutPath = "/dev/logout";
+                cookie.Cookie.Name = ".MockAuth";
+                cookie.SlidingExpiration = true;
+                cookie.ExpireTimeSpan = TimeSpan.FromHours(8);
+                cookie.DataProtectionProvider = null;
+            });
         
         services.AddSingleton<ITokenAcquisition, MockTokenAcquisition>();
         
@@ -150,6 +184,27 @@ public static class MockAzureAdExtensions
         });
 
         return services;
+    }
+    
+    public sealed class PlainTextTicketFormat : ISecureDataFormat<AuthenticationTicket>
+    {
+        public string Protect(AuthenticationTicket data)
+            => Convert.ToBase64String(
+                TicketSerializer.Default.Serialize(data));
+
+        public string Protect(AuthenticationTicket data, string? purpose) => Protect(data);
+
+        public AuthenticationTicket? Unprotect(string? protectedText)
+        {
+            if (protectedText == null)
+                return null;
+
+            var plainText = Convert.FromBase64String(protectedText);
+            
+            return TicketSerializer.Default.Deserialize(plainText);
+        }
+
+        public AuthenticationTicket? Unprotect(string? protectedText, string? purpose) => Unprotect(protectedText);
     }
 
     // For API app: adds a mock bearer scheme that always authenticates
@@ -188,11 +243,14 @@ public static class MockAzureAdExtensions
 
         app.UseRouting();
 
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapGet("/dev/login", async context =>
             {
-                // Force authenticate using the mock scheme and issue a cookie
+                // Authenticate using the mock scheme to build a principal
                 var result = await context.AuthenticateAsync(MockScheme);
                 if (!result.Succeeded || result.Principal == null)
                 {
@@ -201,9 +259,14 @@ public static class MockAzureAdExtensions
                     return;
                 }
 
-                await context.SignInAsync(MockCookieScheme, result.Principal);
+                // Issue cookie
+                await context.SignInAsync(MockCookieScheme, result.Principal, new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8),
+                });
                 context.Response.Redirect("/");
-            });
+            }).AllowAnonymous();
 
             endpoints.MapGet("/dev/logout", async context =>
             {
@@ -226,6 +289,23 @@ public static class MockAzureAdExtensions
         });
 
         return app;
+    }
+
+    private static ClaimsPrincipal? ToClaims(string jwtTokenString)
+    {
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(jwtTokenString);
+
+            var identity = new ClaimsIdentity(jwtToken.Claims, "MockAzureAD");
+            return new ClaimsPrincipal(identity);
+            
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
     }
 
     // For API: inject a mock bearer if none present
