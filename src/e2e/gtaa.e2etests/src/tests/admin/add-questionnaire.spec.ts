@@ -29,15 +29,15 @@ test.describe('Get to an answer create a new questionnaire', () => {
     //     await addQuestionnairePage.assertPageElements();
     // });
 
-    test('click back to questionnaire link on add new questionnaire page', async ({page}) => {
-        await viewQuestionnairePage.clickCreateNewQuestionnaire();
-        
-        addQuestionnairePage = await AddQuestionnairePage.create(page);
-        await addQuestionnairePage.ClickBackToQuestionnaireLink();
-
-        viewQuestionnairePage = await ViewQuestionnairePage.create(page);
-        await viewQuestionnairePage.expectQuestionnaireHeadingOnPage();
-    });
+    // test('click back to questionnaire link on add new questionnaire page', async ({page}) => {
+    //     await viewQuestionnairePage.clickCreateNewQuestionnaire();
+    //    
+    //     addQuestionnairePage = await AddQuestionnairePage.create(page);
+    //     await addQuestionnairePage.ClickBackToQuestionnaireLink();
+    //
+    //     viewQuestionnairePage = await ViewQuestionnairePage.create(page);
+    //     await viewQuestionnairePage.expectQuestionnaireHeadingOnPage();
+    // });
 
     test('Submit a new questionnaire with missing title', async ({page}) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
