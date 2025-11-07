@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Encodings.Web;
@@ -15,6 +16,7 @@ using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.TokenCacheProviders;
 using Microsoft.Identity.Web.TokenCacheProviders.InMemory;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Common.Local;
 
@@ -38,7 +40,6 @@ public sealed class MockAzureAdOptions
 // Authentication handler that always authenticates a mock user
 internal sealed class MockAuthenticationHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
-    IOptionsMonitor<CookieAuthenticationOptions> cookieOptions,
     ILoggerFactory logger,
     UrlEncoder encoder,
     ISystemClock clock,
@@ -81,13 +82,13 @@ internal sealed class MockAuthenticationHandler(
 
             var claims = jwtToken.Claims.ToDictionary(claim => claim.Type, claim => claim.Value );
 
-            var expiration = claims[ClaimTypes.Expiration];
+             int.TryParse(claims["exp"], out var expiration);
             
             // if expiration is in the future, it's not valid'
-            Console.WriteLine($"Expiration: {DateTimeOffset.Parse(expiration)}");
+            Console.WriteLine($"Expiration: {DateTimeOffset.FromUnixTimeSeconds(expiration)}");
             Console.WriteLine($"Now: {DateTimeOffset.UtcNow}");
             
-            if (DateTimeOffset.Parse(expiration) < DateTimeOffset.UtcNow)
+            if (DateTimeOffset.FromUnixTimeSeconds(expiration) < DateTimeOffset.UtcNow)
                 return Task.FromResult(AuthenticateResult.Fail("token expired"));
             
             foreach (var (type, value) in claims)
@@ -169,10 +170,11 @@ public static class MockAzureAdExtensions
                 cookie.DataProtectionProvider = null;
             });
         
+        services.AddHttpContextAccessor();
+        
         services.AddSingleton<ITokenAcquisition, MockTokenAcquisition>();
         
         services.AddMemoryCache();
-        services.AddHttpContextAccessor();
         services.AddSingleton<IMsalTokenCacheProvider, MsalMemoryTokenCacheProvider>();
 
         services.AddAuthorization(options =>
@@ -319,7 +321,7 @@ public static class MockAzureAdExtensions
     }
 }
 
-public sealed class MockTokenAcquisition : ITokenAcquisition
+public sealed class MockTokenAcquisition(IHttpContextAccessor accessor) : ITokenAcquisition
 {
     private static readonly AuthenticationResult MockAuthenticationResult = new(
         accessToken: "mock-user-access-token",
@@ -340,7 +342,34 @@ public sealed class MockTokenAcquisition : ITokenAcquisition
 
     public Task<string> GetAccessTokenForUserAsync(IEnumerable<string> scopes, string? authenticationScheme, string? tenantId = null,
         string? userFlow = null, ClaimsPrincipal? user = null, TokenAcquisitionOptions? tokenAcquisitionOptions = null)
-        => Task.FromResult("mock-user-access-token");
+    {
+        if (user?.Claims == null)
+            return Task.FromResult(String.Empty);
+            
+        var claims = user.Claims; // copy or map as needed
+
+        var secret = "use-a-64-byte-minimum-secret-string................................"; // >=64 bytes
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+
+        claims = claims.Select(c =>
+        {
+            if (c.Type == "aud")
+            {
+                return new Claim(c.Type, "api://client-id/.default");
+            }
+            
+            return new Claim(c.Type, c.Value);
+        });
+        
+        var jwt = new JwtSecurityToken(
+            issuer: "rando-issuer",
+            claims: claims,
+            notBefore: DateTime.UtcNow,
+            expires: DateTime.UtcNow.AddHours(8),
+            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha512));
+
+        return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(jwt));
+    }
 
     public Task<AuthenticationResult> GetAuthenticationResultForUserAsync(IEnumerable<string> scopes,
         string? authenticationScheme, string? tenantId = null,
@@ -349,7 +378,36 @@ public sealed class MockTokenAcquisition : ITokenAcquisition
 
     public Task<string> GetAccessTokenForAppAsync(string scope, string? authenticationScheme, string? tenant = null,
         TokenAcquisitionOptions? tokenAcquisitionOptions = null)
-        => Task.FromResult("mock-app-access-token");
+    {
+        var user = accessor.HttpContext?.User;
+        
+        if (user?.Claims == null)
+            return Task.FromResult(String.Empty);
+            
+        var claims = user.Claims; // copy or map as needed
+
+        var secret = "use-a-64-byte-minimum-secret-string................................"; // >=64 bytes
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+
+        claims = claims.Select(c =>
+        {
+            if (c.Type == "aud")
+            {
+                return new Claim(c.Type, "api://client-id/.default");
+            }
+            
+            return new Claim(c.Type, c.Value);
+        });
+        
+        var jwt = new JwtSecurityToken(
+            issuer: "rando-issuer",
+            claims: claims,
+            notBefore: DateTime.UtcNow,
+            expires: DateTime.UtcNow.AddHours(8),
+            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha512));
+
+        return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(jwt));
+    }
 
     public Task<AuthenticationResult> GetAuthenticationResultForAppAsync(string scope, string? authenticationScheme, string? tenant = null,
         TokenAcquisitionOptions? tokenAcquisitionOptions = null)

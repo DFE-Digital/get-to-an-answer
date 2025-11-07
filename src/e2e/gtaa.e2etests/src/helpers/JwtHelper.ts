@@ -12,6 +12,14 @@ export class SimpleDate extends Date {
             this.getDate() + (data.days ?? 0));
         return this;
     }
+
+    /**
+     * Returns the date as a number of seconds since the epoch.
+     * @constructor
+     */
+    public ToSeconds() {
+        return Math.floor(this.getTime() / 1000);
+    }
 }
 
 export class ClaimTypes {
@@ -26,7 +34,7 @@ export class ClaimTypes {
     public static readonly DenyOnlyPrimaryGroupSid = `${this.ClaimTypeNamespace}/denyonlyprimarygroupsid`;
     public static readonly DenyOnlyWindowsDeviceGroup = `${this.ClaimTypeNamespace}/denyonlywindowsdevicegroup`;
     public static readonly Dsa = `${this.ClaimTypeNamespace}/dsa`;
-    public static readonly Expiration = `${this.ClaimTypeNamespace}/expiration`;
+    public static readonly Expiration = `exp`;
     public static readonly Expired = `${this.ClaimTypeNamespace}/expired`;
     public static readonly GroupSid = `${this.ClaimTypeNamespace}/groupsid`;
     public static readonly IsPersistent = `${this.ClaimTypeNamespace}/ispersistent`;
@@ -103,7 +111,7 @@ export class JwtHelper {
         [ClaimTypes.Name]: 'Test User',
         [ClaimTypes.Email]: 'test@education.gov.uk',
         [ClaimTypes.Role]: ['Admin'],
-        [ClaimTypes.Expiration]: new SimpleDate().addDate({days: 1}).toISOString()
+        [ClaimTypes.Expiration]: new SimpleDate().addDate({days: 1}).ToSeconds()
     })
 
     public static readonly ExpiredToken = JwtHelper.generateToken({
@@ -111,7 +119,7 @@ export class JwtHelper {
         [ClaimTypes.Name]: 'Test User',
         [ClaimTypes.Email]: 'test@education.gov.uk',
         [ClaimTypes.Role]: ['Admin'],
-        [ClaimTypes.Expiration]: new SimpleDate().addDate({days: -1}).toISOString()
+        [ClaimTypes.Expiration]: new SimpleDate().addDate({days: -1}).ToSeconds()
     })
 
     public static readonly UnauthorizedToken = JwtHelper.generateToken({
@@ -119,7 +127,7 @@ export class JwtHelper {
         [ClaimTypes.Name]: 'Test User',
         [ClaimTypes.Email]: 'other-user@education.gov.uk',
         [ClaimTypes.Role]: ['Admin'],
-        [ClaimTypes.Expiration]: new SimpleDate().addDate({days: 1}).toISOString()
+        [ClaimTypes.Expiration]: new SimpleDate().addDate({days: 1}).ToSeconds()
     })
 
     public static readonly NoRecordsToken = () => JwtHelper.generateToken({
@@ -127,7 +135,7 @@ export class JwtHelper {
         [ClaimTypes.Name]: 'Test User',
         [ClaimTypes.Email]: `other-user${Math.round(Math.random() * 10000)}@education.gov.uk`,
         [ClaimTypes.Role]: ['Admin'],
-        [ClaimTypes.Expiration]: new SimpleDate().addDate({days: 1}).toISOString()
+        [ClaimTypes.Expiration]: new SimpleDate().addDate({days: 1}).ToSeconds()
     })
 
     public static readonly InvalidToken = "invalid-token";

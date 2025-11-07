@@ -74,3 +74,27 @@ graph LR
 - Clone: duplicate an existing questionnaire for iteration.
 - Delete: remove a questionnaire (subject to rules).
 - Version Diff: compare versions to see what changed.
+
+## Technical Guides
+
+### AzureAD Setup
+
+TODO
+
+Add the following to your user secrets
+```json
+{
+  "ApiSettings": {
+    "BaseUrl": "https://localhost:7243"
+  },
+  "AzureAd": {
+    "Instance": "https://login.microsoftonline.com/",
+    "Domain": "{your-domain}.onmicrosoft.com",
+    "TenantId": "{Found on the App registration overview page}",
+    "ClientId": "{Application (client) ID}",
+    "ClientSecret": "{Found on the App registration keys page}",
+    "Audience": "api://{client-id}",
+    "CallbackPath": "/signin-oidc"
+  }
+}
+```
