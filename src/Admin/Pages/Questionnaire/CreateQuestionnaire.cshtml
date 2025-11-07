@@ -1,0 +1,53 @@
+@page "/admin/questionnaires/create"
+@model Admin.Pages.Questionnaire.CreateQuestionnaires
+
+@{
+    Layout = "Shared/_Layout";
+}
+
+@{
+  ViewData["Title"] = "Create new questionnaire";
+  
+  var hasErrors = Model != null && !ViewData.ModelState.IsValid;
+  
+  var hasTitleError = Model?.ErrorFor(nameof(Model)) != null;
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires">Back to questionnaires</a>
+}
+
+@if (hasErrors)
+{
+  @await Html.PartialAsync("_ErrorSummary", Model)
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form accept-charset="UTF-8" method="post">
+      <div class="govuk-form-group">
+        <h1 class="govuk-label-wrapper">
+          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the name of your questionnaire?</label>
+        </h1>
+        <div class="govuk-hint" id="forms-name-input-name-hint">The questionnaire name will be shown at the top of each page of the form. 
+          <br/><br/>
+          Use a name that describes what the form will help people to do. For example ‘Check your care leaver support’.
+        </div>
+        @if (hasTitleError)
+        {
+          <p class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> @Model?.ErrorFor(nameof(Model.CreateQuestionnaire.Title))
+          </p>
+        }
+
+        <input id="forms-name-input-name-field" class="govuk-input @(hasTitleError ? "govuk-input--error" : "")"
+               aria-describedby="forms-name-input-name-hint"
+               type="text"
+               name="Title"
+               value="@(Model?.CreateQuestionnaire?.Title ?? "")">
+      </div>
+      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
+    </form>
+  </div>
+</div>

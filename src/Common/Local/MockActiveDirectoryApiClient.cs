@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Encodings.Web;
@@ -15,6 +16,7 @@ using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.TokenCacheProviders;
 using Microsoft.Identity.Web.TokenCacheProviders.InMemory;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Common.Local;
 
@@ -46,9 +48,27 @@ internal sealed class MockAuthenticationHandler(
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        Request.Cookies.TryGetValue(".MockAuth", out var cookie);
+
+        // Gets the cookie from the browser and extracts the ticket
+        var t = new MockAzureAdExtensions.PlainTextTicketFormat().Unprotect(cookie);
+
+        if (t?.Principal.Identity?.IsAuthenticated ?? false)
+        {
+            return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(t.Principal, new AuthenticationProperties(), Scheme.Name)));
+        }
+        
         Request.Headers.TryGetValue("Authorization", out var authHeader);
         
         var (scheme, token) = authHeader.ToString().Split(" ");
+        
+        if (scheme is null || token is null)
+        {
+            Request.Query.TryGetValue("jt", out var jwtTokenString);
+            
+            scheme = "Bearer";
+            token = jwtTokenString;
+        }
 
         if (scheme != "Bearer" || string.IsNullOrWhiteSpace(token))
         {
@@ -62,13 +82,13 @@ internal sealed class MockAuthenticationHandler(
 
             var claims = jwtToken.Claims.ToDictionary(claim => claim.Type, claim => claim.Value );
 
-            var expiration = claims[ClaimTypes.Expiration];
+             int.TryParse(claims["exp"], out var expiration);
             
             // if expiration is in the future, it's not valid'
-            Console.WriteLine($"Expiration: {DateTimeOffset.Parse(expiration)}");
+            Console.WriteLine($"Expiration: {DateTimeOffset.FromUnixTimeSeconds(expiration)}");
             Console.WriteLine($"Now: {DateTimeOffset.UtcNow}");
             
-            if (DateTimeOffset.Parse(expiration) < DateTimeOffset.UtcNow)
+            if (DateTimeOffset.FromUnixTimeSeconds(expiration) < DateTimeOffset.UtcNow)
                 return Task.FromResult(AuthenticateResult.Fail("token expired"));
             
             foreach (var (type, value) in claims)
@@ -128,7 +148,7 @@ public static class MockAzureAdExtensions
         };
         
         services.Configure(configure);
-
+        
         services
             .AddAuthentication(options =>
             {
@@ -136,13 +156,25 @@ public static class MockAzureAdExtensions
                 options.DefaultAuthenticateScheme = MockScheme;
                 options.DefaultChallengeScheme = MockScheme;
                 options.DefaultSignInScheme = MockCookieScheme;
+
             })
-            .AddScheme<AuthenticationSchemeOptions, MockAuthenticationHandler>(MockScheme, _ => { });
+            .AddScheme<AuthenticationSchemeOptions, MockAuthenticationHandler>(MockScheme, _ => { })
+            .AddCookie(MockCookieScheme, cookie =>
+            {
+                cookie.TicketDataFormat = new PlainTextTicketFormat();
+                cookie.LoginPath = "/dev/login";
+                cookie.LogoutPath = "/dev/logout";
+                cookie.Cookie.Name = ".MockAuth";
+                cookie.SlidingExpiration = true;
+                cookie.ExpireTimeSpan = TimeSpan.FromHours(8);
+                cookie.DataProtectionProvider = null;
+            });
+        
+        services.AddHttpContextAccessor();
         
         services.AddSingleton<ITokenAcquisition, MockTokenAcquisition>();
         
         services.AddMemoryCache();
-        services.AddHttpContextAccessor();
         services.AddSingleton<IMsalTokenCacheProvider, MsalMemoryTokenCacheProvider>();
 
         services.AddAuthorization(options =>
@@ -154,6 +186,27 @@ public static class MockAzureAdExtensions
         });
 
         return services;
+    }
+    
+    public sealed class PlainTextTicketFormat : ISecureDataFormat<AuthenticationTicket>
+    {
+        public string Protect(AuthenticationTicket data)
+            => Convert.ToBase64String(
+                TicketSerializer.Default.Serialize(data));
+
+        public string Protect(AuthenticationTicket data, string? purpose) => Protect(data);
+
+        public AuthenticationTicket? Unprotect(string? protectedText)
+        {
+            if (protectedText == null)
+                return null;
+
+            var plainText = Convert.FromBase64String(protectedText);
+            
+            return TicketSerializer.Default.Deserialize(plainText);
+        }
+
+        public AuthenticationTicket? Unprotect(string? protectedText, string? purpose) => Unprotect(protectedText);
     }
 
     // For API app: adds a mock bearer scheme that always authenticates
@@ -192,11 +245,14 @@ public static class MockAzureAdExtensions
 
         app.UseRouting();
 
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapGet("/dev/login", async context =>
             {
-                // Force authenticate using the mock scheme and issue a cookie
+                // Authenticate using the mock scheme to build a principal
                 var result = await context.AuthenticateAsync(MockScheme);
                 if (!result.Succeeded || result.Principal == null)
                 {
@@ -205,9 +261,14 @@ public static class MockAzureAdExtensions
                     return;
                 }
 
-                await context.SignInAsync(MockCookieScheme, result.Principal);
+                // Issue cookie
+                await context.SignInAsync(MockCookieScheme, result.Principal, new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8),
+                });
                 context.Response.Redirect("/");
-            });
+            }).AllowAnonymous();
 
             endpoints.MapGet("/dev/logout", async context =>
             {
@@ -232,6 +293,23 @@ public static class MockAzureAdExtensions
         return app;
     }
 
+    private static ClaimsPrincipal? ToClaims(string jwtTokenString)
+    {
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(jwtTokenString);
+
+            var identity = new ClaimsIdentity(jwtToken.Claims, "MockAzureAD");
+            return new ClaimsPrincipal(identity);
+            
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+
     // For API: inject a mock bearer if none present
     public static IApplicationBuilder UseMockBearerIfMissing(this IApplicationBuilder app)
     {
@@ -243,7 +321,7 @@ public static class MockAzureAdExtensions
     }
 }
 
-public sealed class MockTokenAcquisition : ITokenAcquisition
+public sealed class MockTokenAcquisition(IHttpContextAccessor accessor) : ITokenAcquisition
 {
     private static readonly AuthenticationResult MockAuthenticationResult = new(
         accessToken: "mock-user-access-token",
@@ -264,7 +342,34 @@ public sealed class MockTokenAcquisition : ITokenAcquisition
 
     public Task<string> GetAccessTokenForUserAsync(IEnumerable<string> scopes, string? authenticationScheme, string? tenantId = null,
         string? userFlow = null, ClaimsPrincipal? user = null, TokenAcquisitionOptions? tokenAcquisitionOptions = null)
-        => Task.FromResult("mock-user-access-token");
+    {
+        if (user?.Claims == null)
+            return Task.FromResult(String.Empty);
+            
+        var claims = user.Claims; // copy or map as needed
+
+        var secret = "use-a-64-byte-minimum-secret-string................................"; // >=64 bytes
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+
+        claims = claims.Select(c =>
+        {
+            if (c.Type == "aud")
+            {
+                return new Claim(c.Type, "api://client-id/.default");
+            }
+            
+            return new Claim(c.Type, c.Value);
+        });
+        
+        var jwt = new JwtSecurityToken(
+            issuer: "rando-issuer",
+            claims: claims,
+            notBefore: DateTime.UtcNow,
+            expires: DateTime.UtcNow.AddHours(8),
+            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha512));
+
+        return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(jwt));
+    }
 
     public Task<AuthenticationResult> GetAuthenticationResultForUserAsync(IEnumerable<string> scopes,
         string? authenticationScheme, string? tenantId = null,
@@ -273,7 +378,36 @@ public sealed class MockTokenAcquisition : ITokenAcquisition
 
     public Task<string> GetAccessTokenForAppAsync(string scope, string? authenticationScheme, string? tenant = null,
         TokenAcquisitionOptions? tokenAcquisitionOptions = null)
-        => Task.FromResult("mock-app-access-token");
+    {
+        var user = accessor.HttpContext?.User;
+        
+        if (user?.Claims == null)
+            return Task.FromResult(String.Empty);
+            
+        var claims = user.Claims; // copy or map as needed
+
+        var secret = "use-a-64-byte-minimum-secret-string................................"; // >=64 bytes
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+
+        claims = claims.Select(c =>
+        {
+            if (c.Type == "aud")
+            {
+                return new Claim(c.Type, "api://client-id/.default");
+            }
+            
+            return new Claim(c.Type, c.Value);
+        });
+        
+        var jwt = new JwtSecurityToken(
+            issuer: "rando-issuer",
+            claims: claims,
+            notBefore: DateTime.UtcNow,
+            expires: DateTime.UtcNow.AddHours(8),
+            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha512));
+
+        return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(jwt));
+    }
 
     public Task<AuthenticationResult> GetAuthenticationResultForAppAsync(string scope, string? authenticationScheme, string? tenant = null,
         TokenAcquisitionOptions? tokenAcquisitionOptions = null)

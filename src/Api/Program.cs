@@ -25,7 +25,7 @@ if (builderIsLocalEnvironment)
 }
 
 builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
-{ 
+{
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? 
                          builder.Configuration["ConnectionStrings:DefaultConnection"]);
 });
@@ -88,7 +88,6 @@ else
     // AllowWebApiToBeAuthorizedByACL is an AzureAd setting in the appsettings.json
     // This avoids needing the jwt token from needing a role or scope
 }
-
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

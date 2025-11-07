@@ -16,6 +16,11 @@
 
     <ItemGroup>
       <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+      <PackageReference Include="Microsoft.Identity.Abstractions" />
+      <PackageReference Include="Microsoft.Identity.Web" />
+      <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" />
+      <PackageReference Include="Microsoft.Identity.Web.UI" />
       <PackageReference Include="OpenTelemetry.Api" />
       <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
       <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
@@ -30,6 +35,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Common\Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Pages\Error.cshtml" />
     </ItemGroup>
 
 </Project>
