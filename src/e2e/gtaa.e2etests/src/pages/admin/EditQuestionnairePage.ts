@@ -8,10 +8,12 @@ export class EditQuestionnairePage extends BasePage {
         /\/admin\/questionnaires\/[0-9a-f-]+\/track\/?$/i;
 
     // ===== Locators =====
+    private readonly main = this.page.locator('main.govuk-main-wrapper[role="main"]');
     private readonly banner = this.page.locator('div.govuk-notification-banner--success[role="alert"]');
     private readonly heading = this.banner.locator('.govuk-notification-banner__heading');
-    private readonly main = this.page.locator('main.govuk-main-wrapper[role="main"]');
 
+    private readonly questionnaireTitle = this.page.locator('');
+    private readonly editQuestionnaireHeading = this.page.locator('');
     // Status badges (draft etc.)
     private readonly draftBadge = this.page.locator('[data-status="Draft"]');
 
@@ -70,13 +72,6 @@ export class EditQuestionnairePage extends BasePage {
     }
 
     // ===== Actions =====
-    async expectSuccessBannerVisible(): Promise<void> {
-        await expect(this.banner).toBeVisible();
-        await expect(this.heading).toBeVisible();
-
-        const text = await this.heading.textContent();
-        expect(text?.trim().length).toBeGreaterThan(0);
-    }
     async openEditTitle(): Promise<void> {
         await this.linkEditTitle.click();
     }
@@ -126,12 +121,22 @@ export class EditQuestionnairePage extends BasePage {
     }
 
     // ===== Validation methods (structure only; not content) =====
+    async expectSuccessBannerVisible(): Promise<void> {
+        await expect(this.banner).toBeVisible();
+        await expect(this.heading).toBeVisible();
+
+        const text = await this.heading.textContent();
+        expect(text?.trim().length).toBeGreaterThan(0);
+    }
+    
     async expectUrlOnPage(): Promise<void> {
         await this.validateUrlMatches(EditQuestionnairePage.EDIT_URL);
     }
 
     async validateHeadingAndStatus(): Promise<void> {
         await expect(this.main).toBeVisible();
+        await expect(this.questionnaireTitle).toBeVisible();
+        await expect(this.editQuestionnaireHeading).toBeVisible();
         await expect(this.draftBadge).toBeVisible();
     }
 

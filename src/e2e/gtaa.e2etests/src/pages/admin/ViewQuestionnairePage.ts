@@ -9,10 +9,22 @@ export class ViewQuestionnairePage extends BasePage {
         'div.app-scrolling-wrapper[role="region"]'
     );
 
+    private readonly HelpUserHeading = this.page.locator(
+        'section#main-content-header h1.govuk-heading-xl'
+    );
+
+    private readonly HelpUserDescription = this.page.locator(
+        'section#main-content-header p.govuk-body'
+    );
+
+    private readonly questionnaireHeading = this.page.locator(
+        'main h1.govuk-heading-l'
+    );
+    
     private readonly createNewQuestionnaireButton = this.page.locator(
         'a.govuk-button.govuk-button--start[href$="/questionnaires/create"]'
     );
-
+    
     // ===== Embedded component =====
     readonly table: ViewQuestionnaireTable;
 
@@ -31,7 +43,23 @@ export class ViewQuestionnairePage extends BasePage {
     async expectUrlOnPage(): Promise<void> {
         await this.validateUrlMatches(ViewQuestionnairePage.VIEW_URL);
     }
+
+    async expectQuestionnaireHeadingOnPage(): Promise<void> {
+        await expect(this.questionnaireHeading).toBeVisible();
+    }
     
+    async verifyHelpUserHeadingVisible() {
+        await expect(this.HelpUserHeading).toBeVisible();
+    }
+
+    async verifyHelpUserDescriptionVisible() {
+        await expect(this.HelpUserDescription).toBeVisible();
+    }
+
+    async verifyCreateButtonVisible() {
+        await expect(this.createNewQuestionnaireButton).toBeVisible();
+    }
+
     // Optional: expose a structural check that the table exists
     async verifyQuestionnaireListedByStructure(): Promise<void> {
         await this.table.verifyVisible();
@@ -42,7 +70,7 @@ export class ViewQuestionnairePage extends BasePage {
         await this.verifyHeaderLinks()
         await this.verifyFooterLinks();
         await expect(this.section).toBeVisible();
-        await expect(this.createNewQuestionnaireButton).toBeVisible();
+        await this.verifyCreateButtonVisible();
 
         // Delegate structural visibility of the table to the component
         await this.table.verifyVisible();

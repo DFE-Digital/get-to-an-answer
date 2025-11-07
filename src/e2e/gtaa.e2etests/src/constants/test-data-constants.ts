@@ -1,11 +1,10 @@
-// Define question types
+// ===== API related test data =====
 export enum QuestionType {
     SINGLE = 1,
     MULTIPLE = 2,
     DROPDOWN = 3
 }
 
-// Define destination types
 export enum AnswerDestinationType {
     Question = 1,
     ExternalLink = 2
@@ -19,3 +18,9 @@ export enum EntityStatus {
 }
 
 export const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// ===== Admin related test data =====
+export const ErrorMessages = {
+    ERROR_MESSAGE_MISSING_TITLE: 'Title field is required',
+    ERROR_MESSAGE_INVALID_TITLE: 'Enter a valid title'
+}
