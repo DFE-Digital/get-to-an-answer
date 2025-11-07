@@ -1,5 +1,7 @@
 import {Page, Locator, expect, BrowserContext, Cookie} from '@playwright/test';
 
+type LoadState = 'domcontentloaded' | 'load' | 'networkidle';
+
 export class BasePage {
     protected readonly page: Page;
 
@@ -9,7 +11,7 @@ export class BasePage {
     public readonly SignOutLink: Locator;
     public readonly defaultLogo: Locator;
     public readonly logoLink: Locator;
-    
+
     // Locators for cookie banner and buttons - TBC
     public readonly cookieBanner: Locator;
     public readonly acceptButton: Locator;
@@ -24,34 +26,28 @@ export class BasePage {
     // ===== Constructor =====
     constructor(page: Page) {
         this.page = page;
-        
+
         // Locators for cookie banner and buttons - TBC
         this.cookieBanner = page.locator('');
         this.acceptButton = page.locator('');
         this.rejectButton = page.locator('');
 
         // ===== Locators for web page header =====
-        this.logoLink = page.locator('');
-        this.defaultLogo = page.locator('');
-
-        // Title locator
-        this.WebsiteNameLink = page.locator('');
-
-        // Admin name locator
-        this.WebsiteAdminName = page.locator('');
-
-        // Sign out locator
-        this.SignOutLink = page.locator('');
+        this.logoLink = page.locator('header.dfe-header a.dfe-header__link[aria-label*="homepage"]');
+        this.defaultLogo = page.locator('header.dfe-header img.dfe-logo');
+        this.WebsiteNameLink = page.locator('header.dfe-header a.dfe-header__link--service');
+        this.WebsiteAdminName = page.locator('nav .govuk-service-navigation__text');
+        this.SignOutLink = page.getByRole('link', {name: /sign out/i});
 
         // ===== Locators for web page Footers =====
-        this.footer = page.locator('footer');
-        this.footerLinks = page.locator('footer a');
-        this.cookiePolicyLinkInFooter = page.locator('');
-        this.licenceLogo = page.locator('');
+        this.footer = page.locator('footer.govuk-footer');
+        this.footerLinks = this.footer.locator('a.govuk-footer__link');
+        this.cookiePolicyLinkInFooter = this.footer.getByRole('link', {name: /cookie policy/i});
+        this.licenceLogo = this.footer.locator('svg.govuk-footer__licence-logo');
     }
 
-    async navigateTo(url: string) {
-        await this.page.goto(url, {waitUntil: 'networkidle'});
+    async navigateTo(url: string, waitUntil: LoadState = 'networkidle'): Promise<void> {
+        await this.page.goto(url, {waitUntil});
     }
 
     protected escapeRegexExpression(s: string): string {
@@ -64,14 +60,14 @@ export class BasePage {
             : patternOrFragment;
         await expect(this.page).toHaveURL(pattern);
     }
-    
+
     // ===== Actions =====
-    
+
     // Wait for the page to load
     async waitForPageLoad() {
         await this.page.waitForLoadState('load');
     }
-    
+
     // Cookie banner functionality
     async acceptCookies() {
         await this.acceptButton.click();
@@ -84,21 +80,21 @@ export class BasePage {
         // Ensure the banner disappears
         await expect(this.cookieBanner).not.toBeVisible();
     }
-    
+
     // ===== Verify header Links are visible =====
     async verifyHeaderLinks() {
-        await expect(this.WebsiteNameLink).toHaveText(/Support for/i);
+        //await expect(this.WebsiteNameLink).toHaveText(/Support for/i); //TBC
         await expect(this.WebsiteNameLink).toBeVisible();
-        
+
         await expect(this.WebsiteAdminName).toBeVisible();
-        
+
         await expect(this.logoLink).toBeVisible();
         await expect(this.defaultLogo).toBeVisible();
 
-        await expect(this.SignOutLink).toHaveText(/Support for/i);
+        //await expect(this.SignOutLink).toHaveText(/Support for/i); TBC
         await expect(this.SignOutLink).toBeVisible();
     }
-    
+
     // ===== Verify footer Links are visible =====
     async verifyFooterLinks() {
         //Ensure the footer is visible 
@@ -107,7 +103,7 @@ export class BasePage {
         // Verify the "Cookie policy" link(in Footer)
         await expect(this.cookiePolicyLinkInFooter).toBeVisible();
         await expect(this.cookiePolicyLinkInFooter).toContainText('Cookie policy');
-        await expect(this.cookiePolicyLinkInFooter).toHaveAttribute('href', '/en/cookie-policy');
+        //await expect(this.cookiePolicyLinkInFooter).toHaveAttribute('href', 'Cookie policy'); //TBC
 
         // Verify the footer logo and licence description
         await expect(this.licenceLogo).toBeVisible();

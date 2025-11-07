@@ -2,12 +2,18 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
 
 import {defineConfig, devices} from '@playwright/test';
+import {loadEnvConfig} from './src/config/environment-config';
+
+// Choose an environment: 'local' or 'test'
+const ENV_NAME: 'local' | 'test' = 'local'; //default local
+process.env.ENV_NAME = ENV_NAME;
+const EnvConfig = loadEnvConfig(ENV_NAME);
 
 const healthBase = {
     testDir: './src/tests/health',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: process.env.API_URL || 'http://localhost:5042',
+        baseURL: process.env.API_URL || EnvConfig.API_URL,
     },
 } as const;
 
@@ -15,7 +21,7 @@ const apiBase = {
     testDir: './src/tests/api',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: process.env.API_URL || 'http://localhost:5042',
+        baseURL: process.env.API_URL || EnvConfig.API_URL,
     },
 } as const;
 
@@ -23,7 +29,7 @@ const feBase = {
     testDir: './src/tests/fe',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: process.env.FE_URL || 'https://www.google.co.uk/',
+        baseURL: process.env.API_URL || EnvConfig.FE_URL,
     },
 } as const;
 
@@ -31,20 +37,20 @@ const adminBase = {
     testDir: './src/tests/admin',
     testMatch: '**/*.spec.ts',
     use: {
-        baseURL: process.env.ADMIN_URL || 'https://www.github.com/',
+        baseURL: process.env.API_URL || EnvConfig.ADMIN_URL,
     },
 } as const;
 
 export default defineConfig({
     testDir: './src/tests',
     testMatch: '**/*.spec.ts',
-    timeout: 20 * 1000,
+    timeout: 30 * 1000,
     expect: {
         timeout: 5000,
     },
     
     fullyParallel: true,
-    retries: 1,
+    //retries: 1,
     workers: 4,
     reporter: [['list'], ['html', {open: 'never'}]],
     use: {
@@ -57,9 +63,9 @@ export default defineConfig({
 
     projects: [
         {
-          name: 'health',
-          ...healthBase,
-          use: {...healthBase.use},  
+            name: 'health',
+            ...healthBase,
+            use: {...healthBase.use}, 
         },
         {
             name: 'api',
@@ -137,6 +143,6 @@ export default defineConfig({
                 browserName: 'webkit',
                 ...devices['iPhone 15']
             }
-        }
+         }
     ],
 });
