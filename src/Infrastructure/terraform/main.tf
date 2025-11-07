@@ -35,7 +35,7 @@ resource "azurerm_log_analytics_workspace" "log-analytics-workspace" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   retention_in_days   = 180
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
@@ -47,7 +47,7 @@ resource "azurerm_application_insights" "application-insights" {
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   application_type    = "web"
   workspace_id        = azurerm_log_analytics_workspace.log-analytics-workspace.id
-  tags                = {
+  tags = {
     Environment = var.env
     Product     = var.product
   }
@@ -73,8 +73,8 @@ resource "azurerm_container_registry" "gettoananswer-registry" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   sku                 = "Basic"
   admin_enabled       = true
-  
-  
+
+
 
   lifecycle {
     ignore_changes = [tags]
@@ -83,10 +83,10 @@ resource "azurerm_container_registry" "gettoananswer-registry" {
 
 # Linux Web App - API
 resource "azurerm_linux_web_app" "gettoananswer-api" {
-  name                = "${var.prefix}app-uks-api"
-  location            = azurerm_resource_group.gettoananswer-rg.location
-  resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
+  name                      = "${var.prefix}app-uks-api"
+  location                  = azurerm_resource_group.gettoananswer-rg.location
+  resource_group_name       = azurerm_resource_group.gettoananswer-rg.name
+  service_plan_id           = azurerm_service_plan.gettoananswer-web-asp.id
   virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
 
   site_config {
@@ -108,15 +108,15 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
   }
 
   app_settings = {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
-    ConnectionStrings__DefaultConnection = "Server=tcp:${azurerm_mssql_server.gettoananswer_mssql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.gettoananswer_mssql_db.name};Persist Security Info=False;User ID=${azurerm_mssql_server.gettoananswer_mssql_server.administrator_login};Password=${var.sql_admin_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-    SQLSERVER_SA_PASSWORD = var.sql_admin_password
-    AzureAd__Domain = "Educationgovuk.onmicrosoft.com"
-    AzureAd__TenantId = var.ad_tenant_id
-    AzureAd__ClientId = var.ad_client_id
-    AzureAd__Audience = "api://${var.ad_client_id}"
-    AzureAd__ClientSecret = var.ad_client_secret
+    ConnectionStrings__DefaultConnection  = "Server=tcp:${azurerm_mssql_server.gettoananswer_mssql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.gettoananswer_mssql_db.name};Persist Security Info=False;User ID=${azurerm_mssql_server.gettoananswer_mssql_server.administrator_login};Password=${var.sql_admin_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    SQLSERVER_SA_PASSWORD                 = var.sql_admin_password
+    AzureAd__Domain                       = "Educationgovuk.onmicrosoft.com"
+    AzureAd__TenantId                     = var.ad_tenant_id
+    AzureAd__ClientId                     = var.ad_client_id
+    AzureAd__Audience                     = "api://${var.ad_client_id}"
+    AzureAd__ClientSecret                 = var.ad_client_secret
   }
 
   https_only = true
@@ -125,10 +125,10 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
 
 # Linux Web App - Admin
 resource "azurerm_linux_web_app" "gettoananswer-admin" {
-  name                = "${var.prefix}app-uks-admin"
-  location            = azurerm_resource_group.gettoananswer-rg.location
-  resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
+  name                      = "${var.prefix}app-uks-admin"
+  location                  = azurerm_resource_group.gettoananswer-rg.location
+  resource_group_name       = azurerm_resource_group.gettoananswer-rg.name
+  service_plan_id           = azurerm_service_plan.gettoananswer-web-asp.id
   virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
 
   site_config {
@@ -159,10 +159,10 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
 
 # Linux Web App - Frontend
 resource "azurerm_linux_web_app" "gettoananswer-frontend" {
-  name                = "${var.prefix}app-uks-frontend"
-  location            = azurerm_resource_group.gettoananswer-rg.location
-  resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  service_plan_id     = azurerm_service_plan.gettoananswer-web-asp.id
+  name                      = "${var.prefix}app-uks-frontend"
+  location                  = azurerm_resource_group.gettoananswer-rg.location
+  resource_group_name       = azurerm_resource_group.gettoananswer-rg.name
+  service_plan_id           = azurerm_service_plan.gettoananswer-web-asp.id
   virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
 
   site_config {
