@@ -15,25 +15,35 @@ if (builderIsLocalEnvironment)
         .AddUserSecrets<Program>(optional: true, reloadOnChange: true);
     builder.Services.AddMockAzureAdForMvc();
 }
-else
+
+var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
+var apiScopes = builder.Configuration.GetSection("ApiSettings:Scopes").Get<string[]>() ?? [];
+
+if (!builderIsLocalEnvironment)
 {
     builder.Services
         .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
         .EnableTokenAcquisitionToCallDownstreamApi()
+        .AddDownstreamApi("Api", options =>
+        {
+            options.BaseUrl = apiBaseUrl;
+            options.Scopes = [$"api://{builder.Configuration["AzureAd:ClientId"]}/.default"];
+        })
         .AddInMemoryTokenCaches();
 }
 
-var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
-var apiScopes = builder.Configuration.GetSection("ApiSettings:Scopes").Get<string[]>() ?? [];
-
 builder.Services.AddHttpContextAccessor();
+
+if (builderIsLocalEnvironment)
+{
+    builder.Services.AddSingleton<ITokenAcquisition, MockTokenAcquisition>();
+}
 
 builder.Services.AddTransient(sp =>
     new BearerTokenHandler(
         sp.GetRequiredService<ITokenAcquisition>(),
-        sp.GetRequiredService<IHttpContextAccessor>(),
-        apiScopes));
+        [$"api://{builder.Configuration["AzureAd:ClientId"]}/.default"]));
 
 // Register an HttpClient with a pre-configured base address
 builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAddress = new Uri(apiBaseUrl); })

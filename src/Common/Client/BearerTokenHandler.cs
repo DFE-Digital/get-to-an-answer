@@ -12,8 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.Identity.Web;
 
 public class BearerTokenHandler(
-    ITokenAcquisition tokenAcquisition, 
-    IHttpContextAccessor accessor, 
+    ITokenAcquisition tokenAcquisition,
     IEnumerable<string> scopes)
     : DelegatingHandler
 {
@@ -21,8 +20,8 @@ public class BearerTokenHandler(
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var token = await tokenAcquisition.GetAccessTokenForUserAsync(_scopes, user: accessor.HttpContext?.User);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var accessToken = await tokenAcquisition.GetAccessTokenForAppAsync(_scopes[0]);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         return await base.SendAsync(request, cancellationToken);
     }
 }
