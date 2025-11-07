@@ -57,7 +57,10 @@ builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAdd
 
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI();
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AddPageRoute("/Home/Index", "/");
+});
 
 //builder.AddLogging();
 
