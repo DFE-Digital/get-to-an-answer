@@ -14,7 +14,12 @@ public class EditQuestionnaire(IApiClient apiClient, ILogger<EditQuestionnaire> 
     
     [BindProperty]
     public required UpdateQuestionnaireRequestDto UpdateQuestionnaire { get; set; }
-    
+
+    public IActionResult OnGet()
+    {
+        BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
+        return Page();
+    }
     
     public async Task<IActionResult> OnPost()
     {

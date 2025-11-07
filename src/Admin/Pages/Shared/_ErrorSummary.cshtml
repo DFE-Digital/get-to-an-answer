@@ -1,7 +1,3 @@
-@* C# Razor *@
-@using Microsoft.AspNetCore.Mvc.ModelBinding
-@inject Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper Html
-
 @{
     var modelState = ViewData.ModelState;
     var errors = modelState?.Where(kv => kv.Value?.Errors.Count > 0).ToList() ?? [];

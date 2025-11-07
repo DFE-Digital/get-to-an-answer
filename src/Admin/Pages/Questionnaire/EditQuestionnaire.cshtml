@@ -3,19 +3,17 @@
 
 @{
   ViewData["Title"] = "Edit the questionnaire";
-  
-  var hasErrors = Model?.UpdateQuestionnaire != null && !ViewData.ModelState.IsValid;
   var hasTitleError = Model?.UpdateQuestionnaire != null && Model.ErrorFor(nameof(Model.UpdateQuestionnaire.Title)) != null;
 }
 
 @section BeforeContent
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model?.QuestionnaireId/track">Back to questionnaire '@Model?.UpdateQuestionnaire?.Title'</a>
+  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back to questionnaire '@Model?.UpdateQuestionnaire?.Title'</a>
 }
 
-@if (hasErrors)
+@if (Model!.HasErrors())
 {
-  @await Html.PartialAsync("_ErrorSummary", Model)
+  @await Html.PartialAsync("_ErrorSummary")
 }
 
 <div class="govuk-grid-row">
