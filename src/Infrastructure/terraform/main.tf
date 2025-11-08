@@ -145,12 +145,18 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
   }
 
   lifecycle {
-    ignore_changes = [tags, app_settings, sticky_settings]
+    ignore_changes = [tags]
   }
 
   app_settings = {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
-    AppSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
+    ASPNETCORE_FORWARDEDHEADERS_ENABLED = "true"
+    ApiSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
+    AzureAd__Domain                       = "Educationgovuk.onmicrosoft.com"
+    AzureAd__TenantId                     = var.ad_tenant_id
+    AzureAd__ClientId                     = var.ad_client_id
+    AzureAd__ClientSecret                 = var.ad_client_secret
+    AzureAd__CallbackPath               = "/signin-oidc"
   }
 
   https_only = true
@@ -179,12 +185,12 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
   }
 
   lifecycle {
-    ignore_changes = [tags, app_settings, sticky_settings]
+    ignore_changes = [tags]
   }
 
   app_settings = {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
-    AppSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
+    ApiSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
   }
 
   https_only = true

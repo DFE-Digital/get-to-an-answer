@@ -19,7 +19,7 @@ function generateToken(): string {
 
         console.log(token);
 
-        const res = await fetch(`${baseUrl}/api/questionnaires`, {
+        /*const res = await fetch(`${baseUrl}/api/questionnaires`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -37,7 +37,7 @@ function generateToken(): string {
             const text = await res.text().catch(() => '');
             throw new Error(`Request failed ${res.status}: ${text}`);
         }
-        console.log(await res.json());
+        console.log(await res.json());*/
     } catch (e) {
         // console.error(e);
     }

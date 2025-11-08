@@ -62,6 +62,7 @@ public class QuestionnaireVersionService(GetToAnAnswerDbContext db, ILogger<Ques
 
                 var questionnaire = await db.Questionnaires
                     .AsNoTracking()
+                    .Include(qq => qq.Contents.Where(a => !a.IsDeleted))
                     .Include(q => q.Questions.Where(a => !a.IsDeleted))
                     .ThenInclude(qq => qq.Answers.Where(a => !a.IsDeleted))
                     .FirstAsync(q => q.Id == questionnaireId);

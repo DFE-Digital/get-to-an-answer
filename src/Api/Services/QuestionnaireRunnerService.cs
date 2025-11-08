@@ -34,7 +34,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             var questionnaireVersionJson =  await db.QuestionnaireVersions
                 .Where(qv => db.Questionnaires
                     .Any(q => q.Id == qv.QuestionnaireId && q.Slug == questionnaireSlug && 
-                              q.Status != EntityStatus.Deleted))
+                              !new[] {EntityStatus.Deleted, EntityStatus.Private}.Contains(q.Status)))
                 .OrderByDescending(qv => qv.Version)
                 .Select(qv => qv.QuestionnaireJson)
                 .FirstOrDefaultAsync();

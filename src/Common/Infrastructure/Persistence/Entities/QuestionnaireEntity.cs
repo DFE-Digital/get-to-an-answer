@@ -55,4 +55,7 @@ public class QuestionnaireEntity
 
     // Child entities
     public ICollection<QuestionEntity> Questions { get; set; } = new List<QuestionEntity>();
+    
+    // Custom content final pages
+    public ICollection<ContentEntity> Contents { get; set; } = new List<ContentEntity>();
 }
