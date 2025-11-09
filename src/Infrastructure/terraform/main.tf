@@ -152,10 +152,10 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
     ASPNETCORE_FORWARDEDHEADERS_ENABLED = "true"
     ApiSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
-    AzureAd__Domain                       = "Educationgovuk.onmicrosoft.com"
-    AzureAd__TenantId                     = var.ad_tenant_id
-    AzureAd__ClientId                     = var.ad_client_id
-    AzureAd__ClientSecret                 = var.ad_client_secret
+    AzureAd__Domain                     = "Educationgovuk.onmicrosoft.com"
+    AzureAd__TenantId                   = var.ad_tenant_id
+    AzureAd__ClientId                   = var.ad_client_id
+    AzureAd__ClientSecret               = var.ad_client_secret
     AzureAd__CallbackPath               = "/signin-oidc"
   }
 
