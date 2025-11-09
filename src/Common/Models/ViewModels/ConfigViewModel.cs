@@ -1,4 +1,4 @@
-namespace Admin.Models.ViewModels;
+namespace Common.Models.ViewModels;
 
 public class ConfigViewModel
 {

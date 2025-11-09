@@ -61,7 +61,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
                 Id = questionnaire.Id,
                 DisplayTitle = questionnaire.DisplayTitle,
                 Description = questionnaire.Description,
-                Slug = questionnaire.Slug,
+                Slug = questionnaireSlug,
             });
         }
         catch (Exception ex)
@@ -137,6 +137,14 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
                     x.Id == answer.DestinationQuestionId);
             }
 
+            if (answer.DestinationType == DestinationType.CustomContent)
+            {
+                var content = db.Contents.First();
+                
+                return await GetDestinationContent(x =>
+                    x.Id == answer.DestinationContentId);
+            }
+
             logger.LogInformation("GetNextState resolved to external destination for AnswerId={AnswerId}", selectedAnswerId);
             return Ok(new DestinationDto
             {
@@ -189,5 +197,21 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             logger.LogError(ex, "GetDestinationQuestion failed");
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
+    }
+    
+    private async Task<ServiceResult> GetDestinationContent(Expression<Func<ContentEntity,bool>> destination)
+    {
+        var questionEntity = await db.Contents.Where(destination)
+            .FirstOrDefaultAsync();
+            
+        if (questionEntity == null)
+            return BadRequest();
+
+        return Ok(new DestinationDto
+        {
+            Type = DestinationType.CustomContent,
+            Content = questionEntity.Content,
+            Title = questionEntity.Title,
+        });
     }
 }

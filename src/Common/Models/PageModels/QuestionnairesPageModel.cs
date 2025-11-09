@@ -1,10 +1,10 @@
-using Admin.Models.ViewModels;
+using Common.Models.ViewModels;
 using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 
-namespace Admin.Models.PageModels;
+namespace Common.Models.PageModels;
 
 public class QuestionnairesPageModel : BasePageModel
 {

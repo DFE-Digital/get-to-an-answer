@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Admin.Models.ViewModels;
+namespace Common.Models.ViewModels;
 
 [ExcludeFromCodeCoverage(Justification = "Standard ASP.NET Core error model")]
 public class ErrorViewModel

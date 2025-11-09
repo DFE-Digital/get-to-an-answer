@@ -1,6 +1,6 @@
-using Admin.Models;
-using Admin.Models.PageModels;
-using Admin.Models.ViewModels;
+using Common.Models;
+using Common.Models.PageModels;
+using Common.Models.ViewModels;
 using Common.Client;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

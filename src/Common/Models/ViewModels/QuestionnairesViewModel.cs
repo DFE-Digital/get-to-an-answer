@@ -1,6 +1,7 @@
+using Common.Models;
 using Common.Domain;
 
-namespace Admin.Models.ViewModels;
+namespace Common.Models.ViewModels;
 
 public class QuestionnairesViewModel
 {
