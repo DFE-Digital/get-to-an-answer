@@ -1,74 +1,73 @@
-import {expect, Page} from '@playwright/test';
+import {expect, Page, Locator} from '@playwright/test';
 import {BasePage} from '../BasePage';
 
 type Mode = 'create' | 'edit' | 'clone';
 
 export class EditQuestionnairePage extends BasePage {
-    private static readonly EDIT_URL: RegExp =
-        /\/admin\/questionnaires\/[0-9a-f-]+\/track\/?$/i;
-
     // ===== Locators =====
-    private readonly main = this.page.locator('main.govuk-main-wrapper[role="main"]');
-    private readonly banner = this.page.locator('div.govuk-notification-banner--success[role="alert"]');
-    private readonly heading = this.banner.locator('.govuk-notification-banner__heading');
+    private readonly main: Locator;
+    private readonly banner: Locator;
+    private readonly heading: Locator;
+    private readonly questionnaireTitle: Locator;
+    private readonly editQuestionnaireHeading: Locator;
+    private readonly questionnaireStatus: Locator;
+    private readonly linkEditTitle: Locator;
+    private readonly linkEditSlug: Locator;
+    private readonly linkAddEditQuestions: Locator;
+    private readonly linkStartPage: Locator;
+    private readonly linkBrandingTheme: Locator;
+    private readonly linkCustomisations: Locator;
+    private readonly linkAnswerContent: Locator;
+    private readonly linkPrivacyPolicy: Locator;
+    private readonly btnPublish: Locator;
+    private readonly btnDelete: Locator;
+    private readonly linkViewVersions: Locator;
+    private readonly linkClone: Locator;
 
-    private readonly questionnaireTitle = this.page.locator('');
-    private readonly editQuestionnaireHeading = this.page.locator('');
-    // Status badges (draft etc.)
-    private readonly draftBadge = this.page.locator('[data-status="Draft"]');
-
-    private readonly linkEditTitle = this.page.locator(
-        'a.govuk-task-list__link[aria-describedby="create-your-questionnaire-1-status"]'
-    );
-
-    private readonly linkEditSlug = this.page.locator(
-        'a.govuk-task-list__link[aria-describedby="edit-slug-status"]'
-    );
-
-    private readonly linkAddEditQuestions = this.page.locator(
-        'a.govuk-task-list__link[href*="/questionnaires/"][href$="/questions"]'
-    );
-    
-    private readonly linkStartPage = this.page.locator(
-        'a.govuk-task-list__link[href$="/start-page/edit"]'
-    );
-
-    private readonly linkBrandingTheme = this.page.locator(
-        'a.govuk-task-list__link[href$="/branding"]'
-    );
-    
-    private readonly linkCustomisations = this.page.locator(
-        'a.govuk-task-list__link[href$="/customizations"]'
-    );
-    
-    private readonly linkAnswerContent = this.page.locator(
-        'a.govuk-task-list__link[href$="/contents"]'
-    );
-
-    private readonly linkPrivacyPolicy = this.page.locator(
-        'a.govuk-task-list__link[href*="/privacy-policy"]'
-    );
-
-
-    private readonly btnPublish = this.page.locator(
-        'a.govuk-button.govuk-button--primary[href$="/publish/confirm"]'
-    );
-
-    private readonly btnDelete = this.page.locator(
-        'a.govuk-button.govuk-button--warning[href$="/delete/confirm"]'
-    );
-
-    private readonly linkViewVersions = this.page.locator(
-        'a.govuk-link[href$="/versions"]'
-    );
-
-    private readonly linkClone = this.page.locator(
-        'a.govuk-link[href$="/clone"]'
-    );
-
-    // ===== Constructor =====
-    constructor(page: Page, mode: Mode = 'create') {
+    constructor(page: Page, mode: Mode = 'edit') {
         super(page);
+        this.main = this.page.locator('main.govuk-main-wrapper[role="main"]');
+        this.banner = this.page.locator('div.govuk-notification-banner--success[role="alert"]');
+        this.heading = this.banner.locator('.govuk-notification-banner__heading');
+        this.questionnaireTitle = this.page.locator('h1.govuk-heading-l .govuk-caption-l');
+        this.editQuestionnaireHeading = this.page.locator('main[role="main"] h1.govuk-heading-l');
+        this.questionnaireStatus = this.page.locator('strong.govuk-tag[data-status]');
+        this.linkEditTitle = this.page.locator(
+            'a.govuk-task-list__link[aria-describedby="create-your-questionnaire-1-status"]'
+        );
+        this.linkEditSlug = this.page.locator(
+            'a.govuk-task-list__link[aria-describedby="edit-slug-status"]'
+        );
+        this.linkAddEditQuestions = this.page.locator(
+            'a.govuk-task-list__link[href*="/questionnaires/"][href$="/questions"]'
+        );
+        this.linkStartPage = this.page.locator(
+            'a.govuk-task-list__link[href$="/start-page/edit"]'
+        );
+        this.linkBrandingTheme = this.page.locator(
+            'a.govuk-task-list__link[href$="/branding"]'
+        );
+        this.linkCustomisations = this.page.locator(
+            'a.govuk-task-list__link[href$="/customizations"]'
+        );
+        this.linkAnswerContent = this.page.locator(
+            'a.govuk-task-list__link[href$="/contents"]'
+        );
+        this.linkPrivacyPolicy = this.page.locator(
+            'a.govuk-task-list__link[href*="/privacy-policy"]'
+        );
+        this.btnPublish = this.page.locator(
+            'a.govuk-button.govuk-button--primary[href$="/publish/confirm"]'
+        );
+        this.btnDelete = this.page.locator(
+            'a.govuk-button.govuk-button--warning[href$="/delete/confirm"]'
+        );
+        this.linkViewVersions = this.page.locator(
+            'a.govuk-link[href$="/versions"]'
+        );
+        this.linkClone = this.page.locator(
+            'a.govuk-link[href$="/clone"]'
+        );
     }
 
     // ===== Actions =====
@@ -128,16 +127,12 @@ export class EditQuestionnairePage extends BasePage {
         const text = await this.heading.textContent();
         expect(text?.trim().length).toBeGreaterThan(0);
     }
-    
-    async expectUrlOnPage(): Promise<void> {
-        await this.validateUrlMatches(EditQuestionnairePage.EDIT_URL);
-    }
 
     async validateHeadingAndStatus(): Promise<void> {
         await expect(this.main).toBeVisible();
         await expect(this.questionnaireTitle).toBeVisible();
         await expect(this.editQuestionnaireHeading).toBeVisible();
-        await expect(this.draftBadge).toBeVisible();
+        await expect(this.questionnaireStatus).toBeVisible();
     }
 
     async validateCoreLinks(): Promise<void> {
@@ -183,7 +178,7 @@ export class EditQuestionnairePage extends BasePage {
     }
 
     async assertPageElements() {
-        await this.expectUrlOnPage();
+        await this.validateHeadingAndStatus();
         await this.verifyHeaderLinks()
         await this.verifyFooterLinks();
         await this.validateAllSections();

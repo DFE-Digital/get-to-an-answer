@@ -33,7 +33,7 @@ export class SignInPage extends BasePage {
         await this.signInButton.click();
     }
 
-    async signIn(username: string, password: string): Promise<void> {
+    async enterCredentialsToSignIn(username: string, password: string): Promise<void> {
         await this.enterUsername(username);
         await this.enterPassword(password);
         await this.clickSignIn();
