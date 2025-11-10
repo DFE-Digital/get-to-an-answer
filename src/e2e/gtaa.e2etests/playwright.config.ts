@@ -50,7 +50,7 @@ export default defineConfig({
     },
     
     fullyParallel: true,
-    //retries: 1,
+    retries: 1,
     workers: 4,
     reporter: [['list'], ['html', {open: 'never'}]],
     use: {
