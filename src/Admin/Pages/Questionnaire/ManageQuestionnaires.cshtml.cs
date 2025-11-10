@@ -1,5 +1,5 @@
-using Admin.Models;
-using Admin.Models.PageModels;
+using Common.Models;
+using Common.Models.PageModels;
 using Common.Client;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

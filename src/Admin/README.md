@@ -94,7 +94,10 @@ Add the following to your user secrets
     "ClientId": "{Application (client) ID}",
     "ClientSecret": "{Found on the App registration keys page}",
     "Audience": "api://{client-id}",
-    "CallbackPath": "/signin-oidc"
+    "CallbackPath": "/signin-oidc",
+    "SavesToken": true,
+    "Scope": "openid profile email offline_access api://<api-app-id>/.default"
   }
 }
 ```
+`SaveTokens` - saves the token to the cookie, so you always have access to the user's identity for downstream calls to the api

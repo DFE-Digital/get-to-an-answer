@@ -19,8 +19,8 @@ grant_type=client_credentials&client_id={{client_id}}&client_secret={{client_sec
 
 ###
 
-@Api_Dev_HostAddress = {{Api_Dev_HostAddress}}
-# @Api_Dev_HostAddress = https://localhost:7243
+# @Api_Dev_HostAddress = {{Api_Dev_HostAddress}}
+@Api_Dev_HostAddress = https://localhost:7243
 
 GET {{Api_Dev_HostAddress}}/api/questionnaires
 Authorization: Bearer {{access_token}}

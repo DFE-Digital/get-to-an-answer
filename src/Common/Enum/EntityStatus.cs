@@ -6,4 +6,5 @@ public enum EntityStatus
     Published = 2,
     Deleted = 3,
     Archived = 4,
+    Private = 5,
 }

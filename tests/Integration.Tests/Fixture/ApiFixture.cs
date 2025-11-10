@@ -16,6 +16,7 @@ using DotNet.Testcontainers.Containers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Testcontainers.MsSql;
 using ApiProgram = Program;
 
@@ -43,7 +44,8 @@ public class ApiFixture : WebApplicationFactory<ApiProgram>, IAsyncLifetime
                 ["AzureAd:Domain"] = "contoso.com",
                 ["AzureAd:ClientId"] = "your-client-id",
                 ["AzureAd:ValidateAuthority"] = "false", // avoid host checking
-                ["AzureAd:RequireHttpsMetadata"] = "false"
+                ["AzureAd:RequireHttpsMetadata"] = "false",
+                ["AzureAd:AllowWebApiToBeAuthorizedByACL"] = "false"
             };
             config.AddInMemoryCollection(dict!);
             
@@ -71,6 +73,13 @@ public class ApiFixture : WebApplicationFactory<ApiProgram>, IAsyncLifetime
             
             const string secret = "local-test-signing-key-32bytes-minimum!";
 
+            var actions = services.Where(d => d.ServiceType == typeof(IConfigureOptions<JwtBearerOptions>)).ToList();
+
+            foreach (var p in actions)
+            {
+                services.Remove(p);
+            }
+            
             services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, o =>
             {
                 // Replace Authority-based validation with deterministic HS256 for tests

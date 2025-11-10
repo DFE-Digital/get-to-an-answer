@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Unicode;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,8 @@ using Microsoft.Identity.Client;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.TokenCacheProviders;
 using Microsoft.Identity.Web.TokenCacheProviders.InMemory;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Common.Local;
@@ -48,26 +51,33 @@ internal sealed class MockAuthenticationHandler(
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        Request.Cookies.TryGetValue(".MockAuth", out var cookie);
+        Request.Query.TryGetValue("jt", out var jwtTokenString);
 
-        // Gets the cookie from the browser and extracts the ticket
-        var t = new MockAzureAdExtensions.PlainTextTicketFormat().Unprotect(cookie);
+        string scheme = jwtTokenString.Any() ? "Bearer" : string.Empty;
+        string token = jwtTokenString.Any() ? jwtTokenString.ToString() : string.Empty;
 
-        if (t?.Principal.Identity?.IsAuthenticated ?? false)
+        if (!jwtTokenString.Any())
         {
-            return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(t.Principal, new AuthenticationProperties(), Scheme.Name)));
-        }
-        
-        Request.Headers.TryGetValue("Authorization", out var authHeader);
-        
-        var (scheme, token) = authHeader.ToString().Split(" ");
-        
-        if (scheme is null || token is null)
-        {
-            Request.Query.TryGetValue("jt", out var jwtTokenString);
-            
-            scheme = "Bearer";
-            token = jwtTokenString;
+            Request.Headers.TryGetValue("Authorization", out var authHeader);
+
+            if (!authHeader.Any())
+            {
+                Request.Cookies.TryGetValue(".MockAuth", out var cookie);
+
+                // Gets the cookie from the browser and extracts the ticket
+                var ticket = new MockAzureAdExtensions.PlainTextTicketFormat().Unprotect(cookie);
+
+                if (ticket?.Principal.Identity?.IsAuthenticated ?? false)
+                {
+                    return Task.FromResult(AuthenticateResult.Success(
+                        new AuthenticationTicket(ticket.Principal, new AuthenticationProperties(), Scheme.Name)));
+                }
+            }
+
+            var (authScheme, authToken) = authHeader.ToString().Split(" ");
+
+            scheme = authScheme ?? scheme;
+            token = authToken ?? token;
         }
 
         if (scheme != "Bearer" || string.IsNullOrWhiteSpace(token))
@@ -99,7 +109,10 @@ internal sealed class MockAuthenticationHandler(
             var identity = new ClaimsIdentity(jwtToken.Claims, "MockAzureAD");
             var principal = new ClaimsPrincipal(identity);
 
-            var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), Scheme.Name);
+            var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(new Dictionary<string, string?>() 
+            {
+                { ".Token.id_token", token },
+            }), Scheme.Name);
             return Task.FromResult(AuthenticateResult.Success(ticket));
         }
         catch (Exception ex)
@@ -159,6 +172,14 @@ public static class MockAzureAdExtensions
 
             })
             .AddScheme<AuthenticationSchemeOptions, MockAuthenticationHandler>(MockScheme, _ => { })
+            .AddScheme<OpenIdConnectOptions, MockOpenIdConnectHandler>(OpenIdConnectDefaults.AuthenticationScheme,
+                options =>
+                {
+                    options.ClientId = "client-id";
+                    options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                        "metadata-address", 
+                        new OpenIdConnectConfigurationRetriever());
+                })
             .AddCookie(MockCookieScheme, cookie =>
             {
                 cookie.TicketDataFormat = new PlainTextTicketFormat();
@@ -171,9 +192,7 @@ public static class MockAzureAdExtensions
             });
         
         services.AddHttpContextAccessor();
-        
-        services.AddSingleton<ITokenAcquisition, MockTokenAcquisition>();
-        
+
         services.AddMemoryCache();
         services.AddSingleton<IMsalTokenCacheProvider, MsalMemoryTokenCacheProvider>();
 
@@ -266,6 +285,11 @@ public static class MockAzureAdExtensions
                 {
                     IsPersistent = true,
                     ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8),
+                    AllowRefresh = true,
+                    Items =
+                    {
+                        { ".Token.id_token", result.Properties.GetTokenValue("id_token") }
+                    }
                 });
                 context.Response.Redirect("/");
             }).AllowAnonymous();
@@ -321,107 +345,31 @@ public static class MockAzureAdExtensions
     }
 }
 
-public sealed class MockTokenAcquisition(IHttpContextAccessor accessor) : ITokenAcquisition
+public sealed class MockOpenIdConnectHandler : AuthenticationHandler<OpenIdConnectOptions>
 {
-    private static readonly AuthenticationResult MockAuthenticationResult = new(
-        accessToken: "mock-user-access-token",
-        isExtendedLifeTimeToken: false,
-        uniqueId: "mock-unique-id",
-        expiresOn: DateTimeOffset.UtcNow.AddMinutes(5),
-        extendedExpiresOn: DateTimeOffset.UtcNow.AddMinutes(5),
-        tenantId: "mock-tenant-id",
-        account: null,
-        idToken: "mock-id-token",
-        scopes: ["user.read", "profile"],
-        correlationId: Guid.NewGuid(),
-        tokenType: "Bearer",
-        authenticationResultMetadata: null,
-        claimsPrincipal: null,
-        spaAuthCode: null,
-        additionalResponseParameters: null);
+    private readonly IHttpContextAccessor _accessor;
 
-    public Task<string> GetAccessTokenForUserAsync(IEnumerable<string> scopes, string? authenticationScheme, string? tenantId = null,
-        string? userFlow = null, ClaimsPrincipal? user = null, TokenAcquisitionOptions? tokenAcquisitionOptions = null)
+    public MockOpenIdConnectHandler(
+        IOptionsMonitor<OpenIdConnectOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder,
+        ISystemClock clock,
+        IHttpContextAccessor accessor)
+        : base(options, logger, encoder, clock)
     {
-        if (user?.Claims == null)
-            return Task.FromResult(String.Empty);
-            
-        var claims = user.Claims; // copy or map as needed
-
-        var secret = "use-a-64-byte-minimum-secret-string................................"; // >=64 bytes
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
-
-        claims = claims.Select(c =>
-        {
-            if (c.Type == "aud")
-            {
-                return new Claim(c.Type, "api://client-id/.default");
-            }
-            
-            return new Claim(c.Type, c.Value);
-        });
-        
-        var jwt = new JwtSecurityToken(
-            issuer: "rando-issuer",
-            claims: claims,
-            notBefore: DateTime.UtcNow,
-            expires: DateTime.UtcNow.AddHours(8),
-            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha512));
-
-        return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(jwt));
+        _accessor = accessor;
     }
 
-    public Task<AuthenticationResult> GetAuthenticationResultForUserAsync(IEnumerable<string> scopes,
-        string? authenticationScheme, string? tenantId = null,
-        string? userFlow = null, ClaimsPrincipal? user = null, TokenAcquisitionOptions? tokenAcquisitionOptions = null)
-        => Task.FromResult(MockAuthenticationResult);
-
-    public Task<string> GetAccessTokenForAppAsync(string scope, string? authenticationScheme, string? tenant = null,
-        TokenAcquisitionOptions? tokenAcquisitionOptions = null)
+    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var user = accessor.HttpContext?.User;
+        Request.Cookies.TryGetValue(".MockAuth", out var cookie);
+
+        // Gets the cookie from the browser and extracts the ticket
+        var ticket = new MockAzureAdExtensions.PlainTextTicketFormat().Unprotect(cookie);
         
-        if (user?.Claims == null)
-            return Task.FromResult(String.Empty);
-            
-        var claims = user.Claims; // copy or map as needed
-
-        var secret = "use-a-64-byte-minimum-secret-string................................"; // >=64 bytes
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
-
-        claims = claims.Select(c =>
-        {
-            if (c.Type == "aud")
-            {
-                return new Claim(c.Type, "api://client-id/.default");
-            }
-            
-            return new Claim(c.Type, c.Value);
-        });
+        if (ticket?.Principal.Identity?.IsAuthenticated ?? false)
+            return Task.FromResult(AuthenticateResult.Success(ticket));
         
-        var jwt = new JwtSecurityToken(
-            issuer: "rando-issuer",
-            claims: claims,
-            notBefore: DateTime.UtcNow,
-            expires: DateTime.UtcNow.AddHours(8),
-            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha512));
-
-        return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(jwt));
+        return Task.FromResult(AuthenticateResult.Fail("not authenticated"));
     }
-
-    public Task<AuthenticationResult> GetAuthenticationResultForAppAsync(string scope, string? authenticationScheme, string? tenant = null,
-        TokenAcquisitionOptions? tokenAcquisitionOptions = null)
-        => Task.FromResult(MockAuthenticationResult);
-
-    public void ReplyForbiddenWithWwwAuthenticateHeader(IEnumerable<string> scopes, MsalUiRequiredException msalServiceException,
-        string? authenticationScheme, HttpResponse? httpResponse = null)
-    { }
-
-    public string GetEffectiveAuthenticationScheme(string? authenticationScheme)
-        => "MockScheme";
-
-    public Task ReplyForbiddenWithWwwAuthenticateHeaderAsync(
-        IEnumerable<string> scopes, 
-        MsalUiRequiredException msalServiceException,
-        HttpResponse? httpResponse = null) => Task.CompletedTask;
 }

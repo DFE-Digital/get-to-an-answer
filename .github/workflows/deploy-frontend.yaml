@@ -62,7 +62,7 @@ jobs:
       - name: Configure App Settings
         run: |
           az webapp config appsettings set \
-            --name "$API_NAME" \
+            --name "$FRONTEND_NAME" \
             --resource-group "$RESOURCE_GROUP" \
             --settings \
               ConnectionStrings__DefaultConnection="${{ secrets.SQL_CONNECTION_STRING }}" \

@@ -1,5 +1,5 @@
-using Admin.Models;
-using Admin.Models.PageModels;
+using Common.Models;
+using Common.Models.PageModels;
 using Common.Client;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -10,14 +10,11 @@ public class TrackQuestionnaires(IApiClient apiClient, ILogger<TrackQuestionnair
 {
     [FromRoute(Name = "questionnaireId")] 
     public new Guid? QuestionnaireId { get; set; }
-    
-    
+
     public async Task<IActionResult> OnGet()
     {
         try
         {
-            BackLinkSlug = Routes.QuestionnairesManage;
-            
             if (QuestionnaireId == null)
                 return Page();
 

@@ -13,8 +13,6 @@ public class ContentEntity
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
-    
-    public Guid QuestionnaireId { get; set; }
 
     [Required]
     [MaxLength(250)]
@@ -33,4 +31,9 @@ public class ContentEntity
     public DateTime UpdatedAt { get; set; }
     
     public bool IsDeleted { get; set; }
+    
+    public Guid QuestionnaireId { get; set; }
+    
+    [JsonIgnore]
+    public QuestionnaireEntity? Questionnaire { get; set; }
 }
