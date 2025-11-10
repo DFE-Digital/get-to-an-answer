@@ -19,13 +19,22 @@ export async function createQuestionnaire(
         .withSlug(slug)
         .build();
 
-    const response = await request.post('/api/questionnaires', {
+    const response = await request.post('https://localhost:7043/api/questionnaires', {
         data: payload,
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
+    console.log(response);
+    
+    // const response = await request.post('/api/questionnaires', {
+    //     data: payload,
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
+    //     }
+    // });
 
     const responseBody = await parseBody(response);
 

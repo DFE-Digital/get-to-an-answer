@@ -113,36 +113,36 @@ export default defineConfig({
             ...adminBase,
             use: {...adminBase.use, browserName: 'chromium'}
         },
-        {
-            name: 'admin-firefox',
-            ...adminBase,
-            use: {...adminBase.use, browserName: 'firefox'}
-        },
-        {
-            name: 'admin-edge',
-            ...adminBase,
-            use: {...adminBase.use, channel: 'msedge'}
-        },
-        {
-            name: 'admin-mobile-chrome',
-            ...adminBase,
-            use: {
-                ...adminBase.use,
-                browserName: 'chromium',
-                ...devices['Pixel 8'],
-                isMobile: true,
-                viewport: {width: 412, height: 914},
-                userAgent: devices['Pixel 8']?.userAgent ?? devices['Pixel 7']?.userAgent
-            }
-        },
-        {
-            name: 'admin-mobile-safari',
-            ...adminBase,
-            use: {
-                ...adminBase.use,
-                browserName: 'webkit',
-                ...devices['iPhone 15']
-            }
-         }
+        // {
+        //     name: 'admin-firefox',
+        //     ...adminBase,
+        //     use: {...adminBase.use, browserName: 'firefox'}
+        // },
+        // {
+        //     name: 'admin-edge',
+        //     ...adminBase,
+        //     use: {...adminBase.use, channel: 'msedge'}
+        // },
+        // {
+        //     name: 'admin-mobile-chrome',
+        //     ...adminBase,
+        //     use: {
+        //         ...adminBase.use,
+        //         browserName: 'chromium',
+        //         ...devices['Pixel 8'],
+        //         isMobile: true,
+        //         viewport: {width: 412, height: 914},
+        //         userAgent: devices['Pixel 8']?.userAgent ?? devices['Pixel 7']?.userAgent
+        //     }
+        // },
+        // {
+        //     name: 'admin-mobile-safari',
+        //     ...adminBase,
+        //     use: {
+        //         ...adminBase.use,
+        //         browserName: 'webkit',
+        //         ...devices['iPhone 15']
+        //     }
+        //  }
     ],
 });

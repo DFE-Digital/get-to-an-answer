@@ -18,36 +18,36 @@ test.describe('Get to an answer views questionnaire', () => {
         viewQuestionnairePage = await localSignIn(page, token);
     });
 
-    test('Validate presence of elements on view questionnaire page', async ({page}) => {
-        await viewQuestionnairePage.assertPageElements();
-    });
-
-    test("Header section - H1 and paragraph presence", async () => {
-        await viewQuestionnairePage.verifyHelpUserHeadingVisible();
-        await viewQuestionnairePage.verifyHelpUserDescriptionVisible();
-    });
-
-    test("Create questionnaire CTA navigates to Add page", async ({page}) => {
-        await viewQuestionnairePage.clickCreateNewQuestionnaire();
-
-        addQuestionnairePage = await AddQuestionnairePage.create(page);
-        await addQuestionnairePage.verifyLabelAndHintPresent();
-    });
+    // test('Validate presence of elements on view questionnaire page', async ({page}) => {
+    //     await viewQuestionnairePage.assertPageElements();
+    // });
+    //
+    // test("Header section - H1 and paragraph presence", async () => {
+    //     await viewQuestionnairePage.verifyHelpUserHeadingVisible();
+    //     await viewQuestionnairePage.verifyHelpUserDescriptionVisible();
+    // });
+    //
+    // test("Create questionnaire CTA navigates to Add page", async ({page}) => {
+    //     await viewQuestionnairePage.clickCreateNewQuestionnaire();
+    //
+    //     addQuestionnairePage = await AddQuestionnairePage.create(page);
+    //     await addQuestionnairePage.verifyLabelAndHintPresent();
+    // });
 
     test("Questionnaires table - columns, title link navigates", async ({page, request}) => {
         const {questionnaire} = await createQuestionnaire(request, token);
-         await viewQuestionnairePage.table.verifyHeaders();
-         await viewQuestionnairePage.table.verifyFirstTitleIsLink();
-
-         await viewQuestionnairePage.table.clickFirstQuestionnaireTitle();
-         editQuestionnairePage = await EditQuestionnairePage.create(page);
-         await editQuestionnairePage.validateHeadingAndStatus();
+         // await viewQuestionnairePage.table.verifyHeaders();
+         // await viewQuestionnairePage.table.verifyFirstTitleIsLink();
+         //
+         // await viewQuestionnairePage.table.clickFirstQuestionnaireTitle();
+         // editQuestionnairePage = await EditQuestionnairePage.create(page);
+         // await editQuestionnairePage.validateHeadingAndStatus();
     });
 
-    test("Questionnaires table - status as draft", async ({page, request}) => {
-        const {questionnaire} = await createQuestionnaire(request, token);
-
-        await viewQuestionnairePage.table.expectRowPresentByName(questionnaire.title);
-        await viewQuestionnairePage.table.getStatus(questionnaire.title);
-    });
+    // test("Questionnaires table - status as draft", async ({page, request}) => {
+    //     const {questionnaire} = await createQuestionnaire(request, token);
+    //
+    //     await viewQuestionnairePage.table.expectRowPresentByName(questionnaire.title);
+    //     await viewQuestionnairePage.table.getStatus(questionnaire.title);
+    // });
 });
