@@ -1,11 +1,11 @@
 import {QuestionBuilder} from '../builders/QuestionBuilder';
 import {QuestionType} from '../constants/test-data-constants';
 import { JwtHelper } from "../helpers/JwtHelper";
-import {APIRequestContext, APIResponse} from "@playwright/test";
 import {parseBody} from "../helpers/ParseBody";
+import { EnvConfig } from '../config/environment-config';
 
-//to parse response-body correctly - json body can be json, text or empty string
-//duplicate - to be fixed later
+const BASE_URL = EnvConfig.API_URL;
+
 export async function createQuestion(
     request: any,
     questionnaireId: string,
@@ -21,7 +21,7 @@ export async function createQuestion(
         .withType(type)
         .build();
     
-    const response = await request.post('/api/questions', {
+    const response = await request.post(`${BASE_URL}/api/questions`, {
         data: payload,
         headers: {
             'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export async function getQuestion(
     questionId: string,
     bearerToken?: string
 ) {
-    const response = await request.get(`/api/questions/${questionId}`, {
+    const response = await request.get(`${BASE_URL}/api/questions/${questionId}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
@@ -63,7 +63,7 @@ export async function listQuestions(
     questionnaireId: string,
     bearerToken?: string
 ) {
-    const response = await request.get(`/api/questionnaires/${questionnaireId}/questions`, {
+    const response = await request.get(`${BASE_URL}/api/questionnaires/${questionnaireId}/questions`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
@@ -84,7 +84,7 @@ export async function updateQuestion(
     data: any,
     bearerToken?: string
 ) {
-    const response = await request.put(`/api/questions/${questionId}`, {
+    const response = await request.put(`${BASE_URL}/api/questions/${questionId}`, {
         data,
         headers: {
             'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ export async function deleteQuestion(
     questionId: string,
     bearerToken?: string
 ) {
-    const response = await request.delete(`/api/questions/${questionId}`, {
+    const response = await request.delete(`${BASE_URL}/api/questions/${questionId}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
@@ -126,7 +126,7 @@ export async function moveQuestionDownOne(
     questionId: string,
     bearerToken?: string,
 ) {
-    const response = await request.patch(`/api/questionnaires/${questionnaireId}/questions/${questionId}/move-down`, {
+    const response = await request.patch(`${BASE_URL}/api/questionnaires/${questionnaireId}/questions/${questionId}/move-down`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
@@ -146,7 +146,7 @@ export async function moveQuestionUpOne(
     questionId: string,
     bearerToken?: string
 ) {
-    const response = await request.patch(`/api/questionnaires/${questionnaireId}/questions/${questionId}/move-up`, {
+    const response = await request.patch(`${BASE_URL}/api/questionnaires/${questionnaireId}/questions/${questionId}/move-up`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`

@@ -2,12 +2,13 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
 
 import {defineConfig, devices} from '@playwright/test';
-import {loadEnvConfig} from './src/config/environment-config';
+import {loadEnvConfig, EnvType} from './src/config/environment-config';
 
 // Choose an environment: 'local' or 'test'
 const ENV_NAME: 'local' | 'test' = 'local'; //default local
-process.env.ENV_NAME = ENV_NAME;
-const EnvConfig = loadEnvConfig(ENV_NAME);
+process.env.ENV_NAME = ENV_NAME as EnvType;
+
+const EnvConfig = loadEnvConfig(process.env.ENV_NAME as EnvType);
 
 const healthBase = {
     testDir: './src/tests/health',
@@ -54,7 +55,7 @@ export default defineConfig({
     workers: 4,
     reporter: [['list'], ['html', {open: 'never'}]],
     use: {
-        headless: true,
+        headless: false,
         trace: 'on-first-retry',
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
@@ -113,36 +114,36 @@ export default defineConfig({
             ...adminBase,
             use: {...adminBase.use, browserName: 'chromium'}
         },
-        // {
-        //     name: 'admin-firefox',
-        //     ...adminBase,
-        //     use: {...adminBase.use, browserName: 'firefox'}
-        // },
-        // {
-        //     name: 'admin-edge',
-        //     ...adminBase,
-        //     use: {...adminBase.use, channel: 'msedge'}
-        // },
-        // {
-        //     name: 'admin-mobile-chrome',
-        //     ...adminBase,
-        //     use: {
-        //         ...adminBase.use,
-        //         browserName: 'chromium',
-        //         ...devices['Pixel 8'],
-        //         isMobile: true,
-        //         viewport: {width: 412, height: 914},
-        //         userAgent: devices['Pixel 8']?.userAgent ?? devices['Pixel 7']?.userAgent
-        //     }
-        // },
-        // {
-        //     name: 'admin-mobile-safari',
-        //     ...adminBase,
-        //     use: {
-        //         ...adminBase.use,
-        //         browserName: 'webkit',
-        //         ...devices['iPhone 15']
-        //     }
-        //  }
+        {
+            name: 'admin-firefox',
+            ...adminBase,
+            use: {...adminBase.use, browserName: 'firefox'}
+        },
+        {
+            name: 'admin-edge',
+            ...adminBase,
+            use: {...adminBase.use, channel: 'msedge'}
+        },
+        {
+            name: 'admin-mobile-chrome',
+            ...adminBase,
+            use: {
+                ...adminBase.use,
+                browserName: 'chromium',
+                ...devices['Pixel 8'],
+                isMobile: true,
+                viewport: {width: 412, height: 914},
+                userAgent: devices['Pixel 8']?.userAgent ?? devices['Pixel 7']?.userAgent
+            }
+        },
+        {
+            name: 'admin-mobile-safari',
+            ...adminBase,
+            use: {
+                ...adminBase.use,
+                browserName: 'webkit',
+                ...devices['iPhone 15']
+            }
+         }
     ],
 });

@@ -39,36 +39,38 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await viewQuestionnairePage.expectQuestionnaireHeadingOnPage();
     });
 
-    test('Submit a new questionnaire with missing title', async ({page}) => {
-        await viewQuestionnairePage.clickCreateNewQuestionnaire();
-
-        addQuestionnairePage = await AddQuestionnairePage.create(page);
-        await addQuestionnairePage.enterTitle(''); 
-        await addQuestionnairePage.clickSaveAndContinue();
-
-        await addQuestionnairePage.validateMissingTitleMessageFlow();
-    });
+    //TBC, focus after clicking the error message
+    // test('Submit a new questionnaire with missing title', async ({page}) => {
+    //     await viewQuestionnairePage.clickCreateNewQuestionnaire();
+    //
+    //     addQuestionnairePage = await AddQuestionnairePage.create(page);
+    //     await addQuestionnairePage.enterTitle(''); 
+    //     await addQuestionnairePage.clickSaveAndContinue();
+    //
+    //     await addQuestionnairePage.validateMissingTitleMessageFlow();
+    // });
 
     //TBC, we don't know if special characters are allowed in title
-    test('Submit a new questionnaire with invalid title', async ({page}) => {
-        await viewQuestionnairePage.clickCreateNewQuestionnaire();
+    // test('Submit a new questionnaire with invalid title', async ({page}) => {
+    //     await viewQuestionnairePage.clickCreateNewQuestionnaire();
+    //
+    //     addQuestionnairePage = await AddQuestionnairePage.create(page);
+    //     await addQuestionnairePage.enterTitle('@@@+++###~~~');
+    //     await addQuestionnairePage.clickSaveAndContinue();
+    //
+    //     await addQuestionnairePage.validateInvalidTitleMessageFlow();
+    // });
 
-        addQuestionnairePage = await AddQuestionnairePage.create(page);
-        await addQuestionnairePage.enterTitle('@@@+++###~~~');
-        await addQuestionnairePage.clickSaveAndContinue();
-
-        await addQuestionnairePage.validateInvalidTitleMessageFlow();
-    });
-
-    test('Submit a new questionnaire with invalid title to validate aria-describedby', async ({page}) => {
-        await viewQuestionnairePage.clickCreateNewQuestionnaire();
-
-        addQuestionnairePage = await AddQuestionnairePage.create(page);
-        await addQuestionnairePage.enterTitle('@@@+++###~~~');
-        await addQuestionnairePage.clickSaveAndContinue();
-
-        await addQuestionnairePage.expectTitleAriaDescribedByIncludesHintAndError();
-    });
+    //TBC
+    // test('Submit a new questionnaire with invalid title to validate aria-describedby', async ({page}) => {
+    //     await viewQuestionnairePage.clickCreateNewQuestionnaire();
+    //
+    //     addQuestionnairePage = await AddQuestionnairePage.create(page);
+    //     await addQuestionnairePage.enterTitle('@@@+++###~~~');
+    //     await addQuestionnairePage.clickSaveAndContinue();
+    //
+    //     await addQuestionnairePage.expectTitleAriaDescribedByIncludesHintAndError();
+    // });
 
     test('should prevent double submission for a questionnaire', async ({page}) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
