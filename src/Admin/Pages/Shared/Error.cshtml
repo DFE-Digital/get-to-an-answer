@@ -1,4 +1,6 @@
-﻿@model Admin.Models.ViewModels.ErrorViewModel
+@page
+@using System.Diagnostics
+@model Admin.Pages.Shared.Error
 @{
     ViewData["Title"] = "There is a problem";
 }
@@ -16,10 +18,10 @@
             </div>
         </div>
 
-        @if (Model.ShowRequestId)
+        @if (Model.ViewModel.ShowRequestId)
         {
             <p class="govuk-body govuk-!-margin-top-4">
-                <strong>Request ID:</strong> <code>@Model.RequestId</code>
+                <strong>Request ID:</strong> <code>@Model.ViewModel.RequestId</code>
             </p>
         }
     </main>

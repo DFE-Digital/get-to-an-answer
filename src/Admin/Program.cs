@@ -60,6 +60,7 @@ builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI();
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AddPageRoute("/Home/Index", "/");
+    options.Conventions.AddPageRoute("/Shared/Error", "/error");
 });
 
 //builder.AddLogging();
@@ -71,7 +72,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!builderIsLocalEnvironment)
 {
-    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler("/error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
