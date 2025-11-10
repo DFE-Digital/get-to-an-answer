@@ -27,6 +27,14 @@ RUN dotnet publish "./Frontend.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 RUN mkdir /app/https
 RUN dotnet dev-certs https -ep /app/https/aspnetapp.pfx -p e2e
 
+FROM node:20 AS node
+WORKDIR /src
+COPY "src/Frontend/package.json" "src/Frontend/yarn.lock" "src/Frontend/Gulpfile.js" ./
+COPY "src/Frontend/AssetSrc/" "AssetSrc/"
+RUN yarn install --ignore-scripts
+RUN npm install --ignore-scripts -g gulp
+RUN gulp dev
+
 FROM base AS final
 WORKDIR /app
 COPY --from=node /src/wwwroot ./wwwroot

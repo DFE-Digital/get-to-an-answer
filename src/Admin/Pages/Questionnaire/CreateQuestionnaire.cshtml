@@ -7,20 +7,17 @@
 
 @{
   ViewData["Title"] = "Create new questionnaire";
-  
-  var hasErrors = Model != null && !ViewData.ModelState.IsValid;
-  
   var hasTitleError = Model?.ErrorFor(nameof(Model)) != null;
 }
 
 @section BeforeContent
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires">Back to questionnaires</a>
+  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back to questionnaires</a>
 }
 
-@if (hasErrors)
+@if (Model!.HasErrors())
 {
-  @await Html.PartialAsync("_ErrorSummary", Model)
+  @await Html.PartialAsync("_ErrorSummary")
 }
 
 <div class="govuk-grid-row">

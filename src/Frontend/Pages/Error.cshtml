@@ -1,0 +1,26 @@
+﻿@model Common.Models.ViewModels.ErrorViewModel
+@{
+    ViewData["Title"] = "There is a problem";
+}
+
+<div class="govuk-width-container">
+    <main class="govuk-main-wrapper" id="main-content" role="main">
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1">
+            <h2 class="govuk-error-summary__title" id="error-summary-title">
+                There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+                <p>Sorry, there is a problem with the service.</p>
+                <p>Try again later.</p>
+                <p>If you need to, <a href="/contact" class="govuk-link">contact support</a>.</p>
+            </div>
+        </div>
+
+        @if (Model.ShowRequestId)
+        {
+            <p class="govuk-body govuk-!-margin-top-4">
+                <strong>Request ID:</strong> <code>@Model.RequestId</code>
+            </p>
+        }
+    </main>
+</div>

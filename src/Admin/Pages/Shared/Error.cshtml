@@ -1,0 +1,25 @@
+@page
+@model Admin.Pages.Shared.Error
+@{
+    ViewData["Title"] = "Sorry, there is a problem with the service";
+    Layout = "_ErrorLayout";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">
+            @ViewBag.Title
+        </h1>
+    </div>
+</div>
+
+<div class="govuk-body">
+    <p>Try again later.</p><p>If you need to, <a href="/contact" class="govuk-link">contact support</a>.</p>
+</div>
+
+@if (Model.ViewModel.ShowRequestId)
+{
+    <p class="govuk-body govuk-!-margin-top-4">
+        <strong>Request ID:</strong> <code>@Model.ViewModel.RequestId</code>
+    </p>
+}

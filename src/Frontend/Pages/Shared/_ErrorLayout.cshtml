@@ -1,0 +1,113 @@
+﻿@using System.Globalization
+@using Common.Models
+@using Common.Models.PageModels
+@using Common.Models.ViewModels
+@using Common.Configuration
+@using Microsoft.Extensions.Options
+
+@inject IOptions<ScriptOptions> ScriptOptions
+
+@{
+    var scriptConfig = ScriptOptions.Value;
+    var configViewModel = new ConfigViewModel
+    {
+        TranslationEnabled = false,
+        IsError = true
+    };
+}
+
+<!DOCTYPE html>
+<html class="@(SiteConfiguration.Rebrand ? "govuk-template--rebranded" : "govuk-template")" lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"]</title>
+    <style asp-add-nonce="true">
+        :root {
+            --generated: '@DateTime.Today.ToString("d MMMM yyyy", DateTimeFormatInfo.InvariantInfo)' ;
+            --siteurl: '@Url.ActionLink("Homepage", "Contentful", protocol: "https")';
+        }
+    </style>
+    @if (SiteConfiguration.Rebrand)
+    {
+        <link rel="icon" sizes="48x48" href="/assets/rebrand/images/favicon.ico" asp-append-version="@scriptConfig.AddCssVersion"/>
+        <link rel="icon" sizes="any" type="image/svg+xml" href="/assets/rebrand/images/favicon.svg" asp-append-version="@scriptConfig.AddCssVersion"/>
+        <link rel="mask-icon" href="/assets/rebrand/images/govuk-icon-mask.svg" color="#0b0c0c" asp-append-version="@scriptConfig.AddCssVersion"/>
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/rebrand/images/govuk-icon-180.png" asp-append-version="@scriptConfig.AddCssVersion"/>
+        <link rel="manifest" href="/assets/rebrand/manifest.json">
+    }
+    else
+    {
+        <link rel="icon" sizes="48x48" href="/assets/images/favicon.ico" asp-append-version="@scriptConfig.AddCssVersion"/>
+        <link rel="icon" sizes="any" type="image/svg+xml" href="/assets/images/favicon.svg" asp-append-version="@scriptConfig.AddCssVersion"/>
+        <link rel="mask-icon" href="/assets/images/govuk-icon-mask.svg" color="#0b0c0c" asp-append-version="@scriptConfig.AddCssVersion"/>
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/govuk-icon-180.png" asp-append-version="@scriptConfig.AddCssVersion"/>
+        <link rel="manifest" href="/assets/manifest.json">
+    }
+    
+    <meta name="apple-mobile-web-app-title" content="Support for care leavers" />
+    
+    <link rel="stylesheet" href="~/css/application.css" asp-append-version="@scriptConfig.AddCssVersion"/>
+    <link rel="stylesheet" href="~/css/print.css" asp-append-version="@scriptConfig.AddCssVersion"/>
+    @if (SiteConfiguration.Rebrand)
+    {
+        <link rel="stylesheet" href="~/css/rebrand.css" asp-append-version="@scriptConfig.AddCssVersion"/>
+    }
+    @if (IsSectionDefined("Head")) {
+        @await RenderSectionAsync("Head", required: false)
+    }
+</head>
+
+<body class="govuk-template__body">
+<script asp-add-nonce="true">
+    document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');
+</script>
+<a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+@{
+    await Html.RenderPartialAsync("_Header", configViewModel);
+}
+
+
+@await RenderSectionAsync("BeforeContent", required: false)
+
+
+
+@if (IsSectionDefined("BeforeGDSContent"))
+
+{
+    <section class="dfe-page-grey" id="main-content-header">
+        <div class="govuk-width-container" id="main-header-container">
+            @await RenderSectionAsync("BeforeGDSContent", required: false)
+        </div>
+    </section>
+}
+
+<div class="govuk-width-container @ViewBag.ContainerClasses" id="main-content-container">
+    @await RenderSectionAsync("BeforeContent", required: false)
+    <main class="govuk-main-wrapper @ViewBag.MainClasses" id="main-content" role="main" lang="@ViewBag.MainLang">
+        @RenderBody()
+    </main>
+</div>
+@if (IsSectionDefined("AfterGDSContent"))
+{
+    <section class="dfe-page-grey" id="main-content-footer">
+        <div class="govuk-width-container">
+            @await RenderSectionAsync("AfterGDSContent")
+        </div>
+    </section>
+}
+
+@{
+    await Html.RenderPartialAsync("_Footer", configViewModel);
+}
+
+@await RenderSectionAsync("Scripts", false)
+<script asp-add-nonce="true" type="module">
+    import { initAll } from '/js/govuk-frontend.min.js'
+    initAll()
+</script>
+<script asp-add-nonce="true" src="/js/dfefrontend.min.js"></script>
+</body>
+
+</html>

@@ -192,8 +192,6 @@ public static class MockAzureAdExtensions
             });
         
         services.AddHttpContextAccessor();
-        
-        services.AddSingleton<ITokenAcquisition, MockTokenAcquisition>();
 
         services.AddMemoryCache();
         services.AddSingleton<IMsalTokenCacheProvider, MsalMemoryTokenCacheProvider>();
@@ -374,109 +372,4 @@ public sealed class MockOpenIdConnectHandler : AuthenticationHandler<OpenIdConne
         
         return Task.FromResult(AuthenticateResult.Fail("not authenticated"));
     }
-}
-
-public sealed class MockTokenAcquisition(IHttpContextAccessor accessor) : ITokenAcquisition
-{
-    private static readonly AuthenticationResult MockAuthenticationResult = new(
-        accessToken: "mock-user-access-token",
-        isExtendedLifeTimeToken: false,
-        uniqueId: "mock-unique-id",
-        expiresOn: DateTimeOffset.UtcNow.AddMinutes(5),
-        extendedExpiresOn: DateTimeOffset.UtcNow.AddMinutes(5),
-        tenantId: "mock-tenant-id",
-        account: null,
-        idToken: "mock-id-token",
-        scopes: ["user.read", "profile"],
-        correlationId: Guid.NewGuid(),
-        tokenType: "Bearer",
-        authenticationResultMetadata: null,
-        claimsPrincipal: null,
-        spaAuthCode: null,
-        additionalResponseParameters: null);
-
-    public Task<string> GetAccessTokenForUserAsync(IEnumerable<string> scopes, string? authenticationScheme, string? tenantId = null,
-        string? userFlow = null, ClaimsPrincipal? user = null, TokenAcquisitionOptions? tokenAcquisitionOptions = null)
-    {
-        if (user?.Claims == null)
-            return Task.FromResult(String.Empty);
-            
-        var claims = user.Claims; // copy or map as needed
-
-        var secret = "use-a-64-byte-minimum-secret-string................................"; // >=64 bytes
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
-
-        claims = claims.Select(c =>
-        {
-            if (c.Type == "aud")
-            {
-                return new Claim(c.Type, "api://client-id/.default");
-            }
-            
-            return new Claim(c.Type, c.Value);
-        });
-        
-        var jwt = new JwtSecurityToken(
-            issuer: "rando-issuer",
-            claims: claims,
-            notBefore: DateTime.UtcNow,
-            expires: DateTime.UtcNow.AddHours(8),
-            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha512));
-
-        return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(jwt));
-    }
-
-    public Task<AuthenticationResult> GetAuthenticationResultForUserAsync(IEnumerable<string> scopes,
-        string? authenticationScheme, string? tenantId = null,
-        string? userFlow = null, ClaimsPrincipal? user = null, TokenAcquisitionOptions? tokenAcquisitionOptions = null)
-        => Task.FromResult(MockAuthenticationResult);
-
-    public Task<string> GetAccessTokenForAppAsync(string scope, string? authenticationScheme, string? tenant = null,
-        TokenAcquisitionOptions? tokenAcquisitionOptions = null)
-    {
-        var user = accessor.HttpContext?.User;
-        
-        if (user?.Claims == null)
-            return Task.FromResult(String.Empty);
-            
-        var claims = user.Claims; // copy or map as needed
-
-        var secret = "use-a-64-byte-minimum-secret-string................................"; // >=64 bytes
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
-
-        claims = claims.Select(c =>
-        {
-            if (c.Type == "aud")
-            {
-                return new Claim(c.Type, "api://client-id/.default");
-            }
-            
-            return new Claim(c.Type, c.Value);
-        });
-        
-        var jwt = new JwtSecurityToken(
-            issuer: "rando-issuer",
-            claims: claims,
-            notBefore: DateTime.UtcNow,
-            expires: DateTime.UtcNow.AddHours(8),
-            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha512));
-
-        return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(jwt));
-    }
-
-    public Task<AuthenticationResult> GetAuthenticationResultForAppAsync(string scope, string? authenticationScheme, string? tenant = null,
-        TokenAcquisitionOptions? tokenAcquisitionOptions = null)
-        => Task.FromResult(MockAuthenticationResult);
-
-    public void ReplyForbiddenWithWwwAuthenticateHeader(IEnumerable<string> scopes, MsalUiRequiredException msalServiceException,
-        string? authenticationScheme, HttpResponse? httpResponse = null)
-    { }
-
-    public string GetEffectiveAuthenticationScheme(string? authenticationScheme)
-        => "MockScheme";
-
-    public Task ReplyForbiddenWithWwwAuthenticateHeaderAsync(
-        IEnumerable<string> scopes, 
-        MsalUiRequiredException msalServiceException,
-        HttpResponse? httpResponse = null) => Task.CompletedTask;
 }

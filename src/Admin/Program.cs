@@ -1,4 +1,5 @@
 using Common.Client;
+using Common.Configuration;
 using Common.Extensions;
 using Common.Local;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -18,6 +19,7 @@ if (builderIsLocalEnvironment)
 }
 
 var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
+var apiScopes = builder.Configuration.GetSection("ApiSettings:Scopes").Get<string[]>() ?? [];
 
 if (!builderIsLocalEnvironment)
 {
@@ -28,11 +30,6 @@ if (!builderIsLocalEnvironment)
 
 builder.Services.AddHttpContextAccessor();
 
-if (builderIsLocalEnvironment)
-{
-    builder.Services.AddSingleton<Microsoft.Identity.Web.ITokenAcquisition, MockTokenAcquisition>();
-}
-
 builder.Services.AddTransient(sp =>
     new BearerTokenHandler(sp.GetRequiredService<IHttpContextAccessor>()));
 
@@ -40,20 +37,32 @@ builder.Services.AddTransient(sp =>
 builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAddress = new Uri(apiBaseUrl); })
     .AddHttpMessageHandler<BearerTokenHandler>();
 
+// TODO remove and test no regression
+builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI(); 
+
 // Add services to the container.
-builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI();
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AddPageRoute("/Home/Index", "/");
+    options.Conventions.AddPageRoute("/Shared/Error", "/error");
+});
 
 //builder.AddLogging();
 
 var app = builder.Build();
+
+#region Rebrand
+
+SiteConfiguration.Rebrand = app.Configuration.GetValue<bool>("Rebrand") || DateTime.Today >= new DateTime(2025, 6, 25);
+
+#endregion
 
 //app.UseLogEnrichment();
 
 // Configure the HTTP request pipeline.
 if (!builderIsLocalEnvironment)
 {
-    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler("/error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
