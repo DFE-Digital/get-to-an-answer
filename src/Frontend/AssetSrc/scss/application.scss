@@ -882,3 +882,7 @@ $toc-width-tablet: 210px;
 .govuk-no-scroll {
   overflow: hidden;
 }
+
+.govuk-hint > .govuk-body:only-child {
+  margin-bottom: 0;
+}

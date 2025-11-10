@@ -6,10 +6,7 @@ resource "azurerm_mssql_server" "gettoananswer_mssql_server" {
   administrator_login_password = var.sql_admin_password
   version                      = "12.0"
 
-  tags = {
-    Environment = var.env
-    Product     = var.product
-  }
+  tags = local.common_tags
 
   lifecycle {
     ignore_changes = [tags]
@@ -23,10 +20,7 @@ resource "azurerm_mssql_database" "gettoananswer_mssql_db" {
 
   max_size_gb = 2
 
-  tags = {
-    Environment = var.env
-    Product     = var.product
-  }
+  tags = local.common_tags
 
   lifecycle {
     ignore_changes = [tags]

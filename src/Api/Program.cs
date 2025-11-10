@@ -55,9 +55,10 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     
 #endregion
 
+builder.Services.AddHttpContextAccessor();
+
 #region HTTP Context and Healthchecks
     
-builder.Services.AddHttpContextAccessor();
 builder.Services.AddHealthChecks();
     
 #endregion
@@ -77,7 +78,6 @@ builder.Services.ConfigureHttpJsonOptions(o =>
 
 if (builderIsLocalEnvironment)
 {
-    builder.Services.AddHealthChecks();
     builder.Services.AddMockAzureAdForApi();
 }
 else
@@ -126,9 +126,6 @@ if (appIsLocalEnvironment)
         options.HideSidebar();
         options.AddPreferredSecuritySchemes("Bearer");
     });
-
-    // Expose health check endpoint only in Local environment
-    app.MapHealthChecks("/health");
 }
 else
 {
@@ -137,6 +134,8 @@ else
        .MapOpenApi();
     app.MapScalarApiReference(); // TODO: Add config
 }
+
+app.MapHealthChecks("/health");
 
 app.MapControllers();
 

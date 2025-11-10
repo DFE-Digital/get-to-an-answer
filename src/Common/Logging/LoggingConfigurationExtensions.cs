@@ -19,6 +19,27 @@ namespace Common.Logging;
 [ExcludeFromCodeCoverage(Justification = "Configuration only")]
 public static class LoggingConfigurationExtensions
 {
+    public static LoggerConfiguration ConfigureLogging(
+        this LoggerConfiguration loggerConfig,
+        string? appInsightsConnectionString)
+    {
+        var config = loggerConfig
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .MinimumLevel.Override("System", LogEventLevel.Warning)
+            .WriteTo.Console()
+            .Enrich.FromLogContext();
+
+        if (!string.IsNullOrEmpty(appInsightsConnectionString))
+        {
+            config = config.WriteTo.ApplicationInsights(new TelemetryConfiguration
+            {
+                ConnectionString = appInsightsConnectionString
+            }, TelemetryConverter.Traces);
+        }
+
+        return config;
+    }
+    
     // This method wires up "Azure Silver" level monitoring:
     // - Structured logs to console and Application Insights
     // - Distributed tracing (automatic spans for HTTP, DB, etc.)
@@ -26,10 +47,6 @@ public static class LoggingConfigurationExtensions
     // - Azure Monitor export (unified export for logs, traces, metrics)
     public static WebApplicationBuilder AddLogging(this WebApplicationBuilder builder)
     {
-        // Basic startup logs (visible in console and, if configured, App Insights)
-        Log.Logger.Information("Starting application");
-        Log.Logger.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
-
         // App Insights connection string is the single knob to turn on Azure Monitor export
         var appInsightsConnectionString = builder.Configuration.GetValue<string>("ApplicationInsights:ConnectionString");
 
@@ -60,17 +77,20 @@ public static class LoggingConfigurationExtensions
             // Forward Serilog events to Application Insights as "traces"
             if (!string.IsNullOrEmpty(appInsightsConnectionString))
             {
-                config.WriteTo.ApplicationInsights(new TelemetryConfiguration
+                config = config.WriteTo.ApplicationInsights(new TelemetryConfiguration
                 {
                     ConnectionString = appInsightsConnectionString
                 }, TelemetryConverter.Traces);
             }
+            
+            Log.Logger = config.CreateBootstrapLogger();
         });
 
         // Replace default Microsoft logging with OpenTelemetry logger provider so:
         // - scopes and state are captured as structured properties
         // - logs correlate with traces by sharing trace/span ids
         builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
         builder.Logging.AddOpenTelemetry(otlp =>
         {
             otlp.IncludeScopes = true;      // e.g., "RequestId", "UserId" from logging scopes
@@ -133,6 +153,10 @@ public static class LoggingConfigurationExtensions
                 // - Sends traces and metrics (and optionally logs) to Application Insights/Log Analytics
                 .UseAzureMonitor(options => { options.ConnectionString = appInsightsConnectionString; });
         }
+        
+        // Basic startup logs (visible in console and, if configured, App Insights)
+        Log.Logger.Information("Starting application");
+        Log.Logger.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
 
         return builder;
     }

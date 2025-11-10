@@ -1,8 +1,14 @@
 using Common.Client;
 using Common.Configuration;
 using Common.Local;
+using Common.Logging;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .ConfigureLogging(Environment.GetEnvironmentVariable("ApplicationInsights__ConnectionString"))
+    .CreateBootstrapLogger();
 
 const string localEnvironmentName = "Local";
 var builderIsLocalEnvironment = builder.Environment.IsEnvironment(localEnvironmentName);
@@ -28,6 +34,8 @@ builder.Services.AddAntiforgery(options =>
 });
 
 //builder.AddLogging();
+    
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -57,6 +65,8 @@ if (!builderIsLocalEnvironment)
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.MapHealthChecks("/health");
 
 app.UseHttpsRedirection();
 

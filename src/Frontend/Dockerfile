@@ -1,6 +1,5 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
-EXPOSE 8082
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -24,8 +23,6 @@ FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src/Frontend
 RUN dotnet publish "./Frontend.csproj" -c $BUILD_CONFIGURATION -o /app/publish
-RUN mkdir /app/https
-RUN dotnet dev-certs https -ep /app/https/aspnetapp.pfx -p e2e
 
 FROM node:20 AS node
 WORKDIR /src
@@ -40,3 +37,5 @@ WORKDIR /app
 COPY --from=node /src/wwwroot ./wwwroot
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Frontend.dll"]
+EXPOSE 8080
+EXPOSE 8081

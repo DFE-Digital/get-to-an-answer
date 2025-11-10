@@ -15,11 +15,6 @@
   var hasTitleError = Model?.ErrorFor(nameof(Model)) != null;
 }
 
-@* @section BeforeContent *@
-@* { *@
-@*   <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires">Back to questionnaires</a> *@
-@* } *@
-
 @if (hasErrors)
 {
   @await Html.PartialAsync("_ErrorSummary", Model)
@@ -52,61 +47,81 @@
   </section>
 }
 
-@if (hasErrors)
-{
-  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-    <h2 class="govuk-error-summary__title" id="error-summary-title">
-      There is a problem
-    </h2>
-    <div class="govuk-error-summary__body">
-      <ul class="govuk-list govuk-error-summary__list">
-        @foreach (var kvp in ViewData.ModelState.Where(ms => ms.Value!.Errors.Count > 0))
-        {
-          var fieldName = kvp.Key;
-          var message = kvp.Value!.Errors[0].ErrorMessage;
-          // The href should link to the input id for accessibility
-          <li><a href="#@fieldName">@message</a></li>
-        }
-      </ul>
-    </div>
-  </div>
-}
-
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     @if (Model?.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
     {
       <form action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
         @Html.AntiForgeryToken()
-        <input type="hidden" name="CurrentQuestionId" value="@Model.Destination.Question.Id" autocomplete="off">
-        <input type="hidden" name="CurrentQuestionOrder" value="@Model.Destination.Question.Order" autocomplete="off">
-        <div class="govuk-form-group">
-          <fieldset class="govuk-fieldset" aria-describedby="signIn-hint">
+        <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id" autocomplete="off">
+        <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order" autocomplete="off">
+        <input type="hidden" name="Questionnaire.Id" value="@Model?.Questionnaire?.Id" autocomplete="off">
+        <input type="hidden" name="Questionnaire.Slug" value="@Model?.Questionnaire?.Slug" autocomplete="off">
+        <input type="hidden" name="Questionnaire.DisplayTitle" value="@Model?.Questionnaire?.DisplayTitle" autocomplete="off">
+        <input type="hidden" name="Questionnaire.Description" value="@Model?.Questionnaire?.Description" autocomplete="off">
+        <input type="hidden" name="Destination.Type" value="@Model?.Destination?.Type" autocomplete="off">
+        <input type="hidden" name="Destination.Question.Type" value="@Model?.Destination?.Question.Type" autocomplete="off">
+        <input type="hidden" name="Destination.Question.Id" value="@Model?.Destination?.Question.Id" autocomplete="off">
+        <input type="hidden" name="Destination.Question.Order" value="@Model?.Destination?.Question.Order" autocomplete="off">
+        <input type="hidden" name="Destination.Question.Content" value="@Model?.Destination?.Question.Content" autocomplete="off">
+        <input type="hidden" name="Destination.Question.Description" value="@Model?.Destination?.Question.Description" autocomplete="off">
+        @{
+          var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
+          
+          var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
+          var inputGroupId = $"q-{Model.Destination.Question.Id}";
+        }
+        <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
+          <fieldset class="govuk-fieldset" aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
               <h1 class="govuk-fieldset__heading">
                 @Model.Destination.Question.Content
               </h1>
             </legend>
+            @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
+            {
+              <p id="@inputGroupId-error" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
+              </p>
+            }
             @if (Model.Destination.Question.Description != null)
             {
-              <div id="signIn-hint" class="govuk-hint">
+              <div id="@($"{inputGroupId}-hint")" class="govuk-hint">
                 @(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Question.Description)))
               </div>
             }
-            @if (Model.Destination.Question.Type == QuestionType.SingleSelect) 
-            { 
+            @if (Model.Destination.Question.Type == QuestionType.SingleSelect)
+            {
+              var answers = Model.Destination.Question.Answers;
+              
               <div class="govuk-radios" data-module="govuk-radios">
-                @foreach (var answer in Model.Destination.Question.Answers)
+                @for (var a = 0; a < answers.Count; a++)
                 {
+                  var answer = Model?.Destination?.Question.Answers[a];
+                  
+                  var inputId = $"{inputGroupId}-a-{answer?.Id}";
+                  var itemHintId = $"{inputId}-hint";
+                  
+                  <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer.Id" autocomplete="off">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Score" value="@answer.Score" autocomplete="off">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer.Content" autocomplete="off">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description" autocomplete="off">
+                  
                   <div class="govuk-radios__item">
                     <input type="hidden" name="Scores.@answer.Id" value="@answer.Score" autocomplete="off">
-                    <input class="govuk-radios__input" id="signIn" name="SelectedAnswerId" type="radio" value="@answer.Id" aria-describedby="signIn-item-hint">
-                    <label class="govuk-label govuk-radios__label" for="signIn">
+                    <input
+                      class="govuk-radios__input @(hasFieldError ? "govuk-input--error" : "")"
+                      id="@inputId"
+                      name="NextStateRequest.SelectedAnswerIds"
+                      type="radio"
+                      value="@answer.Id"
+                      aria-describedby="Answer option id @inputId">
+                    <label class="govuk-label govuk-radios__label" for="@inputId">
                       @answer.Content
                     </label>
                     @if (answer.Description != null)
                     {
-                      <div id="signIn-item-hint" class="govuk-hint govuk-radios__hint">
+                      <div id="@itemHintId" class="govuk-hint govuk-radios__hint">
                         @(Html.Raw(GovUkMarkdown.ToGovUkHtml(answer.Description)))
                       </div>
                     }
@@ -116,19 +131,36 @@
             }
             else if (Model.Destination.Question.Type == QuestionType.MultiSelect)
             {
+              var answers = Model.Destination.Question.Answers;
+              
               <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                @foreach (var answer in Model.Destination.Question.Answers)
+                @for (var a = 0; a < answers.Count; a++)
                 {
+                  var answer = Model?.Destination?.Question.Answers[a];
+                  
+                  <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer.Id" autocomplete="off">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Score" value="@answer.Score" autocomplete="off">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer.Content" autocomplete="off">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description" autocomplete="off">
+                  
+                  var inputId = $"{inputGroupId}-a-{answer.Id}";
+                  var itemHintId = $"{inputId}-hint";
                   <div class="govuk-checkboxes__item">
                     <input type="hidden" name="Scores.@answer.Id" value="@answer.Score" autocomplete="off">
-                    <input class="govuk-checkboxes__input" id="nationality" name="SelectedAnswerIds" type="checkbox" value="@answer.Id" aria-describedby="nationality-item-hint">
-                    <label class="govuk-label govuk-checkboxes__label" for="nationality">
+                    <input
+                      class="govuk-checkboxes__input @(hasFieldError ? "govuk-input--error" : "")"
+                      id="@inputId"
+                      name="NextStateRequest.SelectedAnswerIds"
+                      type="checkbox"
+                      value="@answer.Id"
+                      aria-describedby="@(answer.Description != null ? itemHintId : null)">
+                    <label class="govuk-label govuk-checkboxes__label" for="@inputId">
                       @answer.Content
                     </label>
                     @if (answer.Description != null)
                     {
-                      <div id="nationality-item-hint" class="govuk-hint govuk-checkboxes__hint">
-                        @answer.Description
+                      <div id="@itemHintId" class="govuk-hint govuk-checkboxes__hint">
+                        @(Html.Raw(GovUkMarkdown.ToGovUkHtml(answer.Description)))
                       </div>
                     }
                   </div>
@@ -137,20 +169,35 @@
             }
             else if (Model.Destination.Question.Type == QuestionType.DropdownSelect)
             {
-              <div class="govuk-form-group">
-                <label class="govuk-label" for="sort">
-                  Sort by
+              var answers = Model.Destination.Question.Answers;
+              
+              <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
+                @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
+                {
+                  <p id="@inputGroupId-error" class="govuk-error-message">
+                    <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
+                  </p>
+                }
+                <label class="govuk-label" for="@($"{inputGroupId}-select")">
+                  Select an option
                 </label>
-                <select class="govuk-select" id="sort" name="SelectedAnswerId">
-                  @foreach (var answer in Model.Destination.Question.Answers)
+                @for (var a = 0; a < answers.Count; a++)
+                {
+                  var answer = Model?.Destination?.Question.Answers[a];
+                  
+                  <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer?.Id" autocomplete="off">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Score" value="@answer?.Score" autocomplete="off">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer?.Content" autocomplete="off">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer?.Description" autocomplete="off">
+                  <input type="hidden" name="Scores.@answer?.Id" value="@answer?.Score" autocomplete="off">
+                }
+                <select class="govuk-select" id="@($"{inputGroupId}-select")" name="NextStateRequest.SelectedAnswerIds">
+                  <option value="">Please select an answer</option>
+                  @foreach (var answer in answers)
                   {
                     <option value="@answer.Id">@answer.Content</option>
                   }
                 </select>
-                @foreach (var answer in Model.Destination.Question.Answers)
-                {
-                  <input type="hidden" name="Scores.@answer.Id" value="@answer.Score" autocomplete="off">
-                }
               </div>
             }
           </fieldset>

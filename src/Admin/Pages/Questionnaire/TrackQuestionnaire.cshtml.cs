@@ -1,11 +1,13 @@
 using Common.Models;
 using Common.Models.PageModels;
 using Common.Client;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Admin.Pages.Questionnaire;
 
+[Authorize]
 public class TrackQuestionnaires(IApiClient apiClient, ILogger<TrackQuestionnaires> logger) : QuestionnairesPageModel
 {
     [FromRoute(Name = "questionnaireId")] 

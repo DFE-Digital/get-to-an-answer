@@ -54,22 +54,14 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             {
                 return Page();
             }
-            
-            var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireSlug);
-        
-            if (questionnaire == null)
-                return NotFound();
         
             if (NextStateRequest.SelectedAnswerIds.Count > 1)
             {
-                NextStateRequest.SelectedAnswerId = scores.OrderByDescending(kv => kv.Value).First().Key;
+                var selectedAnswerId = scores.OrderByDescending(kv => kv.Value).First().Key;
+                NextStateRequest.SelectedAnswerIds = [selectedAnswerId];
             } 
-            else if (NextStateRequest.SelectedAnswerIds.Count == 1)
-            {
-                NextStateRequest.SelectedAnswerId = NextStateRequest.SelectedAnswerIds.First();
-            }
         
-            var destination = await apiClient.GetNextState(questionnaire.Id, NextStateRequest);
+            var destination = await apiClient.GetNextState(Questionnaire.Id, NextStateRequest);
         
             if (destination == null)
                 return NotFound();
@@ -80,7 +72,6 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
                     return Redirect(destination.Content);
             }
 
-            Questionnaire = questionnaire;
             IsEmbedded = Embed;
             Destination = destination;
             NextStateRequest = new GetNextStateRequest();
