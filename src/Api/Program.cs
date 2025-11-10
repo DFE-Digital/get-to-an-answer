@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Api.Services;
+using Common.Extensions;
 using Common.Infrastructure.Persistence;
 using Common.Local;
 using Common.Logging;

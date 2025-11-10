@@ -282,7 +282,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         try
         {
             logger.LogInformation("UnpublishQuestionnaire started QuestionnaireId={QuestionnaireId}", id);
-            return await UpdateQuestionnaireStatus(email, id, EntityStatus.Draft);
+            return await UpdateQuestionnaireStatus(email, id, EntityStatus.Private);
         }
         catch (Exception ex)
         {
@@ -538,6 +538,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
     {
         var questionnaire = await db.Questionnaires
             .AsNoTracking()
+            .Include(q => q.Contents.Where(a => !a.IsDeleted))
             .Include(q => q.Questions.Where(a => !a.IsDeleted))
             .ThenInclude(qq => qq.Answers.Where(a => !a.IsDeleted))
             .FirstAsync(q => q.Id == id);
@@ -621,10 +622,6 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             {
                 await StoreQuestionnaireVersion(id, versionNumber);
             }
-            else if (status == EntityStatus.Draft)
-            {
-                await RemoveQuestionnaireVersion(id, versionNumber);       
-            }
             
             logger.LogInformation("UpdateQuestionnaireStatus succeeded QuestionnaireId={QuestionnaireId} NewStatus={Status}", id, status);
             return NoContent();
@@ -674,19 +671,6 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 }).ToList()
             }).ToList()
         };
-    }
-    
-    private async Task RemoveQuestionnaireVersion(Guid id, int versionNumber)
-    {
-        var version = await db.QuestionnaireVersions
-            .FirstOrDefaultAsync(q => q.Id == id && q.Version == versionNumber);
-
-        if (version == null)
-            return;
-        
-        db.QuestionnaireVersions.Remove(version);
-        
-        await db.SaveChangesAsync();
     }
     
     public async Task<ServiceResult> GetBranchingMap(string email, Guid questionnaireId)
