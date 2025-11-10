@@ -56,8 +56,7 @@ export class ViewQuestionnairePage extends BasePage {
     async verifyCreateButtonVisible() {
         await expect(this.createNewQuestionnaireButton).toBeVisible();
     }
-
-    // Optional: expose a structural check that the table exists
+    
     async verifyQuestionnaireListedByStructure(): Promise<void> {
         await this.table.verifyVisible();
     }
@@ -67,8 +66,7 @@ export class ViewQuestionnairePage extends BasePage {
         await this.verifyFooterLinks();
         await expect(this.section).toBeVisible();
         await this.verifyCreateButtonVisible();
-
-        // Delegate structural visibility of the table to the component
+        
         await this.table.verifyVisible();
     }
 }

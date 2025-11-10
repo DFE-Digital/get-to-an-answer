@@ -41,7 +41,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
 
     // test('Submit a new questionnaire with missing title', async ({page}) => {
     //     await viewQuestionnairePage.clickCreateNewQuestionnaire();
-    //    
+    //
     //     addQuestionnairePage = await AddQuestionnairePage.create(page);
     //     await addQuestionnairePage.enterTitle(''); 
     //     await addQuestionnairePage.clickSaveAndContinue();
@@ -49,26 +49,33 @@ test.describe('Get to an answer create a new questionnaire', () => {
     //     await addQuestionnairePage.validateMissingTitleMessageFlow();
     // });
 
+    //TBC, we don't know if special characters are allowed in title
     // test('Submit a new questionnaire with invalid title', async ({page}) => {
+    //     await viewQuestionnairePage.clickCreateNewQuestionnaire();
+    //    
     //     addQuestionnairePage = await AddQuestionnairePage.create(page);
     //     await addQuestionnairePage.enterTitle('@@@+++###~~~');
     //     await addQuestionnairePage.clickSaveAndContinue();
     //
     //     await addQuestionnairePage.validateInvalidTitleMessageFlow();
     // });
-    //
+
     // test('Submit a new questionnaire with invalid title to validate aria-describedby', async ({page}) => {
+    //     await viewQuestionnairePage.clickCreateNewQuestionnaire();
+    //
     //     addQuestionnairePage = await AddQuestionnairePage.create(page);
     //     await addQuestionnairePage.enterTitle('@@@+++###~~~');
     //     await addQuestionnairePage.clickSaveAndContinue();
     //
     //     await addQuestionnairePage.expectTitleAriaDescribedByIncludesHintAndError();
     // });
-    //
-    // test('should prevent double submission for a questionnaire', async ({ page }) => {
-    //     addQuestionnairePage = new AddQuestionnairePage(page);
-    //     await addQuestionnairePage.enterTitle('Double click prevention test');
-    //    
-    //     await addQuestionnairePage.submitFormAndCheckNoDoubleSubmit();
-    // });
+
+    test('should prevent double submission for a questionnaire', async ({page}) => {
+        await viewQuestionnairePage.clickCreateNewQuestionnaire();
+
+        addQuestionnairePage = await AddQuestionnairePage.create(page);
+        await addQuestionnairePage.enterTitle('Double click prevention test');
+
+        await addQuestionnairePage.submitFormAndCheckNoDoubleSubmit();
+    });
 });
