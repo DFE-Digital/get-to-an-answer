@@ -1,9 +1,7 @@
 using Common.Models;
 using Common.Models.PageModels;
-using Common.Models.ViewModels;
 using Common.Client;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 
 namespace Admin.Pages.Questionnaire;
@@ -36,7 +34,7 @@ public class TrackQuestionnaires(IApiClient apiClient, ILogger<TrackQuestionnair
         catch (Exception e)
         {
             logger.LogError(e, "Error creating questionnaire. Error: {EMessage}", e.Message);
-            return RedirectToPage("/Error");
+            return RedirectToPage("/error");
         }
 
         return Page(); 

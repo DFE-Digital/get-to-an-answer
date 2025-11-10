@@ -17,6 +17,7 @@ public class CreateQuestionnaires(IApiClient apiClient, ILogger<CreateQuestionna
 
     public IActionResult OnGet()
     {
+        BackLinkSlug = Routes.QuestionnairesManage;
         return Page();
     }
 

@@ -3,6 +3,7 @@ using Common.Configuration;
 using Common.Extensions;
 using Common.Local;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,7 @@ if (builderIsLocalEnvironment)
 }
 
 var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
+var apiScopes = builder.Configuration.GetSection("ApiSettings:Scopes").Get<string[]>() ?? [];
 
 if (!builderIsLocalEnvironment)
 {
@@ -39,7 +41,11 @@ builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAdd
 builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI(); 
 
 // Add services to the container.
-builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AddPageRoute("/Home/Index", "/");
+    options.Conventions.AddPageRoute("/Shared/Error", "/error");
+});
 
 //builder.AddLogging();
 
@@ -56,7 +62,7 @@ SiteConfiguration.Rebrand = app.Configuration.GetValue<bool>("Rebrand") || DateT
 // Configure the HTTP request pipeline.
 if (!builderIsLocalEnvironment)
 {
-    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler("/error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
