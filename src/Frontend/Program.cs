@@ -1,4 +1,6 @@
-using Common.Logging;
+using Common.Client;
+using Common.Configuration;
+using Common.Local;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,34 +13,66 @@ if (builderIsLocalEnvironment)
         .AddUserSecrets<Program>(optional: true, reloadOnChange: true);
 }
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
 
-builder.AddLogging();
+// Register an HttpClient with a pre-configured base address
+builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAddress = new Uri(apiBaseUrl); });
+
+// Add services to the container.
+builder.Services.AddRazorPages();
+
+builder.Services.AddAntiforgery(options =>
+{
+    options.SuppressXFrameOptionsHeader = true;
+    options.Cookie.Expiration = TimeSpan.Zero;
+});
+
+//builder.AddLogging();
 
 var app = builder.Build();
 
-app.UseLogEnrichment();
+#region Rebrand
+
+SiteConfiguration.Rebrand = app.Configuration.GetValue<bool>("Rebrand") || DateTime.Today >= new DateTime(2025, 6, 25);
+
+#endregion
+
+// Security Headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Remove("X-Frame-Options");
+    
+    context.Response.Headers["Content-Security-Policy"] = "frame-ancestors *";
+    //context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    //context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+    await next();
+});
+
+//app.UseLogEnrichment();
 
 // Configure the HTTP request pipeline.
 if (!builderIsLocalEnvironment)
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
+if (builderIsLocalEnvironment)
+{
+    app.UseMockMvcDevEndpoints();
+}
+
 app.MapStaticAssets();
-
-app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
+app.MapRazorPages();
 
 app.Run();

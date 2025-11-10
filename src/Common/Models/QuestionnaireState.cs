@@ -1,4 +1,4 @@
-namespace Admin.Models;
+namespace Common.Models;
 
 public class QuestionnaireState
 {
