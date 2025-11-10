@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Common.Models.PageModels;
 
-public class BasePageModel() : PageModel
+public class BasePageModel : PageModel
 {
     public string? BackLinkSlug { get; set; }
 

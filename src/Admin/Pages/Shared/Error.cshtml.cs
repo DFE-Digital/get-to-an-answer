@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using Admin.Models.ViewModels;
+using Common.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

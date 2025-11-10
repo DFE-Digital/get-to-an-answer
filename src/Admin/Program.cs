@@ -30,12 +30,8 @@ if (!builderIsLocalEnvironment)
 
 builder.Services.AddHttpContextAccessor();
 
-if (builderIsLocalEnvironment)
-{
-    builder.Services.AddSingleton<ITokenAcquisition, MockTokenAcquisition>();
-}
-
-builder.Services.AddTransient(sp => new BearerTokenHandler(sp.GetRequiredService<IHttpContextAccessor>()));
+builder.Services.AddTransient(sp =>
+    new BearerTokenHandler(sp.GetRequiredService<IHttpContextAccessor>()));
 
 // Register an HttpClient with a pre-configured base address
 builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAddress = new Uri(apiBaseUrl); })
