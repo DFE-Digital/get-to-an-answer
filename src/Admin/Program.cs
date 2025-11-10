@@ -45,7 +45,7 @@ builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AddPageRoute("/Home/Index", "/");
     options.Conventions.AddPageRoute("/Shared/Error", "/error");
-}).AddMicrosoftIdentityUI();
+});
 
 //builder.AddLogging();
 

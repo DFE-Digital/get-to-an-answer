@@ -1,4 +1,4 @@
-@page "/admin/questionnaires/{id:guid}/edit"
+@page "/admin/questionnaires/{questionnaireId:guid}/edit"
 @model Admin.Pages.Questionnaire.EditQuestionnaire
 
 @{
@@ -8,7 +8,7 @@
 
 @section BeforeContent
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back to questionnaire '@Model?.UpdateQuestionnaire?.Title'</a>
+  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back to create your questionnaire</a>
 }
 
 @if (Model!.HasErrors())
