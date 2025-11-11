@@ -65,6 +65,32 @@ resource "azapi_resource" "gettoananswer_main_subnet" {
   depends_on = [azurerm_network_security_group.gettoananswer-nsg]
 }
 
+resource "azapi_resource" "gettoananswer_kv_subnet" {
+  type      = "Microsoft.Network/virtualNetworks/subnets@2024-05-01"
+  name      = "${var.prefix}subnet-uks-keyvault"
+  parent_id = azurerm_virtual_network.gettoananswer_vnet.id
+
+  body = {
+    properties = {
+      addressPrefixes = ["10.0.3.0/24"]
+      serviceEndpoints = [
+        {
+          service   = "Microsoft.KeyVault"
+        }
+      ]
+      networkSecurityGroup = {
+        id = azurerm_network_security_group.gettoananswer-nsg.id
+      }
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
+  depends_on = [azurerm_network_security_group.gettoananswer-nsg]
+}
+
 resource "azurerm_private_dns_zone" "default" {
   name                = "${var.prefix}pdz-uks-gtaa.database.windows.net"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name

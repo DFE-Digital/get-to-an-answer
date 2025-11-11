@@ -152,3 +152,11 @@ variable "alerting" {
     }
   }
 }
+
+locals {
+  common_tags = {
+    Environment = var.env
+    Product     = var.product
+    "Service Offering" = var.product
+  }
+}

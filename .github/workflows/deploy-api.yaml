@@ -66,6 +66,7 @@ jobs:
           az webapp config appsettings set \
             --name "$API_NAME" \
             --resource-group "$RESOURCE_GROUP" \
+            --slot "staging" \
             --settings \
               ASPNETCORE_ENVIRONMENT="${{ github.event.inputs.environment }}"
 
@@ -74,7 +75,24 @@ jobs:
           az webapp config container set \
             --name "$API_NAME" \
             --resource-group "$RESOURCE_GROUP" \
+            --slot "staging" \
             --docker-custom-image-name "$ACR_LOGIN_SERVER/gtaa-api:${{ github.sha }}" \
             --docker-registry-server-url "https://$ACR_LOGIN_SERVER" \
             --docker-registry-server-user "$ACR_USERNAME" \
             --docker-registry-server-password "$ACR_PASSWORD"
+
+      - name: Swap staging to production
+        run: |
+          az webapp deployment slot swap \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$API_NAME" \
+            --slot "staging" \
+            --target-slot "production"
+          
+      - name: Delete staging slot
+        run: |
+          az webapp deployment slot delete \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$API_NAME" 
+            --slot staging
+

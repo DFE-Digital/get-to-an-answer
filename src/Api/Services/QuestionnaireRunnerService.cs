@@ -115,9 +115,14 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
     {
         try
         {
-            logger.LogInformation("GetNextState started QuestionnaireId={QuestionnaireId} SelectedAnswerId={SelectedAnswerId}", questionnaireId, request.SelectedAnswerId);
+            logger.LogInformation("GetNextState started QuestionnaireId={QuestionnaireId}", questionnaireId);
 
-            var selectedAnswerId = request.SelectedAnswerId;
+            if (request.SelectedAnswerIds.Count == 0)
+            {
+                return BadRequest(ProblemTrace("No answer was selected.", 400));           
+            }
+            
+            var selectedAnswerId = request.SelectedAnswerIds.First();
 
             var answer = await db.Answers.FirstOrDefaultAsync(x => x.Id == selectedAnswerId);
 

@@ -2,11 +2,13 @@ using Common.Client;
 using Common.Domain.Request.Update;
 using Common.Models;
 using Common.Models.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Admin.Pages.Questionnaire;
 
+[Authorize]
 public class EditQuestionnaire(IApiClient apiClient, ILogger<EditQuestionnaire> logger) : QuestionnairesPageModel
 {
     [FromRoute(Name = "questionnaireId")]

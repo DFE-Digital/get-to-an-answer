@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Common.Domain.Frontend;
 
 public class GetNextStateRequest
@@ -6,7 +8,6 @@ public class GetNextStateRequest
     
     public int CurrentQuestionOrder { get; set; }
 
-    public Guid SelectedAnswerId { get; set; }
-
+    [MinLength(length: 1, ErrorMessage = "Select which answer(s) apply")]
     public List<Guid> SelectedAnswerIds { get; set; } = new();
 }
