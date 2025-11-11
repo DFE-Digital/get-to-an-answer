@@ -6,6 +6,8 @@ import { EnvConfig } from '../config/environment-config';
 
 const BASE_URL = EnvConfig.API_URL;
 
+console.log("#BASE_URL: " + BASE_URL);
+
 export async function createQuestionnaire(
     request: APIRequestContext,
     bearerToken?: string,
@@ -19,13 +21,20 @@ export async function createQuestionnaire(
         .withSlug(slug)
         .build();
     
-    const response = await request.post(`${BASE_URL}/api/questionnaires`, {
-        data: payload,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
-        }
-    });
+    let response;
+    
+    try {
+        response = await request.post(`${BASE_URL}/api/questionnaires`, {
+            data: payload,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
+            }
+        });
+    } catch (error) {
+        console.error('Error creating questionnaire:', error);
+        throw error;
+    }
 
     const responseBody = await parseBody(response);
 

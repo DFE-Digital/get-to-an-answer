@@ -75,9 +75,9 @@ jobs:
         working-directory: ./src/e2e/gtaa.e2etests
         run: |
           echo "Running health project to validate API is up..."
-          ${{ ENVIRONMENT_UPPER }}_API_URL=${{ vars.QA_API_URL }}
-          ${{ ENVIRONMENT_UPPER }}_ADMIN_URL=${{ vars.QA_ADMIN_URL }}
-          ${{ ENVIRONMENT_UPPER }}_FE_URL=${{ vars.QA_FRONTEND_URL }}
+          export ${{ env.ENVIRONMENT_UPPER }}_API_URL=${{ vars.QA_API_URL }}
+          export ${{ env.ENVIRONMENT_UPPER }}_ADMIN_URL=${{ vars.QA_ADMIN_URL }}
+          export ${{ env.ENVIRONMENT_UPPER }}_FE_URL=${{ vars.QA_FRONTEND_URL }}
             yarn playwright test -c playwright.config.ts --project=health
 
 #     Run only API tests for now
@@ -85,21 +85,21 @@ jobs:
         if: steps.run.outcome == 'success'
         working-directory: ./src/e2e/gtaa.e2etests
         run: |
-          ${{ ENVIRONMENT_UPPER }}_API_URL=${{ vars.QA_API_URL }} \
+          export ${{ env.ENVIRONMENT_UPPER }}_API_URL=${{ vars.QA_API_URL }}
           yarn playwright test -c playwright.config.ts --project=Api
           
 #      - name: Run Playwright Admin Tests
 #        if: steps.run.outcome == 'success'
 #        working-directory: ./src/e2e/gtaa.e2etests
 #        run: |
-#          ${{ ENVIRONMENT_UPPER }}_ADMIN_URL=${{ vars.QA_ADMIN_URL }} \
+#          ${{ env.ENVIRONMENT_UPPER }}_ADMIN_URL=${{ vars.QA_ADMIN_URL }} \
 #          yarn playwright test -c playwright.config.ts --project=Admin
 #          
 #      - name: Run Playwright Frontend Tests
 #        if: steps.run.outcome == 'success'
 #        working-directory: ./src/e2e/gtaa.e2etests
 #        run: |
-#          ${{ ENVIRONMENT_UPPER }}_FE_URL=${{ vars.QA_FRONTEND_URL }} \
+#          ${{ env.ENVIRONMENT_UPPER }}_FE_URL=${{ vars.QA_FRONTEND_URL }} \
 #          yarn playwright test -c playwright.config.ts --project=Frontend
 
       - name: Upload Playwright Test Report
