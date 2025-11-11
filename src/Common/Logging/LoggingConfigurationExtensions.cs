@@ -12,6 +12,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
 
 namespace Common.Logging;
@@ -66,30 +67,33 @@ public static class LoggingConfigurationExtensions
         // Serilog for structured logging:
         // - Keep console for local/dev
         // - Send logs to Application Insights when a connection string is present
-        builder.Services.AddSerilog((_, lc) =>
+        // - Initialize Serilog only if not already initialized
+        if (Log.Logger is not Logger || Log.Logger.GetType().Name == "SilentLogger")
         {
-            var config = lc
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning) // reduce noise from framework logs
+            var lc = new LoggerConfiguration()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
-                .WriteTo.Console() // human-friendly console sink
-                .Enrich.FromLogContext(); // include contextual properties like request id, user id when available
-
-            // Forward Serilog events to Application Insights as "traces"
+                .WriteTo.Console()
+                .Enrich.FromLogContext();
+        
             if (!string.IsNullOrEmpty(appInsightsConnectionString))
             {
-                config = config.WriteTo.ApplicationInsights(new TelemetryConfiguration
+                lc = lc.WriteTo.ApplicationInsights(new TelemetryConfiguration
                 {
                     ConnectionString = appInsightsConnectionString
                 }, TelemetryConverter.Traces);
             }
-            
-            Log.Logger = config.CreateBootstrapLogger();
-        });
+        
+            Log.Logger = lc.CreateBootstrapLogger();
+        }
+        
 
         // Replace default Microsoft logging with OpenTelemetry logger provider so:
         // - scopes and state are captured as structured properties
         // - logs correlate with traces by sharing trace/span ids
         builder.Logging.ClearProviders();
+        builder.Logging.AddSerilog(Log.Logger, dispose: false);
+        
         builder.Logging.AddConsole();
         builder.Logging.AddOpenTelemetry(otlp =>
         {
