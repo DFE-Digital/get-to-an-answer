@@ -5,7 +5,7 @@ import {AddQuestionnairePage} from '../pages/admin/AddQuestionnairePage';
 import {EditQuestionnairePage} from "../pages/admin/EditQuestionnairePage";
 import {JwtHelper} from "./JwtHelper";
 
-export async function localSignIn(page: Page): Promise<ViewQuestionnairePage> {
+export async function localSignIn(page: Page, bearerToken?:string): Promise<ViewQuestionnairePage> {
     const signInPage = new SignInPage(page);
     
     page.once('pageerror', e => {
@@ -15,7 +15,7 @@ export async function localSignIn(page: Page): Promise<ViewQuestionnairePage> {
     });
     
     await signInPage
-        .navigateTo(`/dev/login?jt=${JwtHelper.ValidToken}`, 'domcontentloaded')
+        .navigateTo(`/dev/login?jt=${bearerToken ?? JwtHelper.ValidToken}`, 'domcontentloaded')
         .catch(() => { /* ignore if it redirects instantly */ });
     
     await page.waitForLoadState('domcontentloaded').catch(() => {});

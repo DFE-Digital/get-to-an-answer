@@ -1,6 +1,6 @@
 import {test} from "@playwright/test";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
-import {doSignIn} from "../../helpers/admin-test-helper";
+import {localSignIn} from "../../helpers/admin-test-helper";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
 
 test.describe('Get to an answer create a new questionnaire', () => {
@@ -12,7 +12,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
         const password = 'test'; //to be created dynamically
 
         // Create a new questionnaire with an api
-        viewQuestionnairePage = await doSignIn(page, username, password);
+        viewQuestionnairePage = await localSignIn(page);
         // Click on questionnaire created by api or jump straight to view question page with url
     });
 

@@ -3,9 +3,10 @@ import {AnswerDestinationType} from '../constants/test-data-constants'
 import {JwtHelper} from "../helpers/JwtHelper";
 import {APIResponse} from "@playwright/test";
 import {parseBody} from "../helpers/ParseBody";
+import { EnvConfig } from '../config/environment-config';
 
-//to parse response-body correctly - json body can be json, text or empty string
-//duplicate - to be fixed later
+const BASE_URL = EnvConfig.API_URL;
+
 async function safeParseBody(response: APIResponse) {
     const ct = (response.headers()['content-type'] || '').toLowerCase();
 
@@ -36,59 +37,6 @@ async function safeParseBody(response: APIResponse) {
     }
 }
 
-// export async function createMultipleAnswers(
-//     request: any,
-//     questionId: string,
-//     questionnaireId: string,
-//     numberOfAnswers: number,
-//     useDifferentDestinations?: boolean,
-//     bearerToken?: string,
-// ) {
-//     const createdAnswers = [];
-//     const createdPayloads = [];
-//    
-//     const destinationType = AnswerDestinationType.PAGE;
-//     const destination = '/default-destination'
-//     const score = 0.0;
-//
-//     for (let i = 1; i <= numberOfAnswers; i++) {
-//         const content = `Auto-generated answer content - Choice ${i}`;
-//         const description = `Auto-generated description - option ${i}`;
-//
-//         // Either same destination or /default-destination-1, /default-destination-2, etc.
-//         const finalDestination = useDifferentDestinations ? `${destination}-${i}` : destination;
-//
-//         const payload = new AnswerBuilder(questionId, questionnaireId)
-//             .withContent(content)
-//             .withDescription(description)
-//             .withDestinationUrl(finalDestination)
-//             .withDestinationType(destinationType)
-//             .withScore(score)
-//             .build();
-//
-//         const response = await request.post('/api/answers', {
-//             data: payload,
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
-//             }
-//         });
-//
-//         if (!response.ok()) {
-//             throw new Error(`❌ Failed to create answer ${i}: ${response.status()}`);
-//         }
-//
-//         const body = await response.json();
-//         createdAnswers.push(body);
-//         createdPayloads.push(payload);
-//     }
-//
-//     console.log(
-//         `✅ Created ${numberOfAnswers} ${useDifferentDestinations ? 'different' : 'same'} outcomes for question ${questionId}`
-//     );
-//     return {createdAnswers, createdPayloads};
-// }
-
 interface CreateAnswerRequest {
     questionId: string;
     questionnaireId: string;
@@ -115,7 +63,7 @@ export async function createSingleAnswer(
         .withScore(answerRequest.score)
         .build();
 
-    const response = await request.post('/api/answers', {
+    const response = await request.post(`${BASE_URL}/api/answers`, {
         data: payload,
         headers: {
             'Content-Type': 'application/json',
@@ -137,7 +85,7 @@ export async function getAnswer(
     answerId: string,
     bearerToken?: string,
 ) {
-    const response = await request.get(`/api/answers/${answerId}`, {
+    const response = await request.get(`${BASE_URL}/api/answers/${answerId}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
@@ -157,7 +105,7 @@ export async function listAnswers(
     questionId: string,
     bearerToken?: string,
 ) {
-    const response = await request.get(`/api/questions/${questionId}/answers`, {
+    const response = await request.get(`${BASE_URL}/api/questions/${questionId}/answers`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
@@ -178,7 +126,7 @@ export async function updateAnswer(
     data: any,
     bearerToken?: string,
 ) {
-    const response = await request.put(`/api/answers/${answerId}`, {
+    const response = await request.put(`${BASE_URL}/api/answers/${answerId}`, {
         data,
         headers: {
             'Content-Type': 'application/json',
@@ -199,7 +147,7 @@ export async function deleteAnswer(
     answerId: string,
     bearerToken?: string,
 ) {
-    const response = await request.delete(`/api/answers/${answerId}`, {
+    const response = await request.delete(`${BASE_URL}/api/answers/${answerId}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`

@@ -2,9 +2,9 @@ import {QuestionnaireBuilder} from '../builders/QuestionnaireBuilder';
 import {ClaimTypes, JwtHelper, SimpleDate} from '../helpers/JwtHelper';
 import {APIRequestContext, APIResponse} from "@playwright/test";
 import {parseBody} from "../helpers/ParseBody";
+import { EnvConfig } from '../config/environment-config';
 
-//to parse response-body correctly - json body can be json, text or empty string
-//duplicate - to be fixed later
+const BASE_URL = EnvConfig.API_URL;
 
 export async function createQuestionnaire(
     request: APIRequestContext,
@@ -18,8 +18,8 @@ export async function createQuestionnaire(
         .withDescription(description)
         .withSlug(slug)
         .build();
-
-    const response = await request.post('/api/questionnaires', {
+    
+    const response = await request.post(`${BASE_URL}/api/questionnaires`, {
         data: payload,
         headers: {
             'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ export async function getQuestionnaire(
     questionnaireId: number,
     bearerToken?: string,
 ) {
-    const response = await request.get(`/api/questionnaires/${questionnaireId}`, {
+    const response = await request.get(`${BASE_URL}/api/questionnaires/${questionnaireId}`, {
         headers: {
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
@@ -59,7 +59,7 @@ export async function listQuestionnaires(
     request: APIRequestContext,
     bearerToken?: string
 ) {
-    const response = await request.get('/api/questionnaires', {
+    const response = await request.get(`${BASE_URL}/api/questionnaires`, {
         headers: {
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
@@ -79,7 +79,7 @@ export async function updateQuestionnaire(
     data: any,
     bearerToken?: string
 ) {
-    const response = await request.put(`/api/questionnaires/${questionnaireId}`, {
+    const response = await request.put(`${BASE_URL}/api/questionnaires/${questionnaireId}`, {
         data,
         headers: {
             'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ export async function publishQuestionnaire(
     questionnaireId: number | string,
     bearerToken?: string
 ) {
-    const response = await request.put(`/api/questionnaires/${questionnaireId}/publish`, {
+    const response = await request.put(`${BASE_URL}/api/questionnaires/${questionnaireId}/publish`, {
         data: {},
         headers: {
             'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ export async function unpublishQuestionnaire(
     questionnaireId: number | string,
     bearerToken?: string
 ) {
-    const response = await request.put(`/api/questionnaires/${questionnaireId}/unpublish`, {
+    const response = await request.put(`${BASE_URL}/api/questionnaires/${questionnaireId}/unpublish`, {
         data: {},
         headers: {
             'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ export async function cloneQuestionnaire(
     data: any,
     bearerToken?: string
 ) {
-    const response = await request.post(`/api/questionnaires/${questionnaireId}/clones`, {
+    const response = await request.post(`${BASE_URL}/api/questionnaires/${questionnaireId}/clones`, {
         data,
         headers: {
             'Content-Type': 'application/json',
@@ -151,7 +151,7 @@ export async function deleteQuestionnaire(
     questionnaireId: string,
     bearerToken?: string
 ) {
-    const response = await request.delete(`/api/questionnaires/${questionnaireId}`, {
+    const response = await request.delete(`${BASE_URL}/api/questionnaires/${questionnaireId}`, {
         headers: {
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
@@ -172,7 +172,7 @@ export async function listQuestionnaireVersions(
     questionnaireId: number | string,
     bearerToken?: string
 ) {
-    const response = await request.get(`/api/questionnaires/${questionnaireId}/versions`, {
+    const response = await request.get(`${BASE_URL}/api/questionnaires/${questionnaireId}/versions`, {
         headers: {'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`}
     });
     
@@ -191,7 +191,7 @@ export async function getInitialQuestion(
     questionnaireId: number | string,
     bearerToken?: string
 ) {
-    const response = await request.get(`/api/questionnaires/${questionnaireId}/initial`, {
+    const response = await request.get(`${BASE_URL}/api/questionnaires/${questionnaireId}/initial`, {
         headers: {'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`}
     });
     if (!response.ok()) {
@@ -206,7 +206,7 @@ export async function getNextState(
     data: any,
     bearerToken?: string
 ) {
-    const response = await request.post(`/api/questionnaires/${questionnaireId}/next`, {
+    const response = await request.post(`${BASE_URL}/api/questionnaires/${questionnaireId}/next`, {
         data,
         headers: {
             'Content-Type': 'application/json',
@@ -226,7 +226,7 @@ export async function addSelfToQuestionnaireContributors(
     questionnaireId: number | string,
     bearerToken?: string
 ) {
-    const response = await request.put(`/api/questionnaires/${questionnaireId}/contributors/self`, {
+    const response = await request.put(`${BASE_URL}/api/questionnaires/${questionnaireId}/contributors/self`, {
         headers: {
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }

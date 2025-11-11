@@ -21,6 +21,6 @@ export const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9
 
 // ===== Admin related test data =====
 export const ErrorMessages = {
-    ERROR_MESSAGE_MISSING_TITLE: 'Title field is required',
+    ERROR_MESSAGE_MISSING_TITLE: 'Enter a questionnaire title',
     ERROR_MESSAGE_INVALID_TITLE: 'Enter a valid title'
 }
