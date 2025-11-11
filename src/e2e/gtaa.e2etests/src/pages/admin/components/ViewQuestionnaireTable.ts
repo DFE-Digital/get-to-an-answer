@@ -70,4 +70,27 @@ export class ViewQuestionnaireTable {
         const raw = (await cell.textContent()) ?? '';
         return raw.replace(/\s+/g, ' ').trim();
     }
+
+    async verifyTableData(expectedRows: { title: string; createdBy: string; status: string }[]): Promise<void> {
+        const cleanText = (text: string): string => text.replace(/\s+/g, ' ').trim();
+
+        const rows = this.table.locator('tbody tr');
+        const rowCount = await rows.count();
+
+        expect(rowCount, `Expected ${expectedRows.length} rows but found ${rowCount}`).toBe(expectedRows.length);
+
+        for (let i = 0; i < rowCount; i++) {
+            const row = rows.nth(i);
+
+            const titleText = cleanText(await row.locator('td').nth(0).innerText());
+            const createdByText = cleanText(await row.locator('td').nth(1).innerText());
+            const statusText = cleanText(await row.locator('td').nth(2).innerText());
+
+            const expected = expectedRows[i];
+
+            expect(titleText, `Row ${i + 1}: title mismatch`).toBe(expected.title);
+            expect(createdByText, `Row ${i + 1}: createdBy mismatch`).toBe(expected.createdBy);
+            expect(statusText, `Row ${i + 1}: status mismatch`).toBe(expected.status);
+        }
+    }
 }
