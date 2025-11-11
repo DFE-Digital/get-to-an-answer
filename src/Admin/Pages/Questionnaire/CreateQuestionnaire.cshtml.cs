@@ -13,8 +13,12 @@ namespace Admin.Pages.Questionnaire;
 [Authorize]
 public class CreateQuestionnaires(IApiClient apiClient, ILogger<CreateQuestionnaires> logger) : QuestionnairesPageModel
 {
-    [BindProperty] public required CreateQuestionnaireRequestDto CreateQuestionnaire { get; set; }
+    [BindProperty]
+    public required CreateQuestionnaireRequestDto CreateQuestionnaire { get; set; }
 
+    // [BindProperty]
+    // public string? Title { get; set; }
+    
     public IActionResult OnGet()
     {
         BackLinkSlug = Routes.QuestionnairesManage;
