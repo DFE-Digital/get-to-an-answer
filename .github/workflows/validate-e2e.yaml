@@ -1,6 +1,18 @@
 name: Validate - E2E Tests
 
 on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        default: "Local"
+        options:
+          - Local
+          - Development
+          - Test
+          - Production
   push:
     branches: [ "main" ]
     paths:
@@ -19,17 +31,24 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: Run Playwright Tests
-    environment: Test
+    env:
+      ENVIRONMENT: ${{ github.event.inputs.environment }}
+    environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
+          
       - name: Lowercase the repo name and username
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
+      - name: Lowercase the env name and username
+        run: echo "ENVIRONMENT_UPPER=${ENVIRONMENT^^}" >>${GITHUB_ENV}
+
       - name: Run E2E Docker Compose
         id: run
+        if: ${{ github.event.inputs.environment == 'Local' }}
         working-directory: ./src
         env:
           DEFAULT_CONNECTION_STRING: ${{ secrets.DEFAULT_CONNECTION_STRING }}
@@ -56,13 +75,32 @@ jobs:
         working-directory: ./src/e2e/gtaa.e2etests
         run: |
           echo "Running health project to validate API is up..."
-          API_URL=http://localhost:8080 yarn playwright test -c playwright.config.ts --project=health
+          ${{ ENVIRONMENT_UPPER }}_API_URL=${{ vars.QA_API_URL }}
+          ${{ ENVIRONMENT_UPPER }}_ADMIN_URL=${{ vars.QA_ADMIN_URL }}
+          ${{ ENVIRONMENT_UPPER }}_FE_URL=${{ vars.QA_FRONTEND_URL }}
+            yarn playwright test -c playwright.config.ts --project=health
 
 #     Run only API tests for now
-      - name: Run Playwright Tests
+      - name: Run Playwright Api Tests
         if: steps.run.outcome == 'success'
         working-directory: ./src/e2e/gtaa.e2etests
-        run: API_URL=http://localhost:8080 yarn playwright test -c playwright.config.ts --project=Api
+        run: |
+          ${{ ENVIRONMENT_UPPER }}_API_URL=${{ vars.QA_API_URL }} \
+          yarn playwright test -c playwright.config.ts --project=Api
+          
+#      - name: Run Playwright Admin Tests
+#        if: steps.run.outcome == 'success'
+#        working-directory: ./src/e2e/gtaa.e2etests
+#        run: |
+#          ${{ ENVIRONMENT_UPPER }}_ADMIN_URL=${{ vars.QA_ADMIN_URL }} \
+#          yarn playwright test -c playwright.config.ts --project=Admin
+#          
+#      - name: Run Playwright Frontend Tests
+#        if: steps.run.outcome == 'success'
+#        working-directory: ./src/e2e/gtaa.e2etests
+#        run: |
+#          ${{ ENVIRONMENT_UPPER }}_FE_URL=${{ vars.QA_FRONTEND_URL }} \
+#          yarn playwright test -c playwright.config.ts --project=Frontend
 
       - name: Upload Playwright Test Report
         if: always()
