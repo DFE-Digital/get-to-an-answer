@@ -75,7 +75,7 @@ public static class LoggingConfigurationExtensions
                 .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .WriteTo.Console()
                 .Enrich.FromLogContext();
-        
+
             if (!string.IsNullOrEmpty(appInsightsConnectionString))
             {
                 lc = lc.WriteTo.ApplicationInsights(new TelemetryConfiguration
@@ -83,10 +83,9 @@ public static class LoggingConfigurationExtensions
                     ConnectionString = appInsightsConnectionString
                 }, TelemetryConverter.Traces);
             }
-        
+
             Log.Logger = lc.CreateBootstrapLogger();
         }
-        
 
         // Replace default Microsoft logging with OpenTelemetry logger provider so:
         // - scopes and state are captured as structured properties
