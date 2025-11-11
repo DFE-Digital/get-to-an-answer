@@ -91,7 +91,7 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
 
   site_config {
     always_on = true
-    
+
     application_stack {
       docker_image_name        = var.api_image_name
       docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
@@ -135,7 +135,7 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
 
   site_config {
     always_on = true
-    
+
     application_stack {
       docker_image_name        = var.admin_image_name
       docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
@@ -177,7 +177,7 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
 
   site_config {
     always_on = true
-    
+
     application_stack {
       docker_image_name        = var.frontend_image_name
       docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
