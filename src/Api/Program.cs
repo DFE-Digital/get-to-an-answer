@@ -1,14 +1,18 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Api.Services;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Common.Extensions;
 using Common.Infrastructure.Persistence;
 using Common.Local;
 using Common.Logging;
+using Common.Telemetry;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -24,6 +28,37 @@ if (builderIsLocalEnvironment)
     builder.Configuration
         .AddUserSecrets<Program>(optional: true, reloadOnChange: true);
 }
+
+Log.Logger = new LoggerConfiguration()
+    .ConfigureLogging(Environment.GetEnvironmentVariable("ApplicationInsights__ConnectionString"))
+    .CreateBootstrapLogger();
+    
+#region Additional Logging and Application Insights
+    
+Log.Logger.Information("Starting application");
+Log.Logger.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
+    
+builder.Services.AddSerilog((_, lc) => lc
+    .ConfigureLogging(builder.Configuration["ApplicationInsights:ConnectionString"]));
+
+var appInsightsConnectionString = builder.Configuration.GetValue<string>("ApplicationInsights:ConnectionString");
+
+if (!string.IsNullOrEmpty(appInsightsConnectionString))
+{
+    builder.Services.AddOpenTelemetry()
+        .WithTracing(tracing => tracing
+            .AddAspNetCoreInstrumentation()
+            .AddProcessor<RouteTelemetryProcessor>()
+            .AddEntityFrameworkCoreInstrumentation()
+        )
+        .WithMetrics(metrics => metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+        )
+        .UseAzureMonitor(monitor => monitor.ConnectionString = appInsightsConnectionString);
+}
+
+#endregion
 
 builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
 {
