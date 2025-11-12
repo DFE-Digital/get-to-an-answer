@@ -93,6 +93,6 @@ jobs:
         run: |
           az webapp deployment slot delete \
             --resource-group "$RESOURCE_GROUP" \
-            --name "$API_NAME" 
+            --name "$API_NAME" \
             --slot staging
 
