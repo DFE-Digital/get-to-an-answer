@@ -91,6 +91,6 @@ jobs:
         run: |
           az webapp deployment slot delete \
             --resource-group "$RESOURCE_GROUP" \
-            --name "$ADMIN_NAME" 
+            --name "$ADMIN_NAME" \
             --slot staging
 
