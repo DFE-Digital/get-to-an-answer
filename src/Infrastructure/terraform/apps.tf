@@ -54,7 +54,12 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
       service_tag = "AzureFrontDoor.Backend"
     }
 
-    application_stack = app_req_config
+    application_stack {
+      docker_image_name = local.app_req_config.docker_image_name
+      docker_registry_url = local.app_req_config.docker_registry_url
+      docker_registry_username = local.app_req_config.docker_registry_username
+      docker_registry_password = local.app_req_config.docker_registry_password
+    }
 
     # Enforce HTTPS only
     minimum_tls_version = "1.2"
@@ -90,7 +95,12 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-api-staging" {
       service_tag = "AzureFrontDoor.Backend"
     }
 
-    application_stack = app_req_config
+    application_stack {
+      docker_image_name = local.app_req_config.docker_image_name
+      docker_registry_url = local.app_req_config.docker_registry_url
+      docker_registry_username = local.app_req_config.docker_registry_username
+      docker_registry_password = local.app_req_config.docker_registry_password
+    }
 
     minimum_tls_version               = "1.2"
     health_check_path                 = "/health"
@@ -119,7 +129,12 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
       service_tag = "AzureFrontDoor.Backend"
     }
 
-    application_stack = app_req_config
+    application_stack {
+      docker_image_name = local.app_req_config.docker_image_name
+      docker_registry_url = local.app_req_config.docker_registry_url
+      docker_registry_username = local.app_req_config.docker_registry_username
+      docker_registry_password = local.app_req_config.docker_registry_password
+    }
 
     minimum_tls_version = "1.2"
 
@@ -154,7 +169,12 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-admin-staging" {
       service_tag = "AzureFrontDoor.Backend"
     }
 
-    application_stack = app_req_config
+    application_stack {
+      docker_image_name = local.app_req_config.docker_image_name
+      docker_registry_url = local.app_req_config.docker_registry_url
+      docker_registry_username = local.app_req_config.docker_registry_username
+      docker_registry_password = local.app_req_config.docker_registry_password
+    }
 
     minimum_tls_version               = "1.2"
     health_check_path                 = "/health"
@@ -182,7 +202,12 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
       service_tag = "AzureFrontDoor.Backend"
     }
 
-    application_stack = app_req_config
+    application_stack {
+      docker_image_name = local.app_req_config.docker_image_name
+      docker_registry_url = local.app_req_config.docker_registry_url
+      docker_registry_username = local.app_req_config.docker_registry_username
+      docker_registry_password = local.app_req_config.docker_registry_password
+    }
 
     minimum_tls_version = "1.2"
 
@@ -217,7 +242,12 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-frontend-staging" {
       service_tag = "AzureFrontDoor.Backend"
     }
 
-    application_stack = app_req_config
+    application_stack {
+      docker_image_name = local.app_req_config.docker_image_name
+      docker_registry_url = local.app_req_config.docker_registry_url
+      docker_registry_username = local.app_req_config.docker_registry_username
+      docker_registry_password = local.app_req_config.docker_registry_password
+    }
 
     minimum_tls_version               = "1.2"
     health_check_path                 = "/health"
