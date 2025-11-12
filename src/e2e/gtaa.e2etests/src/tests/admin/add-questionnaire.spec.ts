@@ -1,6 +1,6 @@
 import {test, expect} from "@playwright/test";
 import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
-import {goToAddQuestionnairePage, localSignIn} from '../../helpers/admin-test-helper';
+import {goToAddQuestionnairePage, signIn} from '../../helpers/admin-test-helper';
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {JwtHelper} from "../../helpers/JwtHelper";
@@ -13,7 +13,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
 
     test.beforeEach(async ({page}) => {
         token = JwtHelper.NoRecordsToken();
-        viewQuestionnairePage = await localSignIn(page, token);
+        viewQuestionnairePage = await signIn(page, token);
     });
 
     test('Add a new questionnaire successfully and lands on Edit Questionnaire Page', async ({ page }) => {

@@ -1,6 +1,6 @@
 import {expect, test} from "@playwright/test";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
-import {localSignIn, goToAddQuestionnairePage} from "../../helpers/admin-test-helper";
+import {signIn, goToAddQuestionnairePage} from "../../helpers/admin-test-helper";
 import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {createQuestionnaire, getQuestionnaire} from "../../test-data-seeder/questionnaire-data";
@@ -19,19 +19,19 @@ test.describe('Get to an answer views questionnaire', () => {
     });
 
     test('Validate presence of elements on view questionnaire page', async ({page}) => {
-        viewQuestionnairePage = await localSignIn(page, token);
+        viewQuestionnairePage = await signIn(page, token);
         await viewQuestionnairePage.assertPageElements();
     });
 
     test("Header section - H1 and paragraph presence", async ({page}) => {
-        viewQuestionnairePage = await localSignIn(page, token);
+        viewQuestionnairePage = await signIn(page, token);
 
         await viewQuestionnairePage.verifyHelpUserHeadingVisible();
         await viewQuestionnairePage.verifyHelpUserDescriptionVisible();
     });
 
     test("Create questionnaire CTA navigates to Add page", async ({page}) => {
-        viewQuestionnairePage = await localSignIn(page, token);
+        viewQuestionnairePage = await signIn(page, token);
 
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
         addQuestionnairePage = await AddQuestionnairePage.create(page);
@@ -42,7 +42,7 @@ test.describe('Get to an answer views questionnaire', () => {
         const res = await createQuestionnaire(request, token);
         questionnaire = res.questionnaire;
 
-        viewQuestionnairePage = await localSignIn(page, token);
+        viewQuestionnairePage = await signIn(page, token);
 
         await viewQuestionnairePage.table.verifyHeaders();
         await viewQuestionnairePage.table.verifyFirstTitleIsLink();
@@ -73,7 +73,7 @@ test.describe('Get to an answer views questionnaire', () => {
             }
         ];
         
-        viewQuestionnairePage = await localSignIn(page, token);
+        viewQuestionnairePage = await signIn(page, token);
         await viewQuestionnairePage.table.verifyTableData(expectedRows);
     });
 });
