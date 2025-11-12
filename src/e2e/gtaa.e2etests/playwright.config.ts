@@ -55,7 +55,7 @@ export default defineConfig({
     workers: 4,
     reporter: [['list'], ['html', {open: 'never'}]],
     use: {
-        headless: false,
+        headless: true,
         trace: 'on-first-retry',
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',

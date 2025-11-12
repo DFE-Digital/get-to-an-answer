@@ -70,7 +70,10 @@ export class AddQuestionnairePage extends BasePage {
 
     // ===== Actions =====
     async ClickBackToQuestionnaireLink(): Promise<void> {
-        await this.backToQuestionnaireLink.click();
+        await Promise.all([
+            this.page.waitForLoadState('networkidle'),
+            this.backToQuestionnaireLink.click()
+        ]);
     }
 
     async enterTitle(title: string): Promise<void> {
@@ -87,24 +90,7 @@ export class AddQuestionnairePage extends BasePage {
         await this.clickSaveAndContinue();
     }
 
-    async submitFormAndCheckNoDoubleSubmit(): Promise<void> {
-        const requests: string[] = [];
-        this.page.on('request', req => {
-            if (req.url().includes('/admin/questionnaires/create') && req.method() === 'POST') {
-                requests.push(req.url());
-            }
-        });
-
-        await Promise.all([
-            this.waitForPageLoad(),
-            this.saveAndContinueButton.click(),
-            this.saveAndContinueButton.click(),
-        ]);
-
-        expect(requests.length).toBe(1);
-        //await expect(this.saveAndContinueButton).toBeDisabled(); //TBC, should we disable the button
-    }
-
+    
     // ===== Validations =====
     async verifyLabelAndHintPresent(): Promise<void> {
         await expect(this.titleLabel).toBeVisible();

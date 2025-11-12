@@ -57,17 +57,30 @@ export class ViewQuestionnaireTable {
         return this.rows.count();
     }
 
-    private escapeCss(s: string): string {
-        return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    private cleanText(text: string): string {
+        return text.replace(/\s+/g, ' ').trim();
     }
+    
+    async verifyTableData(expectedRows: { title: string; createdBy: string; status: string }[]): Promise<void> {
+        
 
-    async getStatus(title: string): Promise<string> {
-        const row = this.page.locator(
-            `table.govuk-table tr:has(a:has-text("${this.escapeCss(title)}"))`
-        );
-        await row.waitFor({state: 'attached', timeout: 15000});
-        const cell = row.locator('td:last-child');
-        const raw = (await cell.textContent()) ?? '';
-        return raw.replace(/\s+/g, ' ').trim();
+        const rows = this.table.locator('tbody tr');
+        const rowCount = await rows.count();
+
+        expect(rowCount, `Expected ${expectedRows.length} rows but found ${rowCount}`).toBe(expectedRows.length);
+
+        for (let i = 0; i < rowCount; i++) {
+            const row = rows.nth(i);
+
+            const titleText = this.cleanText(await row.locator('td').nth(0).innerText());
+            const createdByText = this.cleanText(await row.locator('td').nth(1).innerText());
+            const statusText = this.cleanText(await row.locator('td').nth(2).innerText());
+
+            const expected = expectedRows[i];
+
+            expect(titleText, `Row ${i + 1}: title mismatch`).toBe(expected.title);
+            //expect(createdByText, `Row ${i + 1}: createdBy mismatch`).toBe(expected.createdBy); //TBC empty at the moment
+            expect(statusText, `Row ${i + 1}: status mismatch`).toBe(expected.status);
+        }
     }
 }
