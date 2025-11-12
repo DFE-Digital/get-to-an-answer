@@ -65,7 +65,7 @@ export class BasePage {
 
     // Wait for the page to load
     async waitForPageLoad() {
-        await this.page.waitForLoadState('load');
+        await this.page.waitForLoadState('networkidle');
     }
 
     // Cookie banner functionality

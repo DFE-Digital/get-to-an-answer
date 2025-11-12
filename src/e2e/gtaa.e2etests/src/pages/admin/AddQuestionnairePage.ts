@@ -70,7 +70,10 @@ export class AddQuestionnairePage extends BasePage {
 
     // ===== Actions =====
     async ClickBackToQuestionnaireLink(): Promise<void> {
-        await this.backToQuestionnaireLink.click();
+        await Promise.all([
+            this.page.waitForLoadState('networkidle'),
+            this.backToQuestionnaireLink.click()
+        ]);
     }
 
     async enterTitle(title: string): Promise<void> {
