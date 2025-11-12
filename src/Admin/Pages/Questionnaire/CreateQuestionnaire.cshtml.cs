@@ -15,9 +15,6 @@ public class CreateQuestionnaires(IApiClient apiClient, ILogger<CreateQuestionna
 {
     [BindProperty]
     public required CreateQuestionnaireRequestDto CreateQuestionnaire { get; set; }
-
-    // [BindProperty]
-    // public string? Title { get; set; }
     
     public IActionResult OnGet()
     {
