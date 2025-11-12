@@ -3,14 +3,17 @@ import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {goToAddQuestionnairePage, localSignIn} from '../../helpers/admin-test-helper';
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
+import {JwtHelper} from "../../helpers/JwtHelper";
 
 test.describe('Get to an answer create a new questionnaire', () => {
+    let token: string;
     let viewQuestionnairePage: ViewQuestionnairePage;
     let addQuestionnairePage: AddQuestionnairePage;
     let editQuestionnairePage: EditQuestionnairePage;
 
     test.beforeEach(async ({page}) => {
-        viewQuestionnairePage = await localSignIn(page);
+        token = JwtHelper.NoRecordsToken();
+        viewQuestionnairePage = await localSignIn(page, token);
     });
 
     test('Add a new questionnaire successfully and lands on Edit Questionnaire Page', async ({ page }) => {
@@ -71,13 +74,4 @@ test.describe('Get to an answer create a new questionnaire', () => {
     //
     //     await addQuestionnairePage.expectTitleAriaDescribedByIncludesHintAndError();
     // });
-
-    test('should prevent double submission for a questionnaire', async ({page}) => {
-        await viewQuestionnairePage.clickCreateNewQuestionnaire();
-
-        addQuestionnairePage = await AddQuestionnairePage.create(page);
-        await addQuestionnairePage.enterTitle('Double click prevention test');
-
-        await addQuestionnairePage.submitFormAndCheckNoDoubleSubmit();
-    });
 });

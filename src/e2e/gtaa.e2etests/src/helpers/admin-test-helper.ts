@@ -3,32 +3,40 @@ import {SignInPage} from '../pages/admin/SignInPage';
 import {ViewQuestionnairePage} from '../pages/admin/ViewQuestionnairePage';
 import {AddQuestionnairePage} from '../pages/admin/AddQuestionnairePage';
 import {EditQuestionnairePage} from "../pages/admin/EditQuestionnairePage";
+import {TermsOfUsePage} from "../pages/admin/TermsOfUsePage";
 import {JwtHelper} from "./JwtHelper";
 
 export async function localSignIn(page: Page, bearerToken?:string): Promise<ViewQuestionnairePage> {
     const signInPage = new SignInPage(page);
     
-    page.once('pageerror', e => {
-        if (page.url().includes('/dev/login')) {
-            console.warn('Ignored /dev/login error:', e.message);
-        }
-    });
+    // page.once('pageerror', e => {
+    //     if (page.url().includes('/dev/login')) {
+    //         console.warn('Ignored /dev/login error:', e.message);
+    //     }
+    // });
     
     await signInPage
         .navigateTo(`/dev/login?jt=${bearerToken ?? JwtHelper.ValidToken}`, 'domcontentloaded')
         .catch(() => { /* ignore if it redirects instantly */ });
+
+    await signInPage.waitForPageLoad();
+    await signInPage.clickSignIn();
     
-    await page.waitForLoadState('domcontentloaded').catch(() => {});
-    await page.waitForTimeout(500); // short grace period (useful for mobile Safari)
+    //await page.waitForLoadState('domcontentloaded').catch(() => {});
+    //await page.waitForTimeout(500); // short grace period (useful for mobile Safari)
     
-    await signInPage
-        .navigateTo(`/admin/questionnaires`, 'domcontentloaded')
-        .catch(() => {});
     
-    const viewQuestionnairePage = new ViewQuestionnairePage(page);
-    await viewQuestionnairePage.waitForPageLoad();
+    // await signInPage
+    //     .navigateTo(`/admin/questionnaires`, 'domcontentloaded')
+    //     .catch(() => {});
+    //
+    const termsOfUsePage = new TermsOfUsePage(page);
+    await termsOfUsePage.agreeToTermsOfUse();
     
-    return viewQuestionnairePage;
+     const viewQuestionnairePage = new ViewQuestionnairePage(page);
+     await viewQuestionnairePage.waitForPageLoad();
+    
+     return viewQuestionnairePage;
 }
 
 export async function SignIn(page: Page, username: string, password: string): Promise<ViewQuestionnairePage> {

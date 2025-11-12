@@ -6,7 +6,7 @@ export class SignInPage extends BasePage {
     // ===== Locators =====
     private usernameInput = this.page.locator('#username');
     private passwordInput = this.page.locator('#password');
-    private signInButton = this.page.locator('[data-test="sign-in-button"]');
+    private signInButton = this.page.getByRole('button', { name: 'Sign in' });
     private errorMessage = this.page.locator('[data-test="error-message"]');
     private forgotPasswordLink = this.page.locator('[data-test="forgot-password-link"]');
 

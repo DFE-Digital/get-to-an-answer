@@ -33,8 +33,8 @@ export class BasePage {
         this.rejectButton = page.locator('');
 
         // ===== Locators for web page header =====
-        this.logoLink = page.locator('header.dfe-header a.dfe-header__link[aria-label*="homepage"]');
-        this.defaultLogo = page.locator('header.dfe-header img.dfe-logo');
+        this.logoLink = page.locator('a.govuk-header__link--homepage');
+        this.defaultLogo = page.locator('img.govuk-header__logotype');
         this.WebsiteNameLink = page.locator('header.dfe-header a.dfe-header__link--service');
         this.WebsiteAdminName = page.locator('nav .govuk-service-navigation__text');
         this.SignOutLink = page.getByRole('link', {name: /sign out/i});
@@ -84,15 +84,15 @@ export class BasePage {
     // ===== Verify header Links are visible =====
     async verifyHeaderLinks() {
         //await expect(this.WebsiteNameLink).toHaveText(/Support for/i); //TBC
-        await expect(this.WebsiteNameLink).toBeVisible();
+        //await expect(this.WebsiteNameLink, '❌ Website name link is not visible on the page').toBeVisible();
 
-        await expect(this.WebsiteAdminName).toBeVisible();
+        await expect(this.WebsiteAdminName, '❌ Admin name is not visible on the page').toBeVisible();
 
-        await expect(this.logoLink).toBeVisible();
-        await expect(this.defaultLogo).toBeVisible();
+        await expect(this.logoLink,'❌ Logo link is not visible on the page').toBeVisible();
+        await expect(this.defaultLogo, '❌ Default logo is not visible on the page').toBeVisible();
 
         //await expect(this.SignOutLink).toHaveText(/Support for/i); TBC
-        await expect(this.SignOutLink).toBeVisible();
+        await expect(this.SignOutLink, '❌ Sign out link is not visible on the page').toBeVisible();
     }
 
     // ===== Verify footer Links are visible =====

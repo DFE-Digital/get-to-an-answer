@@ -5,6 +5,7 @@ import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {createQuestionnaire, getQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {JwtHelper} from "../../helpers/JwtHelper";
+import {EntityStatus} from "../../constants/test-data-constants";
 
 test.describe('Get to an answer views questionnaire', () => {
     let token: string;
@@ -18,7 +19,6 @@ test.describe('Get to an answer views questionnaire', () => {
     });
 
     test('Validate presence of elements on view questionnaire page', async ({page}) => {
-
         viewQuestionnairePage = await localSignIn(page, token);
         await viewQuestionnairePage.assertPageElements();
     });
@@ -52,30 +52,28 @@ test.describe('Get to an answer views questionnaire', () => {
         await editQuestionnairePage.validateHeadingAndStatus();
     });
     
-    test("Questionnaires table - status as draft", async ({page}) => {
-        const status = await viewQuestionnairePage.table.getStatus(questionnaire.title);
-        expect(status).toBe('Draft');
-    });
+    test("Questionnaires table - validate data", async ({page,request}) => {
+        const res = await createQuestionnaire(request, token);
+        questionnaire = res.questionnaire;
+        
+        const getResponse = await getQuestionnaire(
+            request,
+            questionnaire.id,
+            token
+        );
 
-    // test("Questionnaires table - validate data", async ({request}) => {
-    //     const res = await createQuestionnaire(request, token);
-    //     questionnaire = res.questionnaire;
-    //
-    //     //need get questionnaire api call
-    //     const getResponse = await getQuestionnaire(
-    //         request,
-    //         questionnaire.id,
-    //         token
-    //     );
-    //
-    //     const expectedRows = [
-    //         {
-    //             title: getResponse.questionnaireGetBody.title,
-    //             createdBy: getResponse.questionnaireGetBody.createdBy,
-    //             status: getResponse.questionnaireGetBody.status,
-    //         }
-    //     ];
-    //
-    //     await viewQuestionnairePage.table.verifyTableData(expectedRows);
-    // });
+        const statusValue = getResponse.questionnaireGetBody.status; 
+        const statusName = EntityStatus[statusValue];
+        
+        const expectedRows = [
+            {
+                title: getResponse.questionnaireGetBody.title,
+                createdBy: getResponse.questionnaireGetBody.createdBy,
+                status: statusName
+            }
+        ];
+        
+        viewQuestionnairePage = await localSignIn(page, token);
+        await viewQuestionnairePage.table.verifyTableData(expectedRows);
+    });
 });
