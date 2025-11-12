@@ -32,8 +32,6 @@ builder.Services.AddAntiforgery(options =>
     options.SuppressXFrameOptionsHeader = true;
     options.Cookie.Expiration = TimeSpan.Zero;
 });
-
-//builder.AddLogging();
     
 builder.Services.AddHealthChecks();
 
@@ -56,14 +54,20 @@ app.Use(async (context, next) =>
     await next();
 });
 
-//app.UseLogEnrichment();
-
-// Configure the HTTP request pipeline.
 if (!builderIsLocalEnvironment)
 {
-    app.UseExceptionHandler("/Error");
+    // Configure the HTTP request pipeline.
+    app.UseExceptionHandler("/error");
+
+    // Handle non-existing routes (404)
+    app.UseStatusCodePagesWithReExecute("/error/{0}");
+    
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+else
+{
+    app.UseDeveloperExceptionPage();
 }
 
 app.MapHealthChecks("/health");

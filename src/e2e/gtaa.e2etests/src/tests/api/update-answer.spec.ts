@@ -31,7 +31,7 @@ test.describe('PUT Update answer', () => {
             ...createdAnswer,
             content: 'Updated content',
             description: 'Updated description',
-            score: 10.5,
+            priority: 10.5,
         };
 
         const {updatedAnswerPostResponse, updatedAnswer} = await updateAnswer(
@@ -96,7 +96,7 @@ test.describe('PUT Update answer', () => {
         }
     });
 
-    test('Validate update answer with invalid payload (wrong type for score)', async ({request}) => {
+    test('Validate update answer with invalid payload (wrong type for priority)', async ({request}) => {
         const {questionnaire} = await createQuestionnaire(request);
         const {question} = await createQuestion(request, questionnaire.id);
         const {answer: createdAnswer} = await createSingleAnswer(request, {
@@ -109,7 +109,7 @@ test.describe('PUT Update answer', () => {
         const wrongTypeScore: any = 'not-a-number';
         const updatePayload = {
             ...createdAnswer,
-            score: wrongTypeScore,
+            priority: wrongTypeScore,
         };
 
         const {updatedAnswerPostResponse} = await updateAnswer(

@@ -1083,9 +1083,9 @@ public class QuestionnaireTests(ApiFixture factory) :
             createdQuestions.Add(q);
 
             // two answers per question
-            await Create<AnswerDto>(new { questionnaireId, questionId = q.Id, content = $"A1-{qt}", description = $"D1-{qt}", score = 1 },
+            await Create<AnswerDto>(new { questionnaireId, questionId = q.Id, content = $"A1-{qt}", description = $"D1-{qt}", priority = 1 },
                 routePrefixOverride: "/api/answers");
-            await Create<AnswerDto>(new { questionnaireId, questionId = q.Id, content = $"A2-{qt}", description = $"D2-{qt}", score = 2 },
+            await Create<AnswerDto>(new { questionnaireId, questionId = q.Id, content = $"A2-{qt}", description = $"D2-{qt}", priority = 2 },
                 routePrefixOverride: "/api/answers");
         }
 
@@ -1109,7 +1109,7 @@ public class QuestionnaireTests(ApiFixture factory) :
         {
             var answers = await GetAll<List<AnswerDto>>(routePrefixOverride: $"/api/questions/{q.Id}/answers");
             answers.Should().HaveCount(2);
-            originalAnswersByQuestion.Add(q.Content, answers.OrderBy(a => a.Score).ToList());
+            originalAnswersByQuestion.Add(q.Content, answers.OrderBy(a => a.Priority).ToList());
         }
 
         // For each cloned question, validate content/type/order, and answers cloned with same fields but new ids and linked to cloned questionnaire/question
@@ -1125,7 +1125,7 @@ public class QuestionnaireTests(ApiFixture factory) :
             clonedAnswers.Should().HaveCount(2);
 
             var originalAnswers = originalAnswersByQuestion[expectedContent];
-            clonedAnswers = clonedAnswers.OrderBy(a => a.Score).ToList();
+            clonedAnswers = clonedAnswers.OrderBy(a => a.Priority).ToList();
 
             for (var i = 0; i < 2; i++)
             {
@@ -1139,7 +1139,7 @@ public class QuestionnaireTests(ApiFixture factory) :
 
                 ca.Content.Should().Be(oa.Content);
                 ca.Description.Should().Be(oa.Description);
-                ca.Score.Should().Be(oa.Score);
+                ca.Priority.Should().Be(oa.Priority);
                 ca.DestinationUrl.Should().Be(oa.DestinationUrl);
                 ca.DestinationType.Should().Be(oa.DestinationType);
                 ca.DestinationQuestionId.Should().Be(oa.DestinationQuestionId);

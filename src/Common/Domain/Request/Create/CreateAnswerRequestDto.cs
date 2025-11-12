@@ -12,7 +12,7 @@ public class CreateAnswerRequestDto
     public required string Content { get; set; }
     public string? Description { get; set; }
     
-    public float Score { get; set; }
+    public float Priority { get; set; }
     
     [EnumDefined]
     public DestinationType? DestinationType { get; set; }

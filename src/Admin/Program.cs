@@ -3,6 +3,7 @@ using Common.Configuration;
 using Common.Extensions;
 using Common.Local;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 
@@ -26,6 +27,21 @@ if (!builderIsLocalEnvironment)
     builder.Services
         .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+    
+    
+    
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedFor;
+        options.KnownProxies.Clear();
+        options.KnownNetworks.Clear();
+        options.AllowedHosts = new List<string>
+        {
+            "*.azurewebsites.net",
+            "*.azurefd.net",
+            "*.get-to-an-answer.education.gov.uk"
+        };
+    });
 }
 
 builder.Services.AddHttpContextAccessor();
