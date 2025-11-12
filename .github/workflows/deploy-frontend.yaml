@@ -86,11 +86,4 @@ jobs:
             --name "$FRONTEND_NAME" \
             --slot "staging" \
             --target-slot "production"
-          
-      - name: Delete staging slot
-        run: |
-          az webapp deployment slot delete \
-            --resource-group "$RESOURCE_GROUP" \
-            --name "$FRONTEND_NAME" \
-            --slot staging
 
