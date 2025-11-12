@@ -19,6 +19,8 @@ if (builderIsLocalEnvironment)
         .AddUserSecrets<Program>(optional: true, reloadOnChange: true);
 }
 
+builder.Services.AddHttpContextAccessor();
+
 Log.Logger = new LoggerConfiguration()
     .ConfigureLogging(Environment.GetEnvironmentVariable("ApplicationInsights__ConnectionString"))
     .CreateBootstrapLogger();
