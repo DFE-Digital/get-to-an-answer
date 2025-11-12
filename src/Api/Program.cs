@@ -68,7 +68,7 @@ builder.Services.AddControllers()
 
 if (builderIsLocalEnvironment) 
 {
-    builder.AddLogging();
+//    builder.AddLogging();
 }
 
 builder.Services.ConfigureHttpJsonOptions(o =>
@@ -109,7 +109,7 @@ var app = builder.Build();
 
 if (builderIsLocalEnvironment)
 {
-    app.UseLogEnrichment();
+//    app.UseLogEnrichment();
 }
 
 var appIsLocalEnvironment = app.Environment.IsEnvironment(localEnvironmentName);

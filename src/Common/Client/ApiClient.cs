@@ -61,8 +61,8 @@ public interface IApiClient
     
     // === For Service Users ===
     
-    Task<QuestionDto?> GetInitialQuestion(Guid questionnaireId);
-    Task<DestinationDto?> GetNextState(Guid questionnaireId, GetNextStateRequest request);
+    Task<QuestionDto?> GetInitialQuestion(Guid questionnaireId, bool preview = false);
+    Task<DestinationDto?> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool preview = false);
     
     // === For Inviting Contributors ===
     
@@ -367,17 +367,17 @@ public class ApiClient : IApiClient
         return await response.Content.ReadFromJsonAsync<List<ContentDto>>() ?? new ();
     }
 
-    public async Task<QuestionDto?> GetInitialQuestion(Guid questionnaireId)
+    public async Task<QuestionDto?> GetInitialQuestion(Guid questionnaireId, bool preview = false)
     {
-        var response = await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/initial");
+        var response = await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/initial?preview={preview}");
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<QuestionDto>();
     }
 
-    public async Task<DestinationDto?> GetNextState(Guid questionnaireId, GetNextStateRequest request)
+    public async Task<DestinationDto?> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool preview = false)
     {
-        var response = await _httpClient.PostAsJsonAsync($"{Questionnaires}/{questionnaireId}/next", request);
+        var response = await _httpClient.PostAsJsonAsync($"{Questionnaires}/{questionnaireId}/next?preview={preview}", request);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<DestinationDto>();

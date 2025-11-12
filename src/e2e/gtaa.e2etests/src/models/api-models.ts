@@ -21,5 +21,5 @@ export interface AnswerModel {
     description: string;
     destinationUrl: string;
     destinationType: AnswerDestinationType;
-    score: number;
+    priority: number;
 }

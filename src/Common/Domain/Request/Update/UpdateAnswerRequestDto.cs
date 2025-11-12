@@ -10,11 +10,10 @@ public class UpdateAnswerRequestDto
     public required string Content { get; set; }
     public string? Description { get; set; }
     
-    public float? Score { get; set; }
+    public float? Priority { get; set; }
     
     [EnumDefined]
     public DestinationType? DestinationType { get; set; }
-    
     
     [RegularExpression(@"^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$", 
         ErrorMessage = "Please enter a valid URL")]

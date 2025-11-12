@@ -18,8 +18,8 @@ namespace Api.Services;
 public interface IQuestionnaireRunnerService
 {
     Task<ServiceResult> GetLastPublishedQuestionnaireInfo(string questionnaireSlug);
-    Task<ServiceResult> GetInitialQuestion(Guid questionnaireId);
-    Task<ServiceResult> GetNextState(Guid questionnaireId, GetNextStateRequest request);
+    Task<ServiceResult> GetInitialQuestion(Guid questionnaireId, bool isPreview = false);
+    Task<ServiceResult> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool isPreview = false);
 }
 
 public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<QuestionnaireRunnerService> logger) : AbstractService, IQuestionnaireRunnerService
@@ -31,31 +31,18 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         {
             logger.LogInformation("GetLastPublishedQuestionnaireInfo started Slug={Slug}", questionnaireSlug);
 
-            var questionnaireVersionJson =  await db.QuestionnaireVersions
-                .Where(qv => db.Questionnaires
-                    .Any(q => q.Id == qv.QuestionnaireId && q.Slug == questionnaireSlug && 
-                              !new[] {EntityStatus.Deleted, EntityStatus.Private}.Contains(q.Status)))
-                .OrderByDescending(qv => qv.Version)
-                .Select(qv => qv.QuestionnaireJson)
-                .FirstOrDefaultAsync();
+            var questionnaireVersionJson =  await GetDraftOrLatestPublishedVersion(questionnaireSlug: questionnaireSlug);
 
             if (questionnaireVersionJson == null)
                 return BadRequest(ProblemTrace("No published version found for this questionnaire.", 400));
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                ReadCommentHandling = JsonCommentHandling.Skip,
-                AllowTrailingCommas = true,
-            };
-            options.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false));
-
-            var questionnaire = JsonSerializer.Deserialize<QuestionnaireEntity>(questionnaireVersionJson, options);
-
+            var questionnaire = ToQuestionnaire(questionnaireVersionJson);
+            
             if (questionnaire == null)
                 return BadRequest(ProblemTrace("Failed to read questionnaire meta.", 400));
 
             logger.LogInformation("GetLastPublishedQuestionnaireInfo succeeded Slug={Slug} QuestionnaireId={QuestionnaireId}", questionnaireSlug, questionnaire.Id);
+            
             return Ok(new QuestionnaireInfoDto
             {
                 Id = questionnaire.Id,
@@ -71,16 +58,32 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         }
     }
 
-    public async Task<ServiceResult> GetInitialQuestion(Guid questionnaireId)
+    public async Task<ServiceResult> GetInitialQuestion(Guid questionnaireId, bool isPreview = false)
     {
         try
         {
             logger.LogInformation("GetInitialQuestion started QuestionnaireId={QuestionnaireId}", questionnaireId);
 
-            var initialQuestion = await db.Questions
-                .Include(x => x.Answers.Where(a => !a.IsDeleted))
-                .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == 1 && 
-                                          !x.IsDeleted);
+            QuestionEntity? initialQuestion;
+            
+            if (isPreview)
+            {
+                initialQuestion = await db.Questions
+                    .Include(x => x.Answers.Where(a => !a.IsDeleted))
+                    .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Order == 1 && 
+                                              !x.IsDeleted);
+            }
+            else
+            {
+                var questionnaireVersionJson = await GetDraftOrLatestPublishedVersion(questionnaireId);
+
+                if (questionnaireVersionJson == null)
+                    return BadRequest(ProblemTrace("No published version found for this questionnaire.", 400));
+                
+                var questionnaire = ToQuestionnaire(questionnaireVersionJson);
+
+                initialQuestion = questionnaire?.Questions.FirstOrDefault(q => q is { Order: 1, IsDeleted: false });
+            }
 
             if (initialQuestion == null)
                 return BadRequest(ProblemTrace("The questionnaire does not have a starting question.", 400));
@@ -99,7 +102,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
                     Content = a.Content,
                     Description = a.Description,
                     QuestionId = a.QuestionId,
-                    Score = a.Score
+                    Priority = a.Priority
                 }).ToList(),
                 Type = initialQuestion.Type
             });
@@ -111,7 +114,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         }
     }
 
-    public async Task<ServiceResult> GetNextState(Guid questionnaireId, GetNextStateRequest request)
+    public async Task<ServiceResult> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool isPreview = false)
     {
         try
         {
@@ -121,33 +124,48 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             {
                 return BadRequest(ProblemTrace("No answer was selected.", 400));           
             }
-            
+
             var selectedAnswerId = request.SelectedAnswerIds.First();
 
-            var answer = await db.Answers.FirstOrDefaultAsync(x => x.Id == selectedAnswerId);
+            QuestionnaireEntity? questionnaire = null;
+            AnswerEntity? answer;
+
+            if (isPreview)
+            {
+                answer = await db.Answers.FirstOrDefaultAsync(x => x.Id == selectedAnswerId);
+            }
+            else
+            {
+                var questionnaireVersionJson = isPreview ? null : await GetDraftOrLatestPublishedVersion(questionnaireId);
+                
+                if (questionnaireVersionJson == null)
+                    return BadRequest(ProblemTrace("No published version found for this questionnaire.", 400));
+                
+                questionnaire = ToQuestionnaire(questionnaireVersionJson);
+                
+                answer = questionnaire?.Questions.SelectMany(q => q.Answers).FirstOrDefault(a => a.Id == selectedAnswerId);
+            }
 
             if (answer == null)
                 return BadRequest(ProblemTrace("The selected answer was not found.", 400));
-
+            
             if (answer.DestinationType == null)
             {
                 return await GetDestinationQuestion(x => 
-                        x.QuestionnaireId == questionnaireId && 
-                        x.Order == request.CurrentQuestionOrder+1);
+                    x.QuestionnaireId == questionnaireId && 
+                    x.Order == request.CurrentQuestionOrder+1 && !x.IsDeleted, isPreview, questionnaire?.Questions);
             }
 
             if (answer.DestinationType == DestinationType.Question)
             {
                 return await GetDestinationQuestion(x =>
-                    x.Id == answer.DestinationQuestionId);
+                    x.Id == answer.DestinationQuestionId && !x.IsDeleted, isPreview, questionnaire?.Questions);
             }
 
             if (answer.DestinationType == DestinationType.CustomContent)
             {
-                var content = db.Contents.First();
-                
                 return await GetDestinationContent(x =>
-                    x.Id == answer.DestinationContentId);
+                    x.Id == answer.DestinationContentId && !x.IsDeleted, isPreview, questionnaire?.Contents);
             }
 
             logger.LogInformation("GetNextState resolved to external destination for AnswerId={AnswerId}", selectedAnswerId);
@@ -165,37 +183,28 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
     }
 
     [ApiExplorerSettings(IgnoreApi = true)]
-    private async Task<ServiceResult> GetDestinationQuestion(Expression<Func<QuestionEntity,bool>> destination)
+    private async Task<ServiceResult> GetDestinationQuestion(Expression<Func<QuestionEntity,bool>> destination, bool isPreview = false, ICollection<QuestionEntity>? questions = null)
     {
         try
         {
-            var questionEntity = await db.Questions.Where(destination)
-                .Include(x => x.Answers.Where(a => !a.IsDeleted))
-                .FirstOrDefaultAsync();
+            QuestionEntity? questionEntity = null;
+
+            if (isPreview)
+            {
+                questionEntity = await db.Questions.Where(destination)
+                    .FirstOrDefaultAsync();
+                
+            }
+            else if (questions is { Count: > 0 })
+            {
+                questionEntity = questions.Where(destination.Compile())
+                    .FirstOrDefault();
+            }
 
             if (questionEntity == null)
                 return BadRequest(ProblemTrace("Next question could not be determined.", 400));
 
-            return Ok(new DestinationDto
-            {
-                Type = DestinationType.Question,
-                Question = new QuestionDto
-                {
-                    Id = questionEntity.Id,
-                    Content = questionEntity.Content,
-                    Description = questionEntity.Description,
-                    Order = questionEntity.Order,
-                    Answers = questionEntity.Answers.Select(a => new AnswerDto
-                    {
-                        Id = a.Id,
-                        Content = a.Content,
-                        Description = a.Description,
-                        QuestionId = a.QuestionId,
-                        Score = a.Score,
-                    }).ToList(),
-                    Type = questionEntity.Type,
-                }
-            });
+            return Ok(ToDestinationDto(questionEntity));
         }
         catch (Exception ex)
         {
@@ -203,20 +212,81 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
     }
-    
-    private async Task<ServiceResult> GetDestinationContent(Expression<Func<ContentEntity,bool>> destination)
+
+    private DestinationDto? ToDestinationDto(QuestionEntity questionEntity)
     {
-        var questionEntity = await db.Contents.Where(destination)
-            .FirstOrDefaultAsync();
-            
-        if (questionEntity == null)
+        return new DestinationDto
+        {
+            Type = DestinationType.Question,
+            Question = new QuestionDto
+            {
+                Id = questionEntity.Id,
+                Content = questionEntity.Content,
+                Description = questionEntity.Description,
+                Order = questionEntity.Order,
+                Answers = questionEntity.Answers.Select(a => new AnswerDto
+                {
+                    Id = a.Id,
+                    Content = a.Content,
+                    Description = a.Description,
+                    QuestionId = a.QuestionId,
+                    Priority = a.Priority,
+                }).ToList(),
+                Type = questionEntity.Type,
+            }
+        };
+    }
+    
+    private async Task<ServiceResult> GetDestinationContent(Expression<Func<ContentEntity,bool>> destination, bool isPreview = false, ICollection<ContentEntity>? contents = null)
+    {
+        ContentEntity? contentEntity = null;
+
+        if (isPreview)
+        {
+            contentEntity = await db.Contents.Where(destination)
+                .FirstOrDefaultAsync();
+        }
+        else if (contents is { Count: > 0 })
+        {
+            contentEntity = contents.Where(destination.Compile())
+                .FirstOrDefault();
+        }
+        
+        if (contentEntity == null)
             return BadRequest();
 
         return Ok(new DestinationDto
         {
             Type = DestinationType.CustomContent,
-            Content = questionEntity.Content,
-            Title = questionEntity.Title,
+            Content = contentEntity.Content,
+            Title = contentEntity.Title,
         });
+    }
+
+    private async Task<string?> GetDraftOrLatestPublishedVersion(Guid? questionnaireId = null, string? questionnaireSlug = null)
+    {
+        var questionnaireVersionJson =  await db.QuestionnaireVersions
+            .Where(qv => db.Questionnaires
+                .Any(q => (q.Id == qv.QuestionnaireId && (questionnaireId == null || q.Id == questionnaireId)) &&
+                          (questionnaireSlug == null || q.Slug == questionnaireSlug) &&
+                          !new[] {EntityStatus.Deleted, EntityStatus.Private}.Contains(q.Status)))
+            .OrderByDescending(qv => qv.Version)
+            .Select(qv => qv.QuestionnaireJson)
+            .FirstOrDefaultAsync();
+        
+        return questionnaireVersionJson;
+    }
+
+    private QuestionnaireEntity? ToQuestionnaire(string questionnaireJson)
+    {
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            AllowTrailingCommas = true,
+        };
+        options.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false));
+
+        return JsonSerializer.Deserialize<QuestionnaireEntity>(questionnaireJson, options);
     }
 }

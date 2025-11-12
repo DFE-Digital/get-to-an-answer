@@ -32,14 +32,14 @@ public class QuestionnaireRunnerController(IQuestionnaireRunnerService questionn
     }
     
     [HttpGet("questionnaires/{questionnaireId:guid}/initial")]
-    public async Task<IActionResult> GetInitialQuestion(Guid questionnaireId)
+    public async Task<IActionResult> GetInitialQuestion(Guid questionnaireId, [FromQuery] bool preview = false)
     {
-        return (await questionnaireRunnerService.GetInitialQuestion(questionnaireId)).ToActionResult();
+        return (await questionnaireRunnerService.GetInitialQuestion(questionnaireId, preview)).ToActionResult();
     }
 
     [HttpPost("questionnaires/{questionnaireId:guid}/next")]
-    public async Task<IActionResult> GetNextState(Guid questionnaireId, GetNextStateRequest request)
+    public async Task<IActionResult> GetNextState(Guid questionnaireId, GetNextStateRequest request, [FromQuery] bool preview = false)
     {
-        return (await questionnaireRunnerService.GetNextState(questionnaireId, request)).ToActionResult();
+        return (await questionnaireRunnerService.GetNextState(questionnaireId, request, preview)).ToActionResult();
     }
 }
