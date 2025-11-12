@@ -26,15 +26,14 @@ public class CreateQuestionnaires(IApiClient apiClient, ILogger<CreateQuestionna
     {
         try
         {
+            var createQuestionnaireRequest = new CreateQuestionnaireRequestDto { Title =  CreateQuestionnaire.Title };
+            
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            var response = await apiClient.CreateQuestionnaireAsync(new CreateQuestionnaireRequestDto
-            {
-                Title = CreateQuestionnaire.Title
-            });
+            var response = await apiClient.CreateQuestionnaireAsync(createQuestionnaireRequest);
 
             TempData[nameof(QuestionnaireState)] =
                 JsonConvert.SerializeObject(new QuestionnaireState { JustCreated = true });
