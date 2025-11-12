@@ -2,7 +2,7 @@ resource "azurerm_cdn_frontdoor_profile" "frontdoor-web-profile" {
   name                = "${var.prefix}fwb-uks-web"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   sku_name            = "${var.azure_frontdoor_scale}_AzureFrontDoor"
-  tags = local.common_tags
+  tags                = local.common_tags
 }
 
 // One shared origin group (simple single-origin per route usage)
@@ -104,19 +104,19 @@ resource "azurerm_cdn_frontdoor_origin" "frontdoor-frontend-origin" {
 resource "azurerm_cdn_frontdoor_endpoint" "frontdoor-api-endpoint" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
   name                     = "${var.prefix}fde-uks-api"
-  tags = local.common_tags
+  tags                     = local.common_tags
 }
 
 resource "azurerm_cdn_frontdoor_endpoint" "frontdoor-admin-endpoint" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
   name                     = "${var.prefix}fde-uks-admin"
-  tags = local.common_tags
+  tags                     = local.common_tags
 }
 
 resource "azurerm_cdn_frontdoor_endpoint" "frontdoor-frontend-endpoint" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
   name                     = "${var.prefix}fde-uks-frontend"
-  tags = local.common_tags
+  tags                     = local.common_tags
 }
 
 // Routes (separate endpoints/domains, so /* per route)
@@ -382,9 +382,9 @@ resource "azurerm_cdn_frontdoor_custom_domain_association" "frontend-app-custom-
 resource "azurerm_cdn_frontdoor_firewall_policy" "web_firewall_policy" {
   name                = "webFirewallPolicy"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  tags = local.common_tags
-  mode     = "Prevention"
-  sku_name = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.sku_name
+  tags                = local.common_tags
+  mode                = "Prevention"
+  sku_name            = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.sku_name
   redirect_url = coalesce(
     var.frontend_custom_domain != "" ? "https://${var.frontend_custom_domain}/en/service-unavailable" : null,
     var.admin_custom_domain != "" ? "https://${var.admin_custom_domain}/en/service-unavailable" : null,

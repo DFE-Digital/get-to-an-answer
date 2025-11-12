@@ -8,7 +8,7 @@ resource "azurerm_monitor_metric_alert" "availability-alert" {
   frequency           = "PT1M"
   window_size         = "PT1H"
   enabled             = var.alerting[var.prefix].alerts_enabled
-  tags = local.common_tags
+  tags                = local.common_tags
 
   criteria {
     metric_namespace = "microsoft.insights/components"
@@ -33,7 +33,7 @@ resource "azurerm_monitor_metric_alert" "cpu_alert" {
   frequency           = "PT1M"
   window_size         = "PT5M"
   enabled             = var.alerting[var.prefix].alerts_enabled
-  tags = local.common_tags
+  tags                = local.common_tags
 
   criteria {
     metric_namespace = "Microsoft.Web/serverfarms"
@@ -57,7 +57,7 @@ resource "azurerm_monitor_metric_alert" "memory_alert" {
   frequency           = "PT1M"
   window_size         = "PT5M"
   enabled             = var.alerting[var.prefix].alerts_enabled
-  tags = local.common_tags
+  tags                = local.common_tags
 
   criteria {
     metric_namespace = "Microsoft.Web/serverfarms"
@@ -81,7 +81,7 @@ resource "azurerm_monitor_metric_alert" "api_app_error_alert" {
   frequency           = "PT1M"
   window_size         = "PT30M"
   enabled             = var.alerting[var.prefix].alerts_enabled
-  tags = local.common_tags
+  tags                = local.common_tags
 
   criteria {
     metric_namespace = "Microsoft.Web/sites"
@@ -105,7 +105,7 @@ resource "azurerm_monitor_metric_alert" "admin_app_error_alert" {
   frequency           = "PT1M"
   window_size         = "PT30M"
   enabled             = var.alerting[var.prefix].alerts_enabled
-  tags = local.common_tags
+  tags                = local.common_tags
 
   criteria {
     metric_namespace = "Microsoft.Web/sites"
@@ -129,7 +129,7 @@ resource "azurerm_monitor_metric_alert" "frontend_app_error_alert" {
   frequency           = "PT1M"
   window_size         = "PT30M"
   enabled             = var.alerting[var.prefix].alerts_enabled
-  tags = local.common_tags
+  tags                = local.common_tags
 
   criteria {
     metric_namespace = "Microsoft.Web/sites"

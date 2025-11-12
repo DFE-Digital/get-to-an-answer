@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +9,7 @@ namespace Admin.Pages.Home;
 [AllowAnonymous]
 public class TermsOfServiceAgreement : BasePageModel
 {
-    [BindProperty]
+    [BindProperty(Name = "Accepted")]
     public bool Accepted { get; set; }
     
     public IActionResult OnGet()

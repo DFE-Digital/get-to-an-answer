@@ -2,7 +2,7 @@ resource "azurerm_monitor_action_group" "service-support-action" {
   name                = "Service support"
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   short_name          = "Support"
-  tags = local.common_tags
+  tags                = local.common_tags
 
   dynamic "email_receiver" {
     for_each = var.alerting[var.prefix].email_alerts_enabled ? ["true"] : []
