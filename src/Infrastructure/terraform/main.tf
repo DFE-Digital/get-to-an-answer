@@ -32,7 +32,7 @@ resource "azurerm_log_analytics_workspace" "log-analytics-workspace" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   retention_in_days   = 180
-  tags = local.common_tags
+  tags                = local.common_tags
 }
 
 resource "azurerm_application_insights" "application-insights" {
@@ -41,7 +41,7 @@ resource "azurerm_application_insights" "application-insights" {
   resource_group_name = azurerm_resource_group.gettoananswer-rg.name
   application_type    = "web"
   workspace_id        = azurerm_log_analytics_workspace.log-analytics-workspace.id
-  tags = local.common_tags
+  tags                = local.common_tags
 }
 
 # App Service Plan (Web)
@@ -85,21 +85,21 @@ locals {
     AzureAd__ClientSecret                 = var.ad_client_secret
   }
   admin_app_settings = {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
-    ASPNETCORE_FORWARDEDHEADERS_ENABLED = "true"
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
+    ASPNETCORE_FORWARDEDHEADERS_ENABLED   = "true"
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
-    ApiSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
-    AzureAd__Domain                     = "Educationgovuk.onmicrosoft.com"
-    AzureAd__TenantId                   = var.ad_tenant_id
-    AzureAd__ClientId                   = var.ad_client_id
-    AzureAd__ClientSecret               = var.ad_client_secret
-    AzureAd__CallbackPath               = "/signin-oidc"
+    ApiSettings__BaseUrl                  = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
+    AzureAd__Domain                       = "Educationgovuk.onmicrosoft.com"
+    AzureAd__TenantId                     = var.ad_tenant_id
+    AzureAd__ClientId                     = var.ad_client_id
+    AzureAd__ClientSecret                 = var.ad_client_secret
+    AzureAd__CallbackPath                 = "/signin-oidc"
   }
   frontend_app_settings = {
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
-    ASPNETCORE_FORWARDEDHEADERS_ENABLED = "true"
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
+    ASPNETCORE_FORWARDEDHEADERS_ENABLED   = "true"
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
-    ApiSettings__BaseUrl                = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
+    ApiSettings__BaseUrl                  = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
   }
 }
 
@@ -153,8 +153,8 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-api-staging" {
       docker_registry_username = azurerm_container_registry.gettoananswer-registry.admin_username
       docker_registry_password = azurerm_container_registry.gettoananswer-registry.admin_password
     }
-    minimum_tls_version = "1.2"
-    health_check_path   = "/health"
+    minimum_tls_version               = "1.2"
+    health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
   }
 
@@ -211,8 +211,8 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-admin-staging" {
       docker_registry_username = azurerm_container_registry.gettoananswer-registry.admin_username
       docker_registry_password = azurerm_container_registry.gettoananswer-registry.admin_password
     }
-    minimum_tls_version = "1.2"
-    health_check_path   = "/health"
+    minimum_tls_version               = "1.2"
+    health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
   }
 
@@ -268,8 +268,8 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-frontend-staging" {
       docker_registry_username = azurerm_container_registry.gettoananswer-registry.admin_username
       docker_registry_password = azurerm_container_registry.gettoananswer-registry.admin_password
     }
-    minimum_tls_version = "1.2"
-    health_check_path   = "/health"
+    minimum_tls_version               = "1.2"
+    health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
   }
 

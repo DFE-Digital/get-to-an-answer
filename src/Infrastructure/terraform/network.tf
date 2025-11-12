@@ -75,7 +75,7 @@ resource "azapi_resource" "gettoananswer_kv_subnet" {
       addressPrefixes = ["10.0.3.0/24"]
       serviceEndpoints = [
         {
-          service   = "Microsoft.KeyVault"
+          service = "Microsoft.KeyVault"
         }
       ]
       networkSecurityGroup = {
