@@ -866,7 +866,7 @@ public class QuestionTests(ApiFixture factory) :
         }
 
         // Act: Move middle question up
-        using var moveRes = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{questions[1].Id}/move-up");
+        using var moveRes = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{questions[1].Id}?action={QuestionAction.MoveUp}");
 
         // Assert
         moveRes.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -893,7 +893,7 @@ public class QuestionTests(ApiFixture factory) :
 
         var question = await Create<QuestionDto>(payload);
 
-        using var moveRes = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}/move-up");
+        using var moveRes = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}?action={QuestionAction.MoveUp}");
 
         moveRes.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -904,7 +904,7 @@ public class QuestionTests(ApiFixture factory) :
         var questionnaireId = await CreateQuestionnaire();
         
         var invalidId = Guid.NewGuid();
-        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{invalidId}/move-up");
+        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{invalidId}?action={QuestionAction.MoveUp}");
 
         res.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -922,7 +922,7 @@ public class QuestionTests(ApiFixture factory) :
 
         var question = await Create<QuestionDto>(payload);
 
-        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}/move-up",
+        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}?action={QuestionAction.MoveUp}",
             bearerToken: JwtTestTokenGenerator.InvalidAudJwtToken);
         res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
@@ -941,7 +941,7 @@ public class QuestionTests(ApiFixture factory) :
         using var createRes = await Create(payload);
         var question = (await createRes.Content.ReadAsStringAsync()).Deserialize<QuestionDto>()!;
 
-        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}/move-up",
+        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}?action={QuestionAction.MoveUp}",
             bearerToken: JwtTestTokenGenerator.UnauthorizedJwtToken);
         new[] { HttpStatusCode.Forbidden, HttpStatusCode.NotFound }.Should().Contain(res.StatusCode);
     }
@@ -973,7 +973,7 @@ public class QuestionTests(ApiFixture factory) :
         }
 
         // Act: Move middle question up
-        using var moveRes = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{questions[1].Id}/move-down");
+        using var moveRes = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{questions[1].Id}?action={QuestionAction.MoveDown}");
 
         // Assert
         moveRes.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -1000,7 +1000,7 @@ public class QuestionTests(ApiFixture factory) :
 
         var question = await Create<QuestionDto>(payload);
 
-        using var moveRes = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}/move-down");
+        using var moveRes = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}?action={QuestionAction.MoveDown}");
 
         moveRes.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -1011,7 +1011,7 @@ public class QuestionTests(ApiFixture factory) :
         var questionnaireId = await CreateQuestionnaire();
         
         var invalidId = Guid.NewGuid();
-        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{invalidId}/move-down");
+        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{invalidId}?action={QuestionAction.MoveDown}");
 
         res.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -1029,7 +1029,7 @@ public class QuestionTests(ApiFixture factory) :
 
         var question = await Create<QuestionDto>(payload);
 
-        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}/move-down",
+        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}?action={QuestionAction.MoveDown}",
             bearerToken: JwtTestTokenGenerator.InvalidAudJwtToken);
         res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
@@ -1048,7 +1048,7 @@ public class QuestionTests(ApiFixture factory) :
         using var createRes = await Create(payload);
         var question = (await createRes.Content.ReadAsStringAsync()).Deserialize<QuestionDto>()!;
 
-        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}/move-down",
+        using var res = await Patch(routePrefixOverride: $"/api/questionnaires/{questionnaireId}/questions/{question.Id}?action={QuestionAction.MoveDown}",
             bearerToken: JwtTestTokenGenerator.UnauthorizedJwtToken);
         new[] { HttpStatusCode.Forbidden, HttpStatusCode.NotFound }.Should().Contain(res.StatusCode);
     }

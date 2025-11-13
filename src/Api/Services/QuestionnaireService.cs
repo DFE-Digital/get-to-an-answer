@@ -30,7 +30,6 @@ public interface IQuestionnaireService
     Task<ServiceResult> PublishQuestionnaire(string email, Guid id);
     Task<ServiceResult> UnpublishQuestionnaire(string email, Guid id);
     Task<ServiceResult> DeleteQuestionnaire(string email, Guid id);
-    Task<ServiceResult> AddSelfToQuestionnaireContributors(string email, Guid id);
     Task<ServiceResult> CloneQuestionnaire(string email, Guid id, CloneQuestionnaireRequestDto request);
     Task<ServiceResult> GetContributors(string email, Guid questionnaireId);
     Task<ServiceResult> AddContributor(string email, Guid id, AddContributorRequestDto request);
@@ -309,35 +308,6 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         catch (Exception ex)
         {
             logger.LogError(ex, "DeleteQuestionnaire failed QuestionnaireId={QuestionnaireId}", id);
-            return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
-        }
-    }
-
-    public async Task<ServiceResult> AddSelfToQuestionnaireContributors(string email, Guid id)
-    {
-        try
-        {
-            logger.LogInformation("AddSelfToQuestionnaireContributors started QuestionnaireId={QuestionnaireId}", id);
-
-            var questionnaire = await db.Questionnaires.FirstOrDefaultAsync(x => x.Id == id);
-            if (questionnaire == null) 
-                return NotFound(ProblemTrace("We could not find that questionnaire", 404));
-
-            if (!questionnaire.Contributors.Contains(email))
-            {
-                questionnaire.Contributors.Add(email);
-                await db.SaveChangesAsync();
-            }
-            else
-            {
-                return Conflict(ProblemTrace("You are already a contributor.", 409));       
-            }
-            
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "AddSelfToQuestionnaireContributors failed QuestionnaireId={QuestionnaireId}", id);
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
     }
