@@ -20,7 +20,7 @@ public class AnswerEntity
     
     public string? Description { get; set; }
     
-    public float Score { get; set; }
+    public float Priority { get; set; }
     
     public DestinationType? DestinationType { get; set; }
     

@@ -14,6 +14,9 @@ public class ContentEntity
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
 
+    [MaxLength(250)]
+    public string? ReferenceName { get; set; }
+
     [Required]
     [MaxLength(250)]
     public string Title { get; set; }

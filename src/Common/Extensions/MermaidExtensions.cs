@@ -9,7 +9,7 @@ using System.Text;
 // Generates a Mermaid diagram for a QuestionnaireEntity using the template rules:
 // - Solid arrows: branching via destination fields
 // - Dashed 'contains': Questionnaire has Questions (composition, not traversal order)
-// - Answer '(score: n)': prioritisation only (if score exists on your Answer entity; omitted here if unavailable)
+// - Answer '(priority: n)': prioritisation only (if priority exists on your Answer entity; omitted here if unavailable)
 // - Destinations supported: Question, External Link, Custom Info Page
 public static class MermaidExtensions
 {
@@ -63,12 +63,12 @@ public static class MermaidExtensions
         foreach (var q in questions)
         {
             var qNode = questionIds[q.Id];
-            var answers = q.Answers?.OrderBy(a => a.Score).ThenBy(a => a.Id).ToList();
+            var answers = q.Answers?.OrderBy(a => a.Priority).ThenBy(a => a.Id).ToList();
             if (answers == null || answers.Count == 0) continue;
 
             foreach (var a in answers)
             {
-                var answerLabel = BuildAnswerLabel(a.Content, a.Score); // Score is optional; if not present, it’s omitted
+                var answerLabel = BuildAnswerLabel(a.Content, a.Priority); // Priority is optional; if not present, it’s omitted
                 switch (a.DestinationType)
                 {
                     case DestinationType.Question when a.DestinationQuestionId.HasValue && questionIds.TryGetValue(a.DestinationQuestionId.Value, out var destQNode):
@@ -135,7 +135,7 @@ public static class MermaidExtensions
         sb.AppendLine("  subgraph Legend");
         sb.AppendLine("    L1[Solid arrows = branching via destination fields]");
         sb.AppendLine("    L2[Dashed 'contains' = Questionnaire has Questions]");
-        sb.AppendLine("    L3[\"Answer '(score: n)' = prioritisation only\"]");
+        sb.AppendLine("    L3[\"Answer '(priority: n)' = prioritisation only\"]");
         sb.AppendLine("    L4[[Custom Info Page]]:::info");
         sb.AppendLine("    L5{{External Link}}:::link");
         sb.AppendLine("  end");
@@ -148,10 +148,10 @@ public static class MermaidExtensions
 
     // Helpers
 
-    private static string BuildAnswerLabel(string? content, float? score)
+    private static string BuildAnswerLabel(string? content, float? priority)
     {
         var baseText = string.IsNullOrWhiteSpace(content) ? "Answer" : Truncate(content!, 60);
-        return score.HasValue ? $"{baseText} (score: {score.Value})" : baseText;
+        return priority.HasValue ? $"{baseText} (priority: {priority.Value})" : baseText;
     }
 
     private static string EscapeLabel(string text)

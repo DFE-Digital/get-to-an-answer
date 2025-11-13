@@ -44,7 +44,7 @@ interface CreateAnswerRequest {
     content?: string;
     description?: string;
     answerPrefix?: string;
-    score?: number;
+    priority?: number;
     destinationType?: AnswerDestinationType;
     destinationUrl?: string;
 }
@@ -60,7 +60,7 @@ export async function createSingleAnswer(
         .withDescription(answerRequest.description)
         .withDestinationUrl(answerRequest.destinationUrl)
         .withDestinationType(answerRequest.destinationType)
-        .withScore(answerRequest.score)
+        .withScore(answerRequest.priority)
         .build();
 
     const response = await request.post(`${BASE_URL}/api/answers`, {

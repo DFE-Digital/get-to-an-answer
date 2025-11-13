@@ -1,14 +1,14 @@
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Common.Client;
 using Common.Configuration;
 using Common.Local;
 using Common.Logging;
+using Common.Telemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-
-Log.Logger = new LoggerConfiguration()
-    .ConfigureLogging(Environment.GetEnvironmentVariable("ApplicationInsights__ConnectionString"))
-    .CreateBootstrapLogger();
 
 const string localEnvironmentName = "Local";
 var builderIsLocalEnvironment = builder.Environment.IsEnvironment(localEnvironmentName);
@@ -18,6 +18,40 @@ if (builderIsLocalEnvironment)
     builder.Configuration
         .AddUserSecrets<Program>(optional: true, reloadOnChange: true);
 }
+
+builder.Services.AddHttpContextAccessor();
+
+Log.Logger = new LoggerConfiguration()
+    .ConfigureLogging(Environment.GetEnvironmentVariable("ApplicationInsights__ConnectionString"))
+    .CreateBootstrapLogger();
+    
+#region Additional Logging and Application Insights
+    
+Log.Logger.Information("Starting application");
+Log.Logger.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
+    
+builder.Services.AddSerilog((_, lc) => lc
+    .ConfigureLogging(builder.Configuration["ApplicationInsights:ConnectionString"]));
+
+var appInsightsConnectionString = builder.Configuration.GetValue<string>("ApplicationInsights:ConnectionString");
+
+if (!string.IsNullOrEmpty(appInsightsConnectionString))
+{
+    builder.Services.AddOpenTelemetry()
+        .WithTracing(tracing => tracing
+            .AddAspNetCoreInstrumentation()
+            .AddProcessor<RouteTelemetryProcessor>()
+            .AddEntityFrameworkCoreInstrumentation()
+        )
+        .WithMetrics(metrics => metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+        )
+        .UseAzureMonitor(monitor => monitor.ConnectionString = appInsightsConnectionString);
+}
+
+#endregion
+
 
 var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
 
@@ -32,8 +66,6 @@ builder.Services.AddAntiforgery(options =>
     options.SuppressXFrameOptionsHeader = true;
     options.Cookie.Expiration = TimeSpan.Zero;
 });
-
-//builder.AddLogging();
     
 builder.Services.AddHealthChecks();
 
@@ -56,14 +88,20 @@ app.Use(async (context, next) =>
     await next();
 });
 
-//app.UseLogEnrichment();
-
-// Configure the HTTP request pipeline.
 if (!builderIsLocalEnvironment)
 {
-    app.UseExceptionHandler("/Error");
+    // Configure the HTTP request pipeline.
+    app.UseExceptionHandler("/error");
+
+    // Handle non-existing routes (404)
+    app.UseStatusCodePagesWithReExecute("/error/{0}");
+    
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+else
+{
+    app.UseDeveloperExceptionPage();
 }
 
 app.MapHealthChecks("/health");

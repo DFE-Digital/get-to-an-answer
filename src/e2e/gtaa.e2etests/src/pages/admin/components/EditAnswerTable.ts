@@ -19,7 +19,7 @@ export class EditAnswersTable {
         await expect(this.card).toBeVisible();
         await expect(this.table).toBeVisible();
         await expect(this.table.getByRole('columnheader', { name: 'Answer' })).toBeVisible();
-        await expect(this.table.getByRole('columnheader', { name: 'Score' })).toBeVisible();
+        await expect(this.table.getByRole('columnheader', { name: 'Priority' })).toBeVisible();
         await expect(this.table.getByRole('columnheader', { name: 'Target Type' })).toBeVisible();
     }
 
@@ -45,10 +45,10 @@ export class EditAnswersTable {
 
     async getCellText(
         answer: string,
-        column: 'Answer' | 'Score' | 'Target Type'
+        column: 'Answer' | 'Priority' | 'Target Type'
     ): Promise<string> {
         const row = this.rowByAnswer(answer);
-        const colIndex = column === 'Answer' ? 0 : column === 'Score' ? 1 : 2;
+        const colIndex = column === 'Answer' ? 0 : column === 'Priority' ? 1 : 2;
         return (await row.locator('td').nth(colIndex).innerText()).trim();
     }
 

@@ -14,7 +14,7 @@ export class CreateAnswerOptionsPage extends BasePage {
     }
 
     private optionScore(i: number): Locator {
-        return this.page.locator(`input[name="Answers[${i}].Score"]`);
+        return this.page.locator(`input[name="Answers[${i}].Priority"]`);
     }
 
     private destinationRadio(i: number, value: 'Question' | 'ExternalLink' | 'InternalPage' | '0'): Locator {
@@ -59,8 +59,8 @@ export class CreateAnswerOptionsPage extends BasePage {
         await this.optionDescription(i).fill(text);
     }
 
-    async setOptionScore(i: number, score: number) {
-        await this.optionScore(i).fill(String(score));
+    async setOptionScore(i: number, priority: number) {
+        await this.optionScore(i).fill(String(priority));
     }
 
     /** value: "Question" | "ExternalLink" | "InternalPage" | "0" (None) */

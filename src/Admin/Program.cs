@@ -1,10 +1,17 @@
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Common.Client;
 using Common.Configuration;
 using Common.Extensions;
 using Common.Local;
+using Common.Logging;
+using Common.Telemetry;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +33,51 @@ if (!builderIsLocalEnvironment)
     builder.Services
         .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+    
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedFor;
+        options.KnownProxies.Clear();
+        options.KnownNetworks.Clear();
+        options.AllowedHosts = new List<string>
+        {
+            "*.azurewebsites.net",
+            "*.azurefd.net",
+            "*.get-to-an-answer.education.gov.uk"
+        };
+    });
 }
+
+Log.Logger = new LoggerConfiguration()
+    .ConfigureLogging(Environment.GetEnvironmentVariable("ApplicationInsights__ConnectionString"))
+    .CreateBootstrapLogger();
+    
+#region Additional Logging and Application Insights
+    
+Log.Logger.Information("Starting application");
+Log.Logger.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
+    
+builder.Services.AddSerilog((_, lc) => lc
+    .ConfigureLogging(builder.Configuration["ApplicationInsights:ConnectionString"]));
+
+var appInsightsConnectionString = builder.Configuration.GetValue<string>("ApplicationInsights:ConnectionString");
+
+if (!string.IsNullOrEmpty(appInsightsConnectionString))
+{
+    builder.Services.AddOpenTelemetry()
+        .WithTracing(tracing => tracing
+            .AddAspNetCoreInstrumentation()
+            .AddProcessor<RouteTelemetryProcessor>()
+            .AddEntityFrameworkCoreInstrumentation()
+        )
+        .WithMetrics(metrics => metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+        )
+        .UseAzureMonitor(monitor => monitor.ConnectionString = appInsightsConnectionString);
+}
+
+#endregion
 
 builder.Services.AddHttpContextAccessor();
 

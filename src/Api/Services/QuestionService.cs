@@ -106,7 +106,7 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
                     Id = a.Id,
                     Content = a.Content,
                     QuestionId = a.QuestionId,
-                    Score = a.Score,
+                    Priority = a.Priority,
                     DestinationType = a.DestinationType,
                 }).ToList(),
                 Type = question.Type,
@@ -213,6 +213,12 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
 
             question.IsDeleted = true;
             question.UpdatedAt = DateTime.UtcNow;
+            
+            // change the order of all the questions after this one
+            var questions = db.Questions.Where(q => 
+                q.QuestionnaireId == question.QuestionnaireId && q.Order > question.Order);
+            
+            foreach (var q in questions) q.Order--;
 
             await db.SaveChangesAsync();
             await db.ResetQuestionnaireToDraft(question.QuestionnaireId);

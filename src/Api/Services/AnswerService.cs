@@ -87,7 +87,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                 QuestionId = request.QuestionId,
                 Content = request.Content,
                 Description = request.Description,
-                Score = request.Score,
+                Priority = request.Priority,
                 DestinationUrl = request.DestinationUrl,
                 DestinationQuestionId = request.DestinationQuestionId,
                 DestinationType = request.DestinationType,
@@ -221,7 +221,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
             answer.DestinationUrl = request.DestinationUrl ?? answer.DestinationUrl;
             answer.DestinationType = request.DestinationType ?? answer.DestinationType;
             answer.DestinationQuestionId = request.DestinationQuestionId ?? answer.DestinationQuestionId;
-            answer.Score = request.Score ?? answer.Score;
+            answer.Priority = request.Priority ?? answer.Priority;
             answer.UpdatedAt = DateTime.UtcNow;
 
             await db.SaveChangesAsync();
@@ -280,7 +280,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
             DestinationQuestionId = entity.DestinationQuestionId,
             QuestionId = entity.QuestionId,
             QuestionnaireId = entity.QuestionnaireId,
-            Score = entity.Score,
+            Priority = entity.Priority,
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,
         };
