@@ -26,7 +26,8 @@ jobs:
       ACR_PASSWORD: ${{ secrets.AZURE_ACR_PASSWORD }}
       RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
       ADMIN_NAME: ${{ vars.GTAA_PREFIX }}app-uks-admin
-    environment: ${{ github.event.inputs.environment }}
+      ENVIRONMENT: ${{ github.event.inputs.environment || 'Development' }}
+    environment: ${{ github.event.inputs.environment || 'Development' }}
 
     steps:
       - name: Checkout Repository
@@ -58,6 +59,11 @@ jobs:
           tags: |
             ${{ env.ACR_LOGIN_SERVER }}/gtaa-admin:${{ github.sha }}
             ${{ env.ACR_LOGIN_SERVER }}/gtaa-admin:latest
+            
+      - name: Run Terraform workflow
+        id: terraform
+        uses: ./.github/workflows/terraform.yml
+        env: { ENVIRONMENT: ${{ env.ENVIRONMENT }} }
 
       - name: Configure App Settings
         run: |
@@ -86,4 +92,11 @@ jobs:
             --name "$ADMIN_NAME" \
             --slot "staging" \
             --target-slot "production"
+
+      - name: Delete staging slot
+        run: |
+          az webapp deployment slot delete \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$ADMIN_NAME" \
+            --slot staging
 

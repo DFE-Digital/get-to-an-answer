@@ -149,26 +149,33 @@ if (builderIsLocalEnvironment)
 
 var appIsLocalEnvironment = app.Environment.IsEnvironment(localEnvironmentName);
 
-// Configure the HTTP request pipeline.
-if (appIsLocalEnvironment)
+var apiName = "Get To An Answer API";
+
+// Serve OpenAPI JSON at /openapi/v1.json
+app.MapOpenApi();
+app.MapScalarApiReference(options => 
 {
-    // Serve OpenAPI JSON at /openapi/v1.json
-    app.MapOpenApi();
-    app.MapScalarApiReference(options => 
-    {
-        options.WithTitle("My API");
-        options.WithTheme(ScalarTheme.BluePlanet);
-        options.HideSidebar();
-        options.AddPreferredSecuritySchemes("Bearer");
-    });
-}
-else
-{
-    app.MapGroup("/openapi")
-       .RequireAuthorization()
-       .MapOpenApi();
-    app.MapScalarApiReference(); // TODO: Add config
-}
+    options.WithTitle(apiName);
+    options.WithTheme(ScalarTheme.BluePlanet);
+    options.HideSidebar();
+    options.AddPreferredSecuritySchemes("OAuth2")
+        .AddOAuth2Flows("OAuth2", flows =>
+        {
+            flows.AuthorizationCode = new AuthorizationCodeFlow
+            {
+                ClientId = "web-client-12345",
+                AuthorizationUrl = "https://login.microsoftonline.com/{tenant-id}/oauth2/v2.0/authorize",
+                TokenUrl = "https://login.microsoftonline.com/{tenant-id}/oauth2/v2.0/token",
+            };
+            flows.ClientCredentials = new ClientCredentialsFlow
+            {
+                ClientId = "service-client-67890",
+                ClientSecret = "service-secret",
+                TokenUrl = "https://login.microsoftonline.com/{tenant-id}/oauth2/v2.0/token",
+            };
+        })
+        .AddDefaultScopes("OAuth2", ["api://client-id", "client-id"]);
+});
 
 app.MapHealthChecks("/health");
 

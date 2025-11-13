@@ -115,11 +115,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-if (builderIsLocalEnvironment)
-{
-    app.UseMockMvcDevEndpoints();
-}
-
 app.MapStaticAssets();
 app.MapRazorPages();
 
