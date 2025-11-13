@@ -35,8 +35,8 @@ public class TermsOfServiceAgreement : BasePageModel
         
         return Redirect(Routes.QuestionnairesManage);
     }
-    
-    public static readonly string TermsCookieName = "AcceptedAgreement";
+
+    public const string TermsCookieName = "AcceptedAgreement";
     private const int TermsCookieDays = 365;
 
     private bool HasAcceptedTerms()

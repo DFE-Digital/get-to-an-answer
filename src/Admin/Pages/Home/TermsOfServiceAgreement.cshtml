@@ -1,7 +1,6 @@
 @page "/admin/terms-of-service-agreement"
 @attribute [AllowAnonymous]
 @addTagHelper *, Common
-@using Microsoft.AspNetCore.Authorization
 @model Admin.Pages.Home.TermsOfServiceAgreement
 
 @{
@@ -162,7 +161,7 @@
 
 <form accept-charset="UTF-8" method="post">
   @Html.AntiForgeryToken()
-  <div class="govuk-form-group">
+  <govuk-form-group asp-for="@Model.Accepted" >
     <fieldset class="govuk-fieldset" aria-describedby="signIn-hint">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
         <h2 class="govuk-fieldset__heading">
@@ -171,19 +170,26 @@
       </legend>
       <div id="signIn-hint" class="govuk-hint"></div>
 
+      <govuk-field-error asp-for="@Model.Accepted" error-id="forms-name-input-name-field-error"></govuk-field-error>
+
       <div class="govuk-checkboxes" data-module="govuk-checkboxes">
         <div class="govuk-checkboxes__item">
-          <input asp-for="Accepted" class="govuk-checkboxes__input" id="Accepted" name="Accepted"
-                 type="checkbox" value="true" aria-describedby="nationality-item-hint">
+          <input asp-for="Accepted" 
+                 class="govuk-checkboxes__input" 
+                 id="Accepted" name="Accepted"
+                 type="checkbox"
+                 value="true" 
+                 aria-describedby="agree-checkbox-item-hint"
+                 govuk-error-for="@Model.Accepted"/>
           <label class="govuk-label govuk-checkboxes__label" for="Accepted">
             I agree to these terms
           </label>
-          <div id="nationality-item-hint" class="govuk-hint govuk-checkboxes__hint">
+          <div id="agree-checkbox-item-hint" class="govuk-hint govuk-checkboxes__hint">
           </div>
         </div>
       </div>
     </fieldset>
-  </div>
+  </govuk-form-group>
 
   <button type="submit" class="govuk-button govuk-button--primary">
     Save and continue
