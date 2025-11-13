@@ -335,7 +335,7 @@ resource "azurerm_cdn_frontdoor_custom_domain" "fd-api-custom-domain" {
   tls {
     certificate_type = "ManagedCertificate"
   }
-  
+
   lifecycle {
     prevent_destroy = true
   }

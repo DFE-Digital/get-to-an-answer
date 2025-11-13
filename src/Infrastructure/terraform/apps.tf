@@ -55,8 +55,8 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
     }
 
     application_stack {
-      docker_image_name = local.app_req_config.docker_image_name
-      docker_registry_url = local.app_req_config.docker_registry_url
+      docker_image_name        = local.app_req_config.docker_image_name
+      docker_registry_url      = local.app_req_config.docker_registry_url
       docker_registry_username = local.app_req_config.docker_registry_username
       docker_registry_password = local.app_req_config.docker_registry_password
     }
@@ -96,8 +96,8 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-api-staging" {
     }
 
     application_stack {
-      docker_image_name = local.app_req_config.docker_image_name
-      docker_registry_url = local.app_req_config.docker_registry_url
+      docker_image_name        = local.app_req_config.docker_image_name
+      docker_registry_url      = local.app_req_config.docker_registry_url
       docker_registry_username = local.app_req_config.docker_registry_username
       docker_registry_password = local.app_req_config.docker_registry_password
     }
@@ -130,8 +130,8 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
     }
 
     application_stack {
-      docker_image_name = local.app_req_config.docker_image_name
-      docker_registry_url = local.app_req_config.docker_registry_url
+      docker_image_name        = local.app_req_config.docker_image_name
+      docker_registry_url      = local.app_req_config.docker_registry_url
       docker_registry_username = local.app_req_config.docker_registry_username
       docker_registry_password = local.app_req_config.docker_registry_password
     }
@@ -170,8 +170,8 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-admin-staging" {
     }
 
     application_stack {
-      docker_image_name = local.app_req_config.docker_image_name
-      docker_registry_url = local.app_req_config.docker_registry_url
+      docker_image_name        = local.app_req_config.docker_image_name
+      docker_registry_url      = local.app_req_config.docker_registry_url
       docker_registry_username = local.app_req_config.docker_registry_username
       docker_registry_password = local.app_req_config.docker_registry_password
     }
@@ -203,8 +203,8 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
     }
 
     application_stack {
-      docker_image_name = local.app_req_config.docker_image_name
-      docker_registry_url = local.app_req_config.docker_registry_url
+      docker_image_name        = local.app_req_config.docker_image_name
+      docker_registry_url      = local.app_req_config.docker_registry_url
       docker_registry_username = local.app_req_config.docker_registry_username
       docker_registry_password = local.app_req_config.docker_registry_password
     }
@@ -243,8 +243,8 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-frontend-staging" {
     }
 
     application_stack {
-      docker_image_name = local.app_req_config.docker_image_name
-      docker_registry_url = local.app_req_config.docker_registry_url
+      docker_image_name        = local.app_req_config.docker_image_name
+      docker_registry_url      = local.app_req_config.docker_registry_url
       docker_registry_username = local.app_req_config.docker_registry_username
       docker_registry_password = local.app_req_config.docker_registry_password
     }
