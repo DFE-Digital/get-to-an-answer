@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace Admin.Pages.Questionnaire;
+namespace Admin.Pages.Questionnaire.Edit;
 
 [Authorize]
-public class EditQuestionnaire(IApiClient apiClient, ILogger<EditQuestionnaire> logger) : QuestionnairesPageModel
+public class EditQuestionnaireName(IApiClient apiClient, ILogger<EditQuestionnaireName> logger) : QuestionnairesPageModel
 {
     [FromRoute(Name = "questionnaireId")]
     public Guid QuestionnaireId { get; set; }

@@ -1,9 +1,10 @@
-@page "/admin/questionnaires/{questionnaireId:guid}/edit"
+@page "/admin/questionnaires/{questionnaireId:guid}/edit-name"
 @addTagHelper *, Common
-@model Admin.Pages.Questionnaire.EditQuestionnaire
+@model Admin.Pages.Questionnaire.Edit.EditQuestionnaireName
 
 @{
-  ViewData["Title"] = "Edit the questionnaire";
+  const string title = "What's the name of your questionnaire?";
+  ViewData["Title"] = title;
 }
 
 @section BeforeContent
@@ -21,11 +22,10 @@
     <form accept-charset="UTF-8" method="post">
       <govuk-form-group asp-for="@Model.UpdateQuestionnaire.Title">
         <h1 class="govuk-label-wrapper">
-          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the title of your questionnaire?</label>
+          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">@title</label>
         </h1>
-        <div class="govuk-hint" id="forms-name-input-name-hint">The form name will be shown at the top of each page of the form. Use a name
-          that describes what the form will help people to do. For example ‘Apply for a
-          juggling licence’.
+        <div class="govuk-hint" id="forms-name-input-name-hint">The questionnaire will be shown at the top of each page.
+          Use a name that describes what it helps people to do. For example 'Check your care leaver support'.
         </div>
         <govuk-field-error asp-for="@Model.UpdateQuestionnaire.Title" error-id="forms-name-input-name-field-error"></govuk-field-error>
         
