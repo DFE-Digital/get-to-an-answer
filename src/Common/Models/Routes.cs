@@ -5,7 +5,7 @@ public static class Routes
 {
     // Questionnaires
     public static readonly string QuestionnairesList = AdminRoot + "/questionnaires";
-    public static readonly string QuestionnairesManage = AdminRoot + "/questionnaires/manage";
+    public const string QuestionnairesManage = AdminRoot + "/questionnaires/manage";
     public static readonly string QuestionnairesCreate = AdminRoot + "/questionnaires/create";
 
     // Track a specific questionnaire (format with id)
@@ -23,4 +23,5 @@ public static class Routes
     
     // Admin area prefix
     private const string AdminRoot = "/admin";
+    public const string GlobalErrorPage = "error";
 }

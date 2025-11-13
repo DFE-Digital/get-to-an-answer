@@ -20,7 +20,7 @@ public class ManageQuestionnaires(IApiClient apiClient, ILogger<ManageQuestionna
         catch (Exception e)
         {
             logger.LogError(e, "Error creating questionnaire. Error: {EMessage}", e.Message);
-            return RedirectToPage("/Error");
+            return Redirect(Routes.GlobalErrorPage);
         }
         
         return Page();
