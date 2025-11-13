@@ -22,9 +22,7 @@ export class TermsOfUsePage extends BasePage {
     readonly errorList: Locator;
     readonly errorLinks: Locator;
     readonly acceptedErrorLink: Locator;
-
     //readonly inlineError: Locator;
-
 
     constructor(page: Page) {
         super(page);

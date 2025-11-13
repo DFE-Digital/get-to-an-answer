@@ -30,7 +30,7 @@ export class EditQuestionnairePage extends BasePage {
         this.main = this.page.locator('main.govuk-main-wrapper[role="main"]');
         this.banner = this.page.locator('div.govuk-notification-banner--success[role="alert"]');
         this.heading = this.banner.locator('.govuk-notification-banner__heading');
-        this.questionnaireTitle = this.page.locator('a.govuk-link.govuk-task-list__link[href$="/edit"]');
+        this.questionnaireTitle = this.page.locator('span.govuk-caption-l');
         this.editQuestionnaireHeading = this.page.locator('main[role="main"] h1.govuk-heading-l');
         this.questionnaireStatus = this.page.locator('strong.govuk-tag[data-status]');
         this.linkEditTitle = this.page.locator(
