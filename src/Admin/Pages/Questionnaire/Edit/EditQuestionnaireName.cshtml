@@ -1,0 +1,43 @@
+@page "/admin/questionnaires/{questionnaireId:guid}/edit-name"
+@addTagHelper *, Common
+@model Admin.Pages.Questionnaire.Edit.EditQuestionnaireName
+
+@{
+  const string title = "What's the name of your questionnaire?";
+  ViewData["Title"] = title;
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back to create your questionnaire</a>
+}
+
+@if (Model!.HasErrors())
+{
+  @await Html.PartialAsync("_ErrorSummary")
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <form accept-charset="UTF-8" method="post">
+      <govuk-form-group asp-for="@Model.Title">
+        <h1 class="govuk-label-wrapper">
+          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">@title</label>
+        </h1> 
+        <div class="govuk-hint" id="forms-name-input-name-hint">The questionnaire will be shown at the top of each page.
+          Use a name that describes what it helps people to do. For example 'Check your care leaver support'.
+        </div>
+        <govuk-field-error asp-for="@Model.Title" error-id="forms-name-input-name-field-error"></govuk-field-error>
+        
+        <input id="forms-name-input-name-field"
+               class="govuk-input"
+               aria-describedby="forms-name-input-name-hint"
+               type="text"
+               name="@nameof(Model.Title)"
+               asp-for="@Model.Title"
+               govuk-error-for="@Model?.Title" />
+      </govuk-form-group>
+      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
+    </form>
+  </div>
+</div>

@@ -7,6 +7,7 @@ using Common.Domain.Frontend;
 using Common.Domain.Request.Add;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Common.Client;
@@ -134,9 +135,11 @@ public class ApiClient : IApiClient
     public async Task<string?> UpdateQuestionnaireAsync(Guid questionnaireId, UpdateQuestionnaireRequestDto request)
     {
         var response = await _httpClient.PutAsJsonAsync($"{Questionnaires}/{questionnaireId}", request);
-        response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<string>();
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadAsStringAsync();
+
+        return null;
     }
 
     public async Task<string?> PublishQuestionnaireAsync(Guid questionnaireId)
@@ -151,7 +154,7 @@ public class ApiClient : IApiClient
     {
         var response = await _httpClient.DeleteAsync($"{Questionnaires}/{questionnaireId}/unpublish");
         response.EnsureSuccessStatusCode();
-
+        
         return await response.Content.ReadFromJsonAsync<string>();
     }
 

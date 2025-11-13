@@ -3,10 +3,7 @@
 @model Admin.Pages.Questionnaire.CreateQuestionnaires
 
 @{
-    Layout = "Shared/_Layout";
-}
-
-@{
+  Layout = "Shared/_Layout";
   ViewData["Title"] = "Create new questionnaire";
 }
 
@@ -25,16 +22,18 @@
     <form accept-charset="UTF-8" method="post">
       <govuk-form-group asp-for="@Model.CreateQuestionnaire.Title">
         <h1 class="govuk-label-wrapper">
-          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the name of your questionnaire?</label>
+          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the name of your
+            questionnaire?</label>
         </h1>
 
         <div class="govuk-hint" id="forms-name-input-name-hint">
-          The questionnaire name will be shown at the top of each page of the form. 
+          The questionnaire name will be shown at the top of each page of the form.
           <br/><br/>
           Use a name that describes what the form will help people to do. For example ‘Check your care leaver support’.
         </div>
 
-        <govuk-field-error asp-for="@Model.CreateQuestionnaire.Title" error-id="forms-name-input-name-field-error"></govuk-field-error>
+        <govuk-field-error asp-for="@Model.CreateQuestionnaire.Title"
+                           error-id="forms-name-input-name-field-error"></govuk-field-error>
 
         <input id="forms-name-input-name-field"
                class="govuk-input"
@@ -42,10 +41,12 @@
                type="text"
                asp-for="@Model.CreateQuestionnaire.Title"
                value="@(Model?.CreateQuestionnaire?.Title ?? "")"
-               govuk-error-for="@Model?.CreateQuestionnaire?.Title" />
+               govuk-error-for="@Model?.CreateQuestionnaire?.Title"/>
       </govuk-form-group>
 
-      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
+      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button"
+              data-prevent-double-click="true" data-govuk-button-init="">Save and continue
+      </button>
     </form>
   </div>
 </div>
