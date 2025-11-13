@@ -14,17 +14,8 @@ on:
           - Production
   push:
     branches: [ "main" ]
-    paths:
-      - 'src/**'
-      - 'src/e2e/gtaa.e2etests/**'
-      - '.github/workflows/validate-apps.yaml'
-      - '.github/workflows/validate-e2e.yaml'
   pull_request:
     branches: [ "main" ]
-    paths:
-      - 'src/e2e/gtaa.e2etests/**'
-      - '.github/workflows/validate-apps.yaml'
-      - '.github/workflows/validate-e2e.yaml'
 
 jobs:
   test:
