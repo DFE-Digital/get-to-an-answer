@@ -31,13 +31,13 @@ public class QuestionnaireRunnerController(IQuestionnaireRunnerService questionn
         return (await questionnaireRunnerService.GetLastPublishedQuestionnaireInfo(questionnaireSlug)).ToActionResult();
     }
     
-    [HttpGet("questionnaires/{questionnaireId:guid}/initial")]
+    [HttpGet("questionnaires/{questionnaireId:guid}/initial-state")]
     public async Task<IActionResult> GetInitialQuestion(Guid questionnaireId, [FromQuery] bool preview = false)
     {
         return (await questionnaireRunnerService.GetInitialQuestion(questionnaireId, preview)).ToActionResult();
     }
 
-    [HttpPost("questionnaires/{questionnaireId:guid}/next")]
+    [HttpPost("questionnaires/{questionnaireId:guid}/next-state")]
     public async Task<IActionResult> GetNextState(Guid questionnaireId, GetNextStateRequest request, [FromQuery] bool preview = false)
     {
         return (await questionnaireRunnerService.GetNextState(questionnaireId, request, preview)).ToActionResult();

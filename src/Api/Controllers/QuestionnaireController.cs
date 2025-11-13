@@ -4,6 +4,11 @@ using Api.Services;
 using Common.Domain.Request.Add;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
+using Common.Enum;
+using Common.Infrastructure.Persistence;
+using Common.Infrastructure.Persistence.Entities;
+using Common.Local;
+using Common.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -49,20 +54,21 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.UpdateQuestionnaire(email, id, request)).ToActionResult();
     }
 
-    [HttpPut("{id:guid}/publish")]
-    public async Task<IActionResult> PublishQuestionnaire(Guid id)
+    [HttpPatch("{id:guid}")]
+    public async Task<IActionResult> PublishQuestionnaire(Guid id, [FromQuery] [EnumDefined] QuestionnaireAction action)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
-        
-        return (await questionnaireService.PublishQuestionnaire(email, id)).ToActionResult();
-    }
 
-    [HttpDelete("{id:guid}/unpublish")]
-    public async Task<IActionResult> UnpublishQuestionnaire(Guid id)
-    {
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        if (action == QuestionnaireAction.Publish)
+        {
+            return (await questionnaireService.PublishQuestionnaire(email, id)).ToActionResult();
+        }
+        else if (action == QuestionnaireAction.Unpublish)
+        {
+            return (await questionnaireService.UnpublishQuestionnaire(email, id)).ToActionResult();
+        }
         
-        return (await questionnaireService.UnpublishQuestionnaire(email, id)).ToActionResult();
+        return BadRequest();
     }
 
     [HttpDelete("{id:guid}")]
@@ -71,14 +77,6 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         var email = User.FindFirstValue(ClaimTypes.Email)!;
         
         return (await questionnaireService.DeleteQuestionnaire(email, id)).ToActionResult();
-    }
-    
-    [HttpPut("{id:guid}/contributors/self")]
-    public async Task<IActionResult> AddSelfToQuestionnaireContributors(Guid id)
-    {
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
-        
-        return (await questionnaireService.AddSelfToQuestionnaireContributors(email, id)).ToActionResult();
     }
 
     [HttpPost("{id:guid}/clones")]

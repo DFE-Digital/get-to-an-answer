@@ -7,6 +7,7 @@ using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
+using Common.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -58,19 +59,20 @@ public class QuestionController(IQuestionService questionService) : Controller
         return (await questionService.DeleteQuestion(email, id)).ToActionResult();
     }
     
-    [HttpPatch("questionnaires/{questionnaireId:guid}/questions/{id:guid}/move-down")]
-    public async Task<IActionResult> MoveQuestionDownOne(Guid questionnaireId, Guid id)
+    [HttpPatch("questionnaires/{questionnaireId:guid}/questions/{id:guid}")]
+    public async Task<IActionResult> MoveQuestionDownOne(Guid questionnaireId, Guid id, [FromQuery] [EnumDefined] QuestionAction action)
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;
 
-        return (await questionService.MoveQuestionDownOne(email, questionnaireId, id)).ToActionResult();
-    }
-    
-    [HttpPatch("questionnaires/{questionnaireId:guid}/questions/{id:guid}/move-up")]
-    public async Task<IActionResult> MoveQuestionUpOne(Guid questionnaireId, Guid id)
-    {
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
-
-        return (await questionService.MoveQuestionUpOne(email, questionnaireId, id)).ToActionResult();
+        if (action == QuestionAction.MoveDown)
+        {
+            return (await questionService.MoveQuestionDownOne(email, questionnaireId, id)).ToActionResult();
+        }
+        else if (action == QuestionAction.MoveUp)
+        {
+            return (await questionService.MoveQuestionUpOne(email, questionnaireId, id)).ToActionResult();
+        }
+        
+        return BadRequest();
     }
 }
