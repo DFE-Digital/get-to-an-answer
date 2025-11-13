@@ -22,7 +22,8 @@ export class TermsOfUsePage extends BasePage {
     readonly errorList: Locator;
     readonly errorLinks: Locator;
     readonly acceptedErrorLink: Locator;
-    //readonly inlineError: Locator;
+    readonly inlineError: Locator;
+    readonly formGroup: Locator;
 
     constructor(page: Page) {
         super(page);
@@ -55,9 +56,10 @@ export class TermsOfUsePage extends BasePage {
         this.errorLinks = this.errorList.locator('a');
         this.acceptedErrorLink = this.errorList.locator('a[href="#Accepted"]');
 
-        //this.inlineError = page.locator('.govuk-error-message'); // TBC
-
+        // Inline error message to be inside DOM > Fieldset
+        this.inlineError = this.fieldset.locator('p.govuk-error-message');
         this.saveAndContinueButton = page.locator('button.govuk-button');
+        this.formGroup = this.page.locator('.govuk-form-group');
     }
 
     // ===== Validations =====
@@ -81,22 +83,26 @@ export class TermsOfUsePage extends BasePage {
     }
 
     async validateErrorMessage() {
-        await expect(this.errorSummaryTitle).toBeVisible();
-        await expect(this.errorSummary).toBeVisible();
-        await expect(this.errorSummary).toHaveAttribute('role', 'alert');
-        await expect(this.errorSummary).toHaveAttribute('tabindex', '-1');
-        await expect(this.errorSummary).toBeFocused();
-
-        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_TERMS_OF_USE);
-
+        await expect(this.errorSummaryTitle, '❌ Error summary title is not visible')
+            .toBeVisible();
+        await expect(this.errorSummary, '❌ Error summary is not visible')
+            .toBeVisible();
+        await expect(this.errorSummary, '❌ Invalid attribute - role')
+            .toHaveAttribute('role', 'alert');
+        await expect(this.errorSummary, '❌ Invalid attribute - tabIndex')
+            .toHaveAttribute('tabindex', '-1');
+        await expect(this.errorSummary, '❌ Error summary not focused')
+            .toBeFocused();
+        await expect(this.errorList, '❌ Missing error in the error summary list')
+            .toContainText(ErrorMessages.ERROR_MESSAGE_TERMS_OF_USE);
         await this.acceptedErrorLink.click();
-        await expect(this.agreeCheckbox).toBeFocused();
+        await expect(this.agreeCheckbox, '❌ Agree checkbox not focused')
+            .toBeFocused();
+        await expect(this.inlineError, '❌ Inline error not visible inside fieldset')
+            .toBeVisible();
+        await expect(this.formGroup, '❌ Form group missing error class')
+            .toHaveClass(/govuk-form-group--error/);
     }
-
-    // TBC
-    // async verifyInlineError() {
-    //     await expect(this.inlineError).toBeVisible();
-    // }
 
     async assertPageElements() {
         await this.verifyHeaderLinks()

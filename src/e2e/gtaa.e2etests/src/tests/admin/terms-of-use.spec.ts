@@ -38,7 +38,6 @@ test.describe('Get to an answer terms of use page', () => {
         await termsOfUsePage.submitWithoutAccepting();
 
         await termsOfUsePage.validateErrorMessage();
-        //await termsOfUsePage.verifyInlineError(); // TBC, inline error not throwing
     });
 
     test('Successful acceptance - checkbox is ticked and user navigates to next step', async ({page}) => {
