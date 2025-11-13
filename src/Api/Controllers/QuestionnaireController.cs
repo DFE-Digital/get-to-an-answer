@@ -1,21 +1,11 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Claims;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Api.Extensions;
 using Api.Services;
-using Common.Domain;
 using Common.Domain.Request.Add;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
-using Common.Enum;
-using Common.Infrastructure.Persistence;
-using Common.Infrastructure.Persistence.Entities;
-using Common.Local;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers;
 
@@ -43,7 +33,7 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return questionnaireService.GetQuestionnaire(email, id).ToActionResult();
     }
     
-    [HttpGet("")]
+    [HttpGet]
     public IActionResult GetQuestionnaires()
     {
         var email = User.FindFirstValue(ClaimTypes.Email)!;

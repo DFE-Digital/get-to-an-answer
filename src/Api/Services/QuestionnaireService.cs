@@ -133,7 +133,8 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 Status = q.Status,
                 Version = q.Version,
                 CreatedAt = q.CreatedAt,
-                UpdatedAt = q.UpdatedAt
+                UpdatedAt = q.UpdatedAt,
+                CreatedBy = q.CreatedBy
             }).ToList();
 
             logger.LogInformation("GetQuestionnaires succeeded Count={Count}", questionnaires.Count);
