@@ -36,7 +36,7 @@ public class FieldErrorTagHelper : TagHelper
         }
 
         var message = entry!.Errors[0].ErrorMessage;
-        var id = ErrorId ?? $"{fullName}-error";
+        var id = ErrorId ?? $"{fullName}-field-error";
 
         output.TagName = "p";
         output.TagMode = TagMode.StartTagAndEndTag;

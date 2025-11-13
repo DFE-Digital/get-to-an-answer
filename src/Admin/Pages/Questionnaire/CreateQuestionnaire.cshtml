@@ -33,11 +33,11 @@
         </div>
 
         <govuk-field-error asp-for="@Model.CreateQuestionnaire.Title"
-                           error-id="forms-name-input-name-field-error"></govuk-field-error>
+                           error-id="forms-name-input-name-error"></govuk-field-error>
 
-        <input id="forms-name-input-name-field"
+        <input id="forms-name-input-name"
                class="govuk-input"
-               aria-describedby="forms-name-input-name-hint"
+               aria-describedby="forms-name-input-name"
                type="text"
                asp-for="@Model.CreateQuestionnaire.Title"
                value="@(Model?.CreateQuestionnaire?.Title ?? "")"
