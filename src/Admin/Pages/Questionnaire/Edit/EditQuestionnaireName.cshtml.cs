@@ -1,7 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using Common.Client;
 using Common.Domain.Request.Update;
 using Common.Models;
 using Common.Models.PageModels;
+using Common.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -14,9 +16,11 @@ public class EditQuestionnaireName(IApiClient apiClient, ILogger<EditQuestionnai
     [FromRoute(Name = "questionnaireId")]
     public Guid QuestionnaireId { get; set; }
     
-    [BindProperty]
-    public required UpdateQuestionnaireRequestDto UpdateQuestionnaire { get; set; }
-
+    [BindProperty(Name = "Title")]
+    [Required(ErrorMessage = "Enter a questionnaire title")]
+    [GdsTitle]
+    public string? Title { get; set; }
+    
     public IActionResult OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
@@ -32,7 +36,9 @@ public class EditQuestionnaireName(IApiClient apiClient, ILogger<EditQuestionnai
                 return Page();
             }
             
-            await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, UpdateQuestionnaire);
+            var updateQuestionnaireRequest = new UpdateQuestionnaireRequestDto { Title = Title };
+            
+            await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, updateQuestionnaireRequest);
             
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
             
