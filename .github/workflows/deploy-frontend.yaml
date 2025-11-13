@@ -12,9 +12,17 @@ on:
           - Test
 
 jobs:
+  prepare-infrastructure:
+    name: "Prepare Infrastructure"
+    uses: ./.github/workflows/azure-infrastructure.yml
+    with:
+      environment: ${{ github.event.inputs.environment || 'Development' }}
+    secrets: inherit
+  
   build-and-deploy:
     name: "Build & Deploy"
     runs-on: ubuntu-latest
+    needs: prepare-infrastructure
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -86,4 +94,11 @@ jobs:
             --name "$FRONTEND_NAME" \
             --slot "staging" \
             --target-slot "production"
+
+      - name: Delete staging slot
+        run: |
+          az webapp deployment slot delete \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$FRONTEND_NAME" \
+            --slot staging
 

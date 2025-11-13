@@ -72,11 +72,11 @@ public class ControllerTests(ApiFixture factory, string routePrefix) : IClassFix
         return responseBody.Deserialize<TGetToAnAnswerDto>()!;
     }
     
-    public async Task<HttpResponseMessage> Update(object? payload = null, string? bearerToken = null, string? routePrefixOverride = null)
+    public async Task<HttpResponseMessage> Update(object? payload = null, string? bearerToken = null, string? routePrefixOverride = null, HttpMethod? method = null)
     {
         bearerToken ??= JwtTestTokenGenerator.ValidJwtToken;
 
-        var req = new HttpRequestMessage(HttpMethod.Put, routePrefixOverride ?? routePrefix)
+        var req = new HttpRequestMessage(method ?? HttpMethod.Put, routePrefixOverride ?? routePrefix)
         {
             Content = payload == null ? null : new StringContent(JsonSerializer.Serialize(payload, 
                 new JsonSerializerOptions(JsonSerializerDefaults.Web)), Encoding.UTF8, "application/json")

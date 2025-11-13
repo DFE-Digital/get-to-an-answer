@@ -1,6 +1,13 @@
 name: Deploy Azure Infrastructure
 
 on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: 'Development'
+        type: string
   workflow_dispatch:
     inputs:
       environment:
@@ -29,8 +36,8 @@ jobs:
       TF_VAR_admin_custom_domain: ${{ vars.ADMIN_CUSTOM_DOMAIN }}
       TF_VAR_frontend_custom_domain: ${{ vars.FRONTEND_CUSTOM_DOMAIN }}
       TF_VAR_support_alert_email: ${{ secrets.SUPPORT_ALERT_EMAIL }}
-      ENVIRONMENT: ${{ github.event.inputs.environment }}
-    environment: ${{ github.event.inputs.environment }}
+      ENVIRONMENT: ${{ github.event.inputs.environment || 'Development' }}
+    environment: ${{ github.event.inputs.environment || 'Development' }}
     defaults:
       run:
         working-directory: ./src/Infrastructure/terraform
@@ -39,7 +46,7 @@ jobs:
       - name: "Checkout repository"
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.ref_name }}
+          ref: ${{ github.ref_name || 'main' }}
 
       - name: "Setup Terraform"
         uses: hashicorp/setup-terraform@v3
