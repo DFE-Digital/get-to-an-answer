@@ -1,9 +1,9 @@
 @page "/admin/questionnaires/{questionnaireId:guid}/edit"
+@addTagHelper *, Common
 @model Admin.Pages.Questionnaire.EditQuestionnaire
 
 @{
   ViewData["Title"] = "Edit the questionnaire";
-  var hasTitleError = Model?.UpdateQuestionnaire != null && Model.ErrorFor(nameof(Model.UpdateQuestionnaire.Title)) != null;
 }
 
 @section BeforeContent
@@ -19,7 +19,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <form accept-charset="UTF-8" method="post">
-      <div class="govuk-form-group">
+      <govuk-form-group asp-for="@Model.UpdateQuestionnaire.Title">
         <h1 class="govuk-label-wrapper">
           <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the title of your questionnaire?</label>
         </h1>
@@ -27,19 +27,16 @@
           that describes what the form will help people to do. For example ‘Apply for a
           juggling licence’.
         </div>
-        @if (hasTitleError)
-        {
-          <p class="govuk-error-message">
-            <span class="govuk-visually-hidden">Error:</span> @Model?.ErrorFor(nameof(Model.UpdateQuestionnaire.Title))
-          </p>
-        }
-
-        <input id="forms-name-input-name-field" class="govuk-input @(hasTitleError ? "govuk-input--error" : "")"
+        <govuk-field-error asp-for="@Model.UpdateQuestionnaire.Title" error-id="forms-name-input-name-field-error"></govuk-field-error>
+        
+        <input id="forms-name-input-name-field"
+               class="govuk-input"
                aria-describedby="forms-name-input-name-hint"
                type="text"
-               name="Title"
-               value="@(Model?.UpdateQuestionnaire?.Title ?? "")">
-      </div>
+               asp-for="@Model.UpdateQuestionnaire.Title"
+               value="@(Model?.UpdateQuestionnaire?.Title ?? "")"
+               govuk-error-for="@Model?.UpdateQuestionnaire?.Title" />
+      </govuk-form-group>
       <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
     </form>
   </div>

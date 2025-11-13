@@ -36,13 +36,13 @@ public class EditQuestionnaire(IApiClient apiClient, ILogger<EditQuestionnaire> 
             
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
             
-            return Redirect($"/admin/questionnaires/{QuestionnaireId}/edit");
+            return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
 
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error creating questionnaire. Error: {EMessage}", e.Message);
-            return RedirectToPage("/Error");
+            return RedirectToErrorPage();
         }
     }
 }

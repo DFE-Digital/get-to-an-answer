@@ -10,7 +10,7 @@ public static class Routes
 
     // Track a specific questionnaire (format with id)
     // Usage: string.Format(Routes.QuestionnaireTrackById, questionnaireId)
-    public static readonly string QuestionnaireTrackById = AdminRoot + "/questionnaires/{0}/track";
+    public const string QuestionnaireTrackById = AdminRoot + "/questionnaires/{0}/track";
 
     // Terms of service agreement
     public static readonly string TermsOfServiceAgreement = AdminRoot + "/terms-of-service-agreement";
