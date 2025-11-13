@@ -335,6 +335,10 @@ resource "azurerm_cdn_frontdoor_custom_domain" "fd-api-custom-domain" {
   tls {
     certificate_type = "ManagedCertificate"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "azurerm_cdn_frontdoor_custom_domain" "fd-admin-custom-domain" {
@@ -346,6 +350,10 @@ resource "azurerm_cdn_frontdoor_custom_domain" "fd-admin-custom-domain" {
   tls {
     certificate_type = "ManagedCertificate"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "azurerm_cdn_frontdoor_custom_domain" "fd-frontend-custom-domain" {
@@ -356,6 +364,10 @@ resource "azurerm_cdn_frontdoor_custom_domain" "fd-frontend-custom-domain" {
 
   tls {
     certificate_type = "ManagedCertificate"
+  }
+
+  lifecycle {
+    prevent_destroy = true
   }
 }
 

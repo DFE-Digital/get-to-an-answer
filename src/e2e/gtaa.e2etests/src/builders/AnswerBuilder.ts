@@ -52,9 +52,9 @@ export class AnswerBuilder {
         return this;
     }
     
-    withScore(score?: number) {
-        if (score !== undefined)
-            this._score = score;
+    withScore(priority?: number) {
+        if (priority !== undefined)
+            this._score = priority;
         return this;
     }
 
@@ -66,7 +66,7 @@ export class AnswerBuilder {
             description: this._description,
             destinationUrl: this._destinationUrl,
             destinationType: this._destinationType!,
-            score: this._score
+            priority: this._score
         };
 
         if (this._destinationQuestionId && this._destinationQuestionId.trim() !== '') {

@@ -231,7 +231,7 @@ export function expectAnswerSchema(answer: any) {
         'destinationUrl',
         'destinationType',
         'destinationQuestionId',
-        'score',
+        'priority',
         'createdAt',
         'updatedAt'
     ];
@@ -255,7 +255,7 @@ export function expectAnswerTypes(answer: any) {
     expect(typeof answer.content).toBe('string');
     expect(typeof answer.description).toBe('string');
     expect(typeof answer.destinationUrl).toBe('string');
-    expect(typeof answer.score).toBe('number');
+    expect(typeof answer.priority).toBe('number');
     expect(typeof answer.createdAt).toBe('string');
     expect(typeof answer.updatedAt).toBe('string');
     if (answer.destinationQuestionId !== null) {
@@ -281,7 +281,7 @@ export function expectAnswerContent(a: any) {
 
     if (a.destinationQuestionId) {
         expect([1, 2]).toContain(a.destinationType);
-        expect(typeof a.score).toBe('number');
+        expect(typeof a.priority).toBe('number');
         
         expect(a.destinationQuestionId.trim().length).toBeGreaterThan(0);
     }
@@ -299,7 +299,7 @@ export function expectAnswerIO(a: any, payload: any, guidRegex: RegExp) {
     expect(a.questionId).toBe(payload.questionId);
     expect(a.questionnaireId).toBe(payload.questionnaireId);
     expect(a.content).toBe(payload.content);
-    expect(a.score).toBe(payload.score);
+    expect(a.priority).toBe(payload.priority);
 
     if (isEmpty(payload.description)) {
         expect(isEmpty(a.description)).toBeTruthy();

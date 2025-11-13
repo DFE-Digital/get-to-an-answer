@@ -36,6 +36,7 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
                 QuestionnaireId = request.QuestionnaireId,
                 Title = request.Title,
                 Content = request.Content,
+                ReferenceName = request.ReferenceName,
                 CreatedBy = email,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
@@ -131,6 +132,7 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
 
             answer.Content = request.Content ?? answer.Content;
             answer.Title = request.Title ?? answer.Title;
+            answer.ReferenceName = request.ReferenceName ?? answer.ReferenceName;
             answer.UpdatedAt = DateTime.UtcNow;
 
             await db.SaveChangesAsync();

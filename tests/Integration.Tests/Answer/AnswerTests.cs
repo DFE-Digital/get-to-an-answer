@@ -77,7 +77,7 @@ public class AnswerTests(ApiFixture factory) :
             questionId,
             content = "Answer X",
             description = "Desc X",
-            score = 5,
+            priority = 5,
             destinationUrl = "https://url.com",
             destinationType = DestinationType.ExternalLink,
             destinationQuestionId = (Guid?)null
@@ -90,7 +90,7 @@ public class AnswerTests(ApiFixture factory) :
         var dto = (await res.Content.ReadAsStringAsync()).Deserialize<AnswerDto>()!;
         dto.Content.Should().Be("Answer X");
         dto.Description.Should().Be("Desc X");
-        dto.Score.Should().Be(5);
+        dto.Priority.Should().Be(5);
         dto.DestinationUrl.Should().Be("https://url.com");
         dto.DestinationType.Should().Be(DestinationType.ExternalLink);
         dto.DestinationQuestionId.Should().BeNull();
@@ -327,7 +327,7 @@ public class AnswerTests(ApiFixture factory) :
                    questionId,
                    content = "A0",
                    description = "D0",
-                   score = 1,
+                   priority = 1,
                    destinationUrl = "https://url.com",
                }))
         {
@@ -341,7 +341,7 @@ public class AnswerTests(ApiFixture factory) :
         var answer = await GetById<AnswerDto>(id);
         answer.Content.Should().Be("A1");
         answer.Description.Should().Be("D0");
-        answer.Score.Should().Be(1);
+        answer.Priority.Should().Be(1);
         answer.DestinationUrl.Should().Be("https://url.com");
         answer.CreatedAt.Should().NotBe(default);
         answer.UpdatedAt.Should().NotBe(default);
@@ -369,7 +369,7 @@ public class AnswerTests(ApiFixture factory) :
         {
             content = "A2",
             description = "D2",
-            score = 10,
+            priority = 10,
             destinationUrl = "https://url.com",
             destinationType = DestinationType.ExternalLink,
             destinationQuestionId = (Guid?)null
@@ -379,7 +379,7 @@ public class AnswerTests(ApiFixture factory) :
         var dto = await GetById<AnswerDto>(id);
         dto.Content.Should().Be("A2");
         dto.Description.Should().Be("D2");
-        dto.Score.Should().Be(10);
+        dto.Priority.Should().Be(10);
         dto.DestinationUrl.Should().Be("https://url.com");
         dto.DestinationType.Should().Be(DestinationType.ExternalLink);
         dto.DestinationQuestionId.Should().BeNull();

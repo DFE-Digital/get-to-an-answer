@@ -30,13 +30,19 @@ public class QuestionnaireStart(IApiClient apiClient, ILogger<QuestionnaireStart
             }
             
             var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireSlug);
-
+            
             if (questionnaire == null)
                 return NotFound();
             
             Questionnaire = questionnaire;
             
             IsEmbedded = Embed;
+
+            // if the display title is not defined, redirect to the first question
+            if (string.IsNullOrWhiteSpace(questionnaire.DisplayTitle))
+            {
+                return Redirect($"/questionnaires/{QuestionnaireSlug}/next?embed={Embed}");
+            }
         }
         catch (Exception e)
         {
