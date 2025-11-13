@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text;
 using Common.Infrastructure.Persistence;
+using Common.Logging;
 using Integration.Tests.Fake;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
@@ -16,7 +17,9 @@ using DotNet.Testcontainers.Containers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog;
 using Testcontainers.MsSql;
 using ApiProgram = Program;
 
@@ -71,10 +74,15 @@ public class ApiFixture : WebApplicationFactory<ApiProgram>, IAsyncLifetime
                 o.EnableSensitiveDataLogging();
             });
             
+            //Remove & replace Host SeriLog services
+            var seriLogService = services.Where(d => d.ServiceType == typeof(ILoggerFactory)).ToList();
+            seriLogService.ForEach(seriLogInstance => services.Remove(seriLogInstance));
+
+            services.AddSerilog((_, lc) => lc.ConfigureLogging(""), preserveStaticLogger: true);
+            
             const string secret = "local-test-signing-key-32bytes-minimum!";
 
             var actions = services.Where(d => d.ServiceType == typeof(IConfigureOptions<JwtBearerOptions>)).ToList();
-
             foreach (var p in actions)
             {
                 services.Remove(p);

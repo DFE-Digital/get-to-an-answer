@@ -38,10 +38,7 @@ Log.Logger = new LoggerConfiguration()
 Log.Logger.Information("Starting application");
 Log.Logger.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
 
-// builder.Services.AddSerilog((_, lc) => lc
-//     .ConfigureLogging(builder.Configuration["ApplicationInsights:ConnectionString"]));
-
-builder.Host.UseSerilog((_, lc) => lc.ConfigureLogging(builder.Configuration["ApplicationInsights:ConnectionString"]), preserveStaticLogger: true);
+builder.Services.AddSerilog((_, lc) => lc.ConfigureLogging(builder.Configuration["ApplicationInsights:ConnectionString"]));
 
 var appInsightsConnectionString = builder.Configuration.GetValue<string>("ApplicationInsights:ConnectionString");
 
