@@ -32,14 +32,13 @@ if (builderIsLocalEnvironment)
 Log.Logger = new LoggerConfiguration()
     .ConfigureLogging(Environment.GetEnvironmentVariable("ApplicationInsights__ConnectionString"))
     .CreateBootstrapLogger();
-    
+
 #region Additional Logging and Application Insights
-    
+
 Log.Logger.Information("Starting application");
 Log.Logger.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
-    
-builder.Services.AddSerilog((_, lc) => lc
-    .ConfigureLogging(builder.Configuration["ApplicationInsights:ConnectionString"]));
+
+builder.Services.AddSerilog((_, lc) => lc.ConfigureLogging(builder.Configuration["ApplicationInsights:ConnectionString"]));
 
 var appInsightsConnectionString = builder.Configuration.GetValue<string>("ApplicationInsights:ConnectionString");
 
@@ -62,7 +61,7 @@ if (!string.IsNullOrEmpty(appInsightsConnectionString))
 
 builder.Services.AddDbContext<GetToAnAnswerDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ??
                          builder.Configuration["ConnectionStrings:DefaultConnection"]);
 });
 
@@ -87,29 +86,26 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
         "*.get-to-an-answer.education.gov.uk"
     };
 });
-    
+
 #endregion
 
 builder.Services.AddHttpContextAccessor();
 
 #region HTTP Context and Healthchecks
-    
+
 builder.Services.AddHealthChecks();
-    
+
 #endregion
 
 builder.Services.AddControllers()
     .AddDataAnnotationsLocalization();
 
-if (builderIsLocalEnvironment) 
+if (builderIsLocalEnvironment)
 {
 //    builder.AddLogging();
 }
 
-builder.Services.ConfigureHttpJsonOptions(o =>
-{
-    o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-});
+builder.Services.ConfigureHttpJsonOptions(o => { o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
 
 if (builderIsLocalEnvironment)
 {
@@ -120,7 +116,7 @@ else
     builder.Services
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
-    
+
     // AllowWebApiToBeAuthorizedByACL is an AzureAd setting in the appsettings.json
     // This avoids needing the jwt token from needing a role or scope
 }
@@ -154,7 +150,7 @@ if (appIsLocalEnvironment)
 {
     // Serve OpenAPI JSON at /openapi/v1.json
     app.MapOpenApi();
-    app.MapScalarApiReference(options => 
+    app.MapScalarApiReference(options =>
     {
         options.WithTitle("My API");
         options.WithTheme(ScalarTheme.BluePlanet);
@@ -165,8 +161,8 @@ if (appIsLocalEnvironment)
 else
 {
     app.MapGroup("/openapi")
-       .RequireAuthorization()
-       .MapOpenApi();
+        .RequireAuthorization()
+        .MapOpenApi();
     app.MapScalarApiReference(); // TODO: Add config
 }
 
@@ -196,5 +192,7 @@ app.Run();
 [ExcludeFromCodeCoverage]
 public partial class Program
 {
-    protected Program() { }
+    protected Program()
+    {
+    }
 }
