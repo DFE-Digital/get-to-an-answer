@@ -9,8 +9,8 @@ namespace Admin.Pages.Home;
 [AllowAnonymous]
 public class TermsOfServiceAgreement : BasePageModel
 {
-    [BindProperty(Name = "Accepted")]
-    public bool Accepted { get; set; }
+    [BindProperty(Name = "Agreed")]
+    public bool Agreed { get; set; }
     
     public IActionResult OnGet()
     {
@@ -24,13 +24,13 @@ public class TermsOfServiceAgreement : BasePageModel
     
     public IActionResult OnPost()
     {
-        if (!Accepted)
-            ModelState.AddModelError(nameof(Accepted), "You need to accept the agreement to continue");
+        if (!Agreed)
+            ModelState.AddModelError(nameof(Agreed), "You need to accept the agreement to continue");
         
         if (!ModelState.IsValid)
             return Page();
         
-        if (Accepted)
+        if (Agreed)
             SetTermsAcceptedCookie();
         
         return Redirect(Routes.QuestionnairesManage);

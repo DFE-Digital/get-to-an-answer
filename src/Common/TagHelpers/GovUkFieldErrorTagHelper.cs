@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 namespace Common.TagHelpers;
 
 [HtmlTargetElement("govuk-field-error", Attributes = ForAttributeName)]
-public class FieldErrorTagHelper : TagHelper
+public class GovUkFieldErrorTagHelper : TagHelper
 {
     private const string ForAttributeName = "asp-for";
 
@@ -36,7 +36,7 @@ public class FieldErrorTagHelper : TagHelper
         }
 
         var message = entry!.Errors[0].ErrorMessage;
-        var id = ErrorId ?? $"{fullName}-error";
+        var id = ErrorId ?? $"{fullName}-field-error";
 
         output.TagName = "p";
         output.TagMode = TagMode.StartTagAndEndTag;
