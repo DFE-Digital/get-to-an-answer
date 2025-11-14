@@ -100,7 +100,7 @@ export async function publishQuestionnaire(
     questionnaireId: number | string,
     bearerToken?: string
 ) {
-    const response = await request.put(`${BASE_URL}/api/questionnaires/${questionnaireId}/publish`, {
+    const response = await request.patch(`${BASE_URL}/api/questionnaires/${questionnaireId}?action=Publish`, {
         data: {},
         headers: {
             'Content-Type': 'application/json',

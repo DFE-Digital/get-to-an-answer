@@ -123,6 +123,7 @@ if (!builderIsLocalEnvironment)
 app.MapHealthChecks("/health");
 
 app.UseHttpsRedirection();
+app.UseForwardedHeaders();
 
 app.UseStaticFiles();
 

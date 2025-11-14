@@ -126,7 +126,7 @@ export async function moveQuestionDownOne(
     questionId: string,
     bearerToken?: string,
 ) {
-    const response = await request.patch(`${BASE_URL}/api/questionnaires/${questionnaireId}/questions/${questionId}/move-down`, {
+    const response = await request.patch(`${BASE_URL}/api/questionnaires/${questionnaireId}/questions/${questionId}?action={QuestionAction.MoveDown}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
@@ -146,7 +146,7 @@ export async function moveQuestionUpOne(
     questionId: string,
     bearerToken?: string
 ) {
-    const response = await request.patch(`${BASE_URL}/api/questionnaires/${questionnaireId}/questions/${questionId}/move-up`, {
+    const response = await request.patch(`${BASE_URL}/api/questionnaires/${questionnaireId}/questions/${questionId}?action={QuestionAction.MoveUp}`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`

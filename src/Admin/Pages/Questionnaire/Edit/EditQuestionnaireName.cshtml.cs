@@ -1,22 +1,26 @@
+using System.ComponentModel.DataAnnotations;
 using Common.Client;
 using Common.Domain.Request.Update;
 using Common.Models;
 using Common.Models.PageModels;
+using Common.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace Admin.Pages.Questionnaire;
+namespace Admin.Pages.Questionnaire.Edit;
 
 [Authorize]
-public class EditQuestionnaire(IApiClient apiClient, ILogger<EditQuestionnaire> logger) : QuestionnairesPageModel
+public class EditQuestionnaireName(IApiClient apiClient, ILogger<EditQuestionnaireName> logger) : QuestionnairesPageModel
 {
     [FromRoute(Name = "questionnaireId")]
     public Guid QuestionnaireId { get; set; }
     
-    [BindProperty]
-    public required UpdateQuestionnaireRequestDto UpdateQuestionnaire { get; set; }
-
+    [BindProperty(Name = "Title")]
+    [Required(ErrorMessage = "Enter a questionnaire title")]
+    [GdsTitle]
+    public string? Title { get; set; }
+    
     public IActionResult OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
@@ -32,17 +36,19 @@ public class EditQuestionnaire(IApiClient apiClient, ILogger<EditQuestionnaire> 
                 return Page();
             }
             
-            await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, UpdateQuestionnaire);
+            var updateQuestionnaireRequest = new UpdateQuestionnaireRequestDto { Title = Title };
+            
+            await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, updateQuestionnaireRequest);
             
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
             
-            return Redirect($"/admin/questionnaires/{QuestionnaireId}/edit");
+            return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
 
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error creating questionnaire. Error: {EMessage}", e.Message);
-            return RedirectToPage("/Error");
+            return RedirectToErrorPage();
         }
     }
 }

@@ -10,6 +10,8 @@ public class BasePageModel : PageModel
     
     private const string BackLinkTempDataKey = "BackLinkSlugTempData";
 
+    protected virtual ActionResult RedirectToErrorPage() => Redirect("/error");
+    
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context,
         PageHandlerExecutionDelegate next)
     {

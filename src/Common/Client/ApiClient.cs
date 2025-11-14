@@ -7,6 +7,8 @@ using Common.Domain.Frontend;
 using Common.Domain.Request.Add;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
+using Common.Enum;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Common.Client;
@@ -134,14 +136,17 @@ public class ApiClient : IApiClient
     public async Task<string?> UpdateQuestionnaireAsync(Guid questionnaireId, UpdateQuestionnaireRequestDto request)
     {
         var response = await _httpClient.PutAsJsonAsync($"{Questionnaires}/{questionnaireId}", request);
-        response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<string>();
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadAsStringAsync();
+
+        return null;
     }
 
     public async Task<string?> PublishQuestionnaireAsync(Guid questionnaireId)
     {
-        var response = await _httpClient.PutAsync($"{Questionnaires}/{questionnaireId}/publish", null);
+        var response = await _httpClient.PatchAsync(
+            $"{Questionnaires}/{questionnaireId}?action={QuestionnaireAction.Publish}", null);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<string>();
@@ -149,7 +154,8 @@ public class ApiClient : IApiClient
 
     public async Task<string?> UnpublishQuestionnaireAsync(Guid questionnaireId)
     {
-        var response = await _httpClient.DeleteAsync($"{Questionnaires}/{questionnaireId}/unpublish");
+        var response = await _httpClient.PatchAsync(
+            $"{Questionnaires}/{questionnaireId}?action={QuestionnaireAction.Unpublish}", null);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<string>();
@@ -247,7 +253,7 @@ public class ApiClient : IApiClient
 
     public async Task<string?> MoveQuestionDownOneAsync(Guid questionnaireId, Guid questionId)
     {
-        var response = await _httpClient.PutAsync($"{Questionnaires}/{questionnaireId}/questions/{questionId}/move-down", null);
+        var response = await _httpClient.PutAsync($"{Questionnaires}/{questionnaireId}/questions/{questionId}?action={QuestionAction.MoveDown}", null);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<string>();
@@ -255,7 +261,7 @@ public class ApiClient : IApiClient
 
     public async Task<string?> MoveQuestionUpOneAsync(Guid questionnaireId, Guid questionId)
     {
-        var response = await _httpClient.PutAsync($"{Questionnaires}/{questionnaireId}/questions/{questionId}/move-up", null);
+        var response = await _httpClient.PutAsync($"{Questionnaires}/{questionnaireId}/questions/{questionId}?action={QuestionAction.MoveUp}", null);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<string>();
@@ -369,7 +375,7 @@ public class ApiClient : IApiClient
 
     public async Task<QuestionDto?> GetInitialQuestion(Guid questionnaireId, bool preview = false)
     {
-        var response = await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/initial?preview={preview}");
+        var response = await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/initial-state?preview={preview}");
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<QuestionDto>();
@@ -377,7 +383,7 @@ public class ApiClient : IApiClient
 
     public async Task<DestinationDto?> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool preview = false)
     {
-        var response = await _httpClient.PostAsJsonAsync($"{Questionnaires}/{questionnaireId}/next?preview={preview}", request);
+        var response = await _httpClient.PostAsJsonAsync($"{Questionnaires}/{questionnaireId}/next-state?preview={preview}", request);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<DestinationDto>();
