@@ -58,7 +58,7 @@ export async function goToEditQuestionnairePage(page: Page): Promise<EditQuestio
 }
 
 // =====  URL based page navigation =====
-export async function goToEditQuestionnaireTitlePageByUrl(
+export async function goToUpdateQuestionnairePageByUrl(
     page: Page,
     questionnaireId: string,
     waitUntil: LoadState = 'networkidle'): Promise<AddQuestionnairePage> {

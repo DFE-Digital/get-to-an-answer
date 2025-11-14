@@ -41,33 +41,31 @@ test.describe('Get to an answer create a new questionnaire', () => {
         viewQuestionnairePage = await ViewQuestionnairePage.create(page);
         await viewQuestionnairePage.expectQuestionnaireHeadingOnPage();
     });
-
-    //TBC, focus after clicking the error message is not correct
-    test('Submit a new questionnaire with missing title', async ({page}) => {
+    
+    test('Submit a new questionnaire with missing title', async ({page, browserName}) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
 
         addQuestionnairePage = await AddQuestionnairePage.create(page);
         await addQuestionnairePage.enterTitle(''); 
         await addQuestionnairePage.clickSaveAndContinue();
 
-        await addQuestionnairePage.validateMissingTitleMessageSummary();
+        await addQuestionnairePage.validateMissingTitleMessageSummary(browserName);
         await addQuestionnairePage.validateInlineTitleError();
         await addQuestionnairePage.validateTitleFormGroup();
     });
     
-    test('Submit a new questionnaire with invalid title', async ({page}) => {
+    test('Submit a new questionnaire with invalid title', async ({page, browserName}) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
 
         addQuestionnairePage = await AddQuestionnairePage.create(page);
         await addQuestionnairePage.enterInvalidTitle();
         await addQuestionnairePage.clickSaveAndContinue();
 
-        await addQuestionnairePage.validateMissingTitleMessageSummary();
+        await addQuestionnairePage.validateMissingTitleMessageSummary(browserName);
         await addQuestionnairePage.validateInlineTitleError();
         await addQuestionnairePage.validateTitleFormGroup();
     });
     
-    // TBC , aria-describedBy value is not correct
     test('Submit a new questionnaire with invalid title to validate aria-describedby', async ({page}) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
 
@@ -75,6 +73,6 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await addQuestionnairePage.enterInvalidTitle();
         await addQuestionnairePage.clickSaveAndContinue();
 
-        //await addQuestionnairePage.validateTitleFieldAriaDescribedBy();
+        await addQuestionnairePage.validateTitleFieldAriaDescribedBy();
     });
 });

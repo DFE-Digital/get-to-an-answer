@@ -37,7 +37,7 @@ export class EditQuestionnairePage extends BasePage {
             'a.govuk-task-list__link[aria-describedby="create-your-questionnaire-1-status"]'
         );
         this.backToQuestionnaireLink = this.page.locator(
-            '#main-content-container a.govuk-back-link'
+            'a.govuk-back-link[href$="/admin/questionnaires/manage"]'
         );
         this.linkEditSlug = this.page.locator(
             'a.govuk-task-list__link[aria-describedby="edit-slug-status"]'
@@ -81,6 +81,7 @@ export class EditQuestionnairePage extends BasePage {
             this.backToQuestionnaireLink.click()
         ]);
     }
+
     async openEditTitle(): Promise<void> {
         await this.linkEditTitle.click();
     }
@@ -131,6 +132,7 @@ export class EditQuestionnairePage extends BasePage {
 
     // ===== Validation methods (structure only; not content) =====
     async expectSuccessBannerVisible(): Promise<void> {
+        await this.banner.waitFor({state: 'attached'});
         await expect(this.banner).toBeVisible();
         await expect(this.heading).toBeVisible();
 
@@ -141,8 +143,9 @@ export class EditQuestionnairePage extends BasePage {
     async validateHeading(): Promise<void> {
         await expect(this.editQuestionnaireHeading).toBeVisible();
     }
-    
+
     async validateHeadingAndStatus(): Promise<void> {
+        await this.main.waitFor({state: 'attached'});
         await expect(this.main).toBeVisible();
         await expect(this.questionnaireTitle).toBeVisible();
         await expect(this.editQuestionnaireHeading).toBeVisible();

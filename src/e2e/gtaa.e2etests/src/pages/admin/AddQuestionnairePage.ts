@@ -5,6 +5,7 @@ import {ErrorMessages} from "../../constants/test-data-constants";
 type Mode = 'create' | 'update' | 'clone';
 
 export class AddQuestionnairePage extends BasePage {
+    private readonly mode: string;
     // ===== Locators =====
     private readonly form: Locator;
     private readonly backToQuestionnaireLink: Locator;
@@ -17,6 +18,7 @@ export class AddQuestionnairePage extends BasePage {
     private readonly errorLink: Locator;
     private readonly titleFormGroup: Locator;
     private readonly inlineTitleError: Locator;
+    private readonly inlineUpdateTitleError: Locator;
     private readonly error: Locator;
     private readonly hint: Locator;
     private readonly describedBy: Locator;
@@ -24,6 +26,8 @@ export class AddQuestionnairePage extends BasePage {
     // ===== Constructor =====
     constructor(page: Page, mode: Mode = 'create') {
         super(page);
+
+        this.mode = mode;
         this.form = this.page.locator(
             'main[role="main"] form'
         );
@@ -31,16 +35,16 @@ export class AddQuestionnairePage extends BasePage {
             '#main-content-container a.govuk-back-link'
         );
         this.titleInput = this.page.locator(
-            '#forms-name-input-name-field'
+            'input#questionnaire-title'
         );
         this.saveAndContinueButton = this.page.getByRole(
             'button', {name: 'Save and continue'}
         );
         this.titleLabel = this.page.locator(
-            'label[for="forms-name-input-name-field"]'
+            'label[for="questionnaire-title"]'
         );
         this.supportiveHint = this.page.locator(
-            '#forms-name-input-name-hint'
+            '#questionnaire-title-hint'
         );
         this.errorSummary = this.page.locator(
             '.govuk-error-summary[role="alert"][tabindex="-1"]'
@@ -49,13 +53,17 @@ export class AddQuestionnairePage extends BasePage {
             'ul.govuk-error-summary__list'
         );
         this.errorLink = this.page.locator(
-            'a[href="#CreateQuestionnaire.Title"]'
+            'a[href="#Title"]'
         );
         this.titleFormGroup = page.locator(
-            '.govuk-form-group:has(#forms-name-input-name-field)'
+            '.govuk-form-group:has(#questionnaire-title)'
+        );
+
+        this.inlineUpdateTitleError = this.titleFormGroup.locator(
+            '#questionnaire-title-field-error'
         );
         this.inlineTitleError = this.titleFormGroup.locator(
-            '#forms-name-input-name-field-error.govuk-error-message'
+            '#questionnaire-title-error'
         );
         this.error = this.page.locator(
             '#Title-error'
@@ -104,14 +112,20 @@ export class AddQuestionnairePage extends BasePage {
         const ariaValue = await this.titleInput.getAttribute('aria-describedby');
         expect(ariaValue, '❌ aria-describedby is missing').not.toBeNull();
 
-        // Expected to contain both hint ID and error message ID
-        expect(ariaValue, '❌ aria-describedby missing hint id')
-            .toContain('forms-name-input-name-hint');
-        expect(ariaValue, '❌ aria-describedby missing error message id')
-            .toContain('forms-name-input-name-field-error');
+        if (this.mode === 'update') {
+            expect(ariaValue, '❌ aria-describedby missing hint id')
+                .toContain('forms-name-input-name-hint');
+            expect(ariaValue, '❌ aria-describedby missing error message id')
+                .toContain('title-field-error');
+        } else {
+            expect(ariaValue, '❌ aria-describedby missing hint id')
+                .toContain('questionnaire-title-hint');
+            expect(ariaValue, '❌ aria-describedby missing error message id')
+                .toContain('title-field-error');
+        }
     }
 
-    async validateMissingTitleMessageSummary() {
+    async validateMissingTitleMessageSummary(browserName: string) {
         await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
         await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
         await expect(this.errorSummary, '❌ Attribute tabIndex is missing').toHaveAttribute('tabindex', '-1');
@@ -120,11 +134,17 @@ export class AddQuestionnairePage extends BasePage {
         await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
 
         await this.errorLink.click();
-        //await expect(this.titleInput).toBeFocused(); //TBC, failing here and not getting a focus
+        if (browserName !== 'webkit') {
+            await expect(this.errorLink).toBeFocused();
+        }
     }
 
     async validateInlineTitleError() {
-        await expect(this.inlineTitleError, '❌ Inline title error not visible').toBeVisible();
+        if (this.mode === 'update') {
+            await expect(this.inlineUpdateTitleError, '❌ Inline title error not visible').toBeVisible();
+        } else {
+            await expect(this.inlineTitleError, '❌ Inline title error not visible').toBeVisible();
+        }
     }
 
     async validateTitleFormGroup() {

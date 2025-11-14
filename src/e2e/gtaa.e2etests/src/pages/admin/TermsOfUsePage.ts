@@ -30,7 +30,7 @@ export class TermsOfUsePage extends BasePage {
 
         this.heading = page.locator('h1.govuk-heading-l');
 
-        this.agreeCheckbox = page.locator('input.govuk-checkboxes__input#Accepted');
+        this.agreeCheckbox = page.locator('input#Agreed');
         this.checkboxContainer = page.locator('div.govuk-checkboxes__item');
         this.checkboxLabel = page.locator('label.govuk-label.govuk-checkboxes__label[for="Accepted"]');
         this.checkboxHint = page.locator('div.govuk-hint.govuk-checkboxes__hint');
