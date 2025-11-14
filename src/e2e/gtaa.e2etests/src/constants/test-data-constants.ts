@@ -7,7 +7,8 @@ export enum QuestionType {
 
 export enum AnswerDestinationType {
     Question = 1,
-    ExternalLink = 2
+    ExternalLink = 2,
+    CustomContent
 }
 
 export enum EntityStatus {
@@ -15,6 +16,17 @@ export enum EntityStatus {
     Published = 2,
     Deleted = 3,
     Archived = 4,
+    Private = 5
+}
+
+export enum QuestionnaireAction {
+    Publish,
+    Unpublish
+}
+
+export enum QuestionAction {
+    MoveUp,
+    MoveDown,
 }
 
 export const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

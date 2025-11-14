@@ -52,7 +52,7 @@ public class AnswerTests(ApiFixture factory) :
 
         using var res = await Create(payload);
 
-        res.StatusCode.Should().Be(HttpStatusCode.OK);
+        res.StatusCode.Should().Be(HttpStatusCode.Created);
 
         var body = await res.Content.ReadAsStringAsync();
         var dto = body.Deserialize<AnswerDto>()!;
@@ -85,7 +85,7 @@ public class AnswerTests(ApiFixture factory) :
 
         using var res = await Create(payload);
 
-        res.StatusCode.Should().Be(HttpStatusCode.OK);
+        res.StatusCode.Should().Be(HttpStatusCode.Created);
 
         var dto = (await res.Content.ReadAsStringAsync()).Deserialize<AnswerDto>()!;
         dto.Content.Should().Be("Answer X");
@@ -174,15 +174,15 @@ public class AnswerTests(ApiFixture factory) :
         var questionId = await CreateQuestion(questionnaireId);
 
         // Seed for current user
-        using (var r1 = await Create(new { questionnaireId, questionId, content = "A1" })) { r1.StatusCode.Should().Be(HttpStatusCode.OK); }
-        using (var r2 = await Create(new { questionnaireId, questionId, content = "A2" })) { r2.StatusCode.Should().Be(HttpStatusCode.OK); }
+        using (var r1 = await Create(new { questionnaireId, questionId, content = "A1" })) { r1.StatusCode.Should().Be(HttpStatusCode.Created); }
+        using (var r2 = await Create(new { questionnaireId, questionId, content = "A2" })) { r2.StatusCode.Should().Be(HttpStatusCode.Created); }
 
         // Seed for another user on a different question
         var qnOther = await CreateQuestionnaire(JwtTestTokenGenerator.UnauthorizedJwtToken);
         var qOther = await CreateQuestion(qnOther, JwtTestTokenGenerator.UnauthorizedJwtToken);
         using (var r3 = await Create(new { questionnaireId = qnOther, questionId = qOther, content = "Other" },
                    JwtTestTokenGenerator.UnauthorizedJwtToken))
-        { r3.StatusCode.Should().Be(HttpStatusCode.OK); }
+        { r3.StatusCode.Should().Be(HttpStatusCode.Created); }
 
         using var getRes = await GetAll(routePrefixOverride: $"/api/questions/{questionId}/answers");
         getRes.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -247,7 +247,7 @@ public class AnswerTests(ApiFixture factory) :
         string id;
         using (var postRes = await Create(new { questionnaireId, questionId, content = "AX" }))
         {
-            postRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
@@ -272,7 +272,7 @@ public class AnswerTests(ApiFixture factory) :
         string id;
         using (var postRes = await Create(new { questionnaireId, questionId, content = "Secret" }))
         {
-            postRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
@@ -331,7 +331,7 @@ public class AnswerTests(ApiFixture factory) :
                    destinationUrl = "https://url.com",
                }))
         {
-            postRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
@@ -361,7 +361,7 @@ public class AnswerTests(ApiFixture factory) :
                    content = "A0",
                }))
         {
-            postRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
@@ -394,7 +394,7 @@ public class AnswerTests(ApiFixture factory) :
         string id;
         using (var postRes = await Create(new { questionnaireId, questionId, content = "Seed" }))
         {
-            postRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
@@ -414,7 +414,7 @@ public class AnswerTests(ApiFixture factory) :
         string id;
         using (var postRes = await Create(new { questionnaireId, questionId, content = "Seed" }))
         {
-            postRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
@@ -443,7 +443,7 @@ public class AnswerTests(ApiFixture factory) :
         using (var r = await Create(new { questionnaireId, questionId, content = "Private" },
                    JwtTestTokenGenerator.UnauthorizedJwtToken))
         {
-            r.StatusCode.Should().Be(HttpStatusCode.OK);
+            r.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await r.Content.ReadAsStringAsync());
         }
 
@@ -469,7 +469,7 @@ public class AnswerTests(ApiFixture factory) :
         string id;
         using (var postRes = await Create(new { questionnaireId, questionId, content = "Seed", description = "D0" }))
         {
-            postRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
@@ -494,7 +494,7 @@ public class AnswerTests(ApiFixture factory) :
         string id;
         using (var postRes = await Create(new { questionnaireId, questionId, content = "Del" }))
         {
-            postRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
@@ -515,7 +515,7 @@ public class AnswerTests(ApiFixture factory) :
         using (var postRes = await Create(new { questionnaireId, questionId, content = "Private" },
                    JwtTestTokenGenerator.UnauthorizedJwtToken))
         {
-            postRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
@@ -543,7 +543,7 @@ public class AnswerTests(ApiFixture factory) :
         string id;
         using (var postRes = await Create(new { questionnaireId, questionId, content = "Seed" }))
         {
-            postRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
@@ -563,7 +563,7 @@ public class AnswerTests(ApiFixture factory) :
         string id;
         using (var postRes = await Create(new { questionnaireId, questionId, content = "Seed" }))
         {
-            postRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
@@ -583,7 +583,7 @@ public class AnswerTests(ApiFixture factory) :
         string id;
         using (var postRes = await Create(new { questionnaireId, questionId, content = "Tmp" }))
         {
-            postRes.StatusCode.Should().Be(HttpStatusCode.OK);
+            postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 

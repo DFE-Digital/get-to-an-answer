@@ -6,6 +6,13 @@ export interface QuestionnaireModel {
     slug:string;
 }
 
+export interface QuestionnaireDtoModel {
+    id: string;
+    displayTitle: string;
+    description: string;
+    slug: string;
+}
+
 export interface QuestionModel {
     questionnaireId:string;
     content:string;

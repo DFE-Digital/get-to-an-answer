@@ -32,7 +32,7 @@ test.describe('DELETE Answer API request', () => {
 
 
         // Verify question exists before deletion
-        const {answerGetResponse: beforeDelete} = await getAnswer(request, answerId);
+        const {response: beforeDelete} = await getAnswer(request, answerId);
         expect200HttpStatusCode(beforeDelete, 200);
 
         const {deleteAnswerResponse, deleteAnswerBody} = await deleteAnswer(
@@ -44,7 +44,7 @@ test.describe('DELETE Answer API request', () => {
         expect(deleteAnswerResponse.status()).toBeLessThan(300);
         expect([200, 204]).toContain(deleteAnswerResponse.status());
 
-        const {answerGetResponse: afterDelete} = await getAnswer(request, answerId);
+        const {response: afterDelete} = await getAnswer(request, answerId);
         expect(afterDelete.status()).toBe(404);
 
         const {answers: answersList} = await listAnswers(request, questionnaire.id);
@@ -95,7 +95,7 @@ test.describe('DELETE Answer API request', () => {
         expect([403, 404]).toContain(deleteAnswerResponse.status());
 
         //no deletion should be applied
-        const {answerGetResponse: verifyExists} = await getAnswer(
+        const {response: verifyExists} = await getAnswer(
             request,
             answer.id,
             ownerToken
@@ -198,7 +198,7 @@ test.describe('DELETE Answer API request', () => {
         }
 
         // And no deletion occurs
-        const {answerGetResponse: verifyExists} = await getAnswer(request, answer.id);
+        const {response: verifyExists} = await getAnswer(request, answer.id);
         expect200HttpStatusCode(verifyExists, 200);
     });
 
@@ -233,7 +233,7 @@ test.describe('DELETE Answer API request', () => {
 
         expect(secondDelete.status( ) === 404).toBe(true);
 
-        const {answerGetResponse: verifyDeleted} = await getAnswer(request, answer.id);
+        const {response: verifyDeleted} = await getAnswer(request, answer.id);
         expect(verifyDeleted.status()).toBe(404);
     });
 });

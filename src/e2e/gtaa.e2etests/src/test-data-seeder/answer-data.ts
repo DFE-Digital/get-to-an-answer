@@ -80,6 +80,29 @@ export async function createSingleAnswer(
     }
 }
 
+export async function createAnswer(
+    request: any,
+    questionnaireId: string,
+    questionId: string,
+    content?: string,
+    description?: string,
+    priority?: number,
+    destinationType?: AnswerDestinationType,
+    destinationQuestionId?: string,
+    destinationUrl?: string,
+) {
+    return await createSingleAnswer(request, {
+        questionId,
+        questionnaireId,
+        destinationQuestionId,
+        content,
+        description,
+        priority,
+        destinationType,
+        destinationUrl
+    })
+}
+
 export async function getAnswer(
     request: any,
     answerId: string,
@@ -95,7 +118,7 @@ export async function getAnswer(
     const responseBody = await safeParseBody(response);
 
     return {
-        answerGetResponse: response,
+        response,
         answer: responseBody
     }
 }
