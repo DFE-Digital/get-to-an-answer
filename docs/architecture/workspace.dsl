@@ -1,10 +1,10 @@
-workspace "FEATv1" "Find Education and Training - Hosting (Terraform-derived App Service)" {
+workspace "GetToAnAnswer" "Find Education and Training - Hosting (Terraform-derived App Service)" {
 
   model {
     properties { "structurizr.groupSeparator" "/" }
 
     group "DfE" {
-      feat = softwareSystem "Find Education and Training" {
+      gtaa = softwareSystem "Find Education and Training" {
         description "Frontend, API, and Admin running on Azure App Service (Linux) behind Front Door"
         tags "System"
 
