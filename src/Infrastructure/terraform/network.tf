@@ -65,6 +65,29 @@ resource "azapi_resource" "gettoananswer_main_subnet" {
   depends_on = [azurerm_network_security_group.gettoananswer-nsg]
 }
 
+
+
+resource "azapi_resource" "gettoananswer_api_pe_subnet" {
+  type      = "Microsoft.Network/virtualNetworks/subnets@2024-05-01"
+  name      = "${var.prefix}subnet-uks-api-pri-endpoint"
+  parent_id = azurerm_virtual_network.gettoananswer_vnet.id
+
+  body = {
+    properties = {
+      addressPrefixes = ["10.0.2.0/24"]
+      networkSecurityGroup = {
+        id = azurerm_network_security_group.gettoananswer-nsg.id
+      }
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
+  depends_on = [azurerm_network_security_group.gettoananswer-nsg]
+}
+
 resource "azapi_resource" "gettoananswer_kv_subnet" {
   type      = "Microsoft.Network/virtualNetworks/subnets@2024-05-01"
   name      = "${var.prefix}subnet-uks-keyvault"
