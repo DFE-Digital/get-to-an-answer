@@ -64,11 +64,11 @@ export async function goToEditQuestionnaireTitlePageByUrl(
     waitUntil: LoadState = 'networkidle'): Promise<AddQuestionnairePage> {
     
     const adminUrl = EnvConfig.ADMIN_URL;
-    const editTitleUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/edit`;
+    const editTitleUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/edit-name`;
 
     await page.goto(editTitleUrl, {waitUntil});
 
-    const addQuestionnairePage = new AddQuestionnairePage(page)
+    const addQuestionnairePage = new AddQuestionnairePage(page, 'update')
     await addQuestionnairePage.waitForPageLoad();
 
     return addQuestionnairePage;

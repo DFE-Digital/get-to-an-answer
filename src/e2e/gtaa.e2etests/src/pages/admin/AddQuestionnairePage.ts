@@ -2,7 +2,7 @@ import {expect, Page, Locator} from '@playwright/test';
 import {BasePage} from '../BasePage';
 import {ErrorMessages} from "../../constants/test-data-constants";
 
-type Mode = 'create' | 'edit' | 'clone';
+type Mode = 'create' | 'update' | 'clone';
 
 export class AddQuestionnairePage extends BasePage {
     // ===== Locators =====
@@ -117,7 +117,7 @@ export class AddQuestionnairePage extends BasePage {
         await expect(this.errorSummary, '❌ Attribute tabIndex is missing').toHaveAttribute('tabindex', '-1');
         await expect(this.errorSummary, '❌ Error summary not focused').toBeFocused();
 
-        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_TITLE);
+        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
 
         await this.errorLink.click();
         //await expect(this.titleInput).toBeFocused(); //TBC, failing here and not getting a focus
