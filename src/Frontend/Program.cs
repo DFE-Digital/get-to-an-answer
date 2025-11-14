@@ -88,10 +88,10 @@ app.Use(async (context, next) =>
     await next();
 });
 
-if (!builderIsLocalEnvironment)
+if (builderIsLocalEnvironment)
 {
     // Configure the HTTP request pipeline.
-    app.UseExceptionHandler("/error");
+    app.UseExceptionHandler("/error/404");
 
     // Handle non-existing routes (404)
     app.UseStatusCodePagesWithReExecute("/error/{0}");
