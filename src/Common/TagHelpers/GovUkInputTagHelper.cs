@@ -9,16 +9,9 @@ namespace Common.TagHelpers;
 
 // Targets inputs/selects/textareas that are bound with asp-for
 [HtmlTargetElement("govuk-input", Attributes = ForAttributeName)]
-public class GovUkInputTagHelper : TagHelper
+public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
 {
     private const string ForAttributeName = "asp-for";
-
-    private readonly IHtmlGenerator _generator;
-
-    public GovUkInputTagHelper(IHtmlGenerator generator)
-    {
-        _generator = generator;
-    }
 
     [HtmlAttributeName(ForAttributeName)] public ModelExpression For { get; set; } = default!;
 
@@ -27,7 +20,7 @@ public class GovUkInputTagHelper : TagHelper
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
         // Generate a standard MVC input (equivalent to <input asp-for="...">)
-        var tagBuilder = _generator.GenerateTextBox(
+        var tagBuilder = generator.GenerateTextBox(
             ViewContext,
             For.ModelExplorer,
             For.Name,
