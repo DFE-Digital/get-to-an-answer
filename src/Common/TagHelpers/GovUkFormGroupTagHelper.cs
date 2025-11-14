@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 namespace Common.TagHelpers;
 
 [HtmlTargetElement("govuk-form-group", Attributes = ForAttributeName)]
-public class FormGroupTagHelper : TagHelper
+public class GovUkFormGroupTagHelper : TagHelper
 {
     private const string ForAttributeName = "asp-for";
 

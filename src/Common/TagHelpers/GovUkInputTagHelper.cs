@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Common.TagHelpers;
 
@@ -8,16 +10,29 @@ namespace Common.TagHelpers;
 [HtmlTargetElement("govuk-input", Attributes = ForAttributeName)]
 [HtmlTargetElement("select", Attributes = ForAttributeName)]
 [HtmlTargetElement("textarea", Attributes = ForAttributeName)]
-public class FieldInputTagHelper : TagHelper
+public class FieldInputTagHelper : InputTagHelper
 {
     private const string ForAttributeName = "asp-for";
 
-    [HtmlAttributeName(ForAttributeName)] public ModelExpression For { get; set; } = default!;
+    public FieldInputTagHelper(IHtmlGenerator generator, ModelExpression @for) : base(generator)
+    {
+        For = @for;
+    }
+
+    [HtmlAttributeName(ForAttributeName)]
+    public ModelExpression For { get; set; } = default!;
 
     // Gives access to ModelState / TemplateInfo
-    [ViewContext] [HtmlAttributeNotBound] public ViewContext ViewContext { get; set; } = default!;
+    [ViewContext]
+    [HtmlAttributeNotBound]
+    public ViewContext ViewContext
+    {
+        get => base.ViewContext!;
+        set => base.ViewContext = value;
+    }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
+    
     {
         // If the tag is <govuk-input>, render it as a normal <input /> element
         if (string.Equals(output.TagName, "govuk-input", StringComparison.OrdinalIgnoreCase))
@@ -36,7 +51,8 @@ public class FieldInputTagHelper : TagHelper
             {
                 var existingClasses = classAttr.Value?.ToString() ?? string.Empty;
                 var parts = existingClasses.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
-                if (!parts.Contains("govuk-input"))
+
+                if (!parts.Contains("govuk-input") && !parts.Contains("govuk-checkboxes__input"))
                 {
                     parts.Insert(0, "govuk-input");
                 }
