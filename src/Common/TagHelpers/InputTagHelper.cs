@@ -57,8 +57,8 @@ public class FieldInputTagHelper : TagHelper
             return attr.Value.ToString() ?? string.Empty;
         }
 
-        // Ensure the element has the base govuk-input class (or govuk-select / govuk-textarea as appropriate)
-        // We keep it simple: prefer govuk-input for input elements, leave existing classes otherwise.
+        // // Ensure the element has the base govuk-input class (or govuk-select / govuk-textarea as appropriate)
+        // // We keep it simple: prefer govuk-input for input elements, leave existing classes otherwise.
         if (string.Equals(output.TagName, "input", StringComparison.OrdinalIgnoreCase))
         {
             if (output.Attributes.TryGetAttribute("class", out var existingClassAttr))
@@ -69,7 +69,7 @@ public class FieldInputTagHelper : TagHelper
                 {
                     parts.Insert(0, "govuk-input"); // ensure govuk-input is present first
                 }
-
+        
                 output.Attributes.SetAttribute("class", string.Join(" ", parts));
             }
             else
@@ -77,44 +77,44 @@ public class FieldInputTagHelper : TagHelper
                 output.Attributes.SetAttribute("class", "govuk-input");
             }
         }
-        else if (string.Equals(output.TagName, "select", StringComparison.OrdinalIgnoreCase))
-        {
-            // for selects prefer govuk-select
-            if (output.Attributes.TryGetAttribute("class", out var existingClassAttr))
-            {
-                var classes = GetAttributeStringValue(existingClassAttr);
-                var parts = classes.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
-                if (!parts.Contains("govuk-select"))
-                {
-                    parts.Insert(0, "govuk-select");
-                }
-
-                output.Attributes.SetAttribute("class", string.Join(" ", parts));
-            }
-            else
-            {
-                output.Attributes.SetAttribute("class", "govuk-select");
-            }
-        }
-        else if (string.Equals(output.TagName, "textarea", StringComparison.OrdinalIgnoreCase))
-        {
-            // for textareas prefer govuk-textarea
-            if (output.Attributes.TryGetAttribute("class", out var existingClassAttr))
-            {
-                var classes = GetAttributeStringValue(existingClassAttr);
-                var parts = classes.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
-                if (!parts.Contains("govuk-textarea"))
-                {
-                    parts.Insert(0, "govuk-textarea");
-                }
-
-                output.Attributes.SetAttribute("class", string.Join(" ", parts));
-            }
-            else
-            {
-                output.Attributes.SetAttribute("class", "govuk-textarea");
-            }
-        }
+        // else if (string.Equals(output.TagName, "select", StringComparison.OrdinalIgnoreCase))
+        // {
+        //     // for selects prefer govuk-select
+        //     if (output.Attributes.TryGetAttribute("class", out var existingClassAttr))
+        //     {
+        //         var classes = GetAttributeStringValue(existingClassAttr);
+        //         var parts = classes.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+        //         if (!parts.Contains("govuk-select"))
+        //         {
+        //             parts.Insert(0, "govuk-select");
+        //         }
+        //
+        //         output.Attributes.SetAttribute("class", string.Join(" ", parts));
+        //     }
+        //     else
+        //     {
+        //         output.Attributes.SetAttribute("class", "govuk-select");
+        //     }
+        // }
+        // else if (string.Equals(output.TagName, "textarea", StringComparison.OrdinalIgnoreCase))
+        // {
+        //     // for textareas prefer govuk-textarea
+        //     if (output.Attributes.TryGetAttribute("class", out var existingClassAttr))
+        //     {
+        //         var classes = GetAttributeStringValue(existingClassAttr);
+        //         var parts = classes.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+        //         if (!parts.Contains("govuk-textarea"))
+        //         {
+        //             parts.Insert(0, "govuk-textarea");
+        //         }
+        //
+        //         output.Attributes.SetAttribute("class", string.Join(" ", parts));
+        //     }
+        //     else
+        //     {
+        //         output.Attributes.SetAttribute("class", "govuk-textarea");
+        //     }
+        // }
 
         // If there's an error, ensure aria-describedby references the error id (and keep any existing describedby)
         if (hasError)
