@@ -101,7 +101,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
             await db.ResetQuestionnaireToDraft(request.QuestionnaireId);
 
             logger.LogInformation("CreateAnswer succeeded AnswerId={AnswerId}", entity.Id);
-            return Ok(EntityToDto(entity));
+            return Created(EntityToDto(entity));
         }
         catch (Exception ex)
         {

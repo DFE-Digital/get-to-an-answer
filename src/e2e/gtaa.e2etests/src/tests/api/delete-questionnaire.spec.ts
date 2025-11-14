@@ -59,9 +59,7 @@ test.describe('DELETE Questionnaire', () => {
         expect200HttpStatusCode(questionPostResponse, 201);
         
         const {
-            answerPostResponse, 
-            answer,
-            payload
+            answerPostResponse
         } = await createSingleAnswer(
             request,
             {
@@ -71,7 +69,7 @@ test.describe('DELETE Questionnaire', () => {
             },
         );
         
-        expect200HttpStatusCode(answerPostResponse, 200);
+        expect200HttpStatusCode(answerPostResponse, 201);
         
         const {deleteQuestionnaireResponse, deleteQuestionnaireBody: resBody } = await deleteQuestionnaire(
             request,

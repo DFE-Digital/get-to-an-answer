@@ -136,6 +136,10 @@ if (builderIsLocalEnvironment)
 {
     app.UseMockMvcDevEndpoints();
 }
+else if (app.Environment.IsDevelopment())
+{
+    app.UseMockMvcDevEndpoints();
+}
 
 app.MapStaticAssets();
 app.MapRazorPages();

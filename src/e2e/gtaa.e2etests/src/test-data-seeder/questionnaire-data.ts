@@ -1,8 +1,8 @@
 import {QuestionnaireBuilder} from '../builders/QuestionnaireBuilder';
-import {ClaimTypes, JwtHelper, SimpleDate} from '../helpers/JwtHelper';
-import {APIRequestContext, APIResponse} from "@playwright/test";
+import {JwtHelper} from '../helpers/JwtHelper';
+import {APIRequestContext} from "@playwright/test";
 import {parseBody} from "../helpers/ParseBody";
-import { EnvConfig } from '../config/environment-config';
+import {EnvConfig} from '../config/environment-config';
 
 const BASE_URL = EnvConfig.API_URL;
 
@@ -200,39 +200,100 @@ export async function getInitialQuestion(
     return await response.json();
 }
 
+
+export async function getInitialState(
+    request: APIRequestContext,
+    questionnaireId: string,
+    preview: boolean = false,
+) {
+    const response = await request.get(`${BASE_URL}/api/questionnaires/${questionnaireId}/initial-state?preview=${preview}`);
+
+    const responseBody = await parseBody(response);
+
+    return {
+        response,
+        questionnaireInfo: responseBody,
+    }
+}
+
 export async function getNextState(
     request: APIRequestContext,
     questionnaireId: number | string,
     data: any,
-    bearerToken?: string
+    preview?: string
 ) {
-    const response = await request.post(`${BASE_URL}/api/questionnaires/${questionnaireId}/next`, {
-        data,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
-        }
-    });
+    const response = await request.post(`${BASE_URL}/api/questionnaires/${questionnaireId}/next-state?preview=${preview}`);
     if (!response.ok()) {
         throw new Error(`❌ Failed to get next state: ${response.status()}`);
     }
     return await response.json();
 }
 
-// Contributors
-
-export async function addSelfToQuestionnaireContributors(
+export async function getLastInfo(
     request: APIRequestContext,
-    questionnaireId: number | string,
-    bearerToken?: string
+    questionnaireSlug: string
 ) {
-    const response = await request.put(`${BASE_URL}/api/questionnaires/${questionnaireId}/contributors/self`, {
+    const response = await request.get(`${BASE_URL}/api/questionnaires/${questionnaireSlug}/publishes/last/info`);
+    
+    const responseBody = await parseBody(response);
+
+    return {
+        response,
+        questionnaireInfo: responseBody,
+    }
+}
+
+export async function addContributor(
+    request: APIRequestContext, 
+    questionnaireId: string, 
+    email: string,
+    bearerToken?: string,
+) {
+    return await request.put(`${BASE_URL}/api/questionnaires/${questionnaireId}/contributors`, {
+        data: {email},
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
+        }
+    })
+}
+
+export async function getContributors(
+    request: APIRequestContext, 
+    questionnaireId: string,
+    bearerToken?: string,
+) {
+    const response = await request.get(`${BASE_URL}/api/questionnaires/${questionnaireId}/contributors`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
+        }
+    });
+
+    const responseBody = await parseBody(response);
+
+    return {
+        response,
+        contributors: responseBody,
+    }
+}
+
+export async function removeContributor(
+    request: APIRequestContext,
+    questionnaireId: string,
+    email: string,
+    bearerToken?: string,
+) {
+    const response = await request.delete(`${BASE_URL}/api/questionnaires/${questionnaireId}/contributors/${encodeURIComponent(email)}`, {
         headers: {
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`
         }
     });
-    if (!response.ok()) {
-        throw new Error(`❌ Failed to add self to contributors: ${response.status()}`);
+
+    const responseBody = await parseBody(response);
+
+    return {
+        response,
+        body: responseBody,
     }
-    return await response.json();
 }

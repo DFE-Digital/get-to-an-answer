@@ -35,8 +35,8 @@ test.describe('GET answers for a question', () => {
         const response = await getAnswer(request, question.id, JwtHelper.InvalidToken);
 
         // --- HTTP-level checks ---
-        expect(response.answerGetResponse.ok()).toBeFalsy();
-        expect(response.answerGetResponse.status()).toBe(401);
+        expect(response.response.ok()).toBeFalsy();
+        expect(response.response.status()).toBe(401);
     });
 
     test('Validate GET answers with expired JWT token', async ({request}) => {
@@ -47,8 +47,8 @@ test.describe('GET answers for a question', () => {
         const response = await getAnswer(request, question.id, JwtHelper.ExpiredToken);
 
         // --- HTTP-level checks ---
-        expect(response.answerGetResponse.ok()).toBeFalsy();
-        expect(response.answerGetResponse.status()).toBe(401);
+        expect(response.response.ok()).toBeFalsy();
+        expect(response.response.status()).toBe(401);
     });
 
     test('Validate GET answers for non-existent question returns 404', async ({request}) => {
@@ -58,8 +58,8 @@ test.describe('GET answers for a question', () => {
         const response = await getAnswer(request, nonExistentQuestionId);
 
         // --- HTTP-level checks ---
-        expect(response.answerGetResponse.ok()).toBeFalsy();
-        expect(response.answerGetResponse.status()).toBe(404);
+        expect(response.response.ok()).toBeFalsy();
+        expect(response.response.status()).toBe(404);
     });
 
     test('Validate GET answers returns only answers for the specific question (no cross-leakage)', async ({request}) => {
@@ -128,8 +128,8 @@ test.describe('GET answers for a question', () => {
         const response = await getAnswer(request, invalidQuestionId);
 
         // --- HTTP-level checks ---
-        expect(response.answerGetResponse.ok()).toBeFalsy();
-        expect(response.answerGetResponse.status()).toBe(404);
+        expect(response.response.ok()).toBeFalsy();
+        expect(response.response.status()).toBe(404);
     });
 
     test('Validate GET answers returns multiple answers with correct schema and content', async ({request}) => {

@@ -18,7 +18,7 @@ public class EditQuestionnaireName(IApiClient apiClient, ILogger<EditQuestionnai
     
     [BindProperty(Name = "Title")]
     [Required(ErrorMessage = "Enter a questionnaire title")]
-    [GdsTitle]
+    [GdsHeadContent]
     public string? Title { get; set; }
     
     public IActionResult OnGet()

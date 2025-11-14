@@ -159,3 +159,35 @@ export async function moveQuestionUpOne(
 
     return response.status();
 }
+
+export async function moveUpQuestion(
+    request: any, 
+    questionnaireId: string, 
+    questionId: string,
+    bearerToken?: string) {
+    return request.patch(
+        `${BASE_URL}/api/questionnaires/${questionnaireId}/questions/${questionId}?action=MoveUp`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${bearerToken ?? JwtHelper.ValidToken}`,
+            },
+        }
+    );
+}
+
+export async function moveDownQuestion(
+    request: any,
+    questionnaireId: string,
+    questionId: string,
+    bearerToken?: string) {
+    return request.patch(
+        `${BASE_URL}/api/questionnaires/${questionnaireId}/questions/${questionId}?action=MoveDown`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${bearerToken ?? JwtHelper.ValidToken}`,
+            },
+        }
+    );
+}

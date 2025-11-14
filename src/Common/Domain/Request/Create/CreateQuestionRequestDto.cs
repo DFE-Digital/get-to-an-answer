@@ -10,7 +10,7 @@ public class CreateQuestionRequestDto
     public required Guid QuestionnaireId { get; set; }
     
     [Required(ErrorMessage = "Enter question content")]
-    [GdsTitle(MinLength = 1, MaxLength = 500,
+    [GdsHeadContent(MinLength = 1, MaxLength = 500,
         ErrorMessage = "Content must be in plain language, avoid all-caps, not be empty or only whitespace, and should not contain repeated spaces.")]
     public required string Content { get; set; }
     public string? Description { get; set; }

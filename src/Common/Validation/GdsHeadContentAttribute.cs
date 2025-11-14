@@ -2,7 +2,7 @@ namespace Common.Validation;
 
 using System.ComponentModel.DataAnnotations;
 
-public sealed class GdsTitleAttribute : ValidationAttribute
+public sealed class GdsHeadContentAttribute : ValidationAttribute
 {
     // Adjust limits as needed
     public int MinLength { get; init; } = 1;
