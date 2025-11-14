@@ -82,7 +82,7 @@ export class TermsOfUsePage extends BasePage {
         await expect(this.checkboxLabel, '❌ Checkbox label not visible').toBeVisible();
     }
 
-    async validateErrorMessage() {
+    async validateErrorMessageSummary() {
         await expect(this.errorSummaryTitle, '❌ Error summary title is not visible')
             .toBeVisible();
         await expect(this.errorSummary, '❌ Error summary is not visible')
@@ -98,8 +98,14 @@ export class TermsOfUsePage extends BasePage {
         await this.acceptedErrorLink.click();
         await expect(this.agreeCheckbox, '❌ Agree checkbox not focused')
             .toBeFocused();
+    }
+
+    async validateInlineErrorMessage() {
         await expect(this.inlineError, '❌ Inline error not visible inside fieldset')
             .toBeVisible();
+    }
+
+    async validateFormGroupErrorClass() {
         await expect(this.formGroup, '❌ Form group missing error class')
             .toHaveClass(/govuk-form-group--error/);
     }

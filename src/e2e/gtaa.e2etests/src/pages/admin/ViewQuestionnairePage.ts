@@ -35,28 +35,29 @@ export class ViewQuestionnairePage extends BasePage {
         );
         this.table = new ViewQuestionnaireTable(page);
     }
-    
+
     // ===== Actions =====
     async clickCreateNewQuestionnaire(): Promise<void> {
         await this.createNewQuestionnaireButton.click();
     }
-    
+
+    // ===== Validations =====
     async expectQuestionnaireHeadingOnPage(): Promise<void> {
-        await expect(this.questionnaireHeading).toBeVisible();
+        await expect(this.questionnaireHeading, '❌ Questionnaire heading not visible').toBeVisible();
     }
 
     async verifyHelpUserHeadingVisible() {
-        await expect(this.HelpUserHeading).toBeVisible();
+        await expect(this.HelpUserHeading, '❌ Help user heading not visible').toBeVisible();
     }
 
     async verifyHelpUserDescriptionVisible() {
-        await expect(this.HelpUserDescription).toBeVisible();
+        await expect(this.HelpUserDescription, '❌ Help user description not visible').toBeVisible();
     }
 
     async verifyCreateButtonVisible() {
-        await expect(this.createNewQuestionnaireButton).toBeVisible();
+        await expect(this.createNewQuestionnaireButton, '❌ Create new questionnaire button not visible').toBeVisible();
     }
-    
+
     async verifyQuestionnaireListedByStructure(): Promise<void> {
         await this.table.verifyVisible();
     }
@@ -64,9 +65,9 @@ export class ViewQuestionnairePage extends BasePage {
     async assertPageElements() {
         await this.verifyHeaderLinks()
         await this.verifyFooterLinks();
-        await expect(this.section).toBeVisible();
+        await expect(this.section, '❌ Section not visible').toBeVisible();
         await this.verifyCreateButtonVisible();
-        
+
         await this.table.verifyVisible();
     }
 }

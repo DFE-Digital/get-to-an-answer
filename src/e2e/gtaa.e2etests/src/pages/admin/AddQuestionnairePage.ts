@@ -93,7 +93,7 @@ export class AddQuestionnairePage extends BasePage {
         await this.enterTitle(finalTitle);
         await this.clickSaveAndContinue();
     }
-    
+
     // ===== Validations =====
     async verifyLabelAndHintPresent(): Promise<void> {
         await expect(this.titleLabel).toBeVisible();
@@ -111,21 +111,26 @@ export class AddQuestionnairePage extends BasePage {
             .toContain('forms-name-input-name-field-error');
     }
 
-    async validateMissingTitleMessage() {
+    async validateMissingTitleMessageSummary() {
         await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
-         await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
-         await expect(this.errorSummary,'❌ Attribute tabIndex is missing').toHaveAttribute('tabindex', '-1');
-         await expect(this.errorSummary,'❌ Error summary not focused').toBeFocused();
-        
-         await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_TITLE);
-        
-         await this.errorLink.click();
-         //await expect(this.titleInput).toBeFocused(); //TBC, failing here and not getting a focus
+        await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
+        await expect(this.errorSummary, '❌ Attribute tabIndex is missing').toHaveAttribute('tabindex', '-1');
+        await expect(this.errorSummary, '❌ Error summary not focused').toBeFocused();
 
-        await expect(this.titleFormGroup, '❌ Title form group missing').toBeVisible();
+        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_TITLE);
+
+        await this.errorLink.click();
+        //await expect(this.titleInput).toBeFocused(); //TBC, failing here and not getting a focus
+    }
+
+    async validateInlineTitleError() {
         await expect(this.inlineTitleError, '❌ Inline title error not visible').toBeVisible();
     }
-    
+
+    async validateTitleFormGroup() {
+        await expect(this.titleFormGroup, '❌ Title form group missing').toBeVisible();
+    }
+
     async assertPageElements() {
         await this.verifyHeaderLinks()
         await this.verifyFooterLinks();

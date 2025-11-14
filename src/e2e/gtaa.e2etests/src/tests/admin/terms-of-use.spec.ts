@@ -37,7 +37,9 @@ test.describe('Get to an answer terms of use page', () => {
 
         await termsOfUsePage.submitWithoutAccepting();
 
-        await termsOfUsePage.validateErrorMessage();
+        await termsOfUsePage.validateErrorMessageSummary();
+        await termsOfUsePage.validateInlineErrorMessage();
+        await termsOfUsePage.validateFormGroupErrorClass();
     });
 
     test('Successful acceptance - checkbox is ticked and user navigates to next step', async ({page}) => {

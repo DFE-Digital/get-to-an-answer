@@ -50,7 +50,9 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await addQuestionnairePage.enterTitle(''); 
         await addQuestionnairePage.clickSaveAndContinue();
 
-        await addQuestionnairePage.validateMissingTitleMessage();
+        await addQuestionnairePage.validateMissingTitleMessageSummary();
+        await addQuestionnairePage.validateInlineTitleError();
+        await addQuestionnairePage.validateTitleFormGroup();
     });
     
     test('Submit a new questionnaire with invalid title', async ({page}) => {
@@ -60,7 +62,9 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await addQuestionnairePage.enterInvalidTitle();
         await addQuestionnairePage.clickSaveAndContinue();
 
-        await addQuestionnairePage.validateMissingTitleMessage();
+        await addQuestionnairePage.validateMissingTitleMessageSummary();
+        await addQuestionnairePage.validateInlineTitleError();
+        await addQuestionnairePage.validateTitleFormGroup();
     });
     
     // TBC , aria-describedBy value is not correct

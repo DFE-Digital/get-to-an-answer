@@ -1,7 +1,9 @@
 import {Page, expect} from '@playwright/test';
 import {SignInPage} from '../pages/admin/SignInPage';
 import {ViewQuestionnairePage} from '../pages/admin/ViewQuestionnairePage';
+import {ViewQuestionPage} from '../pages/admin/ViewQuestionPage';
 import {AddQuestionnairePage} from '../pages/admin/AddQuestionnairePage';
+import {AddQuestionPage} from '../pages/admin/AddQuestionPage';
 import {EditQuestionnairePage} from "../pages/admin/EditQuestionnairePage";
 import {TermsOfUsePage} from "../pages/admin/TermsOfUsePage";
 import {EnvConfig} from '../config/environment-config';
@@ -55,15 +57,16 @@ export async function goToEditQuestionnairePage(page: Page): Promise<EditQuestio
     return editQuestionnairePage;
 }
 
+// =====  URL based page navigation =====
 export async function goToEditQuestionnaireTitlePageByUrl(
     page: Page,
     questionnaireId: string,
     waitUntil: LoadState = 'networkidle'): Promise<AddQuestionnairePage> {
     
     const adminUrl = EnvConfig.ADMIN_URL;
-    const editUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/edit`;
+    const editTitleUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/edit`;
 
-    await page.goto(editUrl, {waitUntil});
+    await page.goto(editTitleUrl, {waitUntil});
 
     const addQuestionnairePage = new AddQuestionnairePage(page)
     await addQuestionnairePage.waitForPageLoad();
@@ -85,4 +88,36 @@ export async function goToEditQuestionnairePageByUrl(
     await editQuestionnairePage.waitForPageLoad();
 
     return editQuestionnairePage;
+}
+
+export async function goToViewQuestionsPageByUrl(
+    page: Page,
+    questionnaireId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<ViewQuestionPage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const viewQuestionUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/questions`;
+
+    await page.goto(viewQuestionUrl, {waitUntil});
+
+    const viewQuestionPage = new ViewQuestionPage(page)
+    await viewQuestionPage.waitForPageLoad();
+
+    return viewQuestionPage;
+}
+
+export async function goToAddQuestionPageByUrl(
+    page: Page,
+    questionnaireId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<AddQuestionPage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const viewQuestionUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/questions/create`;
+
+    await page.goto(viewQuestionUrl, {waitUntil});
+
+    const addQuestionPage = new AddQuestionPage(page)
+    await addQuestionPage.waitForPageLoad();
+
+    return addQuestionPage;
 }

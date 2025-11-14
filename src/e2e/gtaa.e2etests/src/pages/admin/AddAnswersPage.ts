@@ -3,7 +3,7 @@ import {BasePage} from "../BasePage";
 
 type Mode = 'create' | 'edit';
 
-export class CreateAnswerOptionsPage extends BasePage {
+export class AddAnswersPage extends BasePage {
     // ===== Locators =====
     private optionContent(i: number): Locator {
         return this.page.locator(`input[name="Answers[${i}].Content"]`);
