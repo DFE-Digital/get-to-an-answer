@@ -161,7 +161,7 @@
 
 <form accept-charset="UTF-8" method="post">
   @Html.AntiForgeryToken()
-  <govuk-form-group asp-for="@Model.Accepted" >
+  <govuk-form-group asp-for="@Model.Agreed" >
     <fieldset class="govuk-fieldset" aria-describedby="signIn-hint">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
         <h2 class="govuk-fieldset__heading">
@@ -170,21 +170,21 @@
       </legend>
       <div id="signIn-hint" class="govuk-hint"></div>
 
-      <govuk-field-error asp-for="@Model.Accepted" error-id="forms-name-input-name-field-error"></govuk-field-error>
+      <govuk-field-error asp-for="@Model.Agreed" error-id="forms-name-input-name-field-error"></govuk-field-error>
 
       <div class="govuk-checkboxes" data-module="govuk-checkboxes">
         <div class="govuk-checkboxes__item">
-          <input asp-for="Accepted" 
+          <govuk-input asp-for="Agreed" 
                  class="govuk-checkboxes__input" 
-                 id="Accepted" name="Accepted"
+                 id="Agreed"
                  type="checkbox"
                  value="true" 
-                 aria-describedby="agree-checkbox-item-hint"
-                 govuk-error-for="@Model.Accepted"/>
-          <label class="govuk-label govuk-checkboxes__label" for="Accepted">
+                 aria-describedby="agreed-checkbox-item-hint"
+                 govuk-error-for="@Model.Agreed"/>
+          <label class="govuk-label govuk-checkboxes__label" for="Agreed">
             I agree to these terms
           </label>
-          <div id="agree-checkbox-item-hint" class="govuk-hint govuk-checkboxes__hint">
+          <div id="agreed-checkbox-item-hint" class="govuk-hint govuk-checkboxes__hint">
           </div>
         </div>
       </div>

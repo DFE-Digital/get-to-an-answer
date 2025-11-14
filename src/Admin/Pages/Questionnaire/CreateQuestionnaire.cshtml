@@ -5,6 +5,8 @@
 @{
   Layout = "Shared/_Layout";
   ViewData["Title"] = "Create new questionnaire";
+
+  const string inputId = "questionnaire-title";
 }
 
 @section BeforeContent
@@ -20,28 +22,29 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <form accept-charset="UTF-8" method="post">
-      <govuk-form-group asp-for="@Model.CreateQuestionnaire.Title">
+      <govuk-form-group asp-for="@Model.Title">
         <h1 class="govuk-label-wrapper">
-          <label for="forms-name-input-name-field" class="govuk-label govuk-label--l">What’s the name of your
+          <label for="@inputId" class="govuk-label govuk-label--l">What’s the name of your
             questionnaire?</label>
         </h1>
 
-        <div class="govuk-hint" id="forms-name-input-name-hint">
+        <div class="govuk-hint" id="@inputId-hint">
           The questionnaire name will be shown at the top of each page of the form.
           <br/><br/>
           Use a name that describes what the form will help people to do. For example ‘Check your care leaver support’.
         </div>
 
-        <govuk-field-error asp-for="@Model.CreateQuestionnaire.Title"
-                           error-id="forms-name-input-name-field-error"></govuk-field-error>
+        <govuk-field-error asp-for="@Model.Title"
+                           error-id="@inputId-error">
+        </govuk-field-error>
 
-        <input id="forms-name-input-name-field"
+        <govuk-input id="@inputId"
                class="govuk-input"
-               aria-describedby="forms-name-input-name-hint"
+               aria-describedby="@inputId-hint"
                type="text"
-               asp-for="@Model.CreateQuestionnaire.Title"
-               value="@(Model?.CreateQuestionnaire?.Title ?? "")"
-               govuk-error-for="@Model?.CreateQuestionnaire?.Title"/>
+               asp-for="@Model.Title"
+               value="@(Model?.Title ?? "")"
+               govuk-error-for="@Model?.Title"/>
       </govuk-form-group>
 
       <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button"
