@@ -250,6 +250,71 @@ public static class MockAzureAdExtensions
 
         return services;
     }
+    
+    public static IApplicationBuilder UseMvcTokenEndpoints(this IApplicationBuilder app)
+    {
+        app.UseEndpoints(_ => { });
+        
+        var jsonOptions = new JsonSerializerOptions
+        {
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+            WriteIndented = true
+        };
+
+        app.UseRouting();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapGet("/dev/login", async context =>
+            {
+                // Authenticate using the mock scheme to build a principal
+                var result = await context.AuthenticateAsync(MockScheme);
+                if (!result.Succeeded || result.Principal == null)
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await context.Response.WriteAsync("Mock login failed");
+                    return;
+                }
+
+                // Issue cookie
+                await context.SignInAsync(MockCookieScheme, result.Principal, new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8),
+                    AllowRefresh = true,
+                    Items =
+                    {
+                        { ".Token.id_token", result.Properties.GetTokenValue("id_token") }
+                    }
+                });
+                context.Response.Redirect("/");
+            }).AllowAnonymous();
+
+            endpoints.MapGet("/dev/logout", async context =>
+            {
+                await context.SignOutAsync(MockCookieScheme);
+                context.Response.Redirect("/");
+            });
+
+            endpoints.MapGet("/dev/me", async context =>
+            {
+                var user = context.User;
+                var payload = new
+                {
+                    user.Identity?.IsAuthenticated,
+                    user.Identity?.Name,
+                    Claims = user.Claims.Select(c => new { c.Type, c.Value })
+                };
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(JsonSerializer.Serialize(payload, jsonOptions));
+            });
+        });
+
+        return app;
+    }
 
     // Map minimal dev endpoints for login/logout and info in MVC
     public static IApplicationBuilder UseMockMvcDevEndpoints(this IApplicationBuilder app)
