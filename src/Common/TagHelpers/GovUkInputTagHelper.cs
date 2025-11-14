@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -8,73 +9,52 @@ namespace Common.TagHelpers;
 
 // Targets inputs/selects/textareas that are bound with asp-for
 [HtmlTargetElement("govuk-input", Attributes = ForAttributeName)]
-[HtmlTargetElement("select", Attributes = ForAttributeName)]
-[HtmlTargetElement("textarea", Attributes = ForAttributeName)]
-public class FieldInputTagHelper : InputTagHelper
+public class GovUkInputTagHelper : TagHelper
 {
     private const string ForAttributeName = "asp-for";
 
-    public FieldInputTagHelper(IHtmlGenerator generator, ModelExpression @for) : base(generator)
+    private readonly IHtmlGenerator _generator;
+
+    public GovUkInputTagHelper(IHtmlGenerator generator)
     {
-        For = @for;
+        _generator = generator;
     }
 
-    [HtmlAttributeName(ForAttributeName)]
-    public ModelExpression For { get; set; } = default!;
+    [HtmlAttributeName(ForAttributeName)] public ModelExpression For { get; set; } = default!;
 
-    // Gives access to ModelState / TemplateInfo
-    [ViewContext]
-    [HtmlAttributeNotBound]
-    public ViewContext ViewContext
-    {
-        get => base.ViewContext!;
-        set => base.ViewContext = value;
-    }
+    [ViewContext] [HtmlAttributeNotBound] public ViewContext ViewContext { get; set; } = default!;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
-    
     {
-        // If the tag is <govuk-input>, render it as a normal <input /> element
-        if (string.Equals(output.TagName, "govuk-input", StringComparison.OrdinalIgnoreCase))
+        // Generate a standard MVC input (equivalent to <input asp-for="...">)
+        var tagBuilder = _generator.GenerateTextBox(
+            ViewContext,
+            For.ModelExplorer,
+            For.Name,
+            For.Model,
+            format: null,
+            htmlAttributes: null);
+
+        // Start with the generated input as the base
+        output.TagName = "input";
+        output.TagMode = TagMode.SelfClosing;
+
+        // Copy generated attributes into TagHelperOutput (name, id, value, etc.)
+        output.Attributes.Clear();
+        foreach (var attr in tagBuilder.Attributes)
         {
-            output.TagName = "input";
-            output.TagMode = TagMode.SelfClosing;
-
-            // Ensure type="text" unless explicitly overridden
-            if (!output.Attributes.TryGetAttribute("type", out _))
-            {
-                output.Attributes.SetAttribute("type", "text");
-            }
-
-            // Ensure the govuk-input base class is present
-            if (output.Attributes.TryGetAttribute("class", out var classAttr))
-            {
-                var existingClasses = classAttr.Value?.ToString() ?? string.Empty;
-                var parts = existingClasses.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
-
-                if (!parts.Contains("govuk-input") && !parts.Contains("govuk-checkboxes__input"))
-                {
-                    parts.Insert(0, "govuk-input");
-                }
-
-                output.Attributes.SetAttribute("class", string.Join(" ", parts));
-            }
-            else
-            {
-                output.Attributes.SetAttribute("class", "govuk-input");
-            }
+            output.Attributes.Add(attr.Key, attr.Value);
         }
 
-        // Determine the model field full name (e.g. "Parent.Child.Name")
-        var fullName = ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(For.Name);
-
-        // Determine whether ModelState contains an error for this field
-        var modelState = ViewContext.ViewData.ModelState;
-        var hasError = modelState.TryGetValue(fullName, out var entry) && entry.Errors.Count > 0;
-
-        if (fullName.Contains('.'))
+        // Merge any attributes defined in the Razor markup (id, class, aria-describedby, etc.)
+        foreach (var attr in context.AllAttributes)
         {
-            fullName = fullName.Substring(fullName.LastIndexOf('.') + 1);
+            // Skip asp-* attributes; they are not real HTML attributes
+            if (attr.Name.StartsWith("asp-", System.StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            // If attribute already exists, let the Razor-specified value win
+            output.Attributes.SetAttribute(attr.Name, attr.Value);
         }
 
         // Helper to get the string value from a TagHelper attribute (handles IHtmlContent)
@@ -83,9 +63,9 @@ public class FieldInputTagHelper : InputTagHelper
             if (attr == null || attr.Value == null)
                 return string.Empty;
 
-            if (attr.Value is Microsoft.AspNetCore.Html.IHtmlContent htmlContent)
+            if (attr.Value is IHtmlContent htmlContent)
             {
-                using var sw = new System.IO.StringWriter();
+                using var sw = new StringWriter();
                 htmlContent.WriteTo(sw, System.Text.Encodings.Web.HtmlEncoder.Default);
                 return sw.ToString();
             }
@@ -93,20 +73,52 @@ public class FieldInputTagHelper : InputTagHelper
             return attr.Value.ToString() ?? string.Empty;
         }
 
-        // If there's an error, ensure aria-describedby includes the error id (and keep any existing describedby)
+        // Ensure type="text" unless explicitly overridden
+        if (!output.Attributes.TryGetAttribute("type", out _))
+        {
+            output.Attributes.SetAttribute("type", "text");
+        }
+
+        // Ensure the govuk-input base class is present (or preserve checkbox class if used that way)
+        if (output.Attributes.TryGetAttribute("class", out var classAttr))
+        {
+            var existingClasses = GetAttributeStringValue(classAttr);
+            var parts = existingClasses.Split(' ', System.StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            if (!parts.Contains("govuk-input") && !parts.Contains("govuk-checkboxes__input"))
+            {
+                parts.Insert(0, "govuk-input");
+            }
+
+            output.Attributes.SetAttribute("class", string.Join(" ", parts));
+        }
+        else
+        {
+            output.Attributes.SetAttribute("class", "govuk-input");
+        }
+
+        // === Error handling / aria-describedby logic ===
+
+        var fullName = ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(For.Name);
+        var modelState = ViewContext.ViewData.ModelState;
+        var hasError = modelState.TryGetValue(fullName, out var entry) && entry.Errors.Count > 0;
+
+        var simpleName = fullName.Contains('.')
+            ? fullName[(fullName.LastIndexOf('.') + 1)..]
+            : fullName;
+
         if (hasError)
         {
-            // Convention: error tag helper uses "{fullName}-field-error"
-            var errorId = $"{fullName.ToLower()}-field-error";
+            var errorId = $"{simpleName.ToLower()}-field-error";
 
+            // Ensure aria-describedby includes the error id (and keep any existing describedby)
             if (output.Attributes.TryGetAttribute("aria-describedby", out var describedByAttr)
                 && !string.IsNullOrWhiteSpace(GetAttributeStringValue(describedByAttr)))
             {
                 var existing = GetAttributeStringValue(describedByAttr);
-                var parts = existing.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+                var parts = existing.Split(' ', System.StringSplitOptions.RemoveEmptyEntries).ToList();
                 if (!parts.Contains(errorId))
                 {
-                    // Put error id first so SRs announce it before hints
                     parts.Insert(0, errorId);
                 }
 
@@ -118,10 +130,10 @@ public class FieldInputTagHelper : InputTagHelper
             }
 
             // Add an error-specific CSS class if not present
-            if (output.Attributes.TryGetAttribute("class", out var classAttr))
+            if (output.Attributes.TryGetAttribute("class", out var errClassAttr))
             {
-                var classes = GetAttributeStringValue(classAttr);
-                var classParts = classes.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+                var classes = GetAttributeStringValue(errClassAttr);
+                var classParts = classes.Split(' ', System.StringSplitOptions.RemoveEmptyEntries).ToList();
                 if (!classParts.Contains("govuk-input--error"))
                 {
                     classParts.Add("govuk-input--error");
@@ -130,16 +142,8 @@ public class FieldInputTagHelper : InputTagHelper
             }
             else
             {
-                // If there was no class previously, choose a sensible default base class
-                var baseClass = string.Equals(output.TagName, "select", StringComparison.OrdinalIgnoreCase)
-                    ? "govuk-select"
-                    : string.Equals(output.TagName, "textarea", StringComparison.OrdinalIgnoreCase)
-                        ? "govuk-textarea"
-                        : "govuk-input";
-
-                output.Attributes.SetAttribute("class", $"{baseClass} govuk-input--error");
+                output.Attributes.SetAttribute("class", "govuk-input govuk-input--error");
             }
         }
     }
-// ... existing code ...
 }
