@@ -21,26 +21,16 @@ public class FieldInputTagHelper : TagHelper
 {
     // Determine the model field full name (e.g. "Parent.Child.Name")
     var fullName = ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(For.Name);
-
-    // Normalised base id from the model name (used only if no explicit id)
-    var baseId = fullName.Replace(".", "-").Replace("[", "-").Replace("]", "");
-
-    // If the element already has an id attribute, keep it (do NOT change it)
-    if (output.Attributes.TryGetAttribute("id", out var existingIdAttr))
-    {
-        // leave baseId as-is but do not overwrite the attribute
-        baseId = existingIdAttr.Value?.ToString() ?? baseId;
-    }
-    else
-    {
-        // no id specified in markup – set one based on the model name
-        output.Attributes.SetAttribute("id", baseId);
-    }
-
+    
     // Determine whether ModelState contains an error for this field
     var modelState = ViewContext.ViewData.ModelState;
     var hasError = modelState.TryGetValue(fullName, out var entry) && entry.Errors.Count > 0;
 
+    if (fullName.Contains('.'))
+    {
+        fullName = fullName.Substring(fullName.LastIndexOf('.') + 1);
+    }
+    
     // Helper to get the string value from a TagHelper attribute (handles IHtmlContent)
     static string GetAttributeStringValue(TagHelperAttribute? attr)
     {

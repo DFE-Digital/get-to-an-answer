@@ -4,6 +4,7 @@ using Common.Models.PageModels;
 using Common.Models.ViewModels;
 using Common.Client;
 using Common.Domain.Request.Create;
+using Common.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -14,7 +15,9 @@ namespace Admin.Pages.Questionnaire;
 public class CreateQuestionnaires(IApiClient apiClient, ILogger<CreateQuestionnaires> logger) : QuestionnairesPageModel
 {
     [BindProperty]
-    public required CreateQuestionnaireRequestDto CreateQuestionnaire { get; set; }
+    [Required(ErrorMessage = "Enter a questionnaire title")]
+    [GdsTitle]
+    public string? Title { get; set; }
     
     public IActionResult OnGet()
     {
@@ -33,7 +36,7 @@ public class CreateQuestionnaires(IApiClient apiClient, ILogger<CreateQuestionna
 
             var response = await apiClient.CreateQuestionnaireAsync(new CreateQuestionnaireRequestDto
             {
-                Title = CreateQuestionnaire.Title
+                Title = Title!
             });
 
             TempData[nameof(QuestionnaireState)] =
