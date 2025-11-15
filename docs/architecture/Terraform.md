@@ -22,6 +22,7 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [azapi_resource.gettoananswer_api_pe_subnet](https://registry.terraform.io/providers/Azure/azapi/2.7.0/docs/resources/resource) | resource |
 | [azapi_resource.gettoananswer_kv_subnet](https://registry.terraform.io/providers/Azure/azapi/2.7.0/docs/resources/resource) | resource |
 | [azapi_resource.gettoananswer_main_subnet](https://registry.terraform.io/providers/Azure/azapi/2.7.0/docs/resources/resource) | resource |
 | [azurerm_application_insights.application-insights](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights) | resource |
@@ -71,7 +72,10 @@ No modules.
 | [azurerm_mssql_virtual_network_rule.mssql_vnet_rule](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_virtual_network_rule) | resource |
 | [azurerm_network_security_group.gettoananswer-nsg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_private_dns_zone.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone.webapps_privatelink](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
 | [azurerm_private_dns_zone_virtual_network_link.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.webapps_privatelink_vnet_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_endpoint.api_pe](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_resource_group.gettoananswer-rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [azurerm_service_plan.gettoananswer-web-asp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/service_plan) | resource |
 | [azurerm_user_assigned_identity.gtaa-identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |

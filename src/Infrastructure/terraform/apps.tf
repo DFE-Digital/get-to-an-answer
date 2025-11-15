@@ -205,10 +205,10 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-admin-staging" {
     }
 
     ip_restriction {
-      name                       = "Allow from VNet Subnet"
-      priority                   = 200
-      action                     = "Allow"
-      virtual_network_subnet_id  = azapi_resource.gettoananswer_main_subnet.id
+      name                      = "Allow from VNet Subnet"
+      priority                  = 200
+      action                    = "Allow"
+      virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
     }
 
     application_stack {
