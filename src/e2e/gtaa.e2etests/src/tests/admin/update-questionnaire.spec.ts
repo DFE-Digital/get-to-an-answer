@@ -61,7 +61,7 @@ test.describe('Get to an answer update questionnaire', () => {
         await addQuestionnairePage.validateTitleFieldAriaDescribedBy();
     });
 
-    // TBC - CreateddBy still empty
+    // TBC - CreatedBy still empty
     test('Successful submit updates title and validation', async ({request, page}) => {
         const newTitle = `Updated questionnaire title - ${Date.now()}`;
         await addQuestionnairePage.enterTitle(newTitle);
