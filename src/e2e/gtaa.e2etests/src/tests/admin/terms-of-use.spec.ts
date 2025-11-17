@@ -38,6 +38,7 @@ test.describe('Get to an answer terms of use page', () => {
         await termsOfUsePage.submitWithoutAccepting();
 
         await termsOfUsePage.validateErrorMessageSummary();
+        await termsOfUsePage.clickErrorLinkInSummaryToValidateFocus();
         await termsOfUsePage.validateInlineErrorMessage();
         await termsOfUsePage.validateFormGroupErrorClass();
     });

@@ -1,6 +1,7 @@
 import {expect, Page, Locator} from '@playwright/test';
 import {BasePage} from '../BasePage';
 import {ErrorMessages} from "../../constants/test-data-constants";
+import {Timeouts} from "../../constants/timeouts";
 
 type Mode = 'create' | 'update' | 'clone';
 
@@ -94,6 +95,7 @@ export class AddQuestionnairePage extends BasePage {
 
     async clickSaveAndContinue(): Promise<void> {
         await this.saveAndContinueButton.click();
+        await this.waitForPageLoad();
     }
 
     async addQuestionnaire(title?: string): Promise<void> {
@@ -109,6 +111,12 @@ export class AddQuestionnairePage extends BasePage {
     }
 
     async validateTitleFieldAriaDescribedBy() {
+        const errorElement = this.mode === 'update'
+            ? this.inlineUpdateTitleError
+            : this.inlineTitleError;
+
+        await errorElement.waitFor({state: 'visible', timeout: Timeouts.LONG});
+
         const ariaValue = await this.titleInput.getAttribute('aria-describedby');
         expect(ariaValue, '❌ aria-describedby is missing').not.toBeNull();
 

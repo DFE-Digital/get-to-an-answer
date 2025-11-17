@@ -32,7 +32,7 @@ export class TermsOfUsePage extends BasePage {
 
         this.agreeCheckbox = page.locator('input#Agreed');
         this.checkboxContainer = page.locator('div.govuk-checkboxes__item');
-        this.checkboxLabel = page.locator('label.govuk-label.govuk-checkboxes__label[for="Accepted"]');
+        this.checkboxLabel = page.locator('label.govuk-checkboxes__label[for="Agreed"]');
         this.checkboxHint = page.locator('div.govuk-hint.govuk-checkboxes__hint');
 
         this.fieldset = page.locator('fieldset.govuk-fieldset');
@@ -54,7 +54,7 @@ export class TermsOfUsePage extends BasePage {
 
         this.errorList = this.errorSummary.locator('ul.govuk-error-summary__list');
         this.errorLinks = this.errorList.locator('a');
-        this.acceptedErrorLink = this.errorList.locator('a[href="#Accepted"]');
+        this.acceptedErrorLink = this.errorList.locator('a[href="#Agreed"]');
 
         // Inline error message to be inside DOM > Fieldset
         this.inlineError = this.fieldset.locator('p.govuk-error-message');
@@ -95,6 +95,9 @@ export class TermsOfUsePage extends BasePage {
             .toBeFocused();
         await expect(this.errorList, '❌ Missing error in the error summary list')
             .toContainText(ErrorMessages.ERROR_MESSAGE_TERMS_OF_USE);
+    }
+    
+    async clickErrorLinkInSummaryToValidateFocus() {
         await this.acceptedErrorLink.click();
         await expect(this.agreeCheckbox, '❌ Agree checkbox not focused')
             .toBeFocused();
