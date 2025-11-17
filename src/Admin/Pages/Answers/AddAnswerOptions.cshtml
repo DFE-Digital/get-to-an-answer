@@ -1,5 +1,6 @@
 @page "/admin/questionnaires/{questionnaireId:guid}/questions/{questionId:guid}/answers/add"
 @addTagHelper *, Common
+@using Admin.Models
 @using Common.Enum
 @model Admin.Pages.Answers.AddAnswerOptions
 
@@ -75,7 +76,7 @@
       </govuk-form-group>
 
       <!-- Option 1 destination -->
-      <govuk-form-group asp-for="@Model.Option1Destination">
+      <govuk-form-group asp-for="@Model.Destination">
         <fieldset class="govuk-fieldset" aria-describedby="Option1Destination-hint Option1Destination-error">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
             Destination
@@ -84,17 +85,17 @@
             Where do people go next if they click this option.
           </div>
 
-          <govuk-field-error asp-for="@Model.Option1Destination" error-id="Option1Destination-error">
+          <govuk-field-error asp-for="@Model.Destination" error-id="Option1Destination-error">
           </govuk-field-error>
 
           <div class="govuk-radios" data-module="govuk-radios">
             <div class="govuk-radios__item">
               <govuk-input class="govuk-radios__input"
                            id="Option1Destination"
-                           asp-for="Option1Destination"
+                           asp-for="Destination"
                            type="radio"
-                           value="@Model.Option1Destination"
-                           govuk-error-for="@Model.Option1Destination" />
+                           value="@AnswerOptionDestination.NextQuestion"
+                           govuk-error-for="@Model.Destination" />
               <label class="govuk-label govuk-radios__label" for="Option1Destination">
                 Next question
               </label>
@@ -106,10 +107,10 @@
             <div class="govuk-radios__item">
               <govuk-input class="govuk-radios__input"
                            id="Option1Destination-Specific"
-                           asp-for="Option1Destination"
+                           asp-for="Destination"
                            type="radio"
-                           value="@AnswerDestinationType.SpecificQuestion"
-                           govuk-error-for="@Model.Option1Destination" />
+                           value="@AnswerOptionDestination.SpecificQuestion"
+                           govuk-error-for="@Model.Destination" />
               <label class="govuk-label govuk-radios__label" for="Option1Destination-Specific">
                 Specific question
               </label>
@@ -121,10 +122,10 @@
             <div class="govuk-radios__item">
               <govuk-input class="govuk-radios__input"
                            id="Option1Destination-InternalResult"
-                           asp-for="Option1Destination"
+                           asp-for="Destination"
                            type="radio"
-                           value="@AnswerDestinationType.InternalResultsPage"
-                           govuk-error-for="@Model.Option1Destination" />
+                           value="@AnswerOptionDestination.InternalResultsPage"
+                           govuk-error-for="@Model.Destination" />
               <label class="govuk-label govuk-radios__label" for="Option1Destination-InternalResult">
                 Results page (in ‘Get to an answer’)
               </label>
@@ -136,10 +137,10 @@
             <div class="govuk-radios__item">
               <govuk-input class="govuk-radios__input"
                            id="Option1Destination-ExternalResult"
-                           asp-for="Option1Destination"
+                           asp-for="Destination"
                            type="radio"
-                           value="@AnswerDestinationType.ExternalResultsPage"
-                           govuk-error-for="@Model.Option1Destination" />
+                           value="@AnswerOptionDestination.ExternalResultsPage"
+                           govuk-error-for="@Model.Destination" />
               <label class="govuk-label govuk-radios__label" for="Option1Destination-ExternalResult">
                 Results page (outside of ‘Get to an answer’)
               </label>

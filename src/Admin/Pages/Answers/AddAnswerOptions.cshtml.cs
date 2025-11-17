@@ -1,13 +1,16 @@
 using System.ComponentModel.DataAnnotations;
+using Admin.Models;
 using Common.Client;
 using Common.Domain.Request.Create;
 using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Admin.Pages.Answers;
 
+[Authorize]
 public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiClient) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")]
@@ -29,7 +32,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
     [BindProperty]
     [Required(ErrorMessage = "Select where people go next for option 1")]
-    public DestinationType Option1Destination { get; set; }
+    public AnswerOptionDestination Destination { get; set; }
 
     public IActionResult OnGet()
     {
@@ -53,7 +56,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
                 QuestionId = QuestionId,
                 Content = Option1Content,
                 Description = Option1Hint,
-                DestinationType = Option1Destination
+                //DestinationType = Destination TODO: map this correctly
                 // DestinationQuestionId / DestinationUrl can be added later
             });
 

@@ -26,4 +26,7 @@ public static class Routes
     public const string GlobalErrorPage = "/error";
     
     public const string AddQuestion = AdminRoot + "/questionnaires/{0}/questions/add";
+    
+    //add answer option
+    public const string AddAnswerOptions = AdminRoot + "/questionnaires/{0}/questions/{1}/answers/add";
 }

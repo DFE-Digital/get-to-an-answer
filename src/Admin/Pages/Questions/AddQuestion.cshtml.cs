@@ -4,11 +4,13 @@ using Common.Domain.Request.Create;
 using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Admin.Pages.Questions;
 
+[Authorize]
 public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
@@ -34,7 +36,8 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
 
         try
         {
-             await apiClient.CreateQuestionAsync(new CreateQuestionRequestDto
+            //TODO: based on question type, we need to create different types of questions
+            var response = await apiClient.CreateQuestionAsync(new CreateQuestionRequestDto
             {
                 QuestionnaireId = QuestionnaireId,
                 Content = QuestionContent,
@@ -42,7 +45,7 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
                 Type = QuestionType
             });
 
-            return Page();
+            return Redirect(string.Format(Routes.AddAnswerOptions, QuestionnaireId, response?.Id));
         }
         catch (Exception e)
         {
