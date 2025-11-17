@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using Common.Client;
+using Common.Domain.Request.Create;
 using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
@@ -7,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Admin.Pages.Questions;
 
-public class AddQuestion : BasePageModel
+public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : BasePageModel
 {
-    [FromQuery(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
+    [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
 
     public string QuestionNumber { get; set; } = 1.ToString();
 
@@ -25,11 +27,27 @@ public class AddQuestion : BasePageModel
         return Page();
     }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
             return Page();
 
-        return Page();
+        try
+        {
+             await apiClient.CreateQuestionAsync(new CreateQuestionRequestDto
+            {
+                QuestionnaireId = QuestionnaireId,
+                Content = QuestionContent,
+                Description = QuestionHintText,
+                Type = QuestionType
+            });
+
+            return Page();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error creating question for questionnaire {QuestionnaireId}", QuestionnaireId);
+            return RedirectToErrorPage();
+        }
     }
 }
