@@ -33,6 +33,13 @@ locals {
     docker_registry_username = azurerm_container_registry.gettoananswer-registry.admin_username
     docker_registry_password = azurerm_container_registry.gettoananswer-registry.admin_password
   }
+
+  managed_identity = {
+    type = "UserAssigned"
+    identity_ids = [
+      azurerm_user_assigned_identity.gtaa-identity.id
+    ]
+  }
 }
 
 # Linux Web App - API
@@ -66,6 +73,11 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
+  }
+  
+  identity {
+    type = local.managed_identity.type
+    identity_ids = local.managed_identity.identity_ids
   }
 
   lifecycle {
@@ -138,6 +150,11 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-api-staging" {
     health_check_eviction_time_in_min = 5
   }
 
+  identity {
+    type = local.managed_identity.type
+    identity_ids = local.managed_identity.identity_ids
+  }
+
   # Slot-specific settings to avoid leaking prod secrets
   app_settings = local.api_app_settings
 }
@@ -170,6 +187,11 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
+  }
+
+  identity {
+    type = local.managed_identity.type
+    identity_ids = local.managed_identity.identity_ids
   }
 
   lifecycle {
@@ -223,6 +245,11 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-admin-staging" {
     health_check_eviction_time_in_min = 5
   }
 
+  identity {
+    type = local.managed_identity.type
+    identity_ids = local.managed_identity.identity_ids
+  }
+
   app_settings = local.admin_app_settings
 }
 
@@ -255,6 +282,11 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
+  }
+
+  identity {
+    type = local.managed_identity.type
+    identity_ids = local.managed_identity.identity_ids
   }
 
   lifecycle {
@@ -299,6 +331,11 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-frontend-staging" {
     minimum_tls_version               = "1.2"
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
+  }
+
+  identity {
+    type = local.managed_identity.type
+    identity_ids = local.managed_identity.identity_ids
   }
 
   app_settings = local.frontend_app_settings
