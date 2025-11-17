@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -21,7 +22,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Testcontainers.MsSql;
-using ApiProgram = Program;
+using ApiProgram = Api.Program;
 
 namespace Integration.Tests.Fixture;
 

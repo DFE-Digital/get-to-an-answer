@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Common.Extensions;
 

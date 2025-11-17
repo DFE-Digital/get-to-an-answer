@@ -6,7 +6,7 @@ function generateToken(): string {
         [ClaimTypes.Name]: 'Test User',
         [ClaimTypes.Email]: 'test.user@example.com',
         [ClaimTypes.Role]: ['Admin'],
-        [ClaimTypes.Expiration]: new SimpleDate().addDate({days: 1}).ToSeconds()
+        [ClaimTypes.Expiration]: new SimpleDate().addDate({years: 3}).ToSeconds()
     };
 
     return JwtHelper.generateToken(claims);
