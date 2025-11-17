@@ -1,6 +1,7 @@
 @page "/admin/questionnaires/{questionnaireId:guid}/track"
 @model Admin.Pages.Questionnaire.TrackQuestionnaires
 @using Common.Enum
+@using Common.Models
 
 @{
   ViewData["Title"] = "Home Page";
@@ -168,7 +169,7 @@ else if (questionnaireViewModel.QuestionnaireState is { JustUnpublished: true })
           <div class="govuk-task-list__status" id="edit-slug-status"><strong class="govuk-tag govuk-tag--light-blue">In progress</strong></div>
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-2-status" href="/admin/questionnaires/@questionnaire?.Id/questions">Add and edit your questions</a></div>
+          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-2-status" href="@string.Format(Routes.AddQuestion, Model.QuestionnaireId)">Add and edit your questions</a></div>
           <div class="govuk-task-list__status" id="create-your-questionnaire-2-status"><strong class="govuk-tag govuk-tag--light-blue">In progress</strong></div>
         </li>
       </ul>
