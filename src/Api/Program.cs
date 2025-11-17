@@ -196,10 +196,14 @@ app.UseAuthorization();
 
 app.Run();
 
-[ExcludeFromCodeCoverage]
-public partial class Program
+namespace Api
 {
-    protected Program()
+
+    [ExcludeFromCodeCoverage]
+    public partial class Program
     {
+        protected Program()
+        {
+        }
     }
 }

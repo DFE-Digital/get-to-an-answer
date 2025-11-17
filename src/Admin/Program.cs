@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Common.Client;
 using Common.Configuration;
@@ -136,12 +137,19 @@ if (builderIsLocalEnvironment)
 {
     app.UseMockMvcDevEndpoints();
 }
-else if (app.Environment.IsDevelopment())
-{
-    app.UseMockMvcDevEndpoints();
-}
 
 app.MapStaticAssets();
 app.MapRazorPages();
 
 app.Run();
+
+namespace Admin
+{
+    [ExcludeFromCodeCoverage]
+    public partial class Program
+    {
+        protected Program()
+        {
+        }
+    }
+}
