@@ -101,3 +101,4 @@ Add the following to your user secrets
 }
 ```
 `SaveTokens` - saves the token to the cookie, so you always have access to the user's identity for downstream calls to the api
+`UseTokenLifetime` - sets the token lifetime to the same as the session cookie lifetime

@@ -152,8 +152,8 @@ public static class JwtTestTokenGenerator
     }
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
-    
-    private const string Secret = "local-test-signing-key-32bytes-minimum!";
+
+    public const string Secret = "local-test-signing-key-32bytes-minimum!";
     public static readonly string ValidJwtToken = JwtTestTokenGenerator.Create(
         subject: "user_mock",
         issuer: "http://dfe-issuer",

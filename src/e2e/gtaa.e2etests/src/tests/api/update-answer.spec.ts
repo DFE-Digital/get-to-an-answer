@@ -560,37 +560,39 @@ test.describe('PUT Update answer', () => {
     });
 
     //500 bug
-    // test('Validate update answer with destinationUrl exceeding maximum length (250 characters)', async ({request}) => {
-    //     const {questionnaire} = await createQuestionnaire(request);
-    //     const {question} = await createQuestion(request, questionnaire.id);
-    //
-    //     // Create an initial answer
-    //     const {answer: createdAnswer} = await createSingleAnswer(request, {
-    //         questionId: question.id,
-    //         questionnaireId: questionnaire.id,
-    //         content: 'Original content',
-    //     });
-    //
-    //     // Attempt to update with destinationUrl exceeding 250 characters (251 characters)
-    //     const exceedingLengthUrl = 'https://example.com/' + 'a'.repeat(232); // Total = 251 characters
-    //     const updatePayload = {
-    //         ...createdAnswer,
-    //         content: 'Updated content',
-    //         destinationUrl: exceedingLengthUrl,
-    //         destinationType: AnswerDestinationType.ExternalLink,
-    //     };
-    //
-    //     const {updatedAnswerPostResponse} = await updateAnswer(
-    //         request,
-    //         createdAnswer.id,
-    //         updatePayload
-    //     );
-    //
-    //     // --- HTTP-level checks ---
-    //     expect(updatedAnswerPostResponse.ok()).toBeFalsy();
-    //     expect(updatedAnswerPostResponse.status()).toBe(400);
-    //
-    //     // --- Business rule validation: Should fail due to URL length exceeding limit ---
-    //     expect(exceedingLengthUrl.length).toBe(251);
-    // });
+    test('Validate update answer with destinationUrl exceeding maximum length (250 characters)', async ({request}) => {
+        const {questionnaire} = await createQuestionnaire(request);
+        const {question} = await createQuestion(request, questionnaire.id);
+
+        // Create an initial answer
+        const {answer: createdAnswer} = await createSingleAnswer(request, {
+            questionId: question.id,
+            questionnaireId: questionnaire.id,
+            content: 'Original content',
+        });
+
+        // Attempt to update with destinationUrl exceeding 250 characters (251 characters)
+        const exceedingLengthUrl = 'https://example.com/' + 'a'.repeat(232); // Total = 251 characters
+        const updatePayload = {
+            ...createdAnswer,
+            content: 'Updated content',
+            destinationUrl: exceedingLengthUrl,
+            destinationType: AnswerDestinationType.ExternalLink,
+        };
+
+        const {updatedAnswerPostResponse} = await updateAnswer(
+            request,
+            createdAnswer.id,
+            updatePayload
+        );
+
+        // --- HTTP-level checks ---
+        expect(updatedAnswerPostResponse.ok()).toBeFalsy();
+        expect(updatedAnswerPostResponse.status()).toBe(400);
+
+        const errorBody = await updatedAnswerPostResponse.json();
+        
+        // --- Business rule validation: Should fail due to URL length exceeding limit ---
+        expect(errorBody.errors.DestinationUrl[0]).toBe("The field DestinationUrl must be a string or array type with a maximum length of '250'.");
+    });
 });

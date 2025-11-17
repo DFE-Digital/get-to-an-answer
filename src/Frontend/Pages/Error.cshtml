@@ -24,11 +24,30 @@
 
 <div class="govuk-grid-row" data-last-fetched="2025-09-25T15:45:38">
     <div class="govuk-grid-column-full" id="primary-content">
-        @if (Model?.ErrorDescription != null)
+        @switch (Model.ErrorCode)
         {
-            @(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model?.ErrorDescription)))
-        } else {
-            <p>Sorry, there is a problem with the service.</p>
+            case 404:
+            {
+                <p class="govuk-body">
+                    If you typed the web address, check it is correct.
+                </p>
+                <p class="govuk-body">
+                    If you pasted the web address, check you copied the entire address.
+                </p>
+                break;
+            }
+            case 500:
+            {
+                <p>Sorry, there is a problem with the service.</p>
+                break;
+            }
+            default:
+            {
+                <p class="govuk-body">
+                    Try again later.
+                </p>
+                break;
+            }
         }
     </div>
 </div>

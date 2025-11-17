@@ -64,6 +64,11 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         {
             logger.LogInformation("GetInitialQuestion started QuestionnaireId={QuestionnaireId}", questionnaireId);
 
+            var isExisting = await db.Questionnaires.AnyAsync(q => q.Id == questionnaireId);
+            
+            if (!isExisting)
+                return NotFound(ProblemTrace("The questionnaire does not exist.", 400));
+            
             QuestionEntity? initialQuestion;
             
             if (isPreview)
@@ -120,6 +125,11 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         {
             logger.LogInformation("GetNextState started QuestionnaireId={QuestionnaireId}", questionnaireId);
 
+            var isExisting = await db.Questionnaires.AnyAsync(q => q.Id == questionnaireId);
+            
+            if (!isExisting)
+                return NotFound(ProblemTrace("The questionnaire does not exist.", 400));
+            
             if (request.SelectedAnswerIds.Count == 0)
             {
                 return BadRequest(ProblemTrace("No answer was selected.", 400));           

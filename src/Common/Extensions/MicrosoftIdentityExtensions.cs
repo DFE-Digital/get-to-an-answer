@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Common.Extensions;
 
@@ -24,7 +27,7 @@ public static class MicrosoftIdentityExtensions
     public static MicrosoftIdentityWebAppAuthenticationBuilder AddMicrosoftIdentityWebApp(
         this AuthenticationBuilder builder, IConfigurationSection configurationSection)
     {
-        return builder.AddMicrosoftIdentityWebApp(options =>
+        var authBuilder = builder.AddMicrosoftIdentityWebApp(options =>
         {
             configurationSection.Bind(options);
 
@@ -39,5 +42,24 @@ public static class MicrosoftIdentityExtensions
                 };
             }
         });
+            
+        authBuilder.Services
+        .Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
+        {
+            options.UseTokenLifetime = true; // optional, if you want cookie to match token lifetime
+            options.Events ??= new OpenIdConnectEvents();
+            options.Events.OnTokenValidated = ctx =>
+            {
+                if (ctx.Properties != null)
+                {
+                    ctx.Properties.IsPersistent = true; // make auth cookie persistent
+                }
+
+                // ctx.Properties.AllowRefresh = false; // optional: no sliding
+                return Task.CompletedTask;
+            };
+        });;
+        
+        return authBuilder;
     }
 }

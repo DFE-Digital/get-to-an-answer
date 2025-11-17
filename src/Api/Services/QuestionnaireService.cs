@@ -495,6 +495,14 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 questionnaire.Contributors.Remove(contributorEmail);
                 await db.SaveChangesAsync();
             }
+            else if (!questionnaire.Contributors.Contains(email))
+            {
+                return NotFound(ProblemTrace("Cannot find the contributor", 404));
+            }
+            else if (questionnaire.Contributors.Count <= 2)
+            {
+                return BadRequest(ProblemTrace("You cannot remove a contributor, when there are less than 3", 400));
+            }
 
             return Ok();
         }

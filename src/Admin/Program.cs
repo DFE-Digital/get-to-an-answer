@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Common.Client;
 using Common.Configuration;
@@ -36,7 +37,7 @@ if (!builderIsLocalEnvironment)
     
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
     {
-        options.ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedFor;
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
         options.KnownProxies.Clear();
         options.KnownNetworks.Clear();
         options.AllowedHosts = new List<string>
@@ -122,8 +123,8 @@ if (!builderIsLocalEnvironment)
 
 app.MapHealthChecks("/health");
 
-app.UseHttpsRedirection();
 app.UseForwardedHeaders();
+app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
@@ -141,3 +142,14 @@ app.MapStaticAssets();
 app.MapRazorPages();
 
 app.Run();
+
+namespace Admin
+{
+    [ExcludeFromCodeCoverage]
+    public partial class Program
+    {
+        protected Program()
+        {
+        }
+    }
+}

@@ -5,11 +5,14 @@ export class SimpleDate extends Date {
         super();
     }
 
-    public addDate(data: { years?: number, months?: number, days?: number }): SimpleDate {
+    public addDate(data: { years?: number, months?: number, days?: number, hours?: number, minutes?: number, seconds?: number }): SimpleDate {
         this.setFullYear(
             this.getFullYear() + (data.years ?? 0),
             this.getMonth() + (data.months ?? 0),
             this.getDate() + (data.days ?? 0));
+        this.setHours(this.getHours() + (data.hours ?? 0));
+        this.setMinutes(this.getMinutes() + (data.minutes ?? 0));
+        this.setSeconds(this.getSeconds() + (data.seconds ?? 0));
         return this;
     }
 

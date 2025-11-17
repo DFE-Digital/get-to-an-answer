@@ -263,12 +263,12 @@ test('non-existent questionnaire returns 404', async ({ request }) => {
 });
 
 // Scenario: Unauthorized access attempt
-test('unauthenticated request returns 401', async ({ request }) => {
+test('unauthenticated request returns 403', async ({ request }) => {
     const { questionnaire } = await createQuestionnaire(request, JwtHelper.UnauthorizedToken);
     const id = questionnaire.id;
 
-    const res = await request.get(`/api/questionnaires/${id}/versions`);
-    expect(res.status()).toBe(401);
+    const { response: res } = await listQuestionnaireVersions(request, id);
+    expect(res.status()).toBe(403);
 });
 
 // Utility to safely parse questionnaireJson (string or object)

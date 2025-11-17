@@ -1,8 +1,10 @@
 using System.Security.Claims;
 using System.Text.Json;
+using WireMock.Logging;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
+using WireMock.Settings;
 
 namespace Integration.Tests.Fake;
 
@@ -17,11 +19,24 @@ public sealed class WireMockAadServer : IDisposable
     public WireMockAadServer(string? tenantId = null, int? port = null)
     {
         TenantId = tenantId ?? "mock-tenant";
-        Server = port.HasValue
-            ? WireMockServer.Start(port.Value)
-            : WireMockServer.Start();
+        var settings = new WireMockServerSettings
+        {
+            StartAdminInterface = true,
+            Port = port
+        };
+        Server = WireMockServer.Start(settings);
+        Server.LogEntriesChanged += (sender, args) =>
+        {
+            var items = args.NewItems!;
+            
+            foreach (LogEntry entry in items)
+            {
+                Console.WriteLine($"{entry.RequestMessage.Method} {entry.RequestMessage.Path}");
+            }
+        };
 
         SetupDiscovery();
+        SetupAuthorizeEndpoint();
         SetupTokenEndpoint();
         SetupUserInfo();
         SetupJwks();
@@ -47,6 +62,24 @@ public sealed class WireMockAadServer : IDisposable
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBodyAsJson(discovery));
+    }
+
+    private void SetupAuthorizeEndpoint()
+    {
+        // Return a dummy access_token and id_token. In real tests you may want to sign a JWT.
+        var tokenResponse = new
+        {
+            code="12345",
+            state="135"
+        };
+
+        Server.Given(Request.Create()
+                .WithPath($"/{TenantId}/oauth2/v2.0/authorize")
+                .UsingGet())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBodyAsJson(tokenResponse));
     }
 
     private void SetupTokenEndpoint()

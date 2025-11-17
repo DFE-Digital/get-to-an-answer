@@ -42,7 +42,7 @@ test.describe('POST answers', () => {
         );
 
         // --- HTTP-level checks ---
-        expect200HttpStatusCode(answerPostResponse, 200);
+        expect200HttpStatusCode(answerPostResponse, 201);
 
         // --- Schema-level checks ---
         expectAnswerSchema(answer);
@@ -396,7 +396,7 @@ test.describe('POST answers', () => {
         );
 
         // --- HTTP-level checks ---
-        expect200HttpStatusCode(answerPostResponse, 200);
+        expect200HttpStatusCode(answerPostResponse, 201);
 
         // --- Schema-level checks ---
         expectAnswerSchema(answer);
@@ -561,48 +561,12 @@ test.describe('POST answers', () => {
         );
 
         // --- HTTP-level checks ---
-        expect200HttpStatusCode(answerPostResponse, 200);
+        expect200HttpStatusCode(answerPostResponse, 201);
         
         // --- Business rule validation: Content length should be exactly 250 ---
         expect(answer.content).toBe(maxLengthContent);
         expect(answer.content.length).toBe(250);
     });
-    
-    //bug raised
-    // test('Validate POST create answer with content exceeding maximum length (251 characters)', async ({ request }) => {
-    //     const {
-    //         questionnairePostResponse,
-    //         questionnaire,
-    //     } = await createQuestionnaire(request);
-    //
-    //     expect200HttpStatusCode(questionnairePostResponse, 201);
-    //
-    //     const {
-    //         questionPostResponse,
-    //         question,
-    //     } = await createQuestion(request, questionnaire.id);
-    //
-    //     expect200HttpStatusCode(questionPostResponse, 201);
-    //
-    //     // Create answer with 251 characters (exceeds maximum)
-    //     const tooLongContent = 'A'.repeat(251);
-    //
-    //     const {
-    //         answerPostResponse,
-    //         answer,
-    //     } = await createSingleAnswer(
-    //         request,
-    //         {
-    //             questionId: question.id,
-    //             questionnaireId: questionnaire.id,
-    //             content: tooLongContent,
-    //         },
-    //     );
-    //
-    //     // --- HTTP-level checks ---
-    //     expect(answerPostResponse.ok()).toBeFalsy();
-    //     expect(answerPostResponse.status()).toBe(400);
-    // });
 
     test('Validate POST create answer with destination type Question and valid destinationQuestionId', async ({ request }) => {
         const {
@@ -644,7 +608,7 @@ test.describe('POST answers', () => {
         );
 
         // --- HTTP-level checks ---
-        expect200HttpStatusCode(answerPostResponse, 200);
+        expect200HttpStatusCode(answerPostResponse, 201);
         
         // --- Business rule validation: Destination should match ---
         expect(answer.destinationType).toBe(AnswerDestinationType.Question);
@@ -686,7 +650,7 @@ test.describe('POST answers', () => {
         );
 
         // --- HTTP-level checks ---
-        expect200HttpStatusCode(answerPostResponse, 200);
+        expect200HttpStatusCode(answerPostResponse, 201);
         
         // --- Business rule validation: Destination should match ---
         expect(answer.destinationType).toBe(AnswerDestinationType.ExternalLink);
@@ -766,44 +730,46 @@ test.describe('POST answers', () => {
     });
     
     //bug another 500 when exceeding the characters limit
-    // test('Validate POST create answer with destinationUrl exceeding maximum length (250 characters)', async ({ request }) => {
-    //     const {
-    //         questionnairePostResponse,
-    //         questionnaire,
-    //     } = await createQuestionnaire(request);
-    //
-    //     expectHttpStatusCode(questionnairePostResponse, 201);
-    //
-    //     const {
-    //         questionPostResponse,
-    //         question,
-    //     } = await createQuestion(request, questionnaire.id);
-    //
-    //     expectHttpStatusCode(questionPostResponse, 201);
-    //
-    //     // Attempt to create an answer with destinationUrl exceeding 250 characters (251 characters)
-    //     const exceedingLengthUrl = 'https://example.com/' + 'a'.repeat(232); // Total = 251 characters
-    //
-    //     const {
-    //         answerPostResponse,
-    //         answer,
-    //         payload
-    //     } = await createSingleAnswer(
-    //         request,
-    //         {
-    //             questionId: question.id,
-    //             questionnaireId: questionnaire.id,
-    //             content: 'Answer with exceeding URL length',
-    //             destinationUrl: exceedingLengthUrl,
-    //             destinationType: AnswerDestinationType.ExternalLink,
-    //         },
-    //     );
-    //
-    //     // --- HTTP-level checks ---
-    //     expect(answerPostResponse.ok()).toBeFalsy();
-    //     expect(answerPostResponse.status()).toBe(400);
-    //
-    //     // --- Business rule validation: Should fail due to URL length exceeding limit ---
-    //     expect(exceedingLengthUrl.length).toBe(251);
-    // });
+    test('Validate POST create answer with destinationUrl exceeding maximum length (250 characters)', async ({ request }) => {
+        const {
+            questionnairePostResponse,
+            questionnaire,
+        } = await createQuestionnaire(request);
+
+        expect200HttpStatusCode(questionnairePostResponse, 201);
+
+        const {
+            questionPostResponse,
+            question,
+        } = await createQuestion(request, questionnaire.id);
+
+        expect200HttpStatusCode(questionPostResponse, 201);
+
+        // Attempt to create an answer with destinationUrl exceeding 250 characters (251 characters)
+        const exceedingLengthUrl = 'https://example.com/' + 'a'.repeat(232); // Total = 251 characters
+
+        const {
+            answerPostResponse,
+            answer,
+            payload
+        } = await createSingleAnswer(
+            request,
+            {
+                questionId: question.id,
+                questionnaireId: questionnaire.id,
+                content: 'Answer with exceeding URL length',
+                destinationUrl: exceedingLengthUrl,
+                destinationType: AnswerDestinationType.ExternalLink,
+            },
+        );
+
+        // --- HTTP-level checks ---
+        expect(answerPostResponse.ok()).toBeFalsy();
+        expect(answerPostResponse.status()).toBe(400);
+
+        const errorBody = await answerPostResponse.json();
+
+        // --- Business rule validation: Should fail due to URL length exceeding limit ---
+        expect(errorBody.errors.DestinationUrl[0]).toBe("The field DestinationUrl must be a string or array type with a maximum length of '250'.");
+    });
 });

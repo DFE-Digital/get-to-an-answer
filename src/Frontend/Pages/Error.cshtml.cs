@@ -10,7 +10,7 @@ public class Error(ILogger<Error> logger) : BasePageModel
     [BindProperty] public string? ErrorMessage { get; set; }
     [BindProperty] public string? ErrorDescription { get; set;}
     
-    [FromQuery(Name = "errorCode")] public int? ErrorCode { get; set; }
+    [FromRoute(Name = "errorCode")] public int? ErrorCode { get; set; }
     
     public void OnGet()
     {
@@ -29,7 +29,7 @@ public class Error(ILogger<Error> logger) : BasePageModel
         else
         {
             var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
-
+            
             ErrorCode = (int) HttpStatusCode.InternalServerError;
             ErrorMessage = "Internal server error.";
 
