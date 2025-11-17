@@ -110,6 +110,7 @@ export class AddQuestionnairePage extends BasePage {
         await expect(this.supportiveHint).toBeVisible();
     }
 
+    // Accessibility
     async validateTitleFieldAriaDescribedBy() {
         const errorElement = this.mode === 'update'
             ? this.inlineUpdateTitleError

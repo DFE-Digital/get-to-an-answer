@@ -60,10 +60,10 @@ export class ViewQuestionnaireTable {
     private cleanText(text: string): string {
         return text.replace(/\s+/g, ' ').trim();
     }
-    
+
     async verifyTableData(expectedRows: { title: string; createdBy: string; status: string }[]): Promise<void> {
         const rows = this.table.locator('tbody tr');
-        
+
         // ✅ Wait for at least one row to appear
         await expect(rows.first()).toBeVisible({timeout: 5000});
 
@@ -81,7 +81,11 @@ export class ViewQuestionnaireTable {
             const expected = expectedRows[i];
 
             expect(titleText, `Row ${i + 1}: title mismatch`).toBe(expected.title);
-            //expect(createdByText, `Row ${i + 1}: createdBy mismatch`).toBe(expected.createdBy); //TBC empty at the moment
+            const emailPrefix = expected.createdBy.split('@')[0];
+            // Normalize both strings: replace hyphens with spaces for comparison
+            const normalizedCreatedByText = createdByText.toLowerCase().replace(/-/g, ' ');
+            const normalizedEmailPrefix = emailPrefix.toLowerCase().replace(/-/g, ' ');
+            expect(normalizedCreatedByText).toContain(normalizedEmailPrefix);
             expect(statusText, `Row ${i + 1}: status mismatch`).toBe(expected.status);
         }
     }

@@ -5,7 +5,7 @@ import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {EntityStatus, ErrorMessages} from "../../constants/test-data-constants";
-import {createQuestionnaire, getQuestionnaire} from "../../test-data-seeder/questionnaire-data";
+import {createQuestionnaire, getQuestionnaire, listQuestionnaires} from "../../test-data-seeder/questionnaire-data";
 
 test.describe('Get to an answer update questionnaire', () => {
     let token: string;
@@ -60,8 +60,7 @@ test.describe('Get to an answer update questionnaire', () => {
         await addQuestionnairePage.clickSaveAndContinue();
         await addQuestionnairePage.validateTitleFieldAriaDescribedBy();
     });
-
-    // TBC - CreatedBy still empty
+    
     test('Successful submit updates title and validation', async ({request, page}) => {
         const newTitle = `Updated questionnaire title - ${Date.now()}`;
         await addQuestionnairePage.enterTitle(newTitle);
@@ -77,17 +76,20 @@ test.describe('Get to an answer update questionnaire', () => {
         const statusValue = questionnaireGetResponse.questionnaireGetBody.status;
         const statusName = EntityStatus[statusValue];
 
+        const lisQuestionnaireResponse = await listQuestionnaires(request, token);
+        const list: any[] = lisQuestionnaireResponse.questionnaireGetBody
+        expect(list.length).toBeGreaterThan(0);
+        const firstQuestionnaire = list[0];
+        
         questionnaireGetResponse = await getQuestionnaire(request, questionnaireGetResponse.questionnaireGetBody.id, token);
         
         const expectedRows = [
             {
                 title: questionnaireGetResponse.questionnaireGetBody.title,
-                createdBy: questionnaireGetResponse.questionnaireGetBody.createdBy,
+                createdBy: firstQuestionnaire.createdBy,
                 status: statusName
             }
         ];
-
         await viewQuestionnairePage.table.verifyTableData(expectedRows);
     });
 });
-
