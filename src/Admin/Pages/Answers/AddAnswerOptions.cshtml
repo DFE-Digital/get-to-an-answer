@@ -1,0 +1,170 @@
+@page "/admin/questionnaires/{questionnaireId:guid}/questions/{questionId:guid}/answers/add"
+@addTagHelper *, Common
+@using Common.Enum
+@model Admin.Pages.Answers.AddAnswerOptions
+
+@{
+  Layout = "_Layout";
+  ViewData["Title"] = "Create a list of answer options";
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
+}
+
+@if (Model!.HasErrors())
+{
+  @await Html.PartialAsync("_ErrorSummary")
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
+    <h1 class="govuk-heading-l">Create a list of answer options</h1>
+
+    <p class="govuk-body">
+      People will be able to select one option from your list.
+    </p>
+    <p class="govuk-body">
+      You can have up to XXX options.
+    </p>
+    <p class="govuk-body">
+      You can add your options individually below, or you can
+      <a class="govuk-link" href="#">enter all the options into one text box</a>.
+    </p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">Add answer options to your list</h2>
+
+    <form method="post" accept-charset="UTF-8">
+      <!-- Option 1 text -->
+      <govuk-form-group asp-for="@Model.Option1Content">
+        <label class="govuk-label govuk-label--s" for="Option1Content">
+          Option 1
+        </label>
+
+        <govuk-field-error asp-for="@Model.Option1Content" error-id="Option1Content-error">
+        </govuk-field-error>
+
+        <govuk-input id="Option1Content"
+                     class="govuk-input"
+                     type="text"
+                     asp-for="Option1Content"
+                     value="@Model.Option1Content"
+                     govuk-error-for="@Model.Option1Content" />
+      </govuk-form-group>
+
+      <!-- Option 1 hint -->
+      <govuk-form-group asp-for="@Model.Option1Hint">
+        <label class="govuk-label govuk-label--s" for="Option1Hint">
+          Hint text (optional)
+        </label>
+        <div class="govuk-hint" id="Option1Hint-hint">
+          You can add a short description to help people understand what this option is.
+        </div>
+
+        <govuk-field-error asp-for="@Model.Option1Hint" error-id="Option1Hint-error">
+        </govuk-field-error>
+
+        <textarea class="govuk-textarea"
+                  id="Option1Hint"
+                  rows="4"
+                  asp-for="Option1Hint"
+                  aria-describedby="Option1Hint-hint"></textarea>
+      </govuk-form-group>
+
+      <!-- Option 1 destination -->
+      <govuk-form-group asp-for="@Model.Option1Destination">
+        <fieldset class="govuk-fieldset" aria-describedby="Option1Destination-hint Option1Destination-error">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+            Destination
+          </legend>
+          <div id="Option1Destination-hint" class="govuk-hint">
+            Where do people go next if they click this option.
+          </div>
+
+          <govuk-field-error asp-for="@Model.Option1Destination" error-id="Option1Destination-error">
+          </govuk-field-error>
+
+          <div class="govuk-radios" data-module="govuk-radios">
+            <div class="govuk-radios__item">
+              <govuk-input class="govuk-radios__input"
+                           id="Option1Destination"
+                           asp-for="Option1Destination"
+                           type="radio"
+                           value="@Model.Option1Destination"
+                           govuk-error-for="@Model.Option1Destination" />
+              <label class="govuk-label govuk-radios__label" for="Option1Destination">
+                Next question
+              </label>
+              <div class="govuk-hint govuk-radios__hint">
+                Use this to direct people to the next question in the order.
+              </div>
+            </div>
+
+            <div class="govuk-radios__item">
+              <govuk-input class="govuk-radios__input"
+                           id="Option1Destination-Specific"
+                           asp-for="Option1Destination"
+                           type="radio"
+                           value="@AnswerDestinationType.SpecificQuestion"
+                           govuk-error-for="@Model.Option1Destination" />
+              <label class="govuk-label govuk-radios__label" for="Option1Destination-Specific">
+                Specific question
+              </label>
+              <div class="govuk-hint govuk-radios__hint">
+                Use this to direct people to a specific question.
+              </div>
+            </div>
+
+            <div class="govuk-radios__item">
+              <govuk-input class="govuk-radios__input"
+                           id="Option1Destination-InternalResult"
+                           asp-for="Option1Destination"
+                           type="radio"
+                           value="@AnswerDestinationType.InternalResultsPage"
+                           govuk-error-for="@Model.Option1Destination" />
+              <label class="govuk-label govuk-radios__label" for="Option1Destination-InternalResult">
+                Results page (in ‘Get to an answer’)
+              </label>
+              <div class="govuk-hint govuk-radios__hint">
+                Use this to direct people to a results page created on the ‘Add and edit results’ page.
+              </div>
+            </div>
+
+            <div class="govuk-radios__item">
+              <govuk-input class="govuk-radios__input"
+                           id="Option1Destination-ExternalResult"
+                           asp-for="Option1Destination"
+                           type="radio"
+                           value="@AnswerDestinationType.ExternalResultsPage"
+                           govuk-error-for="@Model.Option1Destination" />
+              <label class="govuk-label govuk-radios__label" for="Option1Destination-ExternalResult">
+                Results page (outside of ‘Get to an answer’)
+              </label>
+              <div class="govuk-hint govuk-radios__hint">
+                Use this to add a link and direct people to a results page.
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </govuk-form-group>
+
+      <!-- Simple scaffold for more options -->
+      <button class="govuk-button govuk-button--secondary govuk-!-margin-top-3" type="button">
+        Add another option
+      </button>
+
+      <p class="govuk-body govuk-!-margin-top-3">
+        <a class="govuk-link" href="#">Enter all the options into one text box</a>
+      </p>
+
+      <button class="govuk-button govuk-!-margin-top-6" type="submit" formnovalidate="formnovalidate"
+              data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
+        Continue
+      </button>
+    </form>
+
+  </div>
+</div>
