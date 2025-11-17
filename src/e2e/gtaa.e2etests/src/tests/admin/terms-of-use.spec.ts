@@ -16,7 +16,7 @@ test.describe('Get to an answer terms of use page', () => {
         signInPage = await landing(page, token);
     });
 
-    test('Validate presence of elements on sign in page', async ({page}) => {
+    test('Validate presence of elements on terms of use page', async ({page}) => {
         await signInPage.clickSignIn();
 
         termsOfUsePage = await TermsOfUsePage.create(page);
