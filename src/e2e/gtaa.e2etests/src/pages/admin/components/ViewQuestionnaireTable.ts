@@ -62,9 +62,11 @@ export class ViewQuestionnaireTable {
     }
     
     async verifyTableData(expectedRows: { title: string; createdBy: string; status: string }[]): Promise<void> {
-        
-
         const rows = this.table.locator('tbody tr');
+        
+        // ✅ Wait for at least one row to appear
+        await expect(rows.first()).toBeVisible({timeout: 5000});
+
         const rowCount = await rows.count();
 
         expect(rowCount, `Expected ${expectedRows.length} rows but found ${rowCount}`).toBe(expectedRows.length);

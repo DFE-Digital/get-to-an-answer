@@ -4,7 +4,7 @@ import {landing} from "../../helpers/admin-test-helper";
 import {SignInPage} from "../../pages/admin/SignInPage";
 import {TermsOfUsePage} from "../../pages/admin/TermsOfUsePage";
 
-test.describe('Get to an answer create a new questionnaire', () => {
+test.describe('Get to an answer sign in page', () => {
     let token: string;
     let signInPage: SignInPage;
     let termsOfUsePage: TermsOfUsePage;
