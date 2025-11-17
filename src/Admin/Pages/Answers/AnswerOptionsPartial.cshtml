@@ -1,0 +1,116 @@
+@using Admin.Models
+@addTagHelper *, Common
+@model Admin.Models.AnswerOptionsViewModel
+
+<govuk-form-group asp-for="@Model.OptionContent">
+  <label class="govuk-label govuk-label--s" for="Option1Content">
+    Option 1
+  </label>
+
+  <govuk-field-error asp-for="@Model.OptionContent" error-id="Option1Content-error">
+  </govuk-field-error>
+
+  <govuk-input id="Option1Content"
+               class="govuk-input"
+               type="text"
+               asp-for="@Model.OptionContent"
+               value="@Model.OptionContent"
+               govuk-error-for="@Model.OptionContent"/>
+</govuk-form-group>
+
+<!-- Option 1 hint -->
+<govuk-form-group asp-for="@Model.OptionHint">
+  <label class="govuk-label govuk-label--s" for="Option1Hint">
+    Hint text (optional)
+  </label>
+  <div class="govuk-hint" id="Option1Hint-hint">
+    You can add a short description to help people understand what this option is.
+  </div>
+
+  <govuk-field-error asp-for="@Model.OptionHint" error-id="Option1Hint-error">
+  </govuk-field-error>
+
+  <textarea class="govuk-textarea"
+            id="Option1Hint"
+            rows="4"
+            asp-for="@Model.OptionHint"
+            aria-describedby="Option1Hint-hint"></textarea>
+</govuk-form-group>
+
+<!-- Option 1 destination -->
+<govuk-form-group asp-for="@Model.Destination">
+  <fieldset class="govuk-fieldset" aria-describedby="Option1Destination-hint Option1Destination-error">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+      Destination
+    </legend>
+    <div id="Option1Destination-hint" class="govuk-hint">
+      Where do people go next if they click this option.
+    </div>
+
+    <govuk-field-error asp-for="@Model.Destination" error-id="Option1Destination-error">
+    </govuk-field-error>
+
+    <div class="govuk-radios" data-module="govuk-radios">
+      <div class="govuk-radios__item">
+        <govuk-input class="govuk-radios__input"
+                     id="Option1Destination"
+                     asp-for="Destination"
+                     type="radio"
+                     value="@AnswerOptionDestination.NextQuestion"
+                     govuk-error-for="@Model.Destination"/>
+        <label class="govuk-label govuk-radios__label" for="Option1Destination">
+          Next question
+        </label>
+        <div class="govuk-hint govuk-radios__hint">
+          Use this to direct people to the next question in the order.
+        </div>
+      </div>
+
+      <div class="govuk-radios__item">
+        <govuk-input class="govuk-radios__input"
+                     id="Option1Destination-Specific"
+                     asp-for="Destination"
+                     type="radio"
+                     value="@AnswerOptionDestination.SpecificQuestion"
+                     govuk-error-for="@Model.Destination"/>
+        <label class="govuk-label govuk-radios__label" for="Option1Destination-Specific">
+          Specific question
+        </label>
+        <div class="govuk-hint govuk-radios__hint">
+          Use this to direct people to a specific question.
+        </div>
+      </div>
+
+      <div class="govuk-radios__item">
+        <govuk-input class="govuk-radios__input"
+                     id="Option1Destination-InternalResult"
+                     asp-for="Destination"
+                     type="radio"
+                     value="@AnswerOptionDestination.InternalResultsPage"
+                     govuk-error-for="@Model.Destination"/>
+        <label class="govuk-label govuk-radios__label" for="Option1Destination-InternalResult">
+          Results page (in ‘Get to an answer’)
+        </label>
+        <div class="govuk-hint govuk-radios__hint">
+          Use this to direct people to a results page created on the ‘Add and edit results’ page.
+        </div>
+      </div>
+
+      <div class="govuk-radios__item">
+        <govuk-input class="govuk-radios__input"
+                     id="Option1Destination-ExternalResult"
+                     asp-for="Destination"
+                     type="radio"
+                     value="@AnswerOptionDestination.ExternalResultsPage"
+                     govuk-error-for="@Model.Destination"/>
+        <label class="govuk-label govuk-radios__label" for="Option1Destination-ExternalResult">
+          Results page (outside of ‘Get to an answer’)
+        </label>
+        <div class="govuk-hint govuk-radios__hint">
+          Use this to add a link and direct people to a results page.
+        </div>
+      </div>
+    </div>
+  </fieldset>
+</govuk-form-group>
+

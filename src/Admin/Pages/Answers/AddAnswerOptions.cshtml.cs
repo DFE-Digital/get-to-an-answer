@@ -19,27 +19,37 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     [FromRoute(Name = "questionId")]
     public Guid QuestionId { get; set; }
 
-    // For now we show "Question 1" statically – this can be wired up later
     public string QuestionNumber { get; set; } = "1";
 
-    // Option 1 fields
+    // Bind a collection of options
     [BindProperty]
-    [Required(ErrorMessage = "Enter option 1")]
-    public string Option1Content { get; set; } = string.Empty;
-
-    [BindProperty]
-    public string? Option1Hint { get; set; }
-
-    [BindProperty]
-    [Required(ErrorMessage = "Select where people go next for option 1")]
-    public AnswerOptionDestination Destination { get; set; }
+    public List<AnswerOptionsViewModel> Options { get; set; } = [];
 
     public IActionResult OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
+
+        // Start with one empty option if none exist yet
+        if (Options.Count == 0)
+        {
+            Options.Add(new AnswerOptionsViewModel());
+        }
+
         return Page();
     }
 
+    // Handler for clicking "Add another option"
+    public IActionResult OnPostAddOption()
+    {
+        // Ensure existing options are bound
+
+        Options.Add(new AnswerOptionsViewModel());
+
+        // Re-render page with the extra option
+        return Page();
+    }
+
+    // Handler for "Continue"
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
@@ -49,18 +59,19 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
         try
         {
-            // TODO: extend to handle multiple options. For now we just send one.
-            await apiClient.CreateAnswerAsync(new CreateAnswerRequestDto
+            // TODO: extend to handle all options; for now just show how you’d iterate
+            foreach (var option in Options)
             {
-                QuestionnaireId = QuestionnaireId,
-                QuestionId = QuestionId,
-                Content = Option1Content,
-                Description = Option1Hint,
-                //DestinationType = Destination TODO: map this correctly
-                // DestinationQuestionId / DestinationUrl can be added later
-            });
+                await apiClient.CreateAnswerAsync(new CreateAnswerRequestDto
+                {
+                    QuestionnaireId = QuestionnaireId,
+                    QuestionId = QuestionId,
+                    Content = option.OptionContent,
+                    Description = option.OptionHint,
+                    // DestinationType = map from option.Destination when ready
+                });
+            }
 
-            // For now, go back to tracking the questionnaire
             return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
         }
         catch (Exception ex)
