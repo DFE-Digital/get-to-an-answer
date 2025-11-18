@@ -1,0 +1,47 @@
+@using Common.Models
+@model Admin.Models.QuestionsPageLayoutViewModel
+
+<div class="govuk-grid-row gtaa-add-edit-questions">
+    <div class="govuk-grid-column-full">
+
+        <span class="govuk-caption-l">Check your care leaver support</span>
+        <h1 class="govuk-heading-l">@Model.Heading</h1>
+
+        @if (Model.ShowDraftTag)
+        {
+            <p class="govuk-body">
+                <strong class="govuk-tag govuk-tag--yellow">Draft</strong>
+            </p>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.IntroText))
+        {
+            <p class="govuk-body">
+                @Model.IntroText
+            </p>
+        }
+
+        <div class="govuk-button-group">
+            <a class="govuk-button" data-module="govuk-button"
+               href="@string.Format(Routes.AddQuestion, Model.QuestionnaireId)">
+                Add a question
+            </a>
+
+            <a class="govuk-link" href="#" target="_blank" rel="noreferrer">
+                Preview this questionnaire (opens in new tab)
+            </a>
+        </div>
+        
+        <h2 class="govuk-heading-m govuk-!-margin-top-6">Your questions</h2>
+
+        @if (Model.QuestionsList.Questions.Any())
+        {
+            @await Html.PartialAsync("_QuestionsListPartial", Model.QuestionsList)
+        }
+        else
+        {
+            <p class="govuk-body">There are no questions to show yet.</p>
+        }
+
+    </div>
+</div>

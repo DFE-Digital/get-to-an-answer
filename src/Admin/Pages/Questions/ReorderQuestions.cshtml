@@ -1,12 +1,12 @@
-@page "/admin/questionnaires/{questionnaireId:guid}/questions"
+@page "/admin/questionnaires/{questionnaireId:guid}/questions/reorder"
 @using Admin.Models
 @using Common.Models
-@model Admin.Pages.Questions.AddEditQuestionsAndAnswers
+@model Admin.Pages.Questions.ReorderQuestions
 
 @{
   Layout = "_Layout";
-  ViewData["Title"] = "Add and edit your questions";
-  
+  ViewData["Title"] = "Reorder your questions";
+
   var questionsViewModel = new QuestionsListViewModel
   {
     Questions = Model.Questions
@@ -20,7 +20,7 @@
       })
       .ToList()
   };
-  
+
   var layoutViewModel = new QuestionsPageLayoutViewModel
   {
     QuestionnaireId = Model.QuestionnaireId,
@@ -34,15 +34,17 @@
 
 @section BeforeContent
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back to create your
-    questionnaire</a>
+  <a class="govuk-back-link govuk-!-display-none-print"
+     href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">
+    Back to create your questionnaire
+  </a>
 }
 
 <div class="govuk-grid-row gtaa-add-edit-questions">
   <div class="govuk-grid-column-full">
-    
+
     @await Html.PartialAsync("_AddEditQuestionsAndAnswersPartial", layoutViewModel)
-    
+
     <form method="post" class="govuk-!-margin-top-6">
       <!-- rest of form unchanged -->
     </form>
