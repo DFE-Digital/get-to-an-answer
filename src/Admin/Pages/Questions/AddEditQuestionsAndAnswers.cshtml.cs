@@ -32,4 +32,20 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
 
         return Page();
     }
+
+    public async Task<IActionResult> OnPostMoveUpAsync(Guid questionnaireId, Guid questionId)
+    {
+        await apiClient.MoveQuestionUpOneAsync(questionnaireId, questionId);
+        Questions = (await apiClient.GetQuestionsAsync(questionnaireId)).OrderBy(q => q.Order).ToList();
+        QuestionnaireId = questionnaireId;
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostMoveDownAsync(Guid questionnaireId, Guid questionId)
+    {
+        await apiClient.MoveQuestionDownOneAsync(questionnaireId, questionId);
+        Questions = (await apiClient.GetQuestionsAsync(questionnaireId)).OrderBy(q => q.Order).ToList();
+        QuestionnaireId = questionnaireId;
+        return Page();
+    }
 }

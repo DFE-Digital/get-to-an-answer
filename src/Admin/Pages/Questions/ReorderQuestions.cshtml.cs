@@ -74,6 +74,12 @@ public class ReorderQuestions(ILogger<ReorderQuestions> logger, IApiClient apiCl
 
         return Page();
     }
+    
+    public async Task<IActionResult> OnPostSaveAndContinue()
+    {
+        // apiClient.MoveQuestionDownOneAsync()
+        return Page();
+    }
 
     private void Renumber()
     {

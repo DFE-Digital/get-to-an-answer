@@ -4,48 +4,147 @@
 @model Admin.Pages.Questions.AddEditQuestionsAndAnswers
 
 @{
-  Layout = "_Layout";
-  ViewData["Title"] = "Add and edit your questions";
-  
-  var questionsViewModel = new QuestionsListViewModel
-  {
-    Questions = Model.Questions
-      .OrderBy(q => q.Order)
-      .Select(q => new QuestionViewModel
-      {
-        QuestionnaireId = Model.QuestionnaireId,
-        QuestionId = q.Id,
-        Order = q.Order,
-        Content = q.Content
-      })
-      .ToList()
-  };
-  
-  var layoutViewModel = new QuestionsPageLayoutViewModel
-  {
-    QuestionnaireId = Model.QuestionnaireId,
-    Heading = "Add and edit your questions",
-    ShowDraftTag = true,
-    IntroText = null, // no extra intro on this page
-    QuestionsList = questionsViewModel
-  };
+    Layout = "_Layout";
+    ViewData["Title"] = "Add and edit your questions";
 }
 
 
 @section BeforeContent
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back to create your
-    questionnaire</a>
+    <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back to create your
+        questionnaire</a>
 }
 
-<div class="govuk-grid-row gtaa-add-edit-questions">
-  <div class="govuk-grid-column-full">
-    
-    @await Html.PartialAsync("_AddEditQuestionsAndAnswersPartial", layoutViewModel)
-    
-    <form method="post" class="govuk-!-margin-top-6">
-      <!-- rest of form unchanged -->
-    </form>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
 
-  </div>
+        @* @await Html.PartialAsync("_AddEditQuestionsAndAnswersPartial", layoutViewModel) *@
+
+        <div class="govuk-grid-row gtaa-add-edit-questions">
+            <div class="govuk-grid-column-full">
+
+                <span class="govuk-caption-l">Check your care leaver support</span>
+                <h1 class="govuk-heading-l">Add and edit your questions</h1>
+
+                @*TODO: add status here *@
+                <p class="govuk-body">
+                    <strong class="govuk-tag govuk-tag--yellow">Draft</strong>
+                </p>
+                
+                <div class="govuk-button-group">
+                    <a class="govuk-button" data-module="govuk-button"
+                       href="@string.Format(Routes.AddQuestion, Model.QuestionnaireId)">
+                        Add a question
+                    </a>
+
+                    @*TODO: add link here *@
+
+                    <a class="govuk-link" href="#" target="_blank" rel="noreferrer">
+                        Preview this questionnaire (opens in new tab)
+                    </a>
+                </div>
+
+                <h2 class="govuk-heading-m govuk-!-margin-top-6">Your questions</h2>
+
+                <ul class="govuk-list govuk-!-margin-top-4 govuk-!-margin-bottom-0">
+                    @foreach (var question in Model.Questions)
+                    {
+                        <li
+                            class="govuk-!-padding-top-2 govuk-!-padding-bottom-2 govuk-!-margin-bottom-3 govuk-!-background-colour-light-grey">
+                            <div class="govuk-grid-row">
+                                <div class="govuk-grid-column-two-thirds">
+                                    <p class="govuk-body govuk-!-margin-bottom-0">
+                                        @string.Concat(question.Order, ". ", question.Content)
+                                    </p>
+                                </div>
+                                <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+                                    <p class="govuk-body govuk-!-margin-bottom-0">
+                        <span class="govuk-!-display-inline-block">
+                            <a href="#" class="govuk-link">Edit</a>
+                            <span class="govuk-visually-hidden">@question.Order</span>
+                            |
+                            <form method="post" asp-page-handler="MoveUp" class="inline-form">
+                                <input type="hidden" name="questionnaireId" value="@question.QuestionnaireId" />
+                                <input type="hidden" name="questionId" value="@question.Id" />
+                                <button type="submit" class="govuk-link govuk-button--link">Move up</button>
+                            </form>
+                            |
+                            <form method="post" asp-page-handler="MoveDown" class="inline-form">
+                                <input type="hidden" name="questionnaireId" value="@question.QuestionnaireId" />
+                                <input type="hidden" name="questionId" value="@question.Id" />
+                                <button type="submit" class="govuk-link govuk-button--link">Move down</button>
+                            </form>
+                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible app-question-separator"/>
+                    }
+                </ul>
+
+                <form method="post" class="govuk-!-margin-top-6">
+                    <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            <h2 class="govuk-fieldset__heading">
+                                Have you finished editing your questions?
+                            </h2>
+                        </legend>
+
+                        <div id="finished-hint" class="govuk-hint">
+                            Selecting “Yes” will mark this task as complete. You’ll still be able to make changes if you
+                            need to.
+                        </div>
+
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="finished-yes" name="FinishedEditing" type="radio"
+                                       value="Yes">
+                                <label class="govuk-label govuk-radios__label" for="finished-yes">
+                                    Yes
+                                </label>
+                            </div>
+
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="finished-no" name="FinishedEditing" type="radio"
+                                       value="No">
+                                <label class="govuk-label govuk-radios__label" for="finished-no">
+                                    No, I’ll come back later
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <button class="govuk-button govuk-!-margin-top-4" data-module="govuk-button" type="submit"
+                            asp-page-handler="SaveAndContinue">
+                        Save and continue
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
 </div>
+
+<style>
+.inline-form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+.govuk-button--link {
+    background: none;
+    border: none;
+    color: #1d70b8;
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+}
+.govuk-button--link:hover,
+.govuk-button--link:focus {
+    color: #003078;
+    text-decoration: underline;
+}
+</style>
