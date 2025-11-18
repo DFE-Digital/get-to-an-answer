@@ -488,7 +488,7 @@ public class HomeController(ILogger<HomeController> logger, IApiClient apiClient
                 DestinationContentId = req.DestinationContentId,
                 QuestionId = questionId,
                 QuestionnaireId = req.QuestionnaireId,
-                Score = req.Score,
+                Priority = req.Priority,
             });
         }));
 

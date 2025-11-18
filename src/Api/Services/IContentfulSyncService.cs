@@ -195,7 +195,7 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
                         QuestionId = questionId.Value,
                         Content = content,
                         Description = S("description"),
-                        Score = Nf("score"),
+                        Priority = Nf("score"),
                         DestinationType = destinationType,
                         DestinationUrl = S("destination"),
                         DestinationQuestionId = destQuestionId,
@@ -210,7 +210,7 @@ public class ContentfulSyncServiceImpl(ContentfulClient client, GetToAnAnswerDbC
                     existing.SyncId = contentfulId ?? existing.SyncId;
                     existing.Content = content;
                     existing.Description = S("description");
-                    existing.Score = Nf("score");
+                    existing.Priority = Nf("score");
                     existing.DestinationType = destinationType;
                     existing.DestinationUrl = S("destination");
                     existing.DestinationQuestionId = destQuestionId;

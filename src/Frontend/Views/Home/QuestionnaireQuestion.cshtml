@@ -84,7 +84,7 @@
                 @foreach (var answer in Model.Destination.Question.Answers)
                 {
                   <div class="govuk-radios__item">
-                    <input type="hidden" name="Scores.@answer.Id" value="@answer.Score" autocomplete="off">
+                    <input type="hidden" name="Scores.@answer.Id" value="@answer.Priority" autocomplete="off">
                     <input class="govuk-radios__input" id="signIn" name="SelectedAnswerId" type="radio" value="@answer.Id" aria-describedby="signIn-item-hint">
                     <label class="govuk-label govuk-radios__label" for="signIn">
                       @answer.Content
@@ -105,7 +105,7 @@
                 @foreach (var answer in Model.Destination.Question.Answers)
                 {
                   <div class="govuk-checkboxes__item">
-                    <input type="hidden" name="Scores.@answer.Id" value="@answer.Score" autocomplete="off">
+                    <input type="hidden" name="Scores.@answer.Id" value="@answer.Priority" autocomplete="off">
                     <input class="govuk-checkboxes__input" id="nationality" name="SelectedAnswerIds" type="checkbox" value="@answer.Id" aria-describedby="nationality-item-hint">
                     <label class="govuk-label govuk-checkboxes__label" for="nationality">
                       @answer.Content
@@ -134,7 +134,7 @@
                 </select>
                 @foreach (var answer in Model.Destination.Question.Answers)
                 {
-                  <input type="hidden" name="Scores.@answer.Id" value="@answer.Score" autocomplete="off">
+                  <input type="hidden" name="Scores.@answer.Id" value="@answer.Priority" autocomplete="off">
                 }
               </div>
             }

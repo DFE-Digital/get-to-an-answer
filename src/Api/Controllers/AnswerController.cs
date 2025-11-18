@@ -29,7 +29,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
             QuestionId = request.QuestionId,
             Content = request.Content,
             Description = request.Description,
-            Score = request.Score,
+            Priority = request.Priority,
             DestinationUrl = request.DestinationUrl,
             DestinationQuestionId = request.DestinationQuestionId,
             DestinationContentId = request.DestinationContentId,
@@ -54,7 +54,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
             DestinationContentId = request.DestinationContentId,
             QuestionId = entity.QuestionId,
             QuestionnaireId = entity.QuestionnaireId,
-            Score = entity.Score,
+            Priority = entity.Priority,
         });
     }
     
@@ -111,7 +111,7 @@ public class AnswerController(GetToAnAnswerDbContext db) : Controller
         answer.DestinationType = request.DestinationType;
         answer.DestinationQuestionId = request.DestinationQuestionId;
         answer.DestinationContentId = request.DestinationContentId;
-        answer.Score = request.Score;
+        answer.Priority = request.Priority;
         answer.UpdatedAt = DateTime.UtcNow;
         
         await db.SaveChangesAsync();

@@ -282,7 +282,7 @@ public class QuestionnaireController(GetToAnAnswerDbContext db) : ControllerBase
                     DestinationUrl = answer.DestinationUrl,
                     DestinationQuestionId = answer.DestinationQuestionId,
                     DestinationType = answer.DestinationType,
-                    Score = answer.Score,
+                    Priority = answer.Priority,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                 };

@@ -41,7 +41,7 @@ module.exports = function (migration) {
         .validations([{ linkContentType: ['question'] }]).required(true);
     answer.createField('content').name('Content').type('Text').required(true);
     answer.createField('description').name('Description').type('Text');
-    answer.createField('score').name('Score').type('Number');
+    answer.createField('score').name('Priority').type('Number');
     answer.createField('destinationType').name('Destination Type').type('Symbol').validations([
         { in: ['Question', 'ExternalLink', 'InternalPage'] }
     ]);

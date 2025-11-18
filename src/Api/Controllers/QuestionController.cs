@@ -82,7 +82,7 @@ public class QuestionController(GetToAnAnswerDbContext db) : Controller
                 Id = a.Id,
                 Content = a.Content,
                 QuestionId = a.QuestionId,
-                Score = a.Score,
+                Priority = a.Priority,
                 DestinationType = a.DestinationType,
             }).ToList(),
             Type = question.Type

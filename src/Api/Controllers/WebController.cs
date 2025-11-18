@@ -78,7 +78,7 @@ public class WebController(GetToAnAnswerDbContext db) : Controller
                 Content = a.Content,
                 Description = a.Description,
                 QuestionId = a.QuestionId,
-                Score = a.Score
+                Priority = a.Priority
             }).ToList(),
             Type = initialQuestion.Type
         });
@@ -144,7 +144,7 @@ public class WebController(GetToAnAnswerDbContext db) : Controller
                     Content = a.Content,
                     Description = a.Description,
                     QuestionId = a.QuestionId,
-                    Score = a.Score,
+                    Priority = a.Priority,
                 }).ToList(),
                 Type = questionEntity.Type,
             }

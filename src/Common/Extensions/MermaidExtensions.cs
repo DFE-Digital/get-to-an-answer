@@ -63,12 +63,12 @@ public static class MermaidExtensions
         foreach (var q in questions)
         {
             var qNode = questionIds[q.Id];
-            var answers = q.Answers?.OrderBy(a => a.Score).ThenBy(a => a.Id).ToList();
+            var answers = q.Answers?.OrderBy(a => a.Priority).ThenBy(a => a.Id).ToList();
             if (answers == null || answers.Count == 0) continue;
 
             foreach (var a in answers)
             {
-                var answerLabel = BuildAnswerLabel(a.Content, a.Score); // Score is optional; if not present, it’s omitted
+                var answerLabel = BuildAnswerLabel(a.Content, a.Priority); // Priority is optional; if not present, it’s omitted
                 switch (a.DestinationType)
                 {
                     case DestinationType.Question when a.DestinationQuestionId.HasValue && questionIds.TryGetValue(a.DestinationQuestionId.Value, out var destQNode):
