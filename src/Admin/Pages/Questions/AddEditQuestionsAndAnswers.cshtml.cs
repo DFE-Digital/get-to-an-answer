@@ -20,7 +20,7 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
     
     public async Task<IActionResult> OnGet()
     {
-        BackLinkSlug = string.Format(Routes.AddQuestion, QuestionnaireId);
+        BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
 
         try
         {
@@ -47,11 +47,11 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
 
 
     //TODO: Implement task status update
-    // public async Task<IActionResult> OnPostSaveAndContinueAsync()
-    // {
-    //     
-    // }
-    //
+    public IActionResult OnPostSaveAndContinueAsync()
+    {
+        return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
+    }
+    
     public async Task<IActionResult> OnPostMoveUpAsync(Guid questionnaireId, Guid questionId)
     {
         try
