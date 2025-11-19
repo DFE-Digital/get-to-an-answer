@@ -3,7 +3,6 @@ using Common.Domain;
 using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Admin.Pages.Questions;
 
@@ -13,6 +12,7 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
     [FromRoute] public Guid QuestionnaireId { get; set; }
 
     [BindProperty] public List<QuestionDto> Questions { get; set; } = [];
+
 
     public async Task<IActionResult> OnGet()
     {
@@ -24,6 +24,13 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
             var response = await apiClient.GetQuestionsAsync(QuestionnaireId);
 
             Questions = response.OrderBy(q => q.Order).ToList();
+
+            // If a move error message was set during a previous POST, surface it in ModelState
+            if (TempData.TryGetValue("MoveError", out var moveErrorObj) && moveErrorObj is string moveError &&
+                !string.IsNullOrWhiteSpace(moveError))
+            {
+                ModelState.AddModelError("QuestionMoveError", moveError);
+            }
         }
         catch (Exception e)
         {
@@ -36,36 +43,18 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
 
     public async Task<IActionResult> OnPostMoveUpAsync(Guid questionnaireId, Guid questionId)
     {
-        return await HandleRequest(questionnaireId, questionId, handler: "MoveUp");
-    }
-
-
-    public async Task<IActionResult> OnPostMoveDownAsync(Guid questionnaireId, Guid questionId)
-    {
-        return await HandleRequest(questionnaireId, questionId, handler: "MoveDown");
-    }
-
-    private async Task<IActionResult> HandleRequest(Guid questionnaireId, Guid questionId, string? handler)
-    {
         try
         {
-            await MoveQuestion(handler, questionnaireId, questionId);
+            await apiClient.MoveQuestionUpOneAsync(questionnaireId, questionId);
 
-            Questions = (await apiClient.GetQuestionsAsync(questionnaireId)).OrderBy(q => q.Order).ToList();
-            QuestionnaireId = questionnaireId;
-
-            return Page();
+            // PRG - redirect back to GET for the same questionnaire so refresh won't resubmit
+            return RedirectToPage(new { questionnaireId });
         }
-        catch (HttpRequestException requestException) when (requestException.StatusCode ==
-                                                            System.Net.HttpStatusCode.BadRequest)
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
         {
-            var direction = handler == "MoveUp" ? "up" : "down";
-            ModelState.AddModelError("QuestionMoveError", $"You cannot move this question any further {direction}.");
-
-            Questions = (await apiClient.GetQuestionsAsync(questionnaireId)).OrderBy(q => q.Order).ToList();
-            QuestionnaireId = questionnaireId;
-
-            return Page();
+            // Set an error message in TempData and redirect back (PRG)
+            TempData["MoveError"] = "You cannot move this question further up";
+            return RedirectToPage(new { questionnaireId });
         }
         catch (Exception e)
         {
@@ -74,16 +63,25 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
         }
     }
 
-    private async Task MoveQuestion(string? handler, Guid questionnaireId, Guid questionId)
+    public async Task<IActionResult> OnPostMoveDownAsync(Guid questionnaireId, Guid questionId)
     {
-        switch (handler, !string.IsNullOrWhiteSpace(handler))
+        try
         {
-            case ("MoveUp", _):
-                await apiClient.MoveQuestionUpOneAsync(questionnaireId, questionId);
-                break;
-            case ("MoveDown", _):
-                await apiClient.MoveQuestionDownOneAsync(questionnaireId, questionId);
-                break;
+            await apiClient.MoveQuestionDownOneAsync(questionnaireId, questionId);
+
+            // PRG - redirect back to GET for the same questionnaire so refresh won't resubmit
+            return RedirectToPage(new { questionnaireId });
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            // Set an error message in TempData and redirect back (PRG)
+            TempData["MoveError"] = "You cannot move this question further down.";
+            return RedirectToPage(new { questionnaireId });
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error moving question down for questionnaire {QuestionnaireId}", questionnaireId);
+            return RedirectToErrorPage();
         }
     }
 }
