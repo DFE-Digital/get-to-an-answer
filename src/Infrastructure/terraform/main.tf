@@ -19,6 +19,10 @@ provider "azurerm" {
   features {}
 }
 
+# resource "azurerm_resource_provider_registration" "reg_cs" {
+#   name = "Microsoft.ContainerService"
+# }
+
 # Resource Group
 resource "azurerm_resource_group" "gettoananswer-rg" {
   name     = "${var.prefix}rg-uks-gtaa"
