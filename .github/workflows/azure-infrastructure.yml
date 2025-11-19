@@ -65,6 +65,17 @@ jobs:
       - name: Lowercase the repo name and username
         run: echo "ENVIRONMENT_LOWER=${ENVIRONMENT,,}" >>${GITHUB_ENV}
 
+      - name: Shorthand environment
+        id: tfenv
+        run: |
+          if [ "${{ env.ENVIRONMENT }}" = "Development" ]; then
+            echo "env=Dev" >> $GITHUB_OUTPUT
+          elif [ "${{ env.ENVIRONMENT }}" = "Production" ]; then
+            echo "env=Prod" >> $GITHUB_OUTPUT
+          else
+            echo "env=Test" >> $GITHUB_OUTPUT
+          fi
+      
       - name: Check if remote state exists
         id: tfstate
         run: |
@@ -79,9 +90,25 @@ jobs:
                --query exists -o tsv | grep -q true; then
             echo "exists=true" >> $GITHUB_OUTPUT
           else
+            az group create \
+              -n ${{ vars.GTAA_PREFIX }}rg-uks-terraform-state \
+              -l uksouth \
+              --tags Environment=Dev Product="Get-To-An-Answer"
+            az storage account create \
+              -g ${{ vars.GTAA_PREFIX }}rg-uks-terraform-state \
+              -n gtaatfstatesa \
+              -l uksouth \
+              --sku Standard_LRS \
+              --kind StorageV2 \
+              --https-only true \
+              --min-tls-version TLS1_2 \
+              --allow-blob-public-access false \
+              --tags Environment="${{ steps.tfenv.outputs.env }}" Product="Get-To-An-Answer" Owner="Platform"
+            az storage container create --name tfstate \
+              --account-name gtaatfstatesa --auth-mode login
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
-    
+
       - name: Terraform Init (migrate or reconfigure)
         run: |
           COMMON='-backend-config="resource_group_name=${{ vars.GTAA_PREFIX }}rg-uks-terraform-state" -backend-config="storage_account_name=gtaatfstatesa" -backend-config="container_name=tfstate" -backend-config="key=${{ env.ENVIRONMENT_LOWER }}.tfstate"'

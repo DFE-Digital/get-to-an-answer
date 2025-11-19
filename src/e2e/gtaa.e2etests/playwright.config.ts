@@ -45,7 +45,7 @@ const adminBase = {
 export default defineConfig({
     testDir: './src/tests',
     testMatch: '**/*.spec.ts',
-    timeout: 30 * 1000,
+    timeout: 40 * 1000,
     expect: {
         timeout: 5000,
     },

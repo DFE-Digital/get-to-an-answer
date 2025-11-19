@@ -3,19 +3,17 @@ import {BasePage} from '../BasePage';
 import {ViewQuestionTable} from './components/ViewQuestionTable';
 
 export class ViewQuestionPage extends BasePage {
+
+    private readonly questionHeading: Locator;
     private readonly radioName = 'forms_mark_pages_section_complete_input_mark_complete';
+
     // ===== Locators  ===== 
-    private readonly section = this.page.locator('div.app-page-list');
-
-    private readonly addQuestionLink = this.page.locator('a.govuk-link[href$="/questions/create"]');
-    private readonly previewLink = this.page.locator('a.govuk-link[href*="/start/preview"]');
-
-    private readonly finishedYesRadio = this.page.locator(`input[type="radio"][name="${this.radioName}"][value="true"]`);
-    private readonly finishedNoRadio = this.page
-        .locator(`input[type="radio"][name="${this.radioName}"][value="false"]`)
-        .or(this.page.locator(`input[type="radio"][name="${this.radioName}"]`).nth(1));
-
-    private readonly saveAndContinueButton = this.page.locator('button.govuk-button[type="submit"]');
+    private readonly section: Locator;
+    private readonly addQuestionLink: Locator;
+    private readonly previewLink: Locator;
+    private readonly finishedYesRadio: Locator;
+    private readonly finishedNoRadio: Locator;
+    private readonly saveAndContinueButton: Locator;
 
     // ===== Embedded component =====
     readonly table: ViewQuestionTable;
@@ -23,6 +21,17 @@ export class ViewQuestionPage extends BasePage {
     // ===== Constructor =====
     constructor(page: Page) {
         super(page);
+
+        this.questionHeading = this.page.locator('main h1.govuk-heading-l');
+        this.section = this.page.locator('div.app-page-list');
+        this.addQuestionLink = this.page.locator('a.govuk-link[href$="/questions/create"]');
+        this.previewLink = this.page.locator('a.govuk-link[href*="/start/preview"]');
+        this.finishedYesRadio = this.page.locator(`input[type="radio"][name="${this.radioName}"][value="true"]`);
+        this.finishedNoRadio = this.page
+            .locator(`input[type="radio"][name="${this.radioName}"][value="false"]`)
+            .or(this.page.locator(`input[type="radio"][name="${this.radioName}"]`).nth(1));
+        this.saveAndContinueButton = this.page.locator('button.govuk-button[type="submit"]');
+
         this.table = new ViewQuestionTable(page);
     }
 
@@ -43,20 +52,24 @@ export class ViewQuestionPage extends BasePage {
         await this.saveAndContinueButton.click();
     }
 
-    // --- Assertions (structure-only; no wording checks) ---
-    async verifyOnViewQuestionsPage(): Promise<void> {
-        await expect(this.page).toHaveURL(/\/questions(\/)?$/);
-        await expect(this.section).toBeVisible();
-        await expect(this.addQuestionLink).toBeVisible();
-        await expect(this.previewLink).toBeVisible();
-        await expect(this.finishedYesRadio).toBeVisible();
-        await expect(this.finishedNoRadio).toBeVisible();
-        await expect(this.saveAndContinueButton).toBeVisible();
+    // ===== Validations =====
+    async expectQuestionnaireHeadingOnPage(): Promise<void> {
+        await expect(this.questionHeading, '❌ Question heading not visible').toBeVisible();
+    }
+    
+    async verifyQuestionListedByStructure(): Promise<void> {
         await this.table.verifyVisible();
     }
 
-    async verifyQuestionListedByStructure(): Promise<void> {
-        // delegates to the component; keep this if you want a structural “table visible” check only
+    async assertPageElements() {
+        await this.verifyHeaderLinks()
+        await this.verifyFooterLinks();
+        await expect(this.section, '❌ Section not visible').toBeVisible();
+        await expect(this.addQuestionLink, '❌ Add question link not visible').toBeVisible();
+        await expect(this.previewLink, '❌ Preview link not visible').toBeVisible();
+        await expect(this.finishedYesRadio, '❌ Finished Yes radio not visible').toBeVisible();
+        await expect(this.finishedNoRadio, '❌ Finished No radio not visible').toBeVisible();
+        await expect(this.saveAndContinueButton, '❌ Save and continue button not visible').toBeVisible();
         await this.table.verifyVisible();
     }
 }

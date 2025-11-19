@@ -8,6 +8,7 @@ export class EditQuestionnairePage extends BasePage {
     private readonly main: Locator;
     private readonly banner: Locator;
     private readonly heading: Locator;
+    private readonly backToQuestionnaireLink: Locator;
     private readonly questionnaireTitle: Locator;
     private readonly editQuestionnaireHeading: Locator;
     private readonly questionnaireStatus: Locator;
@@ -29,11 +30,14 @@ export class EditQuestionnairePage extends BasePage {
         this.main = this.page.locator('main.govuk-main-wrapper[role="main"]');
         this.banner = this.page.locator('div.govuk-notification-banner--success[role="alert"]');
         this.heading = this.banner.locator('.govuk-notification-banner__heading');
-        this.questionnaireTitle = this.page.locator('h1.govuk-heading-l .govuk-caption-l');
+        this.questionnaireTitle = this.page.locator('span.govuk-caption-l');
         this.editQuestionnaireHeading = this.page.locator('main[role="main"] h1.govuk-heading-l');
         this.questionnaireStatus = this.page.locator('strong.govuk-tag[data-status]');
         this.linkEditTitle = this.page.locator(
             'a.govuk-task-list__link[aria-describedby="create-your-questionnaire-1-status"]'
+        );
+        this.backToQuestionnaireLink = this.page.locator(
+            'a.govuk-back-link[href$="/admin/questionnaires/manage"]'
         );
         this.linkEditSlug = this.page.locator(
             'a.govuk-task-list__link[aria-describedby="edit-slug-status"]'
@@ -71,6 +75,13 @@ export class EditQuestionnairePage extends BasePage {
     }
 
     // ===== Actions =====
+    async ClickBackToQuestionnaireLink(): Promise<void> {
+        await Promise.all([
+            this.page.waitForLoadState('networkidle'),
+            this.backToQuestionnaireLink.click()
+        ]);
+    }
+
     async openEditTitle(): Promise<void> {
         await this.linkEditTitle.click();
     }
@@ -121,6 +132,7 @@ export class EditQuestionnairePage extends BasePage {
 
     // ===== Validation methods (structure only; not content) =====
     async expectSuccessBannerVisible(): Promise<void> {
+        await this.banner.waitFor({state: 'attached'});
         await expect(this.banner).toBeVisible();
         await expect(this.heading).toBeVisible();
 
@@ -128,7 +140,12 @@ export class EditQuestionnairePage extends BasePage {
         expect(text?.trim().length).toBeGreaterThan(0);
     }
 
+    async validateHeading(): Promise<void> {
+        await expect(this.editQuestionnaireHeading).toBeVisible();
+    }
+
     async validateHeadingAndStatus(): Promise<void> {
+        await this.main.waitFor({state: 'attached'});
         await expect(this.main).toBeVisible();
         await expect(this.questionnaireTitle).toBeVisible();
         await expect(this.editQuestionnaireHeading).toBeVisible();

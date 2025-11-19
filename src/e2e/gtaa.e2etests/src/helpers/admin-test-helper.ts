@@ -1,15 +1,19 @@
 import {Page, expect} from '@playwright/test';
 import {SignInPage} from '../pages/admin/SignInPage';
 import {ViewQuestionnairePage} from '../pages/admin/ViewQuestionnairePage';
+import {ViewQuestionPage} from '../pages/admin/ViewQuestionPage';
 import {AddQuestionnairePage} from '../pages/admin/AddQuestionnairePage';
+import {AddQuestionPage} from '../pages/admin/AddQuestionPage';
 import {EditQuestionnairePage} from "../pages/admin/EditQuestionnairePage";
 import {TermsOfUsePage} from "../pages/admin/TermsOfUsePage";
-import {JwtHelper} from "./JwtHelper";
+import {EnvConfig} from '../config/environment-config';
+
+type LoadState = 'domcontentloaded' | 'load' | 'networkidle';
 
 export async function landing(page: Page, bearerToken?: string): Promise<SignInPage> {
     const signInPage = new SignInPage(page);
     await signInPage.openSignInPage(bearerToken);
-    
+
     return signInPage;
 }
 
@@ -51,4 +55,69 @@ export async function goToEditQuestionnairePage(page: Page): Promise<EditQuestio
     await editQuestionnairePage.waitForPageLoad();
 
     return editQuestionnairePage;
+}
+
+// =====  URL based page navigation =====
+export async function goToUpdateQuestionnairePageByUrl(
+    page: Page,
+    questionnaireId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<AddQuestionnairePage> {
+    
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const editTitleUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/edit-name`;
+
+    await page.goto(editTitleUrl, {waitUntil});
+
+    const addQuestionnairePage = new AddQuestionnairePage(page, 'update')
+    await addQuestionnairePage.waitForPageLoad();
+
+    return addQuestionnairePage;
+}
+
+export async function goToEditQuestionnairePageByUrl(
+    page: Page,
+    questionnaireId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<EditQuestionnairePage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const editUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/track`;
+
+    await page.goto(editUrl, {waitUntil});
+
+    const editQuestionnairePage = new EditQuestionnairePage(page)
+    await editQuestionnairePage.waitForPageLoad();
+
+    return editQuestionnairePage;
+}
+
+export async function goToViewQuestionsPageByUrl(
+    page: Page,
+    questionnaireId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<ViewQuestionPage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const viewQuestionUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/questions`;
+
+    await page.goto(viewQuestionUrl, {waitUntil});
+
+    const viewQuestionPage = new ViewQuestionPage(page)
+    await viewQuestionPage.waitForPageLoad();
+
+    return viewQuestionPage;
+}
+
+export async function goToAddQuestionPageByUrl(
+    page: Page,
+    questionnaireId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<AddQuestionPage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const viewQuestionUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/questions/create`;
+
+    await page.goto(viewQuestionUrl, {waitUntil});
+
+    const addQuestionPage = new AddQuestionPage(page)
+    await addQuestionPage.waitForPageLoad();
+
+    return addQuestionPage;
 }

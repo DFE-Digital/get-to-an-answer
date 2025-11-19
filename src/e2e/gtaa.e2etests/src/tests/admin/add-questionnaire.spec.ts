@@ -41,37 +41,38 @@ test.describe('Get to an answer create a new questionnaire', () => {
         viewQuestionnairePage = await ViewQuestionnairePage.create(page);
         await viewQuestionnairePage.expectQuestionnaireHeadingOnPage();
     });
+    
+    test('Submit a new questionnaire with missing title', async ({page, browserName}) => {
+        await viewQuestionnairePage.clickCreateNewQuestionnaire();
 
-    //TBC, focus after clicking the error message
-    // test('Submit a new questionnaire with missing title', async ({page}) => {
-    //     await viewQuestionnairePage.clickCreateNewQuestionnaire();
-    //
-    //     addQuestionnairePage = await AddQuestionnairePage.create(page);
-    //     await addQuestionnairePage.enterTitle(''); 
-    //     await addQuestionnairePage.clickSaveAndContinue();
-    //
-    //     await addQuestionnairePage.validateMissingTitleMessageFlow();
-    // });
+        addQuestionnairePage = await AddQuestionnairePage.create(page);
+        await addQuestionnairePage.enterTitle(''); 
+        await addQuestionnairePage.clickSaveAndContinue();
 
-    //TBC, we don't know if special characters are allowed in title
-    // test('Submit a new questionnaire with invalid title', async ({page}) => {
-    //     await viewQuestionnairePage.clickCreateNewQuestionnaire();
-    //
-    //     addQuestionnairePage = await AddQuestionnairePage.create(page);
-    //     await addQuestionnairePage.enterTitle('@@@+++###~~~');
-    //     await addQuestionnairePage.clickSaveAndContinue();
-    //
-    //     await addQuestionnairePage.validateInvalidTitleMessageFlow();
-    // });
+        await addQuestionnairePage.validateMissingTitleMessageSummary(browserName);
+        await addQuestionnairePage.validateInlineTitleError();
+        await addQuestionnairePage.validateTitleFormGroup();
+    });
+    
+    test('Submit a new questionnaire with invalid title', async ({page, browserName}) => {
+        await viewQuestionnairePage.clickCreateNewQuestionnaire();
 
-    //TBC
-    // test('Submit a new questionnaire with invalid title to validate aria-describedby', async ({page}) => {
-    //     await viewQuestionnairePage.clickCreateNewQuestionnaire();
-    //
-    //     addQuestionnairePage = await AddQuestionnairePage.create(page);
-    //     await addQuestionnairePage.enterTitle('@@@+++###~~~');
-    //     await addQuestionnairePage.clickSaveAndContinue();
-    //
-    //     await addQuestionnairePage.expectTitleAriaDescribedByIncludesHintAndError();
-    // });
+        addQuestionnairePage = await AddQuestionnairePage.create(page);
+        await addQuestionnairePage.enterInvalidTitle();
+        await addQuestionnairePage.clickSaveAndContinue();
+
+        await addQuestionnairePage.validateMissingTitleMessageSummary(browserName);
+        await addQuestionnairePage.validateInlineTitleError();
+        await addQuestionnairePage.validateTitleFormGroup();
+    });
+    
+    test('Submit a new questionnaire with invalid title to validate aria-describedby', async ({page}) => {
+        await viewQuestionnairePage.clickCreateNewQuestionnaire();
+
+        addQuestionnairePage = await AddQuestionnairePage.create(page);
+        await addQuestionnairePage.enterInvalidTitle();
+        await addQuestionnairePage.clickSaveAndContinue();
+
+        await addQuestionnairePage.validateTitleFieldAriaDescribedBy();
+    });
 });

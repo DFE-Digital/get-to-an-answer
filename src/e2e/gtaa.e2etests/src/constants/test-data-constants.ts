@@ -33,6 +33,10 @@ export const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9
 
 // ===== Admin related test data =====
 export const ErrorMessages = {
-    ERROR_MESSAGE_MISSING_TITLE: 'Enter a questionnaire title',
-    ERROR_MESSAGE_INVALID_TITLE: 'Enter a valid title'
+    ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE: 'Enter a questionnaire title',
+    ERROR_MESSAGE_INVALID_TITLE: 'Enter a valid title',
+    
+    ERROR_MESSAGE_TERMS_OF_USE: 'You need to accept the agreement to continue',
+    ERROR_MESSAGE_MISSING_QUESTION_TEXT: 'Enter a question text',
+    ERROR_MESSAGE_MISSING_QUESTION_TYPE: 'Enter a question type',
 }
