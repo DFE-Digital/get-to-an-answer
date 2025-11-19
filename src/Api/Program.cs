@@ -115,7 +115,7 @@ else
 {
     builder.Services
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+        .AddMicrosoftIdentityWebApi(builder);
 
     // AllowWebApiToBeAuthorizedByACL is an AzureAd setting in the appsettings.json
     // This avoids needing the jwt token from needing a role or scope

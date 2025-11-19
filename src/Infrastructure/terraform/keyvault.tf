@@ -31,34 +31,15 @@ resource "azurerm_key_vault" "kv" {
   # For policy’s evaluatedExpressions: createMode must be "recover"
   sku_name                    = "standard"
   public_network_access_enabled = true
-
-  access_policy {
-    tenant_id = data.azurerm_client_config.client.tenant_id
-    object_id = data.azurerm_client_config.client.object_id
-
-    key_permissions = [
-      "Get",
-    ]
-
-    secret_permissions = [
-      "Get",
-    ]
-
-    storage_permissions = [
-      "Get",
-    ]
-  }
   
   # Network ACLs – only private endpoint, no public internet
   # Keep default deny; private endpoint bypasses this
   network_acls {
-    default_action = "Deny"
+    default_action = "Allow"
     bypass         = "AzureServices"
-    ip_rules                   = []
-    virtual_network_subnet_ids = ["/subscriptions/5d62e9f6-f497-4c5c-8962-e4bf2e0bc600/resourceGroups/s263d01rg-uks-gtaa/providers/Microsoft.Network/virtualNetworks/s263d01vnet-uks-gtaa/subnets/s263d01subnet-uks-gtaa"]
   }
   
-  rbac_authorization_enabled = false
+  rbac_authorization_enabled = true
 
   tags = local.common_tags
 }
@@ -74,30 +55,64 @@ resource "azurerm_private_endpoint" "kv_pe" {
     name                           = "${var.prefix}-pe-conn"
     private_connection_resource_id = azurerm_key_vault.kv.id
     is_manual_connection           = false
-    subresource_names              = ["vault"]
+    subresource_names = ["vault"]
   }
 
   private_dns_zone_group {
-    name                 = "${var.prefix}-pdns"
+    name = "${var.prefix}-pdns"
     private_dns_zone_ids = [azurerm_private_dns_zone.kv.id]
   }
-
-  tags = local.common_tags
 }
 
-# RBAC: allow app identity to read secrets
-# resource "azurerm_role_assignment" "kv_secrets_user" {
-#   scope                = azurerm_key_vault.kv.id
-#   role_definition_name = "Key Vault Secrets Officer"
-#   principal_id         = data.azurerm_client_config.client.object_id
-# }
+# RBAC: allow app identity to read secrets (use object_id, not client_id)
 
-# Optionally allow ops to manage secrets (adjust as needed)
-# resource "azurerm_role_assignment" "kv_administrator" {
-#   scope                = azurerm_key_vault.kv.id
-#   role_definition_name = "Key Vault Administrator"
-#   principal_id         = "<ops-group-object-id>"
-# }
+data "azurerm_role_definition" "kv_secrets_user" {
+  name  = "Key Vault Secrets User"
+  scope = azurerm_key_vault.kv.id
+}
+
+data "azurerm_role_definition" "kv_secrets_officer" {
+  name  = "Key Vault Secrets Officer"
+  scope = azurerm_key_vault.kv.id
+}
+
+data "azurerm_role_definition" "kv_admin" {
+  name  = "Key Vault Administrator"
+  scope = azurerm_key_vault.kv.id
+}
+
+###################
+# role assignments
+###################
+
+resource "azurerm_role_assignment" "kv_officer" {
+  scope                = azurerm_key_vault.kv.id
+  role_definition_id  = data.azurerm_role_definition.kv_secrets_officer.role_definition_id
+  principal_id         = azurerm_user_assigned_identity.gtaa-identity.principal_id
+  principal_type       = "ServicePrincipal"
+}
+resource "azurerm_role_assignment" "kv_user" {
+  scope                = azurerm_key_vault.kv.id
+  role_definition_id = data.azurerm_role_definition.kv_secrets_user.role_definition_id
+  principal_id         = azurerm_user_assigned_identity.gtaa-identity.principal_id
+  principal_type       = "ServicePrincipal"
+}
+resource "azurerm_role_assignment" "kv_administrator" {
+  scope                = azurerm_key_vault.kv.id
+  role_definition_id = data.azurerm_role_definition.kv_admin.role_definition_id
+  principal_id         = azurerm_user_assigned_identity.gtaa-identity.principal_id
+  principal_type       = "ServicePrincipal"
+}
+resource "azurerm_role_assignment" "kv_admin_sp" {
+  scope                = azurerm_key_vault.kv.id
+  role_definition_id = data.azurerm_role_definition.kv_admin.role_definition_id
+  principal_id         = data.azurerm_client_config.client.object_id
+  principal_type       = "ServicePrincipal"
+}
+
+################
+# Secret values
+################
 
 # Create secrets from CI-provided values
 resource "azurerm_key_vault_secret" "sql_admin_password" {
@@ -105,10 +120,19 @@ resource "azurerm_key_vault_secret" "sql_admin_password" {
   value        = var.sql_admin_password
   key_vault_id = azurerm_key_vault.kv.id
 
-  # Optional content type to satisfy guardrails auditing
   content_type = "application/octet-stream"
 
+  lifecycle {
+    ignore_changes = [value]
+  }
+
   tags = local.common_tags
+  
+  depends_on = [
+    azurerm_role_assignment.kv_officer,
+    azurerm_role_assignment.kv_administrator,
+    azurerm_role_assignment.kv_admin_sp
+  ]
 }
 
 resource "azurerm_key_vault_secret" "ad_client_secret" {
@@ -116,9 +140,18 @@ resource "azurerm_key_vault_secret" "ad_client_secret" {
   value        = var.ad_client_secret
   key_vault_id = azurerm_key_vault.kv.id
 
-  # Optional content type to satisfy guardrails auditing
   content_type = "application/octet-stream"
 
+  lifecycle {
+    ignore_changes = [value]
+  }
+
   tags = local.common_tags
+
+  depends_on = [
+    azurerm_role_assignment.kv_officer,
+    azurerm_role_assignment.kv_administrator,
+    azurerm_role_assignment.kv_admin_sp
+  ]
 }
 

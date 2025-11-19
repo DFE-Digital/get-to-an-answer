@@ -1,5 +1,8 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
@@ -10,9 +13,12 @@ namespace Common.Extensions;
 public static class MicrosoftIdentityExtensions
 {
     public static MicrosoftIdentityWebApiAuthenticationBuilder AddMicrosoftIdentityWebApi(
-        this AuthenticationBuilder builder, IConfigurationSection configurationSection)
+        this AuthenticationBuilder builder, WebApplicationBuilder appBuilder)
     {
-        return builder.AddMicrosoftIdentityWebApi(options =>
+        var environment = appBuilder.Environment.EnvironmentName;
+        var configurationSection = appBuilder.Configuration.GetSection("AzureAd"); 
+        
+        var config = builder.AddMicrosoftIdentityWebApi(options =>
             {
                 var clientId = configurationSection.GetValue<string>("ClientId")!;
             
@@ -20,8 +26,43 @@ public static class MicrosoftIdentityExtensions
                 {
                     clientId, $"api://{clientId}"
                 };
+            
+                // For development/local environments only - accept unsigned tokens
+                if (environment == "Development")
+                {
+                    options.TokenValidationParameters.RequireSignedTokens = false;
+                    options.TokenValidationParameters.ValidateIssuerSigningKey = false;
+                    options.TokenValidationParameters.SignatureValidator = (token, parameters) =>
+                    {
+                        var handler = new JwtSecurityTokenHandler();
+                        var jwtToken = handler.ReadJwtToken(token);
+
+                        var jsonHeader = JsonSerializer.Serialize(jwtToken.Header);
+                        var jsonPayload = JsonSerializer.Serialize(jwtToken.Payload);
+                        
+                        return new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(jsonHeader, jsonPayload);
+                    };
+                    options.TokenValidationParameters.ValidateIssuer = false;
+                    options.TokenValidationParameters.ValidateAudience = false;
+                    options.TokenValidationParameters.ValidateLifetime = true; // Still validate expiration
+                    options.TokenValidationParameters.TryAllIssuerSigningKeys = false;
+                    options.TokenValidationParameters.IssuerSigningKeys = new List<SecurityKey>();
+                    options.TokenValidationParameters.TokenReader = (token, parameters) =>
+                    {
+                        
+                        var handler = new JwtSecurityTokenHandler();
+                        var jwtToken = handler.ReadJwtToken(token);
+                        
+                        var jsonHeader = JsonSerializer.Serialize(jwtToken.Header);
+                        var jsonPayload = JsonSerializer.Serialize(jwtToken.Payload);
+                        
+                        return new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(jsonHeader, jsonPayload);
+                    };
+                }
             }, 
             configurationSection.Bind);
+
+        return config;
     }
     
     public static MicrosoftIdentityWebAppAuthenticationBuilder AddMicrosoftIdentityWebApp(
