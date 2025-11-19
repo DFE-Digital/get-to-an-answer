@@ -2,18 +2,22 @@ using Common.Client;
 using Common.Domain;
 using Common.Models;
 using Common.Models.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Admin.Pages.Questions;
 
+[Authorize]
 public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logger, IApiClient apiClient)
     : BasePageModel
 {
     [FromRoute] public Guid QuestionnaireId { get; set; }
 
     [BindProperty] public List<QuestionDto> Questions { get; set; } = [];
-
-
+    
+    [BindProperty]
+    public bool FinishedEditing { get; set; }
+    
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.AddQuestion, QuestionnaireId);
@@ -41,6 +45,13 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
         return Page();
     }
 
+
+    //TODO: Implement task status update
+    // public async Task<IActionResult> OnPostSaveAndContinueAsync()
+    // {
+    //     
+    // }
+    //
     public async Task<IActionResult> OnPostMoveUpAsync(Guid questionnaireId, Guid questionId)
     {
         try
