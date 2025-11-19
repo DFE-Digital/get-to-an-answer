@@ -2,13 +2,13 @@ locals {
   api_app_settings = {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
-    ConnectionStrings__DefaultConnection  = "Server=tcp:${azurerm_mssql_server.gettoananswer_mssql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.gettoananswer_mssql_db.name};Persist Security Info=False;User ID=${azurerm_mssql_server.gettoananswer_mssql_server.administrator_login};Password=${var.sql_admin_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-    SQLSERVER_SA_PASSWORD                 = var.sql_admin_password
+    ConnectionStrings__DefaultConnection  = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.connection_string.versionless_id})"
+    SQLSERVER_SA_PASSWORD                 = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.sql_admin_password.versionless_id})"
     AzureAd__Domain                       = "Educationgovuk.onmicrosoft.com"
-    AzureAd__TenantId                     = var.ad_tenant_id
-    AzureAd__ClientId                     = var.ad_client_id
+    AzureAd__TenantId                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.ad_tenant_id.versionless_id})"
+    AzureAd__ClientId                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.ad_client_id.versionless_id})"
     AzureAd__Audience                     = "api://${var.ad_client_id}"
-    AzureAd__ClientSecret                 = var.ad_client_secret
+    AzureAd__ClientSecret                 = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.ad_client_secret.versionless_id})"
   }
   admin_app_settings = {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
@@ -16,9 +16,9 @@ locals {
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
     ApiSettings__BaseUrl                  = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
     AzureAd__Domain                       = "Educationgovuk.onmicrosoft.com"
-    AzureAd__TenantId                     = var.ad_tenant_id
-    AzureAd__ClientId                     = var.ad_client_id
-    AzureAd__ClientSecret                 = var.ad_client_secret
+    AzureAd__TenantId                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.ad_tenant_id.versionless_id})"
+    AzureAd__ClientId                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.ad_client_id.versionless_id})"
+    AzureAd__ClientSecret                 = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.ad_client_secret.versionless_id})"
     AzureAd__CallbackPath                 = "/signin-oidc"
   }
   frontend_app_settings = {
@@ -26,12 +26,6 @@ locals {
     ASPNETCORE_FORWARDEDHEADERS_ENABLED   = "true"
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
     ApiSettings__BaseUrl                  = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
-  }
-
-  app_req_config = {
-    docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
-    docker_registry_username = azurerm_container_registry.gettoananswer-registry.admin_username
-    docker_registry_password = azurerm_container_registry.gettoananswer-registry.admin_password
   }
 
   managed_identity = {
@@ -61,24 +55,19 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
       service_tag = "AzureFrontDoor.Backend"
     }
 
-    application_stack {
-      docker_image_name        = var.api_image_name
-      docker_registry_url      = local.app_req_config.docker_registry_url
-      docker_registry_username = local.app_req_config.docker_registry_username
-      docker_registry_password = local.app_req_config.docker_registry_password
-    }
-
-    # Enforce HTTPS only
-    minimum_tls_version = "1.2"
-
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
+
+    minimum_tls_version = "1.3"
+    scm_minimum_tls_version = "1.3"
   }
   
   identity {
     type = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
+
+  key_vault_reference_identity_id = local.managed_identity.identity_ids[0]
 
   lifecycle {
     ignore_changes = [tags]
@@ -138,22 +127,19 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-api-staging" {
       service_tag = "AzureFrontDoor.Backend"
     }
 
-    application_stack {
-      docker_image_name        = var.api_image_name
-      docker_registry_url      = local.app_req_config.docker_registry_url
-      docker_registry_username = local.app_req_config.docker_registry_username
-      docker_registry_password = local.app_req_config.docker_registry_password
-    }
-
-    minimum_tls_version               = "1.2"
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
+
+    minimum_tls_version = "1.3"
+    scm_minimum_tls_version = "1.3"
   }
 
   identity {
     type = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
+
+  key_vault_reference_identity_id = local.managed_identity.identity_ids[0]
 
   # Slot-specific settings to avoid leaking prod secrets
   app_settings = local.api_app_settings
@@ -176,23 +162,19 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
       service_tag = "AzureFrontDoor.Backend"
     }
 
-    application_stack {
-      docker_image_name        = var.admin_image_name
-      docker_registry_url      = local.app_req_config.docker_registry_url
-      docker_registry_username = local.app_req_config.docker_registry_username
-      docker_registry_password = local.app_req_config.docker_registry_password
-    }
-
-    minimum_tls_version = "1.2"
-
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
+
+    minimum_tls_version = "1.3"
+    scm_minimum_tls_version = "1.3"
   }
 
   identity {
     type = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
+
+  key_vault_reference_identity_id = local.managed_identity.identity_ids[0]
 
   lifecycle {
     ignore_changes = [tags]
@@ -233,22 +215,19 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-admin-staging" {
       virtual_network_subnet_id = azapi_resource.gettoananswer_main_subnet.id
     }
 
-    application_stack {
-      docker_image_name        = var.admin_image_name
-      docker_registry_url      = local.app_req_config.docker_registry_url
-      docker_registry_username = local.app_req_config.docker_registry_username
-      docker_registry_password = local.app_req_config.docker_registry_password
-    }
-
-    minimum_tls_version               = "1.2"
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
+
+    minimum_tls_version = "1.3"
+    scm_minimum_tls_version = "1.3"
   }
 
   identity {
     type = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
+
+  key_vault_reference_identity_id = local.managed_identity.identity_ids[0]
 
   app_settings = local.admin_app_settings
 }
@@ -271,23 +250,19 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
       service_tag = "AzureFrontDoor.Backend"
     }
 
-    application_stack {
-      docker_image_name        = var.frontend_image_name
-      docker_registry_url      = local.app_req_config.docker_registry_url
-      docker_registry_username = local.app_req_config.docker_registry_username
-      docker_registry_password = local.app_req_config.docker_registry_password
-    }
-
-    minimum_tls_version = "1.2"
-
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
+
+    minimum_tls_version = "1.3"
+    scm_minimum_tls_version = "1.3"
   }
 
   identity {
     type = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
+
+  key_vault_reference_identity_id = local.managed_identity.identity_ids[0]
 
   lifecycle {
     ignore_changes = [tags]
@@ -321,22 +296,19 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-frontend-staging" {
       service_tag = "AzureFrontDoor.Backend"
     }
 
-    application_stack {
-      docker_image_name        = var.frontend_image_name
-      docker_registry_url      = local.app_req_config.docker_registry_url
-      docker_registry_username = local.app_req_config.docker_registry_username
-      docker_registry_password = local.app_req_config.docker_registry_password
-    }
-
-    minimum_tls_version               = "1.2"
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
+    
+    minimum_tls_version = "1.3"
+    scm_minimum_tls_version = "1.3"
   }
 
   identity {
     type = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
+  
+  key_vault_reference_identity_id = local.managed_identity.identity_ids[0]
 
   app_settings = local.frontend_app_settings
 }

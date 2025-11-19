@@ -81,6 +81,11 @@ data "azurerm_role_definition" "kv_admin" {
   scope = azurerm_key_vault.kv.id
 }
 
+data "azurerm_role_definition" "acr_pull" {
+  name  = "AcrPull"
+  scope = azurerm_container_registry.gettoananswer-registry.id
+}
+
 ###################
 # role assignments
 ###################
@@ -109,49 +114,9 @@ resource "azurerm_role_assignment" "kv_admin_sp" {
   principal_id         = data.azurerm_client_config.client.object_id
   principal_type       = "ServicePrincipal"
 }
-
-################
-# Secret values
-################
-
-# Create secrets from CI-provided values
-resource "azurerm_key_vault_secret" "sql_admin_password" {
-  name         = "${var.prefix}kv-uks-sql-pwd"
-  value        = var.sql_admin_password
-  key_vault_id = azurerm_key_vault.kv.id
-
-  content_type = "application/octet-stream"
-
-  lifecycle {
-    ignore_changes = [value]
-  }
-
-  tags = local.common_tags
-  
-  depends_on = [
-    azurerm_role_assignment.kv_officer,
-    azurerm_role_assignment.kv_administrator,
-    azurerm_role_assignment.kv_admin_sp
-  ]
+resource "azurerm_role_assignment" "acr_pull_role" {
+  scope                = azurerm_container_registry.gettoananswer-registry.id
+  role_definition_id = data.azurerm_role_definition.acr_pull.role_definition_id
+  principal_id         = azurerm_user_assigned_identity.gtaa-identity.principal_id
+  principal_type       = "ServicePrincipal"
 }
-
-resource "azurerm_key_vault_secret" "ad_client_secret" {
-  name         = "${var.prefix}kv-uks-ad-clst"
-  value        = var.ad_client_secret
-  key_vault_id = azurerm_key_vault.kv.id
-
-  content_type = "application/octet-stream"
-
-  lifecycle {
-    ignore_changes = [value]
-  }
-
-  tags = local.common_tags
-
-  depends_on = [
-    azurerm_role_assignment.kv_officer,
-    azurerm_role_assignment.kv_administrator,
-    azurerm_role_assignment.kv_admin_sp
-  ]
-}
-
