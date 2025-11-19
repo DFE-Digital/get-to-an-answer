@@ -11,15 +11,17 @@
 
 @section BeforeContent
 {
-    <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back to create your
-        questionnaire</a>
+    <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back to create your questionnaire</a>
+}
+
+@if (Model!.HasErrors())
+{
+  @await Html.PartialAsync("_ErrorSummary")
 }
 
 <div class="gtaa-add-edit-questions-page govuk-grid-row">
     <div class="govuk-grid-column-full">
-
-        @* @await Html.PartialAsync("_AddEditQuestionsAndAnswersPartial", layoutViewModel) *@
-
+        
         <div class="govuk-grid-row gtaa-add-edit-questions">
             <div class="govuk-grid-column-full">
 
@@ -65,13 +67,15 @@
                           <form method="post" asp-page-handler="MoveUp" class="inline-form">
                               <input type="hidden" name="questionnaireId" value="@question.QuestionnaireId"/>
                               <input type="hidden" name="questionId" value="@question.Id"/>
-                              <button type="submit" class="govuk-link govuk-button--link">Move up</button>
+                              <button type="submit" class="govuk-link govuk-button--link" data-module="govuk-button"
+                                      data-prevent-double-click="true" data-govuk-button-init="">Move up</button>
                           </form>
                           |
                           <form method="post" asp-page-handler="MoveDown" class="inline-form">
                               <input type="hidden" name="questionnaireId" value="@question.QuestionnaireId"/>
                               <input type="hidden" name="questionId" value="@question.Id"/>
-                              <button type="submit" class="govuk-link govuk-button--link">Move down</button>
+                              <button type="submit" class="govuk-link govuk-button--link" data-module="govuk-button"
+                                      data-prevent-double-click="true" data-govuk-button-init="">Move down</button>
                           </form>
                       </span>
                                 </div>
