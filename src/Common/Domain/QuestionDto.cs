@@ -15,5 +15,5 @@ public class QuestionDto
     public DateTime CreatedAt { get; set; }
     
     public DateTime UpdatedAt { get; set; }
-    public List<AnswerDto> Answers { get; set; } = new();
+    public List<AnswerDto> Answers { get; set; } = [];
 }

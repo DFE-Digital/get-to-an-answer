@@ -883,3 +883,32 @@ $toc-width-tablet: 210px;
 .govuk-tag[data-status="Archived"] {
   @extend .govuk-tag--grey;
 }
+
+.gtaa-add-edit-questions-page {
+  .inline-form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+  }
+  .govuk-button--link {
+    background: none;
+    border: none;
+    color: #1d70b8;
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+  }
+  .govuk-button--link:hover,
+  .govuk-button--link:focus {
+    color: #003078;
+    text-decoration: underline;
+  }
+  .gtaa-question-actions {
+    white-space: nowrap;
+  }
+  .govuk-body {
+    white-space: normal !important;
+    word-break: break-word;
+  }
+}

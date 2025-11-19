@@ -24,4 +24,11 @@ public static class Routes
     // Admin area prefix
     private const string AdminRoot = "/admin";
     public const string GlobalErrorPage = "/error";
+    
+    public const string AddQuestion = AdminRoot + "/questionnaires/{0}/questions/add";
+    
+    //add answer option
+    public const string AddAnswerOptions = AdminRoot + "/questionnaires/{0}/questions/{1}/answers/add";
+    
+    public const string AddAndEditQuestionsAndAnswers = AdminRoot + "/questionnaires/{0}/questions";
 }

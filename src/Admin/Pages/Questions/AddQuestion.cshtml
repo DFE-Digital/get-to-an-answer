@@ -1,0 +1,141 @@
+@page "/admin/questionnaires/{questionnaireId:guid}/questions/add"
+@addTagHelper *, Common
+@using Common.Enum
+@model Admin.Pages.Questions.AddQuestion
+
+@{
+  Layout = "_Layout";
+  ViewData["Title"] = "Add a question";
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
+}
+
+@if (Model!.HasErrors())
+{
+  @await Html.PartialAsync("_ErrorSummary")
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
+    <h1 class="govuk-heading-l">Add a question</h1>
+
+    <form method="post" accept-charset="UTF-8">
+      <!-- Question text -->
+      <govuk-form-group asp-for="@Model.QuestionContent">
+        <label class="govuk-label govuk-label--m" for="QuestionContent">
+          What's your question?
+        </label>
+        <div class="govuk-hint" id="QuestionContent-hint">
+          Ask the question the way you would in person. For example, ‘Which of these countries have you lived in?’
+        </div>
+
+        <govuk-field-error asp-for="@Model.QuestionContent" error-id="QuestionContent-error">
+        </govuk-field-error>
+
+        <govuk-input id="QuestionContent"
+                     class="govuk-input"
+                     aria-describedby="QuestionContent-hint"
+                     type="text"
+                     asp-for="QuestionContent"
+                     value="@Model.QuestionContent"
+                     govuk-error-for="@Model.QuestionContent" />
+      </govuk-form-group>
+
+      <!-- Hint text -->
+      <govuk-form-group asp-for="@Model.QuestionHintText">
+        <label class="govuk-label govuk-label--m" for="QuestionHintText">
+          Hint text (optional)
+        </label>
+        <div class="govuk-hint" id="QuestionHintText-hint">
+          You can add a short hint to help people answer the question. For a question where people can select more
+          than one answer you might want to use ‘Select all that apply’.
+        </div>
+
+        <govuk-field-error asp-for="@Model.QuestionHintText" error-id="QuestionHintText-error">
+        </govuk-field-error>
+
+        <textarea class="govuk-textarea"
+                  id="QuestionHintText"
+                  rows="4"
+                  asp-for="QuestionHintText"
+                  aria-describedby="QuestionHintText-hint"></textarea>
+      </govuk-form-group>
+
+      <!-- Question type -->
+      <govuk-form-group asp-for="@Model.QuestionType">
+        <fieldset class="govuk-fieldset" aria-describedby="QuestionType-hint QuestionType-error">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+            <h2 class="govuk-fieldset__heading">
+              Question type
+            </h2>
+          </legend>
+
+          <div id="QuestionType-hint" class="govuk-hint">
+            Choose how many options people will be able to select to answer.
+          </div>
+
+          <govuk-field-error asp-for="@Model.QuestionType" error-id="QuestionType-error">
+          </govuk-field-error>
+
+          <div class="govuk-radios" data-module="govuk-radios">
+            <div class="govuk-radios__item">
+              <govuk-input class="govuk-radios__input"
+                     id="QuestionType"           
+                     asp-for="QuestionType"
+                     type="radio"
+                     value="@QuestionType.SingleSelect"
+                     govuk-error-for="@Model.QuestionType" />
+              <label class="govuk-label govuk-radios__label" for="QuestionType">
+                One option only (radio button)
+              </label>
+              <div class="govuk-hint govuk-radios__hint">
+                Use this when you have a small list of options.
+              </div>
+            </div>
+
+            <div class="govuk-radios__item">
+              <govuk-input class="govuk-radios__input"
+                     id="QuestionType-Dropdown"
+                     asp-for="QuestionType"
+                     type="radio"
+                     value="@QuestionType.DropdownSelect"
+                     govuk-error-for="@Model.QuestionType" />
+              <label class="govuk-label govuk-radios__label" for="QuestionType-Dropdown">
+                One option only (drop-down)
+              </label>
+              <div class="govuk-hint govuk-radios__hint">
+                Use this when you have a long list of options.
+              </div>
+            </div>
+
+            <div class="govuk-radios__item">
+              <govuk-input class="govuk-radios__input"
+                     id="QuestionType-MultiSelect"
+                     asp-for="QuestionType"
+                     type="radio"
+                     value="@QuestionType.MultiSelect"
+                     govuk-error-for="@Model.QuestionType" />
+              <label class="govuk-label govuk-radios__label" for="QuestionType-MultiSelect">
+                One or more options (multi-select)
+              </label>
+              <div class="govuk-hint govuk-radios__hint">
+                Use this when people can select more than one option.
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </govuk-form-group>
+
+      <button class="govuk-button" type="submit" formnovalidate="formnovalidate" data-module="govuk-button"
+              data-prevent-double-click="true" data-govuk-button-init="">
+        Continue
+      </button>
+    </form>
+
+  </div>
+</div>
