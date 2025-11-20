@@ -66,19 +66,19 @@ jobs:
         id: tags
         run: |
           API_TAG=$(az acr repository show-tags \
-            --name s263d01acruksgtaa \
+            --name ${{ vars.GTAA_PREFIX }}acruksgtaa \
             --repository gtaa-api \
             --orderby time_desc \
             --top 2 \
             --output tsv | grep -v "^latest$" | head -n 1)
           ADMIN_TAG=$(az acr repository show-tags \
-            --name s263d01acruksgtaa \
+            --name ${{ vars.GTAA_PREFIX }}acruksgtaa \
             --repository gtaa-admin \
             --orderby time_desc \
             --top 2 \
             --output tsv | grep -v "^latest$" | head -n 1)
           FE_TAG=$(az acr repository show-tags \
-            --name s263d01acruksgtaa \
+            --name ${{ vars.GTAA_PREFIX }}acruksgtaa \
             --repository gtaa-frontend \
             --orderby time_desc \
             --top 2 \
