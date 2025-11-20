@@ -912,3 +912,14 @@ $toc-width-tablet: 210px;
     word-break: break-word;
   }
 }
+
+[id^="Nav-"][id$="-reveal"] .equal-input-width,
+.govuk-radios__conditional .equal-input-width {
+  display: block !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  white-space: normal;        /* lets selects and textareas wrap if they can */
+  overflow-wrap: anywhere;
+}

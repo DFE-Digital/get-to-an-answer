@@ -25,15 +25,18 @@
     <title>@ViewData["Title"]</title>
     <style asp-add-nonce="true">
         :root {
-            --generated: '@DateTime.Today.ToString("d MMMM yyyy", DateTimeFormatInfo.InvariantInfo)' ;
+            --generated: '@DateTime.Today.ToString("d MMMM yyyy", DateTimeFormatInfo.InvariantInfo)';
         }
     </style>
     @if (SiteConfiguration.Rebrand)
     {
         <link rel="icon" sizes="48x48" href="/assets/rebrand/images/favicon.ico" asp-append-version="false"/>
-        <link rel="icon" sizes="any" type="image/svg+xml" href="/assets/rebrand/images/favicon.svg" asp-append-version="false"/>
-        <link rel="mask-icon" href="/assets/rebrand/images/govuk-icon-mask.svg" color="#0b0c0c" asp-append-version="false"/>
-        <link rel="apple-touch-icon" sizes="180x180" href="/assets/rebrand/images/govuk-icon-180.png" asp-append-version="false"/>
+        <link rel="icon" sizes="any" type="image/svg+xml" href="/assets/rebrand/images/favicon.svg"
+              asp-append-version="false"/>
+        <link rel="mask-icon" href="/assets/rebrand/images/govuk-icon-mask.svg" color="#0b0c0c"
+              asp-append-version="false"/>
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/rebrand/images/govuk-icon-180.png"
+              asp-append-version="false"/>
         <link rel="manifest" href="/assets/rebrand/manifest.json">
     }
     else
@@ -41,11 +44,12 @@
         <link rel="icon" sizes="48x48" href="/assets/images/favicon.ico" asp-append-version="false"/>
         <link rel="icon" sizes="any" type="image/svg+xml" href="/assets/images/favicon.svg" asp-append-version="false"/>
         <link rel="mask-icon" href="/assets/images/govuk-icon-mask.svg" color="#0b0c0c" asp-append-version="false"/>
-        <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/govuk-icon-180.png" asp-append-version="false"/>
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/govuk-icon-180.png"
+              asp-append-version="false"/>
         <link rel="manifest" href="/assets/manifest.json">
     }
 
-    <meta name="apple-mobile-web-app-title" content="checker" />
+    <meta name="apple-mobile-web-app-title" content="checker"/>
 
     <link rel="stylesheet" href="~/css/application.css" asp-append-version="false"/>
     <link rel="stylesheet" href="~/css/print.css" asp-append-version="false"/>
@@ -53,8 +57,9 @@
     {
         <link rel="stylesheet" href="~/css/rebrand.css" asp-append-version="false"/>
     }
-
-    @if (IsSectionDefined("Head")) {
+    
+    @if (IsSectionDefined("Head"))
+    {
         @await RenderSectionAsync("Head", required: false)
     }
 </head>
@@ -69,14 +74,18 @@
     await Html.RenderPartialAsync("_Header", configViewModel);
 }
 
-<div class="govuk-service-navigation app-service-navigation" data-module="govuk-service-navigation" data-govuk-service-navigation-init="">
+<div class="govuk-service-navigation app-service-navigation" data-module="govuk-service-navigation"
+     data-govuk-service-navigation-init="">
     <div class="govuk-width-container">
         <div class="govuk-service-navigation__container">
             <nav aria-label="Menu" class="govuk-service-navigation__wrapper">
-                <button type="button" class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle" aria-controls="navigation" hidden="">Menu</button>
+                <button type="button" class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle"
+                        aria-controls="navigation" hidden="">Menu
+                </button>
                 <ul id="navigation" class="govuk-service-navigation__list">
                     <li class="govuk-service-navigation__item">
-                        <a class="govuk-service-navigation__link" aria-current="true" href="https://www.forms.service.gov.uk/support">Support</a>
+                        <a class="govuk-service-navigation__link" aria-current="true"
+                           href="https://www.forms.service.gov.uk/support">Support</a>
                     </li>
                     <li class="govuk-service-navigation__item app-service-navigation__item--featured">
                         <span class="govuk-service-navigation__text">@ViewBag.FullName</span>
@@ -127,7 +136,8 @@
 <script asp-add-nonce="true" src="/js/step-by-step-polyfills.js"></script>
 @await RenderSectionAsync("Scripts", false)
 <script asp-add-nonce="true" type="module">
-    import { initAll } from '/js/govuk-frontend.min.js'
+    import {initAll} from '/js/govuk-frontend.min.js'
+
     initAll()
 </script>
 <script asp-add-nonce="true" src="/js/dfefrontend.min.js"></script>
