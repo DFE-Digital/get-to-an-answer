@@ -38,8 +38,6 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     // Handler for clicking "Add another option"
     public async Task<IActionResult> OnPostAddOption()
     {
-        ModelState.Clear();
-        
         OptionNumber++;
 
         Options.Add(new AnswerOptionsViewModel
