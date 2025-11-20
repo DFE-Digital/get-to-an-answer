@@ -70,10 +70,13 @@ jobs:
         run: |
           if [ "${{ env.ENVIRONMENT }}" = "Development" ]; then
             echo "env=Dev" >> $GITHUB_OUTPUT
+            echo "sa=gtaatfstatesa" >> $GITHUB_OUTPUT
           elif [ "${{ env.ENVIRONMENT }}" = "Production" ]; then
             echo "env=Prod" >> $GITHUB_OUTPUT
+            echo "sa=gtaatfstateprod" >> $GITHUB_OUTPUT
           else
             echo "env=Test" >> $GITHUB_OUTPUT
+            echo "sa=gtaatfstatetest" >> $GITHUB_OUTPUT
           fi
       
       - name: Check if remote state exists
@@ -84,34 +87,42 @@ jobs:
           # Try to stat the blob; exit code 0 if exists
           if az storage blob exists \
                --auth-mode login \
-               --account-name gtaatfstatesa \
+               --account-name ${{ steps.tfenv.outputs.sa }} \
                --container-name tfstate \
                --name "$KEY" \
                --query exists -o tsv | grep -q true; then
             echo "exists=true" >> $GITHUB_OUTPUT
           else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi   
+          
+      - name: Create remote state container
+        id: newstate
+        if: steps.tfstate.outputs.exists == 'false'
+        run: |
+          if ! az group exists -n ${{ vars.GTAA_PREFIX }}rg-uks-terraform-state | grep -q true; then
             az group create \
               -n ${{ vars.GTAA_PREFIX }}rg-uks-terraform-state \
               -l uksouth \
-              --tags Environment=Dev Product="Get-To-An-Answer"
-            az storage account create \
-              -g ${{ vars.GTAA_PREFIX }}rg-uks-terraform-state \
-              -n gtaatfstatesa \
-              -l uksouth \
-              --sku Standard_LRS \
-              --kind StorageV2 \
-              --https-only true \
-              --min-tls-version TLS1_2 \
-              --allow-blob-public-access false \
-              --tags Environment="${{ steps.tfenv.outputs.env }}" Product="Get-To-An-Answer" Owner="Platform"
-            az storage container create --name tfstate \
-              --account-name gtaatfstatesa --auth-mode login
-            echo "exists=false" >> $GITHUB_OUTPUT
+              --tags Environment="${{ steps.tfenv.outputs.env }}" Product="Get-To-An-Answer"
           fi
+          az storage account create \
+            -g ${{ vars.GTAA_PREFIX }}rg-uks-terraform-state \
+            -n ${{ steps.tfenv.outputs.sa }} \
+            -l uksouth \
+            --sku Standard_LRS \
+            --kind StorageV2 \
+            --https-only true \
+            --min-tls-version TLS1_2 \
+            --allow-blob-public-access false \
+            --tags Environment="${{ steps.tfenv.outputs.env }}" Product="Get-To-An-Answer" Owner="Platform"
+          az storage container create --name tfstate \
+            --account-name ${{ steps.tfenv.outputs.sa }} --auth-mode login
+          echo "exists=false" >> $GITHUB_OUTPUT
 
       - name: Terraform Init (migrate or reconfigure)
         run: |
-          COMMON='-backend-config="resource_group_name=${{ vars.GTAA_PREFIX }}rg-uks-terraform-state" -backend-config="storage_account_name=gtaatfstatesa" -backend-config="container_name=tfstate" -backend-config="key=${{ env.ENVIRONMENT_LOWER }}.tfstate"'
+          COMMON='-backend-config="resource_group_name=${{ vars.GTAA_PREFIX }}rg-uks-terraform-state" -backend-config="storage_account_name=${{ steps.tfenv.outputs.sa }}" -backend-config="container_name=tfstate" -backend-config="key=${{ env.ENVIRONMENT_LOWER }}.tfstate"'
           if [ "${{ steps.tfstate.outputs.exists }}" = "true" ]; then
             echo "Remote state exists -> reconfigure"
             eval terraform init -reconfigure $COMMON

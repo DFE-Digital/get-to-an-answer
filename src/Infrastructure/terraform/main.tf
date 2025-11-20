@@ -19,6 +19,10 @@ provider "azurerm" {
   features {}
 }
 
+# resource "azurerm_resource_provider_registration" "reg_cs" {
+#   name = "Microsoft.ContainerService"
+# }
+
 # Resource Group
 resource "azurerm_resource_group" "gettoananswer-rg" {
   name     = "${var.prefix}rg-uks-gtaa"
@@ -65,7 +69,14 @@ resource "azurerm_container_registry" "gettoananswer-registry" {
   sku                 = "Basic"
   admin_enabled       = true
   
+  identity {
+    type = local.managed_identity.type
+    identity_ids = local.managed_identity.identity_ids
+  }
+  
   lifecycle {
     ignore_changes = [tags]
   }
+  
+  depends_on = [azurerm_user_assigned_identity.gtaa-identity]
 }
