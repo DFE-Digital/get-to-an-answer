@@ -13,19 +13,16 @@ namespace Admin.Pages.Answers;
 [Authorize]
 public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiClient) : BasePageModel
 {
-    [FromRoute(Name = "questionnaireId")]
-    public Guid QuestionnaireId { get; set; }
+    [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
 
-    [FromRoute(Name = "questionId")]
-    public Guid QuestionId { get; set; }
+    [FromRoute(Name = "questionId")] public Guid QuestionId { get; set; }
 
     public string QuestionNumber { get; set; } = "1";
 
     // Bind a collection of options
-    [BindProperty]
-    public List<AnswerOptionsViewModel> Options { get; set; } = [];
+    [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
 
-    public IActionResult OnGet()
+    public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
 
@@ -33,6 +30,13 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         if (Options.Count == 0)
         {
             Options.Add(new AnswerOptionsViewModel());
+        }
+
+        var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
+
+        foreach (var option in Options)
+        {
+            
         }
 
         return Page();

@@ -1,7 +1,6 @@
 @page "/admin/questionnaires/{questionnaireId:guid}/questions/add"
 @addTagHelper *, Common
 @using Common.Enum
-@using Microsoft.AspNetCore.Mvc.Rendering
 @model Admin.Pages.Questions.AddQuestion
 
 @{
@@ -44,7 +43,7 @@
                      type="text"
                      asp-for="QuestionContent"
                      value="@Model.QuestionContent"
-                     govuk-error-for="@Model.QuestionContent"/>
+                     govuk-error-for="@Model.QuestionContent" />
       </govuk-form-group>
 
       <!-- Hint text -->
@@ -86,11 +85,11 @@
           <div class="govuk-radios" data-module="govuk-radios">
             <div class="govuk-radios__item">
               <govuk-input class="govuk-radios__input"
-                           id="QuestionType"
-                           asp-for="QuestionType"
-                           type="radio"
-                           value="@QuestionType.SingleSelect"
-                           govuk-error-for="@Model.QuestionType"/>
+                     id="QuestionType"           
+                     asp-for="QuestionType"
+                     type="radio"
+                     value="@QuestionType.SingleSelect"
+                     govuk-error-for="@Model.QuestionType" />
               <label class="govuk-label govuk-radios__label" for="QuestionType">
                 One option only (radio button)
               </label>
@@ -101,11 +100,11 @@
 
             <div class="govuk-radios__item">
               <govuk-input class="govuk-radios__input"
-                           id="QuestionType-Dropdown"
-                           asp-for="QuestionType"
-                           type="radio"
-                           value="@QuestionType.DropdownSelect"
-                           govuk-error-for="@Model.QuestionType"/>
+                     id="QuestionType-Dropdown"
+                     asp-for="QuestionType"
+                     type="radio"
+                     value="@QuestionType.DropdownSelect"
+                     govuk-error-for="@Model.QuestionType" />
               <label class="govuk-label govuk-radios__label" for="QuestionType-Dropdown">
                 One option only (drop-down)
               </label>
@@ -116,115 +115,16 @@
 
             <div class="govuk-radios__item">
               <govuk-input class="govuk-radios__input"
-                           id="QuestionType-MultiSelect"
-                           asp-for="QuestionType"
-                           type="radio"
-                           value="@QuestionType.MultiSelect"
-                           govuk-error-for="@Model.QuestionType"/>
+                     id="QuestionType-MultiSelect"
+                     asp-for="QuestionType"
+                     type="radio"
+                     value="@QuestionType.MultiSelect"
+                     govuk-error-for="@Model.QuestionType" />
               <label class="govuk-label govuk-radios__label" for="QuestionType-MultiSelect">
                 One or more options (multi-select)
               </label>
               <div class="govuk-hint govuk-radios__hint">
                 Use this when people can select more than one option.
-              </div>
-            </div>
-          </div>
-        </fieldset>
-      </govuk-form-group>
-
-      <!-- Navigation / routing radios that reveal additional inputs when selected -->
-      <govuk-form-group asp-for="@Model.NavigationOption">
-        <fieldset class="govuk-fieldset" aria-describedby="NavigationOption-hint NavigationOption-error">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-            <h2 class="govuk-fieldset__heading">
-              After answer, go to
-            </h2>
-          </legend>
-
-          <div id="NavigationOption-hint" class="govuk-hint">
-            Choose where to send the user after they answer this question.
-          </div>
-
-          <govuk-field-error asp-for="@Model.NavigationOption" error-id="NavigationOption-error">
-          </govuk-field-error>
-
-          <div class="govuk-radios" data-module="govuk-radios">
-            <div class="govuk-radios__item">
-              <govuk-input class="govuk-radios__input"
-                           id="Nav-NextQuestion"
-                           asp-for="NavigationOption"
-                           type="radio"
-                           value="NextQuestion"
-                           data-aria-controls="Nav-NextQuestion-reveal"/>
-              <label class="govuk-label govuk-radios__label" for="Nav-NextQuestion">
-                Next question
-              </label>
-              <div class="govuk-hint govuk-radios__hint">
-                Use this to direct people to the next question in the order.
-              </div>
-
-              <div id="Nav-NextQuestion-reveal" class="govuk-radios__conditional">
-                <!-- No extra input for next question; kept for parity -->
-              </div>
-            </div>
-
-            <div class="govuk-radios__item">
-              <govuk-input class="govuk-radios__input"
-                           id="Nav-SpecificQuestion"
-                           asp-for="NavigationOption"
-                           type="radio"
-                           value="SpecificQuestion"
-                           data-aria-controls="Nav-SpecificQuestion-reveal"/>
-              <label class="govuk-label govuk-radios__label" for="Nav-SpecificQuestion">
-                Specific question
-              </label>
-              <div class="govuk-hint govuk-radios__hint">
-                Use this to direct people to a specific question.
-              </div>
-
-              <div id="Nav-SpecificQuestion-reveal" class="govuk-radios__conditional">
-                <label class="govuk-label govuk-!-margin-bottom-2" for="SelectedQuestionId">Select a question</label>
-                <select class="govuk-select equal-input-width" id="SelectedQuestionId" asp-for="SelectedQuestionId" asp-items="Model.QuestionSelectList"></select>
-              </div>
-            </div>
-
-            <div class="govuk-radios__item">
-              <govuk-input class="govuk-radios__input"
-                           id="Nav-ResultsPageInternal"
-                           asp-for="NavigationOption"
-                           type="radio"
-                           value="ResultsPageInternal"
-                           data-aria-controls="Nav-ResultsPageInternal-reveal"/>
-              <label class="govuk-label govuk-radios__label" for="Nav-ResultsPageInternal">
-                Results page (created in 'Get to an answer')
-              </label>
-              <div class="govuk-hint govuk-radios__hint">
-                Use this to direct people to a results page created on the 'Add and edit results' page.
-              </div>
-
-              <div id="Nav-ResultsPageInternal-reveal" class="govuk-radios__conditional">
-                <label class="govuk-label govuk-!-margin-bottom-2" for="SelectedResultsPageId">Select a results page</label>
-                <select class="govuk-select equal-input-width" id="SelectedResultsPageId" asp-for="SelectedResultsPageId" asp-items="Model.ResultsPageSelectList"></select>
-              </div>
-            </div>
-
-            <div class="govuk-radios__item">
-              <govuk-input class="govuk-radios__input"
-                           id="Nav-ResultsPageExternal"
-                           asp-for="NavigationOption"
-                           type="radio"
-                           value="ResultsPageExternal"
-                           data-aria-controls="Nav-ResultsPageExternal-reveal"/>
-              <label class="govuk-label govuk-radios__label" for="Nav-ResultsPageExternal">
-                Results page (outside of 'Get to an answer')
-              </label>
-              <div class="govuk-hint govuk-radios__hint">
-                Use this to add a link and direct people to a results page.
-              </div>
-
-              <div id="Nav-ResultsPageExternal-reveal" class="govuk-radios__conditional">
-                <label class="govuk-label govuk-!-margin-bottom-2" for="ExternalResultsLink">Enter a link</label>
-                <input class="govuk-input equal-input-width" id="ExternalResultsLink" asp-for="ExternalResultsLink" />
               </div>
             </div>
           </div>

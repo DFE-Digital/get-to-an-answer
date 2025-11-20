@@ -37,80 +37,177 @@
             aria-describedby="Option1Hint-hint"></textarea>
 </govuk-form-group>
 
-<!-- Option 1 destination -->
-<govuk-form-group asp-for="@Model.Destination">
-  <fieldset class="govuk-fieldset" aria-describedby="Option1Destination-hint Option1Destination-error">
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-      Destination
-    </legend>
-    <div id="Option1Destination-hint" class="govuk-hint">
-      Where do people go next if they click this option.
-    </div>
 
-    <govuk-field-error asp-for="@Model.Destination" error-id="Option1Destination-error">
-    </govuk-field-error>
+@* <govuk-form-group asp-for="@Model.Destination"> *@
+@*   <fieldset class="govuk-fieldset" aria-describedby="Option1Destination-hint Option1Destination-error"> *@
+@*     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s"> *@
+@*       Destination *@
+@*     </legend> *@
+@*     <div id="Option1Destination-hint" class="govuk-hint"> *@
+@*       Where do people go next if they click this option. *@
+@*     </div> *@
+@* *@
+@*     <govuk-field-error asp-for="@Model.Destination" error-id="Option1Destination-error"> *@
+@*     </govuk-field-error> *@
+@* *@
+@*     <div class="govuk-radios" data-module="govuk-radios"> *@
+@*       <div class="govuk-radios__item"> *@
+@*         <govuk-input class="govuk-radios__input" *@
+@*                      id="Option1Destination" *@
+@*                      asp-for="Destination" *@
+@*                      type="radio" *@
+@*                      value="@AnswerOptionDestination.NextQuestion" *@
+@*                      govuk-error-for="@Model.Destination"/> *@
+@*         <label class="govuk-label govuk-radios__label" for="Option1Destination"> *@
+@*           Next question *@
+@*         </label> *@
+@*         <div class="govuk-hint govuk-radios__hint"> *@
+@*           Use this to direct people to the next question in the order. *@
+@*         </div> *@
+@*       </div> *@
+@* *@
+@*       <div class="govuk-radios__item"> *@
+@*         <govuk-input class="govuk-radios__input" *@
+@*                      id="Option1Destination-Specific" *@
+@*                      asp-for="Destination" *@
+@*                      type="radio" *@
+@*                      value="@AnswerOptionDestination.SpecificQuestion" *@
+@*                      govuk-error-for="@Model.Destination"/> *@
+@*         <label class="govuk-label govuk-radios__label" for="Option1Destination-Specific"> *@
+@*           Specific question *@
+@*         </label> *@
+@*         <div class="govuk-hint govuk-radios__hint"> *@
+@*           Use this to direct people to a specific question. *@
+@*         </div> *@
+@*       </div> *@
+@* *@
+@*       <div class="govuk-radios__item"> *@
+@*         <govuk-input class="govuk-radios__input" *@
+@*                      id="Option1Destination-InternalResult" *@
+@*                      asp-for="Destination" *@
+@*                      type="radio" *@
+@*                      value="@AnswerOptionDestination.InternalResultsPage" *@
+@*                      govuk-error-for="@Model.Destination"/> *@
+@*         <label class="govuk-label govuk-radios__label" for="Option1Destination-InternalResult"> *@
+@*           Results page (in ‘Get to an answer’) *@
+@*         </label> *@
+@*         <div class="govuk-hint govuk-radios__hint"> *@
+@*           Use this to direct people to a results page created on the ‘Add and edit results’ page. *@
+@*         </div> *@
+@*       </div> *@
+@* *@
+@*       <div class="govuk-radios__item"> *@
+@*         <govuk-input class="govuk-radios__input" *@
+@*                      id="Option1Destination-ExternalResult" *@
+@*                      asp-for="Destination" *@
+@*                      type="radio" *@
+@*                      value="@AnswerOptionDestination.ExternalResultsPage" *@
+@*                      govuk-error-for="@Model.Destination"/> *@
+@*         <label class="govuk-label govuk-radios__label" for="Option1Destination-ExternalResult"> *@
+@*           Results page (outside of ‘Get to an answer’) *@
+@*         </label> *@
+@*         <div class="govuk-hint govuk-radios__hint"> *@
+@*           Use this to add a link and direct people to a results page. *@
+@*         </div> *@
+@*       </div> *@
+@*     </div> *@
+@*   </fieldset> *@
+@* </govuk-form-group> *@
 
-    <div class="govuk-radios" data-module="govuk-radios">
-      <div class="govuk-radios__item">
-        <govuk-input class="govuk-radios__input"
-                     id="Option1Destination"
-                     asp-for="Destination"
-                     type="radio"
-                     value="@AnswerOptionDestination.NextQuestion"
-                     govuk-error-for="@Model.Destination"/>
-        <label class="govuk-label govuk-radios__label" for="Option1Destination">
-          Next question
-        </label>
-        <div class="govuk-hint govuk-radios__hint">
-          Use this to direct people to the next question in the order.
-        </div>
-      </div>
+ <govuk-form-group asp-for="@Model.AnswerDestination">
+        <fieldset class="govuk-fieldset" aria-describedby="NavigationOption-hint NavigationOption-error">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+            <h2 class="govuk-fieldset__heading">
+              After answer, go to
+            </h2>
+          </legend>
 
-      <div class="govuk-radios__item">
-        <govuk-input class="govuk-radios__input"
-                     id="Option1Destination-Specific"
-                     asp-for="Destination"
-                     type="radio"
-                     value="@AnswerOptionDestination.SpecificQuestion"
-                     govuk-error-for="@Model.Destination"/>
-        <label class="govuk-label govuk-radios__label" for="Option1Destination-Specific">
-          Specific question
-        </label>
-        <div class="govuk-hint govuk-radios__hint">
-          Use this to direct people to a specific question.
-        </div>
-      </div>
+          <div id="NavigationOption-hint" class="govuk-hint">
+            Choose where to send the user after they answer this question.
+          </div>
 
-      <div class="govuk-radios__item">
-        <govuk-input class="govuk-radios__input"
-                     id="Option1Destination-InternalResult"
-                     asp-for="Destination"
-                     type="radio"
-                     value="@AnswerOptionDestination.InternalResultsPage"
-                     govuk-error-for="@Model.Destination"/>
-        <label class="govuk-label govuk-radios__label" for="Option1Destination-InternalResult">
-          Results page (in ‘Get to an answer’)
-        </label>
-        <div class="govuk-hint govuk-radios__hint">
-          Use this to direct people to a results page created on the ‘Add and edit results’ page.
-        </div>
-      </div>
+          <govuk-field-error asp-for="@Model.AnswerDestination" error-id="NavigationOption-error">
+          </govuk-field-error>
 
-      <div class="govuk-radios__item">
-        <govuk-input class="govuk-radios__input"
-                     id="Option1Destination-ExternalResult"
-                     asp-for="Destination"
-                     type="radio"
-                     value="@AnswerOptionDestination.ExternalResultsPage"
-                     govuk-error-for="@Model.Destination"/>
-        <label class="govuk-label govuk-radios__label" for="Option1Destination-ExternalResult">
-          Results page (outside of ‘Get to an answer’)
-        </label>
-        <div class="govuk-hint govuk-radios__hint">
-          Use this to add a link and direct people to a results page.
-        </div>
-      </div>
-    </div>
-  </fieldset>
-</govuk-form-group>
+          <div class="govuk-radios" data-module="govuk-radios">
+            <div class="govuk-radios__item">
+              <govuk-input class="govuk-radios__input"
+                           id="Nav-NextQuestion"
+                           asp-for="AnswerDestination"
+                           type="radio"
+                           value="NextQuestion"
+                           data-aria-controls="Nav-NextQuestion-reveal"/>
+              <label class="govuk-label govuk-radios__label" for="Nav-NextQuestion">
+                Next question
+              </label>
+              <div class="govuk-hint govuk-radios__hint">
+                Use this to direct people to the next question in the order.
+              </div>
 
+              <div id="Nav-NextQuestion-reveal" class="govuk-radios__conditional">
+                <!-- No extra input for next question; kept for parity -->
+              </div>
+            </div>
+
+            <div class="govuk-radios__item">
+              <govuk-input class="govuk-radios__input"
+                           id="Nav-SpecificQuestion"
+                           asp-for="AnswerDestination"
+                           type="radio"
+                           value="SpecificQuestion"
+                           data-aria-controls="Nav-SpecificQuestion-reveal"/>
+              <label class="govuk-label govuk-radios__label" for="Nav-SpecificQuestion">
+                Specific question
+              </label>
+              <div class="govuk-hint govuk-radios__hint">
+                Use this to direct people to a specific question.
+              </div>
+
+              <div id="Nav-SpecificQuestion-reveal" class="govuk-radios__conditional">
+                <label class="govuk-label govuk-!-margin-bottom-2" for="SelectedQuestionId">Select a question</label>
+                <select class="govuk-select equal-input-width" id="SelectedQuestionId" asp-for="SelectedQuestion" asp-items="Model.QuestionSelectList"></select>
+              </div>
+            </div>
+
+            <div class="govuk-radios__item">
+              <govuk-input class="govuk-radios__input"
+                           id="Nav-ResultsPageInternal"
+                           asp-for="AnswerDestination"
+                           type="radio"
+                           value="ResultsPageInternal"
+                           data-aria-controls="Nav-ResultsPageInternal-reveal"/>
+              <label class="govuk-label govuk-radios__label" for="Nav-ResultsPageInternal">
+                Results page (created in 'Get to an answer')
+              </label>
+              <div class="govuk-hint govuk-radios__hint">
+                Use this to direct people to a results page created on the 'Add and edit results' page.
+              </div>
+
+              <div id="Nav-ResultsPageInternal-reveal" class="govuk-radios__conditional">
+                <label class="govuk-label govuk-!-margin-bottom-2" for="SelectedResultsPageId">Select a results page</label>
+                <select class="govuk-select equal-input-width" id="SelectedResultsPageId" asp-for="SelectedResultsPage" asp-items="Model.ResultsPageSelectList"></select>
+              </div>
+            </div>
+
+            <div class="govuk-radios__item">
+              <govuk-input class="govuk-radios__input"
+                           id="Nav-ResultsPageExternal"
+                           asp-for="AnswerDestination"
+                           type="radio"
+                           value="ResultsPageExternal"
+                           data-aria-controls="Nav-ResultsPageExternal-reveal"/>
+              <label class="govuk-label govuk-radios__label" for="Nav-ResultsPageExternal">
+                Results page (outside of 'Get to an answer')
+              </label>
+              <div class="govuk-hint govuk-radios__hint">
+                Use this to add a link and direct people to a results page.
+              </div>
+
+              <div id="Nav-ResultsPageExternal-reveal" class="govuk-radios__conditional">
+                <label class="govuk-label govuk-!-margin-bottom-2" for="ExternalResultsLink">Enter a link</label>
+                <input class="govuk-input equal-input-width" id="ExternalResultsLink" asp-for="ExternalLink" />
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </govuk-form-group>
