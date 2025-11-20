@@ -64,7 +64,7 @@ resource "azurerm_container_registry" "gettoananswer-registry" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   sku                 = "Basic"
   admin_enabled       = true
-  
+
   lifecycle {
     ignore_changes = [tags]
   }

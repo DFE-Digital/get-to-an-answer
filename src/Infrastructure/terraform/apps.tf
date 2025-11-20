@@ -58,12 +58,12 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
 
-    minimum_tls_version = "1.3"
+    minimum_tls_version     = "1.3"
     scm_minimum_tls_version = "1.3"
   }
-  
+
   identity {
-    type = local.managed_identity.type
+    type         = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
 
@@ -130,12 +130,12 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-api-staging" {
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
 
-    minimum_tls_version = "1.3"
+    minimum_tls_version     = "1.3"
     scm_minimum_tls_version = "1.3"
   }
 
   identity {
-    type = local.managed_identity.type
+    type         = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
 
@@ -165,12 +165,12 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
 
-    minimum_tls_version = "1.3"
+    minimum_tls_version     = "1.3"
     scm_minimum_tls_version = "1.3"
   }
 
   identity {
-    type = local.managed_identity.type
+    type         = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
 
@@ -218,12 +218,12 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-admin-staging" {
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
 
-    minimum_tls_version = "1.3"
+    minimum_tls_version     = "1.3"
     scm_minimum_tls_version = "1.3"
   }
 
   identity {
-    type = local.managed_identity.type
+    type         = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
 
@@ -253,12 +253,12 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
 
-    minimum_tls_version = "1.3"
+    minimum_tls_version     = "1.3"
     scm_minimum_tls_version = "1.3"
   }
 
   identity {
-    type = local.managed_identity.type
+    type         = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
 
@@ -298,16 +298,16 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-frontend-staging" {
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
-    
-    minimum_tls_version = "1.3"
+
+    minimum_tls_version     = "1.3"
     scm_minimum_tls_version = "1.3"
   }
 
   identity {
-    type = local.managed_identity.type
+    type         = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
-  
+
   key_vault_reference_identity_id = local.managed_identity.identity_ids[0]
 
   app_settings = local.frontend_app_settings
