@@ -112,7 +112,7 @@ export async function goToAddQuestionPageByUrl(
     waitUntil: LoadState = 'networkidle'): Promise<AddQuestionPage> {
 
     const adminUrl = EnvConfig.ADMIN_URL;
-    const viewQuestionUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/questions/create`;
+    const viewQuestionUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/questions/add`;
 
     await page.goto(viewQuestionUrl, {waitUntil});
 

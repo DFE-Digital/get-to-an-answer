@@ -4,6 +4,7 @@ import {BasePage} from "../BasePage";
 type Mode = 'create' | 'edit';
 
 export class AddAnswersPage extends BasePage {
+    private readonly addAnswersHeading: Locator;
     // ===== Locators =====
     private optionContent(i: number): Locator {
         return this.page.locator(`input[name="Answers[${i}].Content"]`);
@@ -44,13 +45,18 @@ export class AddAnswersPage extends BasePage {
 
     constructor(page: Page, mode: Mode = 'create') {
         super(page);
+
+        this.addAnswersHeading = this.page.locator('main h1.govuk-heading-l');
     }
 
     // ===== Actions =====
-    async expectOnPage() {
-        await expect(this.page.getByRole('heading', {name: 'Create a list of answer options'})).toBeVisible();
-    }
+    async expectAnswerHeadingOnPage(expectedText?: string): Promise<void> {
+        await expect(this.addAnswersHeading, '❌ Add answers page heading not visible').toBeVisible();
 
+        if (expectedText) {
+            await expect(this.addAnswersHeading, `❌ Add answers page heading text does not match: expected "${expectedText}"`).toHaveText(expectedText);
+        }
+    }
     async setOptionContent(i: number, text: string) {
         await this.optionContent(i).fill(text);
     }
