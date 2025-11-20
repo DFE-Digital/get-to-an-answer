@@ -7,6 +7,7 @@ using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Admin.Pages.Answers;
 
@@ -22,32 +23,29 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     // Bind a collection of options
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
 
+    [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
+
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
 
-        // Start with one empty option if none exist yet
-        if (Options.Count == 0)
-        {
-            Options.Add(new AnswerOptionsViewModel());
-        }
-
-        var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
-
-        foreach (var option in Options)
-        {
-            
-        }
+        await HydrateOptionListsAsync();
+        ReassignOptionNumbers();
 
         return Page();
     }
 
     // Handler for clicking "Add another option"
-    public IActionResult OnPostAddOption()
+    public async Task<IActionResult> OnPostAddOption()
     {
-        // Ensure existing options are bound
+        OptionNumber++;
 
-        Options.Add(new AnswerOptionsViewModel());
+        Options.Add(new AnswerOptionsViewModel
+        {
+            OptionNumber = OptionNumber
+        });
+
+        await HydrateOptionListsAsync();
 
         // Re-render page with the extra option
         return Page();
@@ -58,6 +56,9 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     {
         if (!ModelState.IsValid)
         {
+            await HydrateOptionListsAsync();
+            ReassignOptionNumbers();
+            
             return Page();
         }
 
@@ -84,6 +85,29 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
                 "Error creating answer options for questionnaire {QuestionnaireId}, question {QuestionId}",
                 QuestionnaireId, QuestionId);
             return RedirectToErrorPage();
+        }
+    }
+
+    private async Task HydrateOptionListsAsync()
+    {
+        var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
+        // var resultsPages = await apiClient.GetResultsPagesAsync(QuestionnaireId);
+
+        var questionSelect = questions.Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
+        // var resultsSelect = resultsPages.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
+
+        foreach (var option in Options)
+        {
+            option.QuestionSelectList = questionSelect;
+            // option.ResultsPageSelectList = resultsSelect;
+        }
+    }
+
+    private void ReassignOptionNumbers()
+    {
+        for (var index = 0; index < Options.Count; index++)
+        {
+            Options[index].OptionNumber = index + 1;
         }
     }
 }

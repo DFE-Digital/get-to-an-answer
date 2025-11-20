@@ -5,13 +5,17 @@ namespace Admin.Models;
 
 public class AnswerOptionsViewModel
 {
+    public Guid ViewModelId { get; set; } = Guid.NewGuid();
+
+    public int OptionNumber { get; set; }
+    
     public string OptionContent { get; set; } = string.Empty;
     
     public string OptionHint { get; set; } = string.Empty;
     public AnswerDestination AnswerDestination { get; set; }
     
     public IEnumerable<SelectListItem> QuestionSelectList { get; set; } = [];
-    public IEnumerable<SelectListItem> ResultsPageSelectList { get; set; } = [];
+    public List<SelectListItem> ResultsPageSelectList { get; set; } = [];
     
     public string? ResultPageUrl { get; set; }
     
