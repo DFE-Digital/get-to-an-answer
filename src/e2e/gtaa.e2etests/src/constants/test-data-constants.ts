@@ -40,9 +40,12 @@ export const ErrorMessages = {
 
     ERROR_MESSAGE_MISSING_QUESTION_TYPE: 'The QuestionType field is required.',
     ERROR_MESSAGE_MISSING_QUESTION_CONTENT: 'The QuestionContent field is required.',
+
+    ERROR_MESSAGE_MISSING_OPTION_CONTENT: 'The OptionContent field is required.',
 }
 
 export const PageHeadings = {
     VIEW_QUESTION_PAGE_HEADING: 'Add and edit your questions',
-    ADD_QUESTION_PAGE_HEADING: 'Add a question'
+    ADD_QUESTION_PAGE_HEADING: 'Add a question',
+    ADD_ANSWER_PAGE_HEADING: 'Create a list of answer options',
 }

@@ -24,7 +24,7 @@ export class AddQuestionPage extends BasePage {
     private readonly typeSingleShort: Locator;
     private readonly typeSingleLong: Locator;
     private readonly typeMulti: Locator;
-    private readonly saveButton: Locator;
+    private readonly saveAndContinueButton: Locator;
     private readonly radios: Locator;
     private readonly radiosFormGroup: Locator;
     private readonly errorSummary: Locator;
@@ -34,9 +34,7 @@ export class AddQuestionPage extends BasePage {
     private readonly errorList: Locator;
     private readonly errorLinks: Locator;
     private readonly errorLinkQuestionContent: Locator;
-    private readonly errorLinkQuestionText: Locator;
     private readonly errorLinkQuestionType: Locator;
-    private readonly acceptedErrorLink: Locator;
     private readonly questionContentFormGroup: Locator;
     private readonly inlineQuestionContentError: Locator;
     private readonly inlineUpdateQuestionContentError: Locator;
@@ -75,7 +73,7 @@ export class AddQuestionPage extends BasePage {
             .or(this.form.locator(`input[type="radio"][name="${this.radioName}"]`).last());
 
         // Save button
-        this.saveButton = this.form.locator('button.govuk-button[type="submit"]');
+        this.saveAndContinueButton = this.form.locator('button.govuk-button[type="submit"]');
 
         // All radios in the QuestionType group
         this.radios = this.form.locator('input[type="radio"][name="QuestionType"]');
@@ -90,9 +88,7 @@ export class AddQuestionPage extends BasePage {
         this.errorList = this.errorSummary.locator('ul.govuk-error-summary__list');
         this.errorLinks = this.errorList.locator('a');
         this.errorLinkQuestionContent = this.page.locator('a[href="#QuestionContent"]');
-        this.errorLinkQuestionText = this.page.locator('a[href="#QuestionHintText"]');
         this.errorLinkQuestionType = this.page.locator('a[href="#QuestionType"]');
-        this.acceptedErrorLink = this.errorList.locator('a[href="#Accepted"]');
         this.errorSummaryLinks = this.errorSummary.locator('.govuk-error-summary__list a');
         
         this.questionInputFormGroup = this.form.locator(
@@ -134,9 +130,9 @@ export class AddQuestionPage extends BasePage {
         await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
         await expect(this.errorSummary, '❌ Attribute tabIndex is missing').toHaveAttribute('tabindex', '-1');
         await expect(this.errorSummary, '❌ Error summary not focused').toBeFocused();
-
-        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_TYPE);
+        
         await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_CONTENT);
+        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_TYPE);
 
         await this.clickAllLinksAndValidateFocus(browserName);
     }
@@ -180,10 +176,52 @@ export class AddQuestionPage extends BasePage {
     async assertPageElements() {
         await this.verifyHeaderLinks();
         await this.verifyFooterLinks();
+        await this.verifyBackLinkPresent();
         await this.VerifyQuestionInputAndHintTextarea();
         await expect(this.form, '❌ Form not visible').toBeVisible();
         expect(await this.radios.count()).toBeGreaterThan(1);
-        await expect(this.saveButton, '❌ Save button not visible').toBeVisible();
+        await expect(this.saveAndContinueButton, '❌ Save button not visible').toBeVisible();
+    }
+
+    // Accessibility
+    async validateQuestionContentFieldAriaDescribedBy() {
+        const errorElement = this.mode === 'update'
+            ? this.inlineUpdateQuestionContentError
+            : this.inlineQuestionContentError;
+
+        await errorElement.waitFor({state: 'visible', timeout: Timeouts.LONG});
+
+        const ariaValue = await this.questionInput.getAttribute('aria-describedby');
+        expect(ariaValue, '❌ aria-describedby is missing').not.toBeNull();
+
+        if (this.mode === 'update') {
+            expect(ariaValue, '❌ aria-describedby missing error id')
+                .toContain('questioncontent-field-error');
+        } else {
+            expect(ariaValue, '❌ aria-describedby missing error id')
+                .toContain('questioncontent-field-error');
+        }
+    }
+
+    async validateQuestionTypeErrorAriaDescribedBy(): Promise<void> {
+        const errorElement = this.mode === 'update'
+            ? this.inlineQuestionTypeError
+            : this.inlineUpdateQuestionTypeError;
+
+        await errorElement.waitFor({state: 'visible', timeout: Timeouts.LONG});
+
+        await expect(this.fieldset).toHaveAttribute('aria-describedby');
+
+        const ariaValue = await this.fieldset.getAttribute('aria-describedby');
+        expect(ariaValue, '❌ aria-describedby missing').not.toBeNull();
+
+        if (this.mode === 'update') {
+            expect(ariaValue, '❌ aria-describedby missing error id')
+                .toContain('QuestionType-error');
+        } else {
+            expect(ariaValue, '❌ aria-describedby missing error id')
+                .toContain('QuestionType-error');
+        }
     }
 
     // ===== Actions =====
@@ -246,7 +284,7 @@ export class AddQuestionPage extends BasePage {
         await this.hintTextarea.clear();
     }
 
-    async chooseType(type: QuestionType): Promise<void> {
+    async chooseQuestionType(type: QuestionType): Promise<void> {
         switch (type) {
             case QuestionType.SingleSelectShort:
                 await this.typeSingleShort.check();
@@ -260,49 +298,8 @@ export class AddQuestionPage extends BasePage {
         }
     }
 
-    async save(): Promise<void> {
-        await this.saveButton.click();
-    }
-
-    // Accessibility
-    async validateQuestionContentFieldAriaDescribedBy() {
-        const errorElement = this.mode === 'update'
-            ? this.inlineUpdateQuestionContentError
-            : this.inlineQuestionContentError;
-
-        await errorElement.waitFor({state: 'visible', timeout: Timeouts.LONG});
-
-        const ariaValue = await this.questionInput.getAttribute('aria-describedby');
-        expect(ariaValue, '❌ aria-describedby is missing').not.toBeNull();
-
-        if (this.mode === 'update') {
-            expect(ariaValue, '❌ aria-describedby missing error id')
-                .toContain('questioncontent-field-error');
-        } else {
-            expect(ariaValue, '❌ aria-describedby missing error id')
-                .toContain('questioncontent-field-error');
-        }
-    }
-
-    async validateQuestionTypeErrorAriaDescribedBy(): Promise<void> {
-        const errorElement = this.mode === 'update'
-            ? this.inlineQuestionTypeError
-            : this.inlineUpdateQuestionTypeError;
-
-        await errorElement.waitFor({state: 'visible', timeout: Timeouts.LONG});
-        
-        await expect(this.fieldset).toHaveAttribute('aria-describedby');
-        
-        const ariaValue = await this.fieldset.getAttribute('aria-describedby');
-        expect(ariaValue, '❌ aria-describedby missing').not.toBeNull();
-
-        if (this.mode === 'update') {
-            expect(ariaValue, '❌ aria-describedby missing error id')
-                .toContain('QuestionType-error');
-        } else {
-            expect(ariaValue, '❌ aria-describedby missing error id')
-                .toContain('QuestionType-error');
-        }
+    async clickSaveAndContinue(): Promise<void> {
+        await this.saveAndContinueButton.click();
     }
     
     // Convenience helper for typical flow
@@ -313,7 +310,7 @@ export class AddQuestionPage extends BasePage {
     ): Promise<void> {
         await this.enterQuestionContent(question);
         if (hint !== undefined) await this.enterQuestionHintText(hint);
-        await this.chooseType(type);
-        await this.save();
+        await this.chooseQuestionType(type);
+        await this.clickSaveAndContinue();
     }
 }
