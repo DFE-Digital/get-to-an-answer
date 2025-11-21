@@ -9,63 +9,67 @@
     .Replace(".", "-");
   
   string Id(string suffix) => $"{prefix}-{suffix}";
+
+
+  var contentIdSuffix = "OptionContent";
+  var contentHintIdSuffix = "OptionHint";
+  var destinationIdSuffix = "AnswerDestination";
 }
 
 <input type="hidden" asp-for="OptionNumber" />
 
 <govuk-form-group asp-for="OptionContent">
-  <label class="govuk-label govuk-label--s" for="@Id("content")">
+  <label class="govuk-label govuk-label--s" for="@Id(contentIdSuffix)">
     Option @Model.OptionNumber
   </label>
 
-  <govuk-field-error asp-for="@Model.OptionContent" error-id="@Id("content-error")">
+  <govuk-field-error asp-for="@Model.OptionContent" error-id="@Id($"{contentIdSuffix}-error")">
   </govuk-field-error>
 
-  <govuk-input id="@Id("content")"
+  <govuk-input id="@Id(contentIdSuffix)"
                class="govuk-input"
                type="text"
                asp-for="@Model.OptionContent"
-               value="@Model.OptionContent"
-               govuk-error-for="@Id("content-error")"/>
+               govuk-error-for="@Id($"{contentIdSuffix}-error")"/>
 </govuk-form-group>
 
 <govuk-form-group asp-for="OptionHint">
-  <label class="govuk-label govuk-label--s" for="@Id("hint")">
+  <label class="govuk-label govuk-label--s" for="@Id(contentHintIdSuffix)">
     Hint text (optional)
   </label>
-  <div class="govuk-hint" id="@Id("hint-hint")">
+  <div class="govuk-hint" id="@Id(contentHintIdSuffix)">
     You can add a short description to help people understand what this option is.
   </div>
 
-  <govuk-field-error asp-for="OptionHint" error-id="@Id("hint-error")">
+  <govuk-field-error asp-for="OptionHint" error-id="@Id($"{contentHintIdSuffix}-error")">
   </govuk-field-error>
 
   <textarea class="govuk-textarea"
-            id="@Id("hint")"
+            id="@Id(contentHintIdSuffix)"
             rows="4"
             asp-for="OptionHint"
-            aria-describedby="@Id("hint-hint")"></textarea>
+            aria-describedby="@Id(contentHintIdSuffix)"></textarea>
 </govuk-form-group>
 
 <govuk-form-group asp-for="AnswerDestination">
-  <fieldset class="govuk-fieldset" aria-describedby="@($"{Id("destination-hint")} {Id("destination-error")}")">
+  <fieldset class="govuk-fieldset" aria-describedby="@($"{Id($"{destinationIdSuffix}-hint")} {Id($"{destinationIdSuffix}-error")}")">
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
       Destination
     </legend>
-    <div id="@Id("destination-hint")" class="govuk-hint">
+    <div id="@Id($"{destinationIdSuffix}-hint")" class="govuk-hint">
       Choose where to send the user after they answer this option.
     </div>
 
-    <govuk-field-error asp-for="AnswerDestination" error-id="@Id("destination-error")">
+    <govuk-field-error asp-for="AnswerDestination" error-id="@Id($"{destinationIdSuffix}-error")">
     </govuk-field-error>
 
-    <div class="govuk-radios" data-module="govuk-radios">
+    <div class="govuk-radios" data-module="govuk-radios" id="@Id(destinationIdSuffix)">
       <div class="govuk-radios__item">
         <govuk-input class="govuk-radios__input"
                      id="@Id("destination-next")"
                      asp-for="AnswerDestination"
                      type="radio"
-                     value="NextQuestion"/>
+                     value="@AnswerDestination.NextQuestion"/>
         <label class="govuk-label govuk-radios__label" for="@Id("destination-next")">
           Next question
         </label>
@@ -79,7 +83,7 @@
                      id="@Id("destination-specific")"
                      asp-for="AnswerDestination"
                      type="radio"
-                     value="SpecificQuestion"
+                     value="@AnswerDestination.SpecificQuestion"
                      data-aria-controls="@Id("destination-specific-reveal")"/>
         <label class="govuk-label govuk-radios__label" for="@Id("destination-specific")">
           Specific question
@@ -106,7 +110,7 @@
                      id="@Id("destination-internal")"
                      asp-for="AnswerDestination"
                      type="radio"
-                     value="ResultsPageInternal"
+                     value="@AnswerDestination.InternalResultsPage"
                      data-aria-controls="@Id("destination-internal-reveal")"/>
         <label class="govuk-label govuk-radios__label" for="@Id("destination-internal")">
           Results page (in ‘Get to an answer’)
@@ -133,7 +137,7 @@
                      id="@Id("destination-external")"
                      asp-for="AnswerDestination"
                      type="radio"
-                     value="ResultsPageExternal"
+                     value="@AnswerDestination.ExternalResultsPage"
                      data-aria-controls="@Id("destination-external-reveal")"/>
         <label class="govuk-label govuk-radios__label" for="@Id("destination-external")">
           Results page (outside of ‘Get to an answer’)

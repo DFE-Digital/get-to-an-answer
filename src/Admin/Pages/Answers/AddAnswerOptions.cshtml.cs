@@ -25,11 +25,10 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
     [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
     
-    [TempData(Key = "OnPostError")] 
-    public bool OnPostError { get; set; }
-
-    public async Task<IActionResult> OnGet()
+    [TempData(Key = "ErrorMessage")] public string? ErrorMessage { get; set; }
     
+    
+    public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
 
@@ -42,8 +41,11 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     // Handler for clicking "Add another option"
     public async Task<IActionResult> OnPostAddOption()
     {
-        if (!ModelState.IsValid && !OnPostError)
-            RemoveOptionRelatedErrors();
+        if (!ModelState.IsValid)
+        {
+            // ModelState.Select(x => x.Value?.Errors).ToList().ForEach(x => x?.Clear());
+            return Page();
+        }
         
         OptionNumber++;
 
@@ -64,7 +66,6 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     {
         if (!ModelState.IsValid)
         {
-            OnPostError = true;
             RemoveGenericOptionErrors();
             await HydrateOptionListsAsync();
             ReassignOptionNumbers();
