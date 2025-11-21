@@ -8,6 +8,7 @@ using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Admin.Pages.Answers;
 
@@ -43,7 +44,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     {
         if (!ModelState.IsValid)
         {
-            // ModelState.Select(x => x.Value?.Errors).ToList().ForEach(x => x?.Clear());
+            RemoveGenericOptionErrors();
             return Page();
         }
         
@@ -121,13 +122,6 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         }
     }
     
-    private void RemoveOptionRelatedErrors()
-    {
-        foreach (var key in ModelState.Keys.Where(k => k.StartsWith("Options[", StringComparison.Ordinal)).ToList())
-        {
-            ModelState.Remove(key);
-        }
-    }
     
     private void RemoveGenericOptionErrors()
     {

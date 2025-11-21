@@ -13,7 +13,7 @@ public class AnswerOptionsViewModel
     [AnswerOptionRequired(fieldType : "content")]
     public string OptionContent { get; set; } = string.Empty;
     
-    public string OptionHint { get; set; } = string.Empty;
+    public string? OptionHint { get; set; } = string.Empty;
     
     [AnswerOptionRequired(fieldType : "destination")]
     public AnswerDestination AnswerDestination { get; set; }
