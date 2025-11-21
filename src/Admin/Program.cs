@@ -8,7 +8,6 @@ using Common.Logging;
 using Common.Telemetry;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -136,6 +135,10 @@ app.UseAuthorization();
 if (builderIsLocalEnvironment)
 {
     app.UseMockMvcDevEndpoints();
+}
+else if (builder.Environment.IsDevelopment())
+{
+    app.UseDevMvcTokenEndpoints();
 }
 
 app.MapStaticAssets();

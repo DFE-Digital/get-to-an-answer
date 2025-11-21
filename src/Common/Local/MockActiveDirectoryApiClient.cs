@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Unicode;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -251,7 +252,7 @@ public static class MockAzureAdExtensions
         return services;
     }
     
-    public static IApplicationBuilder UseMvcTokenEndpoints(this IApplicationBuilder app)
+    public static IApplicationBuilder UseDevMvcTokenEndpoints(this IApplicationBuilder app)
     {
         app.UseEndpoints(_ => { });
         
@@ -270,47 +271,62 @@ public static class MockAzureAdExtensions
         {
             endpoints.MapGet("/dev/login", async context =>
             {
+                context.Request.Query.TryGetValue("jt", out var jwtTokenString);
+
+                string scheme = jwtTokenString.Any() ? "Bearer" : string.Empty;
+                string token = jwtTokenString.Any() ? jwtTokenString.ToString() : string.Empty;
+                
                 // Authenticate using the mock scheme to build a principal
-                var result = await context.AuthenticateAsync(MockScheme);
-                if (!result.Succeeded || result.Principal == null)
+                if (scheme != "Bearer" || string.IsNullOrWhiteSpace(token))
                 {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    await context.Response.WriteAsync("Mock login failed");
+                    return;
+                }
+
+                try
+                {
+                    var handler = new JwtSecurityTokenHandler();
+                    var jwtToken = handler.ReadJwtToken(token);
+
+                    var claims = jwtToken.Claims.ToDictionary(claim => claim.Type, claim => claim.Value );
+
+                    int.TryParse(claims["exp"], out var expiration);
+            
+                    // if expiration is in the future, it's not valid'
+                    Console.WriteLine($"Expiration: {DateTimeOffset.FromUnixTimeSeconds(expiration)}");
+                    Console.WriteLine($"Now: {DateTimeOffset.UtcNow}");
+            
+                    if (DateTimeOffset.FromUnixTimeSeconds(expiration) < DateTimeOffset.UtcNow)
+                        return;
+            
+                    foreach (var (type, value) in claims)
+                    {
+                        Console.WriteLine($"{type}: {value}");
+                    }
+            
+                    var identity = new ClaimsIdentity(jwtToken.Claims, "MockAzureAD");
+                    var principal = new ClaimsPrincipal(identity);
+                    
+                    await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties
+                    {
+                        IsPersistent = true,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8),
+                        AllowRefresh = true,
+                        Items =
+                        {
+                            { ".AuthScheme", OpenIdConnectDefaults.AuthenticationScheme },
+                            { ".Token.id_token", token }
+                        }
+                    });
+                    context.Response.Redirect("/");
+                }
+                catch (Exception ex)
+                {
                     return;
                 }
 
                 // Issue cookie
-                await context.SignInAsync(MockCookieScheme, result.Principal, new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8),
-                    AllowRefresh = true,
-                    Items =
-                    {
-                        { ".Token.id_token", result.Properties.GetTokenValue("id_token") }
-                    }
-                });
-                context.Response.Redirect("/");
+                
             }).AllowAnonymous();
-
-            endpoints.MapGet("/dev/logout", async context =>
-            {
-                await context.SignOutAsync(MockCookieScheme);
-                context.Response.Redirect("/");
-            });
-
-            endpoints.MapGet("/dev/me", async context =>
-            {
-                var user = context.User;
-                var payload = new
-                {
-                    user.Identity?.IsAuthenticated,
-                    user.Identity?.Name,
-                    Claims = user.Claims.Select(c => new { c.Type, c.Value })
-                };
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(JsonSerializer.Serialize(payload, jsonOptions));
-            });
         });
 
         return app;
@@ -382,21 +398,36 @@ public static class MockAzureAdExtensions
         return app;
     }
 
-    private static ClaimsPrincipal? ToClaims(string jwtTokenString)
+    public static void AddDeveloperJwtOptions(this JwtBearerOptions options)
     {
-        try
+        options.TokenValidationParameters.RequireSignedTokens = false;
+        options.TokenValidationParameters.ValidateIssuerSigningKey = false;
+        options.TokenValidationParameters.SignatureValidator = (token, parameters) =>
         {
             var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadJwtToken(jwtTokenString);
+            var jwtToken = handler.ReadJwtToken(token);
 
-            var identity = new ClaimsIdentity(jwtToken.Claims, "MockAzureAD");
-            return new ClaimsPrincipal(identity);
-            
-        }
-        catch (Exception ex)
+            var jsonHeader = JsonSerializer.Serialize(jwtToken.Header);
+            var jsonPayload = JsonSerializer.Serialize(jwtToken.Payload);
+                    
+            return new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(jsonHeader, jsonPayload);
+        };
+        options.TokenValidationParameters.ValidateIssuer = false;
+        options.TokenValidationParameters.ValidateAudience = false;
+        options.TokenValidationParameters.ValidateLifetime = true; // Still validate expiration
+        options.TokenValidationParameters.TryAllIssuerSigningKeys = false;
+        options.TokenValidationParameters.IssuerSigningKeys = new List<SecurityKey>();
+        options.TokenValidationParameters.TokenReader = (token, parameters) =>
         {
-            return null;
-        }
+                    
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+                    
+            var jsonHeader = JsonSerializer.Serialize(jwtToken.Header);
+            var jsonPayload = JsonSerializer.Serialize(jwtToken.Payload);
+                    
+            return new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(jsonHeader, jsonPayload);
+        };
     }
 
     // For API: inject a mock bearer if none present

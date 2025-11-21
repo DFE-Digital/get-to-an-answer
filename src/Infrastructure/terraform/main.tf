@@ -68,15 +68,15 @@ resource "azurerm_container_registry" "gettoananswer-registry" {
   location            = azurerm_resource_group.gettoananswer-rg.location
   sku                 = "Basic"
   admin_enabled       = true
-  
+
   identity {
-    type = local.managed_identity.type
+    type         = local.managed_identity.type
     identity_ids = local.managed_identity.identity_ids
   }
-  
+
   lifecycle {
     ignore_changes = [tags]
   }
-  
+
   depends_on = [azurerm_user_assigned_identity.gtaa-identity]
 }

@@ -54,14 +54,14 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
       name        = "Access from Front Door"
       service_tag = "AzureFrontDoor.Backend"
     }
-    
+
     application_stack {
-      docker_image_name        = var.api_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_image_name   = var.api_image_name
+      docker_registry_url = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
     }
 
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.gtaa-identity.client_id
-    container_registry_use_managed_identity = true
+    container_registry_use_managed_identity       = true
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
@@ -76,7 +76,7 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
   }
 
   key_vault_reference_identity_id = local.managed_identity.identity_ids[0]
-  
+
   lifecycle {
     ignore_changes = [tags]
   }
@@ -136,12 +136,12 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-api-staging" {
     }
 
     application_stack {
-      docker_image_name        = var.api_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_image_name   = var.api_image_name
+      docker_registry_url = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
     }
 
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.gtaa-identity.client_id
-    container_registry_use_managed_identity = true
+    container_registry_use_managed_identity       = true
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
@@ -179,12 +179,12 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
     }
 
     application_stack {
-      docker_image_name        = var.admin_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_image_name   = var.admin_image_name
+      docker_registry_url = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
     }
 
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.gtaa-identity.client_id
-    container_registry_use_managed_identity = true
+    container_registry_use_managed_identity       = true
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
@@ -233,12 +233,12 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-admin-staging" {
     }
 
     application_stack {
-      docker_image_name        = var.admin_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_image_name   = var.admin_image_name
+      docker_registry_url = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
     }
 
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.gtaa-identity.client_id
-    container_registry_use_managed_identity = true
+    container_registry_use_managed_identity       = true
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
@@ -276,12 +276,12 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
     }
 
     application_stack {
-      docker_image_name        = var.frontend_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_image_name   = var.frontend_image_name
+      docker_registry_url = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
     }
 
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.gtaa-identity.client_id
-    container_registry_use_managed_identity = true
+    container_registry_use_managed_identity       = true
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
@@ -330,12 +330,12 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-frontend-staging" {
     }
 
     application_stack {
-      docker_image_name        = var.frontend_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_image_name   = var.frontend_image_name
+      docker_registry_url = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
     }
 
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.gtaa-identity.client_id
-    container_registry_use_managed_identity = true
+    container_registry_use_managed_identity       = true
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5

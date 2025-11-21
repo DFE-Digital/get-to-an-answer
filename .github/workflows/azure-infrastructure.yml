@@ -61,6 +61,31 @@ jobs:
               "tenantId": "${{ env.ARM_TENANT_ID }}",
               "subscriptionId": "${{ env.ARM_SUBSCRIPTION_ID }}"
             }
+            
+      - name: Get latest app tag versions
+        id: tags
+        run: |
+          API_TAG=$(az acr repository show-tags \
+            --name s263d01acruksgtaa \
+            --repository gtaa-api \
+            --orderby time_desc \
+            --top 2 \
+            --output tsv | grep -v "^latest$" | head -n 1)
+          ADMIN_TAG=$(az acr repository show-tags \
+            --name s263d01acruksgtaa \
+            --repository gtaa-admin \
+            --orderby time_desc \
+            --top 2 \
+            --output tsv | grep -v "^latest$" | head -n 1)
+          FE_TAG=$(az acr repository show-tags \
+            --name s263d01acruksgtaa \
+            --repository gtaa-frontend \
+            --orderby time_desc \
+            --top 2 \
+            --output tsv | grep -v "^latest$" | head -n 1)
+          echo "api_tag=gtaa-api:$API_TAG" >> $GITHUB_OUTPUT
+          echo "admin_tag=gtaa-admin:$ADMIN_TAG" >> $GITHUB_OUTPUT
+          echo "frontend_tag=gtaa-frontend:$FE_TAG" >> $GITHUB_OUTPUT
 
       - name: Lowercase the repo name and username
         run: echo "ENVIRONMENT_LOWER=${ENVIRONMENT,,}" >>${GITHUB_ENV}
@@ -132,7 +157,15 @@ jobs:
           fi
 
       - name: "Terraform Plan"
+        env:
+          TF_VAR_api_image_name: ${{ steps.tags.outputs.api_tag }}
+          TF_VAR_admin_image_name: ${{ steps.tags.outputs.admin_tag }}
+          TF_VAR_frontend_image_name: ${{ steps.tags.outputs.frontend_tag }}
         run: terraform plan -var-file=${{ env.ENVIRONMENT_LOWER }}.tfvars -out=tfplan
 
       - name: "Terraform Apply"
+        env:
+          TF_VAR_api_image_name: ${{ steps.tags.outputs.api_tag }}
+          TF_VAR_admin_image_name: ${{ steps.tags.outputs.admin_tag }}
+          TF_VAR_frontend_image_name: ${{ steps.tags.outputs.frontend_tag }}
         run: terraform apply -auto-approve tfplan
