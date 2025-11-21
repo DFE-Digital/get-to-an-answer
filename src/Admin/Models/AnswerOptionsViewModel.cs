@@ -1,3 +1,4 @@
+using Admin.Attributes;
 using Common.Domain;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -9,9 +10,13 @@ public class AnswerOptionsViewModel
 
     public int OptionNumber { get; set; }
     
+    [AnswerOptionRequired(fieldType : "content")]
     public string OptionContent { get; set; } = string.Empty;
     
+    [AnswerOptionRequired(fieldType : "hint")]
     public string OptionHint { get; set; } = string.Empty;
+    
+    [AnswerOptionRequired(fieldType : "destination")]
     public AnswerDestination AnswerDestination { get; set; }
     
     public IEnumerable<SelectListItem> QuestionSelectList { get; set; } = [];

@@ -24,8 +24,12 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
 
     [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
+    
+    [TempData(Key = "OnPostError")] 
+    public bool OnPostError { get; set; }
 
     public async Task<IActionResult> OnGet()
+    
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
 
@@ -38,6 +42,9 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     // Handler for clicking "Add another option"
     public async Task<IActionResult> OnPostAddOption()
     {
+        if (!ModelState.IsValid && !OnPostError)
+            RemoveOptionRelatedErrors();
+        
         OptionNumber++;
 
         Options.Add(new AnswerOptionsViewModel
@@ -46,19 +53,21 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         });
 
         await HydrateOptionListsAsync();
-
+        ReassignOptionNumbers();
+        
         // Re-render page with the extra option
         return Page();
     }
 
     // Handler for "Continue"
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostContinue()
     {
         if (!ModelState.IsValid)
         {
+            OnPostError = true;
+            RemoveGenericOptionErrors();
             await HydrateOptionListsAsync();
             ReassignOptionNumbers();
-            
             return Page();
         }
 
@@ -108,6 +117,30 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         for (var index = 0; index < Options.Count; index++)
         {
             Options[index].OptionNumber = index + 1;
+        }
+    }
+    
+    private void RemoveOptionRelatedErrors()
+    {
+        foreach (var key in ModelState.Keys.Where(k => k.StartsWith("Options[", StringComparison.Ordinal)).ToList())
+        {
+            ModelState.Remove(key);
+        }
+    }
+    
+    private void RemoveGenericOptionErrors()
+    {
+        foreach (var key in ModelState.Keys.ToList())
+        {
+            if (key.StartsWith("Options[", StringComparison.Ordinal) && ModelState.TryGetValue(key, out var entry))
+            {
+                var custom = entry.Errors.FirstOrDefault(e => e.ErrorMessage.Contains("Option "));
+                if (custom != null)
+                {
+                    entry.Errors.Clear();
+                    entry.Errors.Add(custom);
+                }
+            }
         }
     }
 }
