@@ -1,14 +1,8 @@
-using System.Security.Claims;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Api.Extensions;
 using Api.Services;
-using Common.Domain;
-using Common.Infrastructure.Persistence;
-using Common.Infrastructure.Persistence.Entities;
+using Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers;
 
@@ -26,8 +20,8 @@ public class QuestionnaireVersionController(IQuestionnaireVersionService questio
    [HttpGet("questionnaires/{questionnaireId:guid}/versions")]
     public async Task<IActionResult> GetQuestionnaireVersions(Guid questionnaireId)
     {
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        var userId = User.GetIdClaim()!;
 
-        return (await questionnaireVersionService.GetQuestionnaireVersions(email, questionnaireId)).ToActionResult();
+        return (await questionnaireVersionService.GetQuestionnaireVersions(userId, questionnaireId)).ToActionResult();
     }
 }

@@ -5,17 +5,23 @@ import {
     publishQuestionnaire,
     updateQuestionnaire,
 } from "../../test-data-seeder/questionnaire-data";
-import {EntityStatus, QuestionType} from "../../constants/test-data-constants";
+import {AnswerDestinationType, EntityStatus, QuestionType} from "../../constants/test-data-constants";
 import {JwtHelper} from '../../helpers/JwtHelper';
 import {expect200HttpStatusCode} from '../../helpers/api-assertions-helper'
 import {createQuestion} from "../../test-data-seeder/question-data";
+import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 
 test.describe('PUT Publish questionnaire api request', () => {
     test('Validate PUT publish questionnaire', async ({request}) => {
         const { questionnaire } = await createQuestionnaire(request);
-        
-        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
 
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+        
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
+            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+        })
+        
         const { response } = await publishQuestionnaire(request, questionnaire.id);
         
         expect(response.status()).toBe(204);
@@ -61,8 +67,13 @@ test.describe('PUT Publish questionnaire api request', () => {
     test('Validate POST publish unauthorised questionnaire', async ({request}) => {
         const { questionnaire } = await createQuestionnaire(request);
 
-        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
-
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+        
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
+            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+        })
+        
         const { response } = await publishQuestionnaire(request, questionnaire.id, JwtHelper.UnauthorizedToken);
 
         // no questions in questionnaire

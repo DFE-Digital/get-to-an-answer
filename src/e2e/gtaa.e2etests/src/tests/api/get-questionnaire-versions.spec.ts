@@ -18,7 +18,12 @@ test('should return versions for existing questionnaire', async ({request}) => {
     // Update questionnaire to create a new version
     await updateQuestionnaire(request, id, {title: 'Updated Title'});
     
-    await createQuestion(request, id, undefined, 'Q1?')
+    const { question } = await createQuestion(request, id, undefined, 'Q1?')
+    
+    await createSingleAnswer(request, {
+        questionnaireId: id, questionId: question.id, content: 'A1', 
+        destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+    })
     
     await publishQuestionnaire(request, id)
 
@@ -48,7 +53,7 @@ test('retrieve all versions of a questionnaire includes required fields', async 
     
     const id = questionnaire.id;
     
-    let tempAnswer;
+    let tempAnswer = null;
 
     // Create 5 published versions
     for (let i = 1; i <= 5; i++) {
@@ -78,7 +83,9 @@ test('retrieve all versions of a questionnaire includes required fields', async 
             await deleteAnswer(request, tempAnswer.id);
         }
         
-        await publishQuestionnaire(request, id);
+        const { response } = await publishQuestionnaire(request, id);
+        
+        expect(response.status()).toBe(204);
     }
 
     // Current draft version
@@ -107,8 +114,6 @@ test('retrieve all versions of a questionnaire includes required fields', async 
         expect(v.changeLog).toBeTruthy();
         expect(Array.isArray(v.changeLog)).toBe(true);
     }
-
-    //expect(versions[0].changeLog.length).toBe(2);
 
     assertChanges(versions[0].changeLog, {
         path: "$.status",
@@ -198,7 +203,12 @@ test('versions are ordered by version number descending', async ({ request }) =>
     const { questionnaire } = await createQuestionnaire(request, undefined, 'Order Test');
     const id = questionnaire.id;
 
-    await createQuestion(request, id, undefined, 'Q1?')
+    const { question } = await createQuestion(request, id, undefined, 'Q1?')
+
+    await createSingleAnswer(request, {
+        questionnaireId: id, questionId: question.id, content: 'A1',
+        destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+    })
 
     // Publish version 1
     await updateQuestionnaire(request, id, { title: 'v1' });
@@ -230,7 +240,12 @@ test('single-version questionnaire returns exactly one publish and one current d
     const { questionnaire } = await createQuestionnaire(request, undefined, 'Single' );
     const id = questionnaire.id;
 
-    await createQuestion(request, id, undefined, 'Q1?')
+    const { question } = await createQuestion(request, id, undefined, 'Q1?')
+
+    await createSingleAnswer(request, {
+        questionnaireId: id, questionId: question.id, content: 'A1',
+        destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+    })
 
     await updateQuestionnaire(request, id, { title: 'v1' });
     await publishQuestionnaire(request, id);
