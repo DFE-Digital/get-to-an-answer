@@ -5,8 +5,8 @@ import {ErrorMessages} from "../../constants/test-data-constants";
 type Mode = 'create' | 'edit';
 
 export enum QuestionType {
-    SingleSelectShort = 'SingleSelect',
-    SingleSelectLong = 'SingleSelectLong',
+    SingleSelect = 'SingleSelect',
+    DropdownSelect = 'DropdownSelect',
     MultiSelect = 'MultiSelect'
 }
 
@@ -47,11 +47,11 @@ export class AddQuestionPage extends BasePage {
         this.hintTextarea = this.form.locator('textarea[name="description"]');
 
         this.typeSingleShort = this.form
-            .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionType.SingleSelectShort}"]`)
+            .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionType.SingleSelect}"]`)
             .or(this.form.locator(`input[type="radio"][name="${this.radioName}"]`).nth(0));
 
         this.typeSingleLong = this.form
-            .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionType.SingleSelectLong}"]`)
+            .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionType.DropdownSelect}"]`)
             .or(this.form.locator(`input[type="radio"][name="${this.radioName}"]`).nth(1));
 
         this.typeMulti = this.form
@@ -178,10 +178,10 @@ export class AddQuestionPage extends BasePage {
 
     async chooseType(type: QuestionType): Promise<void> {
         switch (type) {
-            case QuestionType.SingleSelectShort:
+            case QuestionType.SingleSelect:
                 await this.typeSingleShort.check();
                 break;
-            case QuestionType.SingleSelectLong:
+            case QuestionType.DropdownSelect:
                 await this.typeSingleLong.check();
                 break;
             case QuestionType.MultiSelect:

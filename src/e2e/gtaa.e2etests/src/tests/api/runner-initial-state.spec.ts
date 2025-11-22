@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { JwtHelper } from '../../helpers/JwtHelper';
-import { EntityStatus, QuestionType } from '../../constants/test-data-constants';
+import {AnswerDestinationType, EntityStatus, QuestionType} from '../../constants/test-data-constants';
 import {
     createQuestionnaire,
     publishQuestionnaire,
@@ -8,13 +8,19 @@ import {
     getQuestionnaire, getInitialState
 } from '../../test-data-seeder/questionnaire-data';
 import { createQuestion } from '../../test-data-seeder/question-data';
+import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 
 test.describe('GET /api/questionnaires/{questionnaireId}/initial-state', () => {
     test('returns initial question for published questionnaire (200)', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
         // seed at least one question to allow publish
-        await createQuestion(request, questionnaire.id, undefined, 'Start Q', QuestionType.SINGLE);
-
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Start Q', QuestionType.SINGLE);
+        
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
+            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+        })
+        
         await publishQuestionnaire(request, questionnaire.id);
 
         const { response: res } = await getInitialState(request, questionnaire.id, false);

@@ -1,5 +1,6 @@
 locals {
   api_app_settings = {
+    ASPNETCORE_ENVIRONMENT                = var.asp_env
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
     ConnectionStrings__DefaultConnection  = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.connection_string.versionless_id})"
@@ -11,6 +12,7 @@ locals {
     AzureAd__ClientSecret                 = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.ad_client_secret.versionless_id})"
   }
   admin_app_settings = {
+    ASPNETCORE_ENVIRONMENT                = var.asp_env
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
     ASPNETCORE_FORWARDEDHEADERS_ENABLED   = "true"
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
@@ -22,6 +24,7 @@ locals {
     AzureAd__CallbackPath                 = "/signin-oidc"
   }
   frontend_app_settings = {
+    ASPNETCORE_ENVIRONMENT                = var.asp_env
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
     ASPNETCORE_FORWARDEDHEADERS_ENABLED   = "true"
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string

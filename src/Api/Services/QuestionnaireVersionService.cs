@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Common.Domain;
@@ -7,27 +5,24 @@ using Common.Extensions;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
 using Common.Local;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Api.Services;
 
 public interface IQuestionnaireVersionService
 {
-    Task<ServiceResult> GetQuestionnaireVersions(string email, Guid questionnaireId);
+    Task<ServiceResult> GetQuestionnaireVersions(string userId, Guid questionnaireId);
 }
 
 public class QuestionnaireVersionService(GetToAnAnswerDbContext db, ILogger<QuestionnaireVersionService> logger) : AbstractService, IQuestionnaireVersionService
 {
-    public async Task<ServiceResult> GetQuestionnaireVersions(string email, Guid questionnaireId)
+    public async Task<ServiceResult> GetQuestionnaireVersions(string userId, Guid questionnaireId)
     {
         try
         {
             logger.LogInformation("GetQuestionnaireVersions started QuestionnaireId={QuestionnaireId}", questionnaireId);
 
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, questionnaireId);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, questionnaireId);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)
@@ -84,7 +79,7 @@ public class QuestionnaireVersionService(GetToAnAnswerDbContext db, ILogger<Ques
                         Version = previousVersion.Version + 1,
                         CreatedAt = DateTime.UtcNow,
                         ChangeDescription = "Current draft changes",
-                        CreatedBy = email,
+                        CreatedBy = userId,
                         ChangeLog = changeMap?.Values.ToList()!
                     });
                 }

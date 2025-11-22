@@ -18,7 +18,7 @@ test.describe('POST /api/questionnaires/{questionnaireId}/next-state', () => {
 
         // Link q1 -> q2 via answer destination
         const {answer} = await createAnswer(request, questionnaire.id, q1.id, 'GoNext', undefined, 1, AnswerDestinationType.Question, q2.id);
-        await createAnswer(request, questionnaire.id, q2.id, 'GoNext', undefined, 1, AnswerDestinationType.ExternalLink, 'https://example.org/help');
+        await createAnswer(request, questionnaire.id, q2.id, 'GoNext', undefined, 1, AnswerDestinationType.ExternalLink, undefined, 'https://example.org/help');
 
         // Must be published to use runner endpoints (non-preview)
         await publishQuestionnaire(request, questionnaire.id);

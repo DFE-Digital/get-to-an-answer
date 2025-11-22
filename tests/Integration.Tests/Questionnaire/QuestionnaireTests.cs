@@ -856,8 +856,17 @@ public class QuestionnaireTests(ApiFixture factory) :
             id = ExtractId(await createRes.Content.ReadAsStringAsync());
         }
 
-        await Create(payload: new { QuestionnaireId = id, Content = "Q1?", Type = QuestionType.MultiSelect }, routePrefixOverride: "/api/questions");
+        var question = await Create<QuestionDto>(payload: new { QuestionnaireId = id, Content = "Q1?", Type = QuestionType.MultiSelect }, routePrefixOverride: "/api/questions");
     
+        await Create(payload: new
+        {
+            QuestionId = question.Id,
+            QuestionnaireId = id, 
+            Content = "A1", 
+            DestinationType = DestinationType.ExternalLink,
+            DestinationUrl = "https://www.google.com"
+        }, routePrefixOverride: "/api/answers");
+        
         // Act
         using var res = await Update(method: HttpMethod.Patch, routePrefixOverride: $"/api/questionnaires/{id}?action={QuestionnaireAction.Publish}");
     
@@ -943,8 +952,17 @@ public class QuestionnaireTests(ApiFixture factory) :
             id = ExtractId(await createRes.Content.ReadAsStringAsync());
         }
     
-        await Create(payload: new { QuestionnaireId = id, Content = "Q1?", Type = QuestionType.MultiSelect }, routePrefixOverride: "/api/questions");
+        var question = await Create<QuestionDto>(payload: new { QuestionnaireId = id, Content = "Q1?", Type = QuestionType.MultiSelect }, routePrefixOverride: "/api/questions");
     
+        await Create(payload: new
+        {
+            QuestionId = question.Id,
+            QuestionnaireId = id, 
+            Content = "A1", 
+            DestinationType = DestinationType.ExternalLink,
+            DestinationUrl = "https://www.google.com"
+        }, routePrefixOverride: "/api/answers");
+        
         // Act as unauthorized user
         using var res = await Update(method: HttpMethod.Patch, routePrefixOverride: $"/api/questionnaires/{id}?action={QuestionnaireAction.Publish}", 
             bearerToken: JwtTestTokenGenerator.UnauthorizedJwtToken);

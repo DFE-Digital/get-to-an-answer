@@ -42,6 +42,15 @@ public static class MicrosoftIdentityExtensions
         {
             configurationSection.Bind(options);
 
+            var scopes = configurationSection.GetValue<string>("Scope")?.Split(' ') ?? ["offline_access"];
+
+            foreach (var scope in scopes) {
+                options.Scope.Add(scope);
+            }
+            
+            options.ResponseMode = "form_post";
+            options.ResponseType = "id_token code";
+            
             var forceConsentPrompt = configurationSection.GetValue<bool>("ForceConsentPrompt");
 
             if (forceConsentPrompt)
