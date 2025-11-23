@@ -25,7 +25,7 @@ public class AnswerOptionsViewModel
     
     public string? SelectedResultsPage { get; set; }
     
-    public string? SelectedQuestion { get; set; }
+    public string? SelectedDestinationQuestion { get; set; }
 
     public string? ExternalLink { get; set; }
 }

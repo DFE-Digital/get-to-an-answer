@@ -1,6 +1,7 @@
 using Admin.Models;
 using Common.Client;
 using Common.Domain.Request.Create;
+using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
@@ -77,7 +78,6 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
         try
         {
-            // TODO: extend to handle all options; for now just show how you’d iterate
             foreach (var option in Options)
             {
                 await apiClient.CreateAnswerAsync(new CreateAnswerRequestDto
@@ -86,7 +86,8 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
                     QuestionId = QuestionId,
                     Content = option.OptionContent,
                     Description = option.OptionHint,
-                    // DestinationType = map from option.Destination when ready
+                    DestinationType = MapDestination(option.AnswerDestination),
+                    DestinationQuestionId = Guid.Parse(option.SelectedDestinationQuestion)
                 });
             }
 
@@ -106,7 +107,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
         // var resultsPages = await apiClient.GetResultsPagesAsync(QuestionnaireId);
 
-        var questionSelect = questions.Select(q => new SelectListItem(q.Content, q.Content)).ToList();
+        var questionSelect = questions.Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
         // var resultsSelect = resultsPages.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
 
         foreach (var option in Options)
@@ -129,7 +130,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     {
         var optionsWithSpecificQuestionNoSelection =
             Options.Where(x =>
-                x.AnswerDestination == AnswerDestination.SpecificQuestion && string.IsNullOrEmpty(x.SelectedQuestion));
+                x.AnswerDestination == AnswerDestination.SpecificQuestion && string.IsNullOrEmpty(x.SelectedDestinationQuestion));
 
         foreach (var specificQuestion in optionsWithSpecificQuestionNoSelection)
         {
@@ -171,5 +172,23 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
                 }
             }
         }
+    }
+
+    private static DestinationType MapDestination(AnswerDestination answerDestination)
+    {
+        switch (answerDestination)
+        {
+            case AnswerDestination.NextQuestion:
+            case AnswerDestination.SpecificQuestion:
+                return DestinationType.Question;
+            case AnswerDestination.InternalResultsPage:
+                break;
+            case AnswerDestination.ExternalResultsPage:
+                return DestinationType.ExternalLink;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(answerDestination), answerDestination, null);
+        }
+
+        return 0;
     }
 }
