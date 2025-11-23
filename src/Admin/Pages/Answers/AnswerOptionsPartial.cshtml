@@ -14,6 +14,7 @@
   var contentIdSuffix = "OptionContent";
   var contentHintIdSuffix = "OptionHint";
   var destinationIdSuffix = "AnswerDestination";
+  var destinationSpecificSelectErrorId = $"{destinationIdSuffix}-specific-error";
 }
 
 <input type="hidden" asp-for="OptionNumber" />
@@ -96,10 +97,23 @@
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-specific-select")">
             Select a question
           </label>
+
+          @* <govuk-field-error asp-for="SelectedQuestion" error-id="@Id(destinationSpecificSelectErrorId)"> *@
+          @* </govuk-field-error> *@
+          
+          @if (ViewData.ModelState.TryGetValue($"{prefix}-destination-specific", out var specificEntry) && specificEntry?.Errors.Count > 0)
+          {
+            <p id="@Id($"{destinationIdSuffix}-specific-error")" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> Please select a question
+            </p>
+          }
+
+
           <select class="govuk-select equal-input-width"
                   id="@Id("destination-specific-select")"
                   asp-for="SelectedQuestion"
-                  asp-items="Model.QuestionSelectList">
+                  asp-items="Model.QuestionSelectList"
+                  govuk-error-for="@Id(destinationSpecificSelectErrorId)">
             <option value="">Select a question</option>
           </select>
         </div>
