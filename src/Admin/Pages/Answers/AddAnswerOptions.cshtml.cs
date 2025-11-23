@@ -149,6 +149,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         var optionsWithResultsPageNoSelection = Options.Where(o =>
             o.AnswerDestination == AnswerDestination.InternalResultsPage &&
             string.IsNullOrEmpty(o.SelectedResultsPage));
+
         foreach (var resultsPage in optionsWithResultsPageNoSelection)
         {
             var index = resultsPage.OptionNumber - 1;
@@ -178,21 +179,13 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         }
     }
 
-    private static DestinationType MapDestination(AnswerDestination answerDestination)
-    {
-        switch (answerDestination)
+    private static DestinationType MapDestination(AnswerDestination answerDestination) => 
+        answerDestination switch
         {
-            case AnswerDestination.NextQuestion:
-            case AnswerDestination.SpecificQuestion:
-                return DestinationType.Question;
-            case AnswerDestination.InternalResultsPage:
-                break;
-            case AnswerDestination.ExternalResultsPage:
-                return DestinationType.ExternalLink;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(answerDestination), answerDestination, null);
-        }
-
-        return 0;
-    }
+            AnswerDestination.NextQuestion => DestinationType.Question,
+            AnswerDestination.SpecificQuestion => DestinationType.Question,
+            AnswerDestination.InternalResultsPage => DestinationType.CustomContent,
+            AnswerDestination.ExternalResultsPage => DestinationType.ExternalLink,
+            _ => throw new ArgumentOutOfRangeException(nameof(answerDestination), answerDestination, null)
+        };
 }
