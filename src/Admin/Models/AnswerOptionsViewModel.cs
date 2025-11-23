@@ -6,8 +6,6 @@ namespace Admin.Models;
 
 public class AnswerOptionsViewModel
 {
-    public Guid ViewModelId { get; set; } = Guid.NewGuid();
-
     public int OptionNumber { get; set; }
     
     [AnswerOptionRequired(fieldType : "content")]

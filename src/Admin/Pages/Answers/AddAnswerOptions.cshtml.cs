@@ -87,7 +87,8 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
                     Content = option.OptionContent,
                     Description = option.OptionHint,
                     DestinationType = MapDestination(option.AnswerDestination),
-                    DestinationQuestionId = Guid.Parse(option.SelectedDestinationQuestion)
+                    DestinationQuestionId = Guid.Parse(option.SelectedDestinationQuestion),
+                    DestinationUrl = option.ResultPageUrl
                 });
             }
 
@@ -130,29 +131,32 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     {
         var optionsWithSpecificQuestionNoSelection =
             Options.Where(x =>
-                x.AnswerDestination == AnswerDestination.SpecificQuestion && string.IsNullOrEmpty(x.SelectedDestinationQuestion));
+                x.AnswerDestination == AnswerDestination.SpecificQuestion &&
+                string.IsNullOrEmpty(x.SelectedDestinationQuestion));
 
         foreach (var specificQuestion in optionsWithSpecificQuestionNoSelection)
         {
             var index = specificQuestion.OptionNumber - 1;
             var errorMessage = $"Please select a question for option {specificQuestion.OptionNumber}";
-            
+
             var destinationKey = $"Options-{index}-AnswerDestination";
             var specificQuestionRadioInputId = $"Options-{index}-destination-specific";
 
             ModelState.AddModelError(destinationKey, string.Empty);
             ModelState.AddModelError(specificQuestionRadioInputId, errorMessage);
         }
-        
-        var optionsWithResultsPageNoSelection = Options.Where(o => o.AnswerDestination == AnswerDestination.InternalResultsPage && string.IsNullOrEmpty(o.SelectedResultsPage));
+
+        var optionsWithResultsPageNoSelection = Options.Where(o =>
+            o.AnswerDestination == AnswerDestination.InternalResultsPage &&
+            string.IsNullOrEmpty(o.SelectedResultsPage));
         foreach (var resultsPage in optionsWithResultsPageNoSelection)
         {
             var index = resultsPage.OptionNumber - 1;
             var errorMessage = $"Please select a results page for option {resultsPage.OptionNumber}";
-            
+
             var selectKey = $"Options[{index}].SelectedResultsPage";
             var resultsPageRadioInputId = $"Options-{index}-destination-internal";
-            
+
             ModelState.AddModelError(selectKey, string.Empty);
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
         }
