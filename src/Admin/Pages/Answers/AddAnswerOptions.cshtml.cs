@@ -178,8 +178,34 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             }
         }
     }
+    
+    public async Task<IActionResult> OnPostRemoveOption(int index)
+    {
+        Options.RemoveAt(index);
+        RemoveModelStateEntriesForOption(index);
 
-    private static DestinationType MapDestination(AnswerDestination answerDestination) => 
+        await HydrateOptionListsAsync();
+        ReassignOptionNumbers();
+        return Page();
+    }
+
+    private void RemoveModelStateEntriesForOption(int index)
+    {
+        var prefixBracket = $"Options[{index}]";
+        var prefixDash = $"Options-{index}-";
+        var keysToRemove = ModelState.Keys
+            .Where(key =>
+                key.StartsWith(prefixBracket, StringComparison.Ordinal) ||
+                key.StartsWith(prefixDash, StringComparison.Ordinal))
+            .ToList();
+
+        foreach (var key in keysToRemove)
+        {
+            ModelState.Remove(key);
+        }
+    }
+
+    private static DestinationType MapDestination(AnswerDestination answerDestination) =>
         answerDestination switch
         {
             AnswerDestination.NextQuestion => DestinationType.Question,

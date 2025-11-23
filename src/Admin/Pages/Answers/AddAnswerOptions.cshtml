@@ -50,6 +50,12 @@
         };
 
         @await Html.PartialAsync("AnswerOptionsPartial", Model.Options[i], viewData)
+        
+        <button class="govuk-button govuk-button--secondary govuk-!-margin-top-3"
+                type="submit"
+                asp-page-handler="RemoveOption">
+          Remove
+        </button>
       }
 
       <button class="govuk-button govuk-button--secondary govuk-!-margin-top-3"
