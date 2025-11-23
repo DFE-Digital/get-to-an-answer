@@ -25,10 +25,10 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
 
     [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
-    
+
     [TempData(Key = "ErrorMessage")] public string? ErrorMessage { get; set; }
-    
-    
+
+
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
@@ -42,12 +42,15 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     // Handler for clicking "Add another option"
     public async Task<IActionResult> OnPostAddOption()
     {
+        ValidateSelectedQuestionsIfAny();
+        
         if (!ModelState.IsValid)
         {
             RemoveGenericOptionErrors();
+            await HydrateOptionListsAsync();
             return Page();
         }
-        
+
         OptionNumber++;
 
         Options.Add(new AnswerOptionsViewModel
@@ -57,7 +60,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
         await HydrateOptionListsAsync();
         ReassignOptionNumbers();
-        
+
         // Re-render page with the extra option
         return Page();
     }
@@ -65,6 +68,8 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     // Handler for "Continue"
     public async Task<IActionResult> OnPostContinue()
     {
+        ValidateSelectedQuestionsIfAny();
+        
         if (!ModelState.IsValid)
         {
             RemoveGenericOptionErrors();
@@ -104,7 +109,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
         // var resultsPages = await apiClient.GetResultsPagesAsync(QuestionnaireId);
 
-        var questionSelect = questions.Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
+        var questionSelect = questions.Select(q => new SelectListItem(q.Content, q.Content)).ToList();
         // var resultsSelect = resultsPages.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
 
         foreach (var option in Options)
@@ -121,8 +126,20 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             Options[index].OptionNumber = index + 1;
         }
     }
-    
-    
+
+
+    private void ValidateSelectedQuestionsIfAny()
+    {
+        var optionsWithSpecificQuestionNoSelection =
+            Options.Where(x =>
+                x.AnswerDestination == AnswerDestination.SpecificQuestion && string.IsNullOrEmpty(x.SelectedQuestion));
+
+        foreach (var specificQuestion in optionsWithSpecificQuestionNoSelection)
+        {
+            ModelState.AddModelError($"Options-{specificQuestion.OptionNumber - 1}-destination-specific", $"Please select a question for option {specificQuestion.OptionNumber}");
+        }
+    }
+
     private void RemoveGenericOptionErrors()
     {
         foreach (var key in ModelState.Keys.ToList())
