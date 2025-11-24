@@ -17,11 +17,17 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
 
     public string QuestionNumber { get; set; } = 1.ToString();
 
-    [BindProperty] [Required] public string QuestionContent { get; set; } = "";
+    [BindProperty] 
+    [Required(ErrorMessage = "Enter a question")] 
+    public string QuestionContent { get; set; } = "";
 
-    [BindProperty] [Required] public string QuestionHintText { get; set; } = "";
+    [BindProperty] 
+    [Required(ErrorMessage = "Enter question hint text")]
+    public string QuestionHintText { get; set; } = "";
 
-    [BindProperty] [Required] public QuestionType QuestionType { get; set; }
+    [BindProperty] 
+    [Required(ErrorMessage = "Select question type")] 
+    public QuestionType QuestionType { get; set; }
 
     public IActionResult OnGet()
     {

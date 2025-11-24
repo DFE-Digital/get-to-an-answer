@@ -1,6 +1,6 @@
 namespace Admin.Models;
 
-public enum AnswerOptionDestination
+public enum AnswerDestination
 {
     NextQuestion = 1,
     SpecificQuestion = 2,

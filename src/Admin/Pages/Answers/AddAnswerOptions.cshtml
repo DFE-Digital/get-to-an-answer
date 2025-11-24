@@ -29,9 +29,6 @@
       People will be able to select one option from your list.
     </p>
     <p class="govuk-body">
-      You can have up to XXX options.
-    </p>
-    <p class="govuk-body">
       You can add your options individually below, or you can
       <a class="govuk-link" href="#">enter all the options into one text box</a>.
     </p>
@@ -50,6 +47,12 @@
         };
 
         @await Html.PartialAsync("AnswerOptionsPartial", Model.Options[i], viewData)
+        
+        <button class="govuk-button govuk-button--secondary govuk-!-margin-top-3"
+                type="submit"
+                asp-page-handler="RemoveOption">
+          Remove
+        </button>
       }
 
       <button class="govuk-button govuk-button--secondary govuk-!-margin-top-3"
@@ -63,6 +66,7 @@
       </p>
 
       <button class="govuk-button govuk-!-margin-top-6"
+              asp-page-handler="Continue"
               type="submit"
               formnovalidate="formnovalidate"
               data-module="govuk-button"

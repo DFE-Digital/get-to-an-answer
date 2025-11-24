@@ -9,12 +9,12 @@ public class GovUkFormGroupTagHelper : TagHelper
 {
     private const string ForAttributeName = "asp-for";
 
-    [HtmlAttributeName(ForAttributeName)]
-    public ModelExpression For { get; set; } = default!;
+    [HtmlAttributeName(ForAttributeName)] public ModelExpression For { get; set; } = default!;
 
-    [ViewContext]
-    [HtmlAttributeNotBound]
-    public ViewContext ViewContext { get; set; } = default!;
+    [ViewContext] [HtmlAttributeNotBound] public ViewContext ViewContext { get; set; } = default!;
+
+    [HtmlAttributeName("specific-id-for-form-group-error")]
+    public string? SpecificIdForFormGroupError { get; set; }
 
     private string GetFullHtmlFieldName(string name) => ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(name);
 
@@ -25,10 +25,20 @@ public class GovUkFormGroupTagHelper : TagHelper
 
         var fullName = GetFullHtmlFieldName(For.Name);
         var modelState = ViewContext.ViewData.ModelState;
-        var hasError = modelState.ContainsKey(fullName) && modelState[fullName]?.Errors.Count > 0;
+
+        var hasError = false;
+
+        if (!string.IsNullOrEmpty(SpecificIdForFormGroupError) 
+            && modelState.ContainsKey(SpecificIdForFormGroupError) 
+            && modelState[SpecificIdForFormGroupError]?.Errors.Count > 0 
+            || modelState.TryGetValue(fullName, out var entry) && entry.Errors.Count > 0)
+        {
+            hasError = true;
+        }
+
 
         var css = "govuk-form-group" + (hasError ? " govuk-form-group--error" : "");
-        
+
         if (output.Attributes.TryGetAttribute("class", out var existing))
         {
             output.Attributes.SetAttribute("class", $"{existing.Value} {css}".Trim());
