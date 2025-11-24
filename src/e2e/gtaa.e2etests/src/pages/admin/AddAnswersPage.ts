@@ -226,7 +226,7 @@ export class AddAnswersPage extends BasePage {
         await this.optionScore(i).fill(String(priority));
     }
 
-    /** Next Question - nothing is set
+    /** Next Question - nothing is set (set to null in backend)
      Specific question - Question (set to 1 in backend)
      Results page (inside Get to an answer) - CustomContent (set to 3 in backend)
      Results page (outside Get to an answer) - ExternalLink (set to 2 in backend) */
