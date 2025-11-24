@@ -18,13 +18,13 @@ public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> opt
         base.OnModelCreating(modelBuilder);
     }
     
-    public EntityAccess HasAccessToEntity<TEntityType>(string email, Guid id)
+    public EntityAccess HasAccessToEntity<TEntityType>(string userId, Guid id)
     {
         if (typeof(TEntityType) == typeof(QuestionnaireEntity))
         {
             var access = Questionnaires
                 .Where(qq => qq.Id == id && qq.Status != EntityStatus.Deleted)
-                .Select(qq => new { IsContributor = qq.Contributors.Contains(email) })
+                .Select(qq => new { IsContributor = qq.Contributors.Contains(userId) })
                 .FirstOrDefault();
 
             return access is null
@@ -38,7 +38,7 @@ public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> opt
                 .Where(q => q.Id == id && !q.IsDeleted)
                 .Select(q => Questionnaires
                     .Where(qq => qq.Id == q.QuestionnaireId)
-                    .Select(qq => new { IsContributor = qq.Contributors.Contains(email) }).FirstOrDefault())
+                    .Select(qq => new { IsContributor = qq.Contributors.Contains(userId) }).FirstOrDefault())
                 .FirstOrDefault();
 
             return access is null
@@ -52,7 +52,7 @@ public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> opt
                 .Where(q => q.Id == id && !q.IsDeleted)
                 .Select(q => Questionnaires
                     .Where(qq => qq.Id == q.QuestionnaireId)
-                    .Select(qq => new { IsContributor = qq.Contributors.Contains(email) }).FirstOrDefault())
+                    .Select(qq => new { IsContributor = qq.Contributors.Contains(userId) }).FirstOrDefault())
                 .FirstOrDefault();
 
             return access is null
@@ -66,7 +66,7 @@ public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> opt
                 .Where(q => q.Id == id && !q.IsDeleted)
                 .Select(q => Questionnaires
                     .Where(qq => qq.Id == q.QuestionnaireId)
-                    .Select(qq => new { IsContributor = qq.Contributors.Contains(email) }).FirstOrDefault())
+                    .Select(qq => new { IsContributor = qq.Contributors.Contains(userId) }).FirstOrDefault())
                 .FirstOrDefault();
             
             return access is null

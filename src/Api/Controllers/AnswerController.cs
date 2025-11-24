@@ -1,12 +1,8 @@
-using System.Security.Claims;
 using Api.Extensions;
 using Api.Services;
-using Common.Domain;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
-using Common.Enum;
-using Common.Infrastructure.Persistence;
-using Common.Infrastructure.Persistence.Entities;
+using Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,41 +16,41 @@ public class AnswerController(IAnswerService answerService) : Controller
     [HttpPost("answers")]
     public async Task<IActionResult> CreateAnswer(CreateAnswerRequestDto request)
     {
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        var userId = User.GetIdClaim()!;
 
-        return (await answerService.CreateAnswer(email, request)).ToActionResult();
+        return (await answerService.CreateAnswer(userId, request)).ToActionResult();
     }
     
     [HttpGet("answers/{id:guid}")]
     public IActionResult GetAnswer(Guid id)
     {
         // Extract user and tenant from claims
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        var userId = User.GetIdClaim()!;
         
-        return answerService.GetAnswer(email, id).ToActionResult();
+        return answerService.GetAnswer(userId, id).ToActionResult();
     }
     
     [HttpGet("questions/{questionId:guid}/answers")]
     public IActionResult GetAnswers(Guid questionId)
     {
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        var userId = User.GetIdClaim()!;
         
-        return answerService.GetAnswers(email, questionId).ToActionResult();
+        return answerService.GetAnswers(userId, questionId).ToActionResult();
     }
 
     [HttpPut("answers/{id:guid}")]
     public async Task<IActionResult> UpdateAnswer(Guid id, UpdateAnswerRequestDto request)
     {
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        var userId = User.GetIdClaim()!;
         
-        return (await answerService.UpdateAnswer(email, id, request)).ToActionResult();
+        return (await answerService.UpdateAnswer(userId, id, request)).ToActionResult();
     }
 
     [HttpDelete("answers/{id:guid}")]
     public async Task<IActionResult> DeleteAnswer(Guid id)
     {
-        var email = User.FindFirstValue(ClaimTypes.Email)!;
+        var userId = User.GetIdClaim()!;
         
-        return (await answerService.DeleteAnswer(email, id)).ToActionResult();
+        return (await answerService.DeleteAnswer(userId, id)).ToActionResult();
     }
 }

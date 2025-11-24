@@ -1,12 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Text.Json;
+using Common.Local;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Common.Extensions;
 
@@ -26,38 +24,10 @@ public static class MicrosoftIdentityExtensions
                 {
                     clientId, $"api://{clientId}"
                 };
-            
-                // For development/local environments only - accept unsigned tokens
+
                 if (environment == "Development")
                 {
-                    options.TokenValidationParameters.RequireSignedTokens = false;
-                    options.TokenValidationParameters.ValidateIssuerSigningKey = false;
-                    options.TokenValidationParameters.SignatureValidator = (token, parameters) =>
-                    {
-                        var handler = new JwtSecurityTokenHandler();
-                        var jwtToken = handler.ReadJwtToken(token);
-
-                        var jsonHeader = JsonSerializer.Serialize(jwtToken.Header);
-                        var jsonPayload = JsonSerializer.Serialize(jwtToken.Payload);
-                        
-                        return new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(jsonHeader, jsonPayload);
-                    };
-                    options.TokenValidationParameters.ValidateIssuer = false;
-                    options.TokenValidationParameters.ValidateAudience = false;
-                    options.TokenValidationParameters.ValidateLifetime = true; // Still validate expiration
-                    options.TokenValidationParameters.TryAllIssuerSigningKeys = false;
-                    options.TokenValidationParameters.IssuerSigningKeys = new List<SecurityKey>();
-                    options.TokenValidationParameters.TokenReader = (token, parameters) =>
-                    {
-                        
-                        var handler = new JwtSecurityTokenHandler();
-                        var jwtToken = handler.ReadJwtToken(token);
-                        
-                        var jsonHeader = JsonSerializer.Serialize(jwtToken.Header);
-                        var jsonPayload = JsonSerializer.Serialize(jwtToken.Payload);
-                        
-                        return new Microsoft.IdentityModel.JsonWebTokens.JsonWebToken(jsonHeader, jsonPayload);
-                    };
+                    options.AddDeveloperJwtOptions();
                 }
             }, 
             configurationSection.Bind);
@@ -72,6 +42,15 @@ public static class MicrosoftIdentityExtensions
         {
             configurationSection.Bind(options);
 
+            var scopes = configurationSection.GetValue<string>("Scope")?.Split(' ') ?? ["offline_access"];
+
+            foreach (var scope in scopes) {
+                options.Scope.Add(scope);
+            }
+            
+            options.ResponseMode = "form_post";
+            options.ResponseType = "id_token code";
+            
             var forceConsentPrompt = configurationSection.GetValue<bool>("ForceConsentPrompt");
 
             if (forceConsentPrompt)
@@ -99,7 +78,7 @@ public static class MicrosoftIdentityExtensions
                 // ctx.Properties.AllowRefresh = false; // optional: no sliding
                 return Task.CompletedTask;
             };
-        });;
+        });
         
         return authBuilder;
     }

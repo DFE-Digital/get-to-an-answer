@@ -20,27 +20,27 @@ namespace Api.Services;
 
 public interface IQuestionnaireService
 {
-    Task<ServiceResult> CreateQuestionnaire(string email, CreateQuestionnaireRequestDto request);
+    Task<ServiceResult> CreateQuestionnaire(string userId, CreateQuestionnaireRequestDto request);
 
-    ServiceResult GetQuestionnaire(string email, Guid id);
+    ServiceResult GetQuestionnaire(string userId, Guid id);
 
-    ServiceResult GetQuestionnaires(string email);
+    ServiceResult GetQuestionnaires(string userId);
 
-    Task<ServiceResult> UpdateQuestionnaire(string email, Guid id, UpdateQuestionnaireRequestDto request);
-    Task<ServiceResult> PublishQuestionnaire(string email, Guid id);
-    Task<ServiceResult> UnpublishQuestionnaire(string email, Guid id);
-    Task<ServiceResult> DeleteQuestionnaire(string email, Guid id);
-    Task<ServiceResult> CloneQuestionnaire(string email, Guid id, CloneQuestionnaireRequestDto request);
-    Task<ServiceResult> GetContributors(string email, Guid questionnaireId);
-    Task<ServiceResult> AddContributor(string email, Guid id, AddContributorRequestDto request);
-    Task<ServiceResult> RemoveContributor(string email, Guid id, string contributorEmail);
-    Task<ServiceResult> GetBranchingMap(string email, Guid questionnaireId);
+    Task<ServiceResult> UpdateQuestionnaire(string userId, Guid id, UpdateQuestionnaireRequestDto request);
+    Task<ServiceResult> PublishQuestionnaire(string userId, Guid id);
+    Task<ServiceResult> UnpublishQuestionnaire(string userId, Guid id);
+    Task<ServiceResult> DeleteQuestionnaire(string userId, Guid id);
+    Task<ServiceResult> CloneQuestionnaire(string userId, Guid id, CloneQuestionnaireRequestDto request);
+    Task<ServiceResult> GetContributors(string userId, Guid questionnaireId);
+    Task<ServiceResult> AddContributor(string userId, Guid id, AddContributorRequestDto request);
+    Task<ServiceResult> RemoveContributor(string userId, Guid id, string contributorEmail);
+    Task<ServiceResult> GetBranchingMap(string userId, Guid questionnaireId);
 }
 
 public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<QuestionnaireService> logger) : AbstractService, IQuestionnaireService
 {
     [HttpPost("questionnaires")]
-    public async Task<ServiceResult> CreateQuestionnaire(string email, CreateQuestionnaireRequestDto request)
+    public async Task<ServiceResult> CreateQuestionnaire(string userId, CreateQuestionnaireRequestDto request)
     {
         try
         {
@@ -49,10 +49,10 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             var entity = new QuestionnaireEntity
             {
                 Title = request.Title,
-                Contributors = [email],
+                Contributors = [userId],
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatedBy = email
+                CreatedBy = userId
             };
             
             db.Questionnaires.Add(entity);
@@ -76,13 +76,13 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public ServiceResult GetQuestionnaire(string email, Guid id)
+    public ServiceResult GetQuestionnaire(string userId, Guid id)
     {
         try
         {
             logger.LogInformation("GetQuestionnaire started QuestionnaireId={QuestionnaireId}", id);
 
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, id);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)
@@ -113,14 +113,14 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public ServiceResult GetQuestionnaires(string email)
+    public ServiceResult GetQuestionnaires(string userId)
     {
         try
         {
             logger.LogInformation("GetQuestionnaires started");
 
             var questionnairesQuery = db.Questionnaires
-                .Where(q => q.Contributors.Contains(email)
+                .Where(q => q.Contributors.Contains(userId)
                             && q.Status != EntityStatus.Deleted);
 
             var questionnaires = questionnairesQuery.Select(q => new QuestionnaireDto
@@ -146,7 +146,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public async Task<ServiceResult> UpdateQuestionnaire(string email, Guid id, UpdateQuestionnaireRequestDto request)
+    public async Task<ServiceResult> UpdateQuestionnaire(string userId, Guid id, UpdateQuestionnaireRequestDto request)
     {
         try
         {
@@ -160,7 +160,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 }));
             }
             
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, id);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)
@@ -171,6 +171,11 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             
             if (questionnaire == null) 
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
+
+            if (request.Slug != null && await db.Questionnaires.AnyAsync(q => q.Slug == request.Slug))
+            {
+                return Conflict(ProblemTrace("A questionnaire with the same slug already exists", 409));
+            }
 
             questionnaire.DisplayTitle = request.DisplayTitle ?? questionnaire.DisplayTitle;
             questionnaire.Title = request.Title ?? questionnaire.Title;
@@ -191,7 +196,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public async Task<ServiceResult> PublishQuestionnaire(string email, Guid id)
+    public async Task<ServiceResult> PublishQuestionnaire(string userId, Guid id)
     {
         try
         {
@@ -210,6 +215,12 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (questionnaire.Questions.Count == 0)
                 return BadRequest(ProblemTrace("The questionnaire has no questions", 400));
 
+            foreach (var question in questionnaire.Questions)
+            {
+                if (question.Answers.Count == 0)
+                    return BadRequest(ProblemTrace($"The question {question.Order} has no answers", 400));
+            }
+            
             if (questionnaire.Status == EntityStatus.Published)
                 return BadRequest(ProblemTrace("The questionnaire is already published", 400));
 
@@ -220,7 +231,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 return BadRequest(ProblemTrace("Branching is not healthy", 400));       
             }
             
-            return await UpdateQuestionnaireStatus(email, id, EntityStatus.Published);
+            return await UpdateQuestionnaireStatus(userId, id, EntityStatus.Published);
         }
         catch (Exception ex)
         {
@@ -277,12 +288,12 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         return BranchingHealthType.Ok;
     }
 
-    public async Task<ServiceResult> UnpublishQuestionnaire(string email, Guid id)
+    public async Task<ServiceResult> UnpublishQuestionnaire(string userId, Guid id)
     {
         try
         {
             logger.LogInformation("UnpublishQuestionnaire started QuestionnaireId={QuestionnaireId}", id);
-            return await UpdateQuestionnaireStatus(email, id, EntityStatus.Private);
+            return await UpdateQuestionnaireStatus(userId, id, EntityStatus.Private);
         }
         catch (Exception ex)
         {
@@ -291,7 +302,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public async Task<ServiceResult> DeleteQuestionnaire(string email, Guid id)
+    public async Task<ServiceResult> DeleteQuestionnaire(string userId, Guid id)
     {
         try
         {
@@ -303,7 +314,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             await db.Answers.Where(q => q.QuestionnaireId == id)
                 .ExecuteUpdateAsync(s => s.SetProperty(b => b.IsDeleted, true));
             
-            return await UpdateQuestionnaireStatus(email, id, EntityStatus.Deleted);
+            return await UpdateQuestionnaireStatus(userId, id, EntityStatus.Deleted);
         }
         catch (Exception ex)
         {
@@ -312,13 +323,13 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public async Task<ServiceResult> CloneQuestionnaire(string email, Guid id, CloneQuestionnaireRequestDto request)
+    public async Task<ServiceResult> CloneQuestionnaire(string userId, Guid id, CloneQuestionnaireRequestDto request)
     {
         try
         {
             logger.LogInformation("CloneQuestionnaire started QuestionnaireId={QuestionnaireId}", id);
 
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, id);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)
@@ -341,7 +352,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 Contributors = questionnaire.Contributors,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                CreatedBy = email
+                CreatedBy = userId
             };
 
             db.Questionnaires.Add(cloneQuestionnaire);
@@ -361,7 +372,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                     Description = question.Description,
                     Type = question.Type,
                     Order = question.Order,
-                    CreatedBy = email,
+                    CreatedBy = userId,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                 };
@@ -391,7 +402,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                         DestinationQuestionId = answer.DestinationQuestionId,
                         DestinationType = answer.DestinationType,
                         Priority = answer.Priority,
-                        CreatedBy = email,
+                        CreatedBy = userId,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow,
                     };
@@ -413,13 +424,13 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public async Task<ServiceResult> GetContributors(string email, Guid questionnaireId)
+    public async Task<ServiceResult> GetContributors(string userId, Guid questionnaireId)
     {
         try
         {
             logger.LogInformation("GetContributors started QuestionnaireId={QuestionnaireId}", questionnaireId);
 
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, questionnaireId);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, questionnaireId);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)
@@ -440,13 +451,13 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public async Task<ServiceResult> AddContributor(string email, Guid id, AddContributorRequestDto request)
+    public async Task<ServiceResult> AddContributor(string userId, Guid id, AddContributorRequestDto request)
     {
         try
         {
             logger.LogInformation("AddContributor started QuestionnaireId={QuestionnaireId} Contributor={Contributor}", id, request.Email);
 
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, id);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)
@@ -473,13 +484,13 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public async Task<ServiceResult> RemoveContributor(string email, Guid id, string contributorEmail)
+    public async Task<ServiceResult> RemoveContributor(string userId, Guid id, string contributorEmail)
     {
         try
         {
             logger.LogInformation("RemoveContributor started QuestionnaireId={QuestionnaireId} Contributor={Contributor}", id, contributorEmail);
 
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, id);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)
@@ -495,7 +506,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 questionnaire.Contributors.Remove(contributorEmail);
                 await db.SaveChangesAsync();
             }
-            else if (!questionnaire.Contributors.Contains(email))
+            else if (!questionnaire.Contributors.Contains(userId))
             {
                 return NotFound(ProblemTrace("Cannot find the contributor", 404));
             }
@@ -562,13 +573,13 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         await db.SaveChangesAsync();
     }
     
-    private async Task<ServiceResult> UpdateQuestionnaireStatus(string email, Guid id, EntityStatus status)
+    private async Task<ServiceResult> UpdateQuestionnaireStatus(string userId, Guid id, EntityStatus status)
     {
         try
         {
             logger.LogInformation("UpdateQuestionnaireStatus started QuestionnaireId={QuestionnaireId} Status={Status}", id, status);
 
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, id);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)
@@ -592,7 +603,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             }
 
             questionnaire.UpdatedAt = DateTime.UtcNow;
-            questionnaire.PublishedBy = email;
+            questionnaire.PublishedBy = userId;
             questionnaire.PublishedAt = DateTime.UtcNow;
             
             await db.SaveChangesAsync();
@@ -652,13 +663,13 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         };
     }
     
-    public async Task<ServiceResult> GetBranchingMap(string email, Guid questionnaireId)
+    public async Task<ServiceResult> GetBranchingMap(string userId, Guid questionnaireId)
     {
         try
         {
             logger.LogInformation("GetBranchingMap started QuestionnaireId={QuestionnaireId}", questionnaireId);
 
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, questionnaireId);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, questionnaireId);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)

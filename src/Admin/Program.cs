@@ -8,7 +8,6 @@ using Common.Logging;
 using Common.Telemetry;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -27,7 +26,6 @@ if (builderIsLocalEnvironment)
 }
 
 var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
-var apiScopes = builder.Configuration.GetSection("ApiSettings:Scopes").Get<string[]>() ?? [];
 
 if (!builderIsLocalEnvironment)
 {
@@ -86,8 +84,16 @@ builder.Services.AddTransient(sp =>
     new BearerTokenHandler(sp.GetRequiredService<IHttpContextAccessor>()));
 
 // Register an HttpClient with a pre-configured base address
-builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAddress = new Uri(apiBaseUrl); })
+builder.Services.AddHttpClient<IApiClient, ApiClient>(client => client.BaseAddress = new Uri(apiBaseUrl))
     .AddHttpMessageHandler<BearerTokenHandler>();
+
+builder.Services.AddTransient(sp =>
+    new MsGraphHandler(sp.GetRequiredService<IHttpContextAccessor>()));
+
+var msGraphBaseUrl = builder.Configuration.GetSection("MsGraph:BaseUrl").Value!;
+
+builder.Services.AddHttpClient<IMsGraphClient, MsGraphClient>(client => client.BaseAddress = new Uri(msGraphBaseUrl))
+    .AddHttpMessageHandler<MsGraphHandler>();
 
 // TODO remove and test no regression
 builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI(); 
@@ -136,6 +142,10 @@ app.UseAuthorization();
 if (builderIsLocalEnvironment)
 {
     app.UseMockMvcDevEndpoints();
+}
+else if (builder.Environment.IsDevelopment())
+{
+    app.UseDevMvcTokenEndpoints();
 }
 
 app.MapStaticAssets();

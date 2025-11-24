@@ -2,6 +2,7 @@
 @client_id={{client_id}}
 @client_secret={{client_secret}}
 @api_scope={{api_scope}}
+@email_address={{email_address}}
 
 POST https://login.microsoftonline.com/{{tenant_id}}/oauth2/v2.0/token
 Content-Type: application/x-www-form-urlencoded
@@ -19,16 +20,48 @@ grant_type=client_credentials&client_id={{client_id}}&client_secret={{client_sec
 
 ###
 
-# @Api_Dev_HostAddress = {{Api_Dev_HostAddress}}
-@Api_Dev_HostAddress = https://localhost:7243
+@code=authorize-endpoint-response-code
+@graph_scope=https://graph.microsoft.com/.default
+@redirect_uri=https://localhost:7082/signin-oidc
+
+POST https://login.microsoftonline.com/{{tenant_id}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&client_id={{client_id}}&client_secret={{client_secret}}&scope={{graph_scope}}&code={{code}}&response_type=token&redirect_uri={{redirect_uri}}
+
+> {%
+    // Response Handler Script
+    const tokenRes = response.body;
+
+    console.log(tokenRes);
+
+    client.global.set("graph_access_token", tokenRes.access_token)
+%}
+
+###
+
+GET https://graph.microsoft.com/v1.0/users/{{email_address}}
+Authorization: Bearer {{graph_access_token}}
+
+> {%
+    // Response Handler Script
+    const tokenRes = response.body;
+
+    console.log(tokenRes);
+%}
+
+###
+
+@id_token=authorize-endpoint-response-id-token
+@Api_Dev_HostAddress = {{Api_Dev_HostAddress}}
 
 GET {{Api_Dev_HostAddress}}/api/questionnaires
-Authorization: Bearer {{access_token}}
+Authorization: Bearer {{id_token}}
 
 ###
 
 POST {{Api_Dev_HostAddress}}/api/questionnaires
-Authorization: Bearer {{access_token}}
+Authorization: Bearer {{id_token}}
 Content-Type: application/json
 
 {
@@ -38,6 +71,6 @@ Content-Type: application/json
 ###
 
 GET {{Api_Dev_HostAddress}}/api/questionnaires
-Authorization: Bearer {{access_token}}
+Authorization: Bearer {{id_token}}
 
 ###

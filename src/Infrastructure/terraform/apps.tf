@@ -1,5 +1,6 @@
 locals {
   api_app_settings = {
+    ASPNETCORE_ENVIRONMENT                = var.asp_env
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
     ConnectionStrings__DefaultConnection  = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.connection_string.versionless_id})"
@@ -11,6 +12,7 @@ locals {
     AzureAd__ClientSecret                 = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.ad_client_secret.versionless_id})"
   }
   admin_app_settings = {
+    ASPNETCORE_ENVIRONMENT                = var.asp_env
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
     ASPNETCORE_FORWARDEDHEADERS_ENABLED   = "true"
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
@@ -22,6 +24,7 @@ locals {
     AzureAd__CallbackPath                 = "/signin-oidc"
   }
   frontend_app_settings = {
+    ASPNETCORE_ENVIRONMENT                = var.asp_env
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
     ASPNETCORE_FORWARDEDHEADERS_ENABLED   = "true"
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
@@ -54,14 +57,14 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
       name        = "Access from Front Door"
       service_tag = "AzureFrontDoor.Backend"
     }
-    
+
     application_stack {
-      docker_image_name        = var.api_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_image_name   = var.api_image_name
+      docker_registry_url = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
     }
 
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.gtaa-identity.client_id
-    container_registry_use_managed_identity = true
+    container_registry_use_managed_identity       = true
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
@@ -76,7 +79,7 @@ resource "azurerm_linux_web_app" "gettoananswer-api" {
   }
 
   key_vault_reference_identity_id = local.managed_identity.identity_ids[0]
-  
+
   lifecycle {
     ignore_changes = [tags]
   }
@@ -136,12 +139,12 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-api-staging" {
     }
 
     application_stack {
-      docker_image_name        = var.api_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_image_name   = var.api_image_name
+      docker_registry_url = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
     }
 
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.gtaa-identity.client_id
-    container_registry_use_managed_identity = true
+    container_registry_use_managed_identity       = true
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
@@ -179,12 +182,12 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
     }
 
     application_stack {
-      docker_image_name        = var.admin_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_image_name   = var.admin_image_name
+      docker_registry_url = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
     }
 
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.gtaa-identity.client_id
-    container_registry_use_managed_identity = true
+    container_registry_use_managed_identity       = true
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
@@ -233,12 +236,12 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-admin-staging" {
     }
 
     application_stack {
-      docker_image_name        = var.admin_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_image_name   = var.admin_image_name
+      docker_registry_url = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
     }
 
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.gtaa-identity.client_id
-    container_registry_use_managed_identity = true
+    container_registry_use_managed_identity       = true
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
@@ -276,12 +279,12 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
     }
 
     application_stack {
-      docker_image_name        = var.frontend_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_image_name   = var.frontend_image_name
+      docker_registry_url = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
     }
 
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.gtaa-identity.client_id
-    container_registry_use_managed_identity = true
+    container_registry_use_managed_identity       = true
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5
@@ -330,12 +333,12 @@ resource "azurerm_linux_web_app_slot" "gettoananswer-frontend-staging" {
     }
 
     application_stack {
-      docker_image_name        = var.frontend_image_name
-      docker_registry_url      = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
+      docker_image_name   = var.frontend_image_name
+      docker_registry_url = "https://${azurerm_container_registry.gettoananswer-registry.login_server}"
     }
 
     container_registry_managed_identity_client_id = azurerm_user_assigned_identity.gtaa-identity.client_id
-    container_registry_use_managed_identity = true
+    container_registry_use_managed_identity       = true
 
     health_check_path                 = "/health"
     health_check_eviction_time_in_min = 5

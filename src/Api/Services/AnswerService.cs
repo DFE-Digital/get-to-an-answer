@@ -10,22 +10,22 @@ namespace Api.Services;
 
 public interface IAnswerService
 {
-    Task<ServiceResult> CreateAnswer(string email, CreateAnswerRequestDto request);
-    ServiceResult GetAnswer(string email, Guid id);
-    ServiceResult GetAnswers(string email, Guid questionId);
-    Task<ServiceResult> UpdateAnswer(string email, Guid id, UpdateAnswerRequestDto request);
-    Task<ServiceResult> DeleteAnswer(string email, Guid id);
+    Task<ServiceResult> CreateAnswer(string userId, CreateAnswerRequestDto request);
+    ServiceResult GetAnswer(string userId, Guid id);
+    ServiceResult GetAnswers(string userId, Guid questionId);
+    Task<ServiceResult> UpdateAnswer(string userId, Guid id, UpdateAnswerRequestDto request);
+    Task<ServiceResult> DeleteAnswer(string userId, Guid id);
 }
 
 public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> logger) : AbstractService, IAnswerService
 {
-    public async Task<ServiceResult> CreateAnswer(string email, CreateAnswerRequestDto request)
+    public async Task<ServiceResult> CreateAnswer(string userId, CreateAnswerRequestDto request)
     {
         try
         {
             logger.LogInformation("CreateAnswer started QuestionnaireId={QuestionnaireId} QuestionId={QuestionId}", request.QuestionnaireId, request.QuestionId);
 
-            var access = db.HasAccessToEntity<QuestionEntity>(email, request.QuestionId);
+            var access = db.HasAccessToEntity<QuestionEntity>(userId, request.QuestionId);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that question", 404));
             if (access == EntityAccess.Deny)
@@ -91,7 +91,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                 DestinationUrl = request.DestinationUrl,
                 DestinationQuestionId = request.DestinationQuestionId,
                 DestinationType = request.DestinationType,
-                CreatedBy = email,
+                CreatedBy = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             };
@@ -110,13 +110,13 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
         }
     }
 
-    public ServiceResult GetAnswer(string email, Guid id)
+    public ServiceResult GetAnswer(string userId, Guid id)
     {
         try
         {
             logger.LogInformation("GetAnswer started AnswerId={AnswerId}", id);
 
-            var access = db.HasAccessToEntity<AnswerEntity>(email, id);
+            var access = db.HasAccessToEntity<AnswerEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that answer", 404));
             if (access == EntityAccess.Deny)
@@ -136,13 +136,13 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
         }
     }
 
-    public ServiceResult GetAnswers(string email, Guid questionId)
+    public ServiceResult GetAnswers(string userId, Guid questionId)
     {
         try
         {
             logger.LogInformation("GetAnswers started QuestionId={QuestionId}", questionId);
 
-            var access = db.HasAccessToEntity<QuestionEntity>(email, questionId);
+            var access = db.HasAccessToEntity<QuestionEntity>(userId, questionId);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that question", 404));
             if (access == EntityAccess.Deny)
@@ -161,13 +161,13 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
         }
     }
 
-    public async Task<ServiceResult> UpdateAnswer(string email, Guid id, UpdateAnswerRequestDto request)
+    public async Task<ServiceResult> UpdateAnswer(string userId, Guid id, UpdateAnswerRequestDto request)
     {
         try
         {
             logger.LogInformation("UpdateAnswer started AnswerId={AnswerId}", id);
 
-            var access = db.HasAccessToEntity<AnswerEntity>(email, id);
+            var access = db.HasAccessToEntity<AnswerEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that answer", 404));
             if (access == EntityAccess.Deny)
@@ -237,13 +237,13 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
         }
     }
 
-    public async Task<ServiceResult> DeleteAnswer(string email, Guid id)
+    public async Task<ServiceResult> DeleteAnswer(string userId, Guid id)
     {
         try
         {
             logger.LogInformation("DeleteAnswer started AnswerId={AnswerId}", id);
 
-            var access = db.HasAccessToEntity<AnswerEntity>(email, id);
+            var access = db.HasAccessToEntity<AnswerEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that answer", 404));
             if (access == EntityAccess.Deny)
