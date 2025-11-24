@@ -88,6 +88,25 @@ variable "frontend_custom_domain" {
   description = "The public subdomain for the frontend service"
 }
 
+variable "is_api_deployment" {
+  type        = bool
+  description = "Only prepare the slot for Api"
+  default     = false
+}
+
+
+variable "is_admin_deployment" {
+  type        = bool
+  description = "Only prepare the slot for Admin"
+  default     = false
+}
+
+variable "is_frontend_deployment" {
+  type        = bool
+  description = "Only prepare the slot for Frontend"
+  default     = false
+}
+
 variable "azure_frontdoor_scale" {
   description = "Azure Front Door Scale"
   type        = string

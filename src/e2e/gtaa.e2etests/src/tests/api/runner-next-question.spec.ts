@@ -7,21 +7,48 @@ import {
     updateQuestionnaire
 } from '../../test-data-seeder/questionnaire-data';
 import {createQuestion} from '../../test-data-seeder/question-data';
-import {createAnswer} from '../../test-data-seeder/answer-data';
+import {createAnswer, createSingleAnswer} from '../../test-data-seeder/answer-data';
+import {JwtHelper} from "../../helpers/JwtHelper";
 
 test.describe('POST /api/questionnaires/{questionnaireId}/next-state', () => {
     test('returns next destination for a valid published questionnaire path (200)', async ({ request }) => {
+        const token = JwtHelper.NoRecordsToken();
+        
         // Create questionnaire -> 2 questions -> publish -> call next-state
-        const { questionnaire } = await createQuestionnaire(request);
-        const { question: q1 } = await createQuestion(request, questionnaire.id, undefined, 'Q1', QuestionType.MULTIPLE);
-        const { question: q2 } = await createQuestion(request, questionnaire.id, undefined, 'Q2', QuestionType.SINGLE);
+        const { questionnaire } = await createQuestionnaire(request, token);
+        const { question: q1 } = await createQuestion(request, questionnaire.id, token, 'Q1', QuestionType.MultiSelect);
+        const { question: q2 } = await createQuestion(request, questionnaire.id, token, 'Q2', QuestionType.SingleSelect);
 
         // Link q1 -> q2 via answer destination
-        const {answer} = await createAnswer(request, questionnaire.id, q1.id, 'GoNext', undefined, 1, AnswerDestinationType.Question, q2.id);
-        await createAnswer(request, questionnaire.id, q2.id, 'GoNext', undefined, 1, AnswerDestinationType.ExternalLink, undefined, 'https://example.org/help');
+        const {answer} = await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id,
+            questionId: q1.id, 
+            content: 'GoNext',
+            priority: 1, 
+            destinationType: AnswerDestinationType.Question, 
+            destinationQuestionId: q2.id
+        }, token);
+        
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id,
+            questionId: q1.id,
+            content: 'GoNext',
+            priority: 1,
+            destinationType: AnswerDestinationType.ExternalLink, 
+            destinationUrl: 'https://example.org/help'
+        }, token);
+
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id,
+            questionId: q2.id,
+            content: 'GoNext',
+            priority: 1,
+            destinationType: AnswerDestinationType.ExternalLink,
+            destinationUrl: 'https://example.org/help'
+        }, token);
 
         // Must be published to use runner endpoints (non-preview)
-        await publishQuestionnaire(request, questionnaire.id);
+        await publishQuestionnaire(request, questionnaire.id, token);
 
         const payload = {
             currentQuestionId: q1.id,
@@ -41,8 +68,8 @@ test.describe('POST /api/questionnaires/{questionnaireId}/next-state', () => {
 
     test('preview=true works on draft questionnaire (200)', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
-        const { question: q1 } = await createQuestion(request, questionnaire.id, undefined, 'Q1', QuestionType.SINGLE);
-        const { question: q2 } = await createQuestion(request, questionnaire.id, undefined, 'Q2', QuestionType.SINGLE);
+        const { question: q1 } = await createQuestion(request, questionnaire.id, undefined, 'Q1', QuestionType.SingleSelect);
+        const { question: q2 } = await createQuestion(request, questionnaire.id, undefined, 'Q2', QuestionType.SingleSelect);
 
         const { answer } = await createAnswer(request, questionnaire.id, q1.id, 'Next', undefined, 1, AnswerDestinationType.Question, q2.id);
 
@@ -92,10 +119,10 @@ test.describe('POST /api/questionnaires/{questionnaireId}/next-state', () => {
 
     test('handles external link destination (200) with url in response', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
-        const { question: q1 } = await createQuestion(request, questionnaire.id, undefined, 'Q1', QuestionType.SINGLE);
+        const { question: q1 } = await createQuestion(request, questionnaire.id, undefined, 'Q1', QuestionType.SingleSelect);
 
         const {answer} = await createAnswer(request, questionnaire.id, q1.id, 'Go External', undefined, 1,
-            AnswerDestinationType.ExternalLink, undefined, 'https://example.org/help');
+            AnswerDestinationType.ExternalLink, undefined, undefined, 'https://example.org/help');
 
         await publishQuestionnaire(request, questionnaire.id);
 

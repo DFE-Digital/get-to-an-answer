@@ -12,7 +12,7 @@ export class QuestionBuilder {
         this._questionnaireId = questionnaireId;
         this._content = `Default question content - ${timestamp}`;
         this._description = `Default question description - ${timestamp}`;
-        this._type = QuestionType.SINGLE; //set to default
+        this._type = QuestionType.SingleSelect; //set to default
     }
 
     withContent(content?: string) {

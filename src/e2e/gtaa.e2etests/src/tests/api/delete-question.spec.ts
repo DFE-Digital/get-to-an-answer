@@ -13,7 +13,7 @@ test.describe('DELETE Question API request', () => {
             questionnaire.id,
             undefined,
             'Question to be deleted',
-            QuestionType.SINGLE,
+            QuestionType.SingleSelect,
             'This question will be deleted'
         );
 
@@ -61,7 +61,7 @@ test.describe('DELETE Question API request', () => {
             questionnaire.id,
             ownerToken,
             'Question owned by another user',
-            QuestionType.SINGLE
+            QuestionType.SingleSelect
         );
 
         const {deleteQuestionResponse} = await deleteQuestion(
@@ -176,7 +176,7 @@ test.describe('DELETE Question API request', () => {
             questionnaire.id,
             undefined,
             'Question to delete twice',
-            QuestionType.SINGLE
+            QuestionType.SingleSelect
         );
 
         // Delete the question first time

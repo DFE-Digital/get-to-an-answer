@@ -15,7 +15,7 @@ test.describe('PUT Publish questionnaire api request', () => {
     test('Validate PUT publish questionnaire', async ({request}) => {
         const { questionnaire } = await createQuestionnaire(request);
 
-        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
         
         await createSingleAnswer(request, {
             questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
@@ -34,7 +34,7 @@ test.describe('PUT Publish questionnaire api request', () => {
     test('Validate PUT republish published questionnaire', async ({request}) => {
         const { questionnaire } = await createQuestionnaire(request);
 
-        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
 
         await publishQuestionnaire(request, questionnaire.id);
         
@@ -54,7 +54,7 @@ test.describe('PUT Publish questionnaire api request', () => {
     test('Validate PUT publish deleted questionnaire', async ({request}) => {
         const { questionnaire } = await createQuestionnaire(request);
 
-        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
 
         await deleteQuestionnaire(request, questionnaire.id);
         
@@ -67,7 +67,7 @@ test.describe('PUT Publish questionnaire api request', () => {
     test('Validate POST publish unauthorised questionnaire', async ({request}) => {
         const { questionnaire } = await createQuestionnaire(request);
 
-        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
         
         await createSingleAnswer(request, {
             questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
@@ -83,7 +83,7 @@ test.describe('PUT Publish questionnaire api request', () => {
     test('Validate POST publish unauthorised questionnaire with expired token', async ({request}) => {
         const { questionnaire } = await createQuestionnaire(request);
 
-        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
 
         const { response } = await publishQuestionnaire(request, questionnaire.id, JwtHelper.ExpiredToken);
 

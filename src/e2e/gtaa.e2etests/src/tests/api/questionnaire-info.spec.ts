@@ -20,7 +20,8 @@ test.describe('GET /questionnaires/{slug}/publishes/last/info', () => {
             displayTitle: 'Custom display title',
             slug: questionnaireSlug
         });
-        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 
+            'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
 
         await createSingleAnswer(request, {
             questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
@@ -35,7 +36,7 @@ test.describe('GET /questionnaires/{slug}/publishes/last/info', () => {
         const body = (await res.json()) as QuestionnaireDtoModel;
 
         // Minimal DTO only
-        expect(Object.keys(body).sort()).toEqual(['description', 'displayTitle', 'id', 'slug'].sort());
+        expect(Object.keys(body).sort()).toEqual(['description', 'displayTitle', 'id', 'slug', "hasStartPage"].sort());
         // Types and values present
         expect(body.id).toMatch(
             GUID_REGEX,
@@ -51,11 +52,11 @@ test.describe('GET /questionnaires/{slug}/publishes/last/info', () => {
         }
     });
 
-    test('400 Bad Request when no published version exists', async ({ request }) => {
+    test('404 Not found when no published version exists', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
 
         const { response: res, questionnaireInfo } = await getLastInfo(request, questionnaire.slug);
-        expect([400]).toContain(res.status());
+        expect(res.status()).toBe(404);
 
         const problem = await res.json();
         // ProblemDetails shape without sensitive info
@@ -69,14 +70,14 @@ test.describe('GET /questionnaires/{slug}/publishes/last/info', () => {
         }
     });
 
-    test('400 Bad Request when questionnaire is deleted', async ({ request }) => {
+    test('404 Not found when questionnaire is deleted', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
-        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
         await publishQuestionnaire(request, questionnaire.id);
         await deleteQuestionnaire(request, questionnaire.id);
 
         const { response: res, questionnaireInfo } = await getLastInfo(request, questionnaire.slug);
-        expect([400]).toContain(res.status());
+        expect(res.status()).toBe(404);
 
         const problem = await res.json();
         const sensitive = ['stackTrace', 'exception', 'errors', 'developerMessage', 'debug'];
@@ -109,7 +110,7 @@ test.describe('GET /questionnaires/{slug}/publishes/last/info', () => {
             slug: questionnaireSlug
         })
 
-        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
         
         await createSingleAnswer(request, {
             questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',

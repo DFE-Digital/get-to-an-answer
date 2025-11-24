@@ -3,10 +3,11 @@ using Common.Client;
 using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
+using Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace Frontend.Pages.Questionnaire;
+namespace Admin.Pages.Preview;
 
 [IgnoreAntiforgeryToken]
 public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> logger) : QuestionnairesPageModel
@@ -16,29 +17,28 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
     [BindProperty] public bool IsRedirectConfirmation { get; set; } = false;
     [BindProperty] public required QuestionnaireInfoDto Questionnaire { get; set; }
     [BindProperty] public required DestinationDto Destination { get; set; }
-    
-    [FromRoute(Name = "questionnaireSlug")] 
-    public new string? QuestionnaireSlug { get; set; }
 
     [FromQuery(Name = "embed")] 
     public bool Embed { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
-        if (QuestionnaireSlug == null)
-            return NotFound();
-        
-        var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireSlug);
+        var questionnaire = await apiClient.GetQuestionnaireAsync(Questionnaire.Id);
         
         if (questionnaire == null)
             return NotFound();
 
-        Questionnaire = questionnaire;
+        Questionnaire = new QuestionnaireInfoDto()
+        {
+            Id = questionnaire.Id,
+            DisplayTitle = questionnaire.DisplayTitle ?? questionnaire.Title,
+            Slug = questionnaire.Slug,
+        };
         IsEmbedded = Embed;
         Destination = new DestinationDto
         {
             Type = DestinationType.Question,
-            Question = await apiClient.GetInitialQuestion(questionnaire.Id)
+            Question = await apiClient.GetInitialQuestion(questionnaire.Id, true)
         };
         
         return Page();
@@ -50,9 +50,6 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
     {
         try
         {
-            if (QuestionnaireSlug == null)
-                return NotFound();
-            
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -88,7 +85,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
                 NextStateRequest.SelectedAnswerIds = [selectedAnswerId];
             } 
         
-            var destination = await apiClient.GetNextState(Questionnaire.Id, NextStateRequest);
+            var destination = await apiClient.GetNextState(Questionnaire.Id, NextStateRequest, true);
         
             if (destination == null)
                 return NotFound();
@@ -113,7 +110,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
         catch (Exception e)
         {
             logger.LogError(e, "Error load next question or final destination. Error: {EMessage}", e.Message);
-            throw;
+            return RedirectToPage("/Error");
         }
         
         return Page();

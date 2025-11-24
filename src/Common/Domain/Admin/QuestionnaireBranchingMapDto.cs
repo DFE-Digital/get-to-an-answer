@@ -1,6 +1,6 @@
 namespace Common.Domain.Admin;
 
-public class QuestionnaireBranchingMap
+public class QuestionnaireBranchingMapDto
 {
     public required Guid QuestionnaireId { get; set; }
     public required string QuestionnaireTitle { get; set; }

@@ -206,6 +206,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             var questionnaire = await db.Questionnaires
                 .AsNoTracking()    
                 .Where(q => q.Id == id)
+                .Include(q => q.Contents.Where(a => !a.IsDeleted))
                 .Include(q => q.Questions.Where(a => !a.IsDeleted))
                 .ThenInclude(qq => qq.Answers.Where(a => !a.IsDeleted))
                 .FirstOrDefaultAsync();
@@ -244,10 +245,11 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
     internal static BranchingHealthType IsBranchingHealthy(QuestionnaireEntity current)
     {
         var questionMap = current.Questions.ToDictionary(q => q.Id, q => q);
-        
+        var contentMap = current.Contents.ToDictionary(q => q.Id, q => q);
+
         foreach (var question in current.Questions)
         {
-            var branchingHealth = IsBranchingHealthy(question, new Dictionary<Guid, bool>(), questionMap);
+            var branchingHealth = IsBranchingHealthy(question, new Dictionary<Guid, bool>(), questionMap, contentMap);
             
             if (branchingHealth != BranchingHealthType.Ok)
                 return branchingHealth;
@@ -261,7 +263,8 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
     internal static BranchingHealthType IsBranchingHealthy(
         QuestionEntity current, 
         Dictionary<Guid, bool> visited, 
-        Dictionary<Guid, QuestionEntity> questionMap)
+        Dictionary<Guid, QuestionEntity> questionMap,
+        Dictionary<Guid, ContentEntity> contentMap)
     {
         if (visited.ContainsKey(current.Id))
         {
@@ -275,11 +278,16 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (answer is { DestinationType: DestinationType.Question, DestinationQuestionId: { } id })
             {
                 var type = IsBranchingHealthy(questionMap[id], 
-                    new Dictionary<Guid, bool>(visitedList), questionMap);
+                    new Dictionary<Guid, bool>(visitedList), questionMap, contentMap);
                 
                 if (type != BranchingHealthType.Ok)
                     return type;
             }
+            else if (answer is { DestinationType: DestinationType.CustomContent, DestinationContentId: not null } && 
+                         contentMap.ContainsKey(answer.DestinationContentId.Value))
+            {
+                // Continue
+            }  
             else if (answer.DestinationType != DestinationType.ExternalLink && current.Order == questionMap.Count)
             {
                 return BranchingHealthType.Broken; 
@@ -691,7 +699,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 .Where(x => x.QuestionnaireId == questionnaireId)
                 .ToDictionaryAsync(c => c.Id, c => c.Title);
             
-            return Ok(new QuestionnaireBranchingMap
+            return Ok(new QuestionnaireBranchingMapDto
             {
                 QuestionnaireId = questionnaire.Id,
                 QuestionnaireTitle = questionnaire.Title,
