@@ -12,6 +12,9 @@ namespace Admin.Pages.Preview;
 [IgnoreAntiforgeryToken]
 public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> logger) : QuestionnairesPageModel
 {
+    [FromRoute(Name = "questionnaireId")] 
+    public required Guid QuestionnaireId { get; set; }
+
     [BindProperty] public required GetNextStateRequest NextStateRequest { get; set; }
     [BindProperty] public required bool IsEmbedded { get; set; }
     [BindProperty] public bool IsRedirectConfirmation { get; set; } = false;
@@ -23,7 +26,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 
     public async Task<IActionResult> OnGet()
     {
-        var questionnaire = await apiClient.GetQuestionnaireAsync(Questionnaire.Id);
+        var questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId);
         
         if (questionnaire == null)
             return NotFound();

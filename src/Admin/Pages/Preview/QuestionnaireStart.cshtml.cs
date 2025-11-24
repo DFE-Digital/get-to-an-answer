@@ -9,7 +9,7 @@ namespace Admin.Pages.Preview;
 public class QuestionnaireStart(IApiClient apiClient, ILogger<QuestionnaireStart> logger) : QuestionnairesPageModel
 {
     [FromRoute(Name = "questionnaireId")] 
-    [BindProperty] public required Guid QuestionnaireId { get; set; }
+    public required Guid QuestionnaireId { get; set; }
 
     [BindProperty] public required bool IsEmbedded { get; set; }
     [BindProperty] public required QuestionnaireInfoDto Questionnaire { get; set; }
