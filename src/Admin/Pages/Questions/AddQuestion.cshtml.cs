@@ -22,8 +22,7 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
     public string QuestionContent { get; set; } = "";
 
     [BindProperty] 
-    [Required(ErrorMessage = "Enter question hint text")]
-    public string QuestionHintText { get; set; } = "";
+    public string? QuestionHintText { get; set; } = "";
 
     [BindProperty] 
     [Required(ErrorMessage = "Select question type")] 
