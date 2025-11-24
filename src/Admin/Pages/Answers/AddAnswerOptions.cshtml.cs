@@ -24,12 +24,9 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
     [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
 
-    [TempData(Key = "ErrorMessage")] public string? ErrorMessage { get; set; }
-
-
     public async Task<IActionResult> OnGet()
     {
-        BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
+        BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId);
 
         await HydrateOptionListsAsync();
         ReassignOptionNumbers();
@@ -75,7 +72,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             ReassignOptionNumbers();
             return Page();
         }
-
+        
         try
         {
             foreach (var option in Options)
@@ -87,7 +84,9 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
                     Content = option.OptionContent,
                     Description = option.OptionHint,
                     DestinationType = MapDestination(option.AnswerDestination),
-                    DestinationQuestionId = Guid.Parse(option.SelectedDestinationQuestion),
+                    DestinationQuestionId = !string.IsNullOrEmpty(option.SelectedDestinationQuestion)
+                        ? Guid.Parse(option.SelectedDestinationQuestion)
+                        : null,
                     DestinationUrl = option.ResultPageUrl
                 });
             }
@@ -178,7 +177,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             }
         }
     }
-    
+
     public async Task<IActionResult> OnPostRemoveOption(int index)
     {
         Options.RemoveAt(index);
