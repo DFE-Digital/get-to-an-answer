@@ -64,6 +64,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 Title = entity.Title,
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.CreatedAt,
+                CreatedBy = entity.CreatedBy
             };
 
             logger.LogInformation("CreateQuestionnaire succeeded QuestionnaireId={QuestionnaireId}", entity.Id);

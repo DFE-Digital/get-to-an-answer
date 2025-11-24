@@ -47,7 +47,7 @@ public class CreateQuestionnaires(IApiClient apiClient, ILogger<CreateQuestionna
         catch (Exception e)
         {
             logger.LogError(e, "Error creating questionnaire. Error: {EMessage}", e.Message);
-            return RedirectToPage("/Error");
+            return RedirectToErrorPage();
         }
     }
 }
