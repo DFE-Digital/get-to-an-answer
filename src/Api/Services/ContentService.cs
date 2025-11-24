@@ -10,22 +10,22 @@ namespace Api.Services;
 
 public interface IContentService
 {
-    Task<ServiceResult> CreateContent(string email, CreateContentRequestDto request);
-    ServiceResult GetContent(string email, Guid id);
-    ServiceResult GetContents(string email, Guid questionId);
-    Task<ServiceResult> UpdateContent(string email, Guid id, UpdateContentRequestDto request);
-    Task<ServiceResult> DeleteContent(string email, Guid id);
+    Task<ServiceResult> CreateContent(string userId, CreateContentRequestDto request);
+    ServiceResult GetContent(string userId, Guid id);
+    ServiceResult GetContents(string userId, Guid questionId);
+    Task<ServiceResult> UpdateContent(string userId, Guid id, UpdateContentRequestDto request);
+    Task<ServiceResult> DeleteContent(string userId, Guid id);
 }
 
 public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> logger) : AbstractService, IContentService
 {
-    public async Task<ServiceResult> CreateContent(string email, CreateContentRequestDto request)
+    public async Task<ServiceResult> CreateContent(string userId, CreateContentRequestDto request)
     {
         try
         {
             logger.LogInformation("CreateContent started QuestionnaireId={QuestionnaireId}", request.QuestionnaireId);
 
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, request.QuestionnaireId);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, request.QuestionnaireId);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)
@@ -37,7 +37,7 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
                 Title = request.Title,
                 Content = request.Content,
                 ReferenceName = request.ReferenceName,
-                CreatedBy = email,
+                CreatedBy = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             };
@@ -55,13 +55,13 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
         }
     }
 
-    public ServiceResult GetContent(string email, Guid id)
+    public ServiceResult GetContent(string userId, Guid id)
     {
         try
         {
             logger.LogInformation("GetContent started ContentId={ContentId}", id);
 
-            var access = db.HasAccessToEntity<ContentEntity>(email, id);
+            var access = db.HasAccessToEntity<ContentEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that content", 404));
             if (access == EntityAccess.Deny)
@@ -81,13 +81,13 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
         }
     }
 
-    public ServiceResult GetContents(string email, Guid questionnaireId)
+    public ServiceResult GetContents(string userId, Guid questionnaireId)
     {
         try
         {
             logger.LogInformation("GetContents started QuestionnaireId={QuestionnaireId}", questionnaireId);
 
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, questionnaireId);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, questionnaireId);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)
@@ -106,7 +106,7 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
         }
     }
 
-    public async Task<ServiceResult> UpdateContent(string email, Guid id, UpdateContentRequestDto request)
+    public async Task<ServiceResult> UpdateContent(string userId, Guid id, UpdateContentRequestDto request)
     {
         try
         {
@@ -120,7 +120,7 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
                 }));
             }
 
-            var access = db.HasAccessToEntity<ContentEntity>(email, id);
+            var access = db.HasAccessToEntity<ContentEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that content", 404));
             if (access == EntityAccess.Deny)
@@ -148,13 +148,13 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
         }
     }
 
-    public async Task<ServiceResult> DeleteContent(string email, Guid id)
+    public async Task<ServiceResult> DeleteContent(string userId, Guid id)
     {
         try
         {
             logger.LogInformation("DeleteContent started ContentId={ContentId}", id);
 
-            var access = db.HasAccessToEntity<ContentEntity>(email, id);
+            var access = db.HasAccessToEntity<ContentEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that content", 404));
             if (access == EntityAccess.Deny)

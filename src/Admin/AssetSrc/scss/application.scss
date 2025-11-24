@@ -17,6 +17,7 @@ $govuk-font-family: 'Inter', sans-serif; // Override govuk font
 }
 .govuk-phase-banner__content
 {
+  display: flex;
   width: 100%;
 }
 

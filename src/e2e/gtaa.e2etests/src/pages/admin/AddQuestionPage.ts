@@ -1,7 +1,6 @@
-import { expect, Locator, Page } from '@playwright/test';
-import { BasePage } from '../BasePage';
-import { ErrorMessages } from '../../constants/test-data-constants';
-import {Timeouts} from "../../constants/timeouts";
+import {expect, Locator, Page} from '@playwright/test';
+import {BasePage} from '../BasePage';
+import {ErrorMessages} from "../../constants/test-data-constants";
 
 type Mode = 'create' | 'update';
 

@@ -14,24 +14,24 @@ namespace Api.Services;
 
 public interface IQuestionService
 {
-    Task<ServiceResult> CreateQuestion(string email, CreateQuestionRequestDto request);
-    ServiceResult GetQuestion(string email, Guid id);
-    ServiceResult GetQuestions(string email, Guid questionnaireId);
-    Task<ServiceResult> UpdateQuestion(string email, Guid id, UpdateQuestionRequestDto request);
-    Task<ServiceResult> DeleteQuestion(string email, Guid id);
-    Task<ServiceResult> MoveQuestionDownOne(string email, Guid questionnaireId, Guid id);
-    Task<ServiceResult> MoveQuestionUpOne(string email, Guid questionnaireId, Guid id);
+    Task<ServiceResult> CreateQuestion(string userId, CreateQuestionRequestDto request);
+    ServiceResult GetQuestion(string userId, Guid id);
+    ServiceResult GetQuestions(string userId, Guid questionnaireId);
+    Task<ServiceResult> UpdateQuestion(string userId, Guid id, UpdateQuestionRequestDto request);
+    Task<ServiceResult> DeleteQuestion(string userId, Guid id);
+    Task<ServiceResult> MoveQuestionDownOne(string userId, Guid questionnaireId, Guid id);
+    Task<ServiceResult> MoveQuestionUpOne(string userId, Guid questionnaireId, Guid id);
 }
 
 public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService> logger) : AbstractService, IQuestionService
 {
-    public async Task<ServiceResult> CreateQuestion(string email, CreateQuestionRequestDto request)
+    public async Task<ServiceResult> CreateQuestion(string userId, CreateQuestionRequestDto request)
     {
         try
         {
             logger.LogInformation("CreateQuestion started QuestionnaireId={QuestionnaireId}", request.QuestionnaireId);
 
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, request.QuestionnaireId);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, request.QuestionnaireId);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)
@@ -45,7 +45,7 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
                 Type = request.Type,
                 Order = db.Questions.Count(x => x.QuestionnaireId == request.QuestionnaireId
                                                 && !x.IsDeleted) + 1,
-                CreatedBy = email,
+                CreatedBy = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             };
@@ -75,13 +75,13 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
         }
     }
     
-    public ServiceResult GetQuestion(string email, Guid id)
+    public ServiceResult GetQuestion(string userId, Guid id)
     {
         try
         {
             logger.LogInformation("GetQuestion started QuestionId={QuestionId}", id);
 
-            var access = db.HasAccessToEntity<QuestionEntity>(email, id);
+            var access = db.HasAccessToEntity<QuestionEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that question", 404));
             if (access == EntityAccess.Deny)
@@ -121,13 +121,13 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
         }
     }
 
-    public ServiceResult GetQuestions(string email, Guid questionnaireId)
+    public ServiceResult GetQuestions(string userId, Guid questionnaireId)
     {
         try
         {
             logger.LogInformation("GetQuestions started QuestionnaireId={QuestionnaireId}", questionnaireId);
 
-            var access = db.HasAccessToEntity<QuestionnaireEntity>(email, questionnaireId);
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, questionnaireId);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             if (access == EntityAccess.Deny)
@@ -161,13 +161,13 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
         }
     }
 
-    public async Task<ServiceResult> UpdateQuestion(string email, Guid id, UpdateQuestionRequestDto request)
+    public async Task<ServiceResult> UpdateQuestion(string userId, Guid id, UpdateQuestionRequestDto request)
     {
         try
         {
             logger.LogInformation("UpdateQuestion started QuestionId={QuestionId}", id);
 
-            var access = db.HasAccessToEntity<QuestionEntity>(email, id);
+            var access = db.HasAccessToEntity<QuestionEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that question", 404));
             if (access == EntityAccess.Deny)
@@ -195,13 +195,13 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
         }
     }
 
-    public async Task<ServiceResult> DeleteQuestion(string email, Guid id)
+    public async Task<ServiceResult> DeleteQuestion(string userId, Guid id)
     {
         try
         {
             logger.LogInformation("DeleteQuestion started QuestionId={QuestionId}", id);
 
-            var access = db.HasAccessToEntity<QuestionEntity>(email, id);
+            var access = db.HasAccessToEntity<QuestionEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that question", 404));
             if (access == EntityAccess.Deny)
@@ -233,23 +233,23 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
         }
     }
     
-    public async Task<ServiceResult> MoveQuestionDownOne(string email, Guid questionnaireId, Guid id)
+    public async Task<ServiceResult> MoveQuestionDownOne(string userId, Guid questionnaireId, Guid id)
     {
-        return await MoveQuestionByOne(email, questionnaireId, id, +1);
+        return await MoveQuestionByOne(userId, questionnaireId, id, +1);
     }
     
-    public async Task<ServiceResult> MoveQuestionUpOne(string email, Guid questionnaireId, Guid id)
+    public async Task<ServiceResult> MoveQuestionUpOne(string userId, Guid questionnaireId, Guid id)
     {
-        return await MoveQuestionByOne(email, questionnaireId, id, -1);
+        return await MoveQuestionByOne(userId, questionnaireId, id, -1);
     }
     
-    private async Task<ServiceResult> MoveQuestionByOne(string email, Guid questionnaireId, Guid id, int direction)
+    private async Task<ServiceResult> MoveQuestionByOne(string userId, Guid questionnaireId, Guid id, int direction)
     {
         try
         {
             logger.LogInformation("MoveQuestionByOne started QuestionnaireId={QuestionnaireId} QuestionId={QuestionId} Direction={Direction}", questionnaireId, id, direction);
 
-            var access = db.HasAccessToEntity<QuestionEntity>(email, id);
+            var access = db.HasAccessToEntity<QuestionEntity>(userId, id);
             if (access == EntityAccess.NotFound)
                 return NotFound(ProblemTrace("We could not find that question", 404));
             if (access == EntityAccess.Deny)

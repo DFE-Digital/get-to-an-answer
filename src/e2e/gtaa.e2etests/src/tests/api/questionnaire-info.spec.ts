@@ -7,20 +7,29 @@ import {
 } from "../../test-data-seeder/questionnaire-data";
 import {QuestionnaireDtoModel} from "../../models/api-models";
 import {createQuestion} from "../../test-data-seeder/question-data";
-import {GUID_REGEX, QuestionType} from "../../constants/test-data-constants";
+import {AnswerDestinationType, GUID_REGEX, QuestionType} from "../../constants/test-data-constants";
+import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 
 test.describe('GET /questionnaires/{slug}/publishes/last/info', () => {
     test('200 OK with minimal DTO when a published version exists', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
+        
+        const questionnaireSlug = 'custom-slug-' + Math.floor(Math.random() * 1000)
+        
         await updateQuestionnaire(request, questionnaire.id, { 
             displayTitle: 'Custom display title',
-            slug: 'custom-slug'
+            slug: questionnaireSlug
         });
-        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
+            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+        })
 
         await publishQuestionnaire(request, questionnaire.id);
 
-        const { response: res, questionnaireInfo } = await getLastInfo(request, 'custom-slug');
+        const { response: res, questionnaireInfo } = await getLastInfo(request, questionnaireSlug);
         expect(res.status()).toBe(200);
 
         const body = (await res.json()) as QuestionnaireDtoModel;
@@ -92,23 +101,30 @@ test.describe('GET /questionnaires/{slug}/publishes/last/info', () => {
     test('200 OK when stored published questionnaire JSON is valid', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
         
+        const questionnaireSlug = 'valid-json' + Math.floor(Math.random() * 1000)
+        
         await updateQuestionnaire(request, questionnaire.id, {
             displayTitle: `Valid JSON uuid`,
             description: 'Valid JSON description',
-            slug: 'valid-json'
+            slug: questionnaireSlug
         })
 
-        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
-
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MULTIPLE, undefined);
+        
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
+            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+        })
+        
         await publishQuestionnaire(request, questionnaire.id);
 
-        const { response: res, questionnaireInfo } = await getLastInfo(request, 'valid-json');
+        const { response: res, questionnaireInfo } = await getLastInfo(request, questionnaireSlug);
         expect(res.status()).toBe(200);
 
         const body = (await res.json()) as QuestionnaireDtoModel;
         expect(body.displayTitle).toContain('Valid JSON');
         expect(body.description).toBe('Valid JSON description');
-        expect(body.slug).toBe('valid-json');
+        expect(body.slug).toBe(questionnaireSlug);
     });
 
     test('400 Bad Request when deserialization fails (generic ProblemDetails)', async ({ request }) => {

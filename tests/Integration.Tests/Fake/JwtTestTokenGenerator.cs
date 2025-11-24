@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Common.Extensions;
 
 namespace Integration.Tests.Fake;
 
@@ -59,6 +60,7 @@ public static class JwtTestTokenGenerator
 
         var payload = new Dictionary<string, object>
         {
+            [ClaimsPrincipalExtensions.IdClaimType] = subject + "@example.com",
             ["sub"] = subject,
             ["iss"] = issuer,
             ["aud"] = audience,
