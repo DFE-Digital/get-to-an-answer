@@ -15,6 +15,8 @@
   var contentHintIdSuffix = "OptionHint";
   var destinationIdSuffix = "AnswerDestination";
   var destinationSpecificSelectErrorId = $"{destinationIdSuffix}-specific-error";
+
+  var destinationFormGroupErrorId = Id(destinationIdSuffix);
 }
 
 <input type="hidden" asp-for="OptionNumber" />
@@ -41,10 +43,7 @@
   <div class="govuk-hint" id="@Id(contentHintIdSuffix)">
     You can add a short description to help people understand what this option is.
   </div>
-
-  @* <govuk-field-error asp-for="OptionHint" error-id="@Id($"{contentHintIdSuffix}-error")"> *@
-  @* </govuk-field-error> *@
-
+  
   <textarea class="govuk-textarea"
             id="@Id(contentHintIdSuffix)"
             rows="4"
@@ -52,7 +51,7 @@
             aria-describedby="@Id(contentHintIdSuffix)"></textarea>
 </govuk-form-group>
 
-<govuk-form-group asp-for="AnswerDestination">
+<govuk-form-group asp-for="AnswerDestination" specific-id-for-form-group-error="@destinationFormGroupErrorId">
   <fieldset class="govuk-fieldset" aria-describedby="@($"{Id($"{destinationIdSuffix}-hint")} {Id($"{destinationIdSuffix}-error")}")">
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
       Destination
@@ -107,7 +106,6 @@
               <span class="govuk-visually-hidden">Error:</span> Please select a question
             </p>
           }
-
 
           <select class="govuk-select equal-input-width"
                   id="@Id("destination-specific-select")"

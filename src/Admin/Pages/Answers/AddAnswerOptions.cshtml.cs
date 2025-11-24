@@ -44,7 +44,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
         if (!ModelState.IsValid)
         {
-            RemoveGenericOptionErrors();
+            // RemoveGenericOptionErrors();
             await HydrateOptionListsAsync();
             return Page();
         }
@@ -70,7 +70,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
         if (!ModelState.IsValid)
         {
-            RemoveGenericOptionErrors();
+            // RemoveGenericOptionErrors();
             await HydrateOptionListsAsync();
             ReassignOptionNumbers();
             return Page();
