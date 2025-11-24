@@ -72,6 +72,9 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
             output.Attributes.SetAttribute("type", "text");
         }
 
+        var typeAttribute = output.Attributes.FirstOrDefault(a => string.Equals(a.Name, "type", StringComparison.OrdinalIgnoreCase));
+        var typeValue = GetAttributeStringValue(typeAttribute);
+
         // Ensure the govuk-input base class is present (or preserve checkbox class if used that way)
         if (output.Attributes.TryGetAttribute("class", out var classAttr))
         {
@@ -95,10 +98,25 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
         var fullName = ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(For.Name);
         var modelState = ViewContext.ViewData.ModelState;
         var hasError = modelState.TryGetValue(fullName, out var entry) && entry.Errors.Count > 0;
-
+        var attemptedValue = entry?.AttemptedValue;
+        var effectiveValue = !string.IsNullOrEmpty(attemptedValue) ? attemptedValue : For.Model?.ToString();
         var simpleName = fullName.Contains('.')
             ? fullName[(fullName.LastIndexOf('.') + 1)..]
             : fullName;
+
+        if (string.Equals(typeValue, "radio", StringComparison.OrdinalIgnoreCase)
+            && output.Attributes.TryGetAttribute("value", out var valueAttr))
+        {
+            var radioValue = GetAttributeStringValue(valueAttr);
+            if (!string.IsNullOrEmpty(effectiveValue) && string.Equals(effectiveValue, radioValue, StringComparison.Ordinal))
+            {
+                output.Attributes.SetAttribute("checked", "checked");
+            }
+            else
+            {
+                output.Attributes.RemoveAll("checked");
+            }
+        }
 
         if (hasError)
         {

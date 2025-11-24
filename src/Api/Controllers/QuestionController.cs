@@ -64,7 +64,8 @@ public class QuestionController(IQuestionService questionService) : Controller
         {
             return (await questionService.MoveQuestionDownOne(userId, questionnaireId, id)).ToActionResult();
         }
-        else if (action == QuestionAction.MoveUp)
+        
+        if (action == QuestionAction.MoveUp)
         {
             return (await questionService.MoveQuestionUpOne(userId, questionnaireId, id)).ToActionResult();
         }
