@@ -16,6 +16,7 @@ jobs:
     name: "Prepare Infrastructure"
     uses: ./.github/workflows/azure-infrastructure.yml
     with:
+      TF_VAR_is_frontend_deployment: "true"
       environment: ${{ github.event.inputs.environment || 'Development' }}
     secrets: inherit
   

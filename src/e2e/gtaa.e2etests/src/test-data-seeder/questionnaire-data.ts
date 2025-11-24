@@ -220,7 +220,7 @@ export async function getNextState(
     request: APIRequestContext,
     questionnaireId: number | string,
     data: any,
-    preview: boolean = false
+    preview: boolean = false,
 ) {
     const response = await request.post(`${BASE_URL}/api/questionnaires/${questionnaireId}/next-state?preview=${preview}`, {
         data,

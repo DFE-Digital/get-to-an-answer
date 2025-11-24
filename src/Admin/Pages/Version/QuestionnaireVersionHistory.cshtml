@@ -1,0 +1,109 @@
+@page "/admin/questionnaires/{questionnaireId:guid}/version-history"
+@using Common.Local
+@model Admin.Pages.Version.QuestionnaireVersionHistory
+
+@{
+    ViewData["Title"] = "Questionnaire version history";
+}
+
+<style>
+/* Keep JSON formatting */
+.json-view { white-space: pre; line-height: 1.4; tab-size: 2; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+/* Accessible highlights: color + border/text decoration */
+.diff-added   { background-color: #e6f4ea; border-left: 3px solid #00703c; }
+.diff-removed { background-color: #fbe9e7; border-left: 3px solid #d4351c; /*text-decoration: line-through;*/ }
+.diff-modified{ background-color: #fff7e6; border-left: 3px solid #ffbf47; }
+</style>
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.QuestionnaireId/track">Back to questionnaire</a>
+}
+
+<div data-module="appstepnav"id="step-by-step-navigation" class="app-step-nav js-hidden app-step-nav--large" data-show-text="Show Changes" data-hide-text="Hide Changes" data-show-all-text="Show all versions" data-hide-all-text="Hide all versions">
+  <ol class="app-step-nav__steps">
+    @foreach (var version in Model.QuestionnaireVersions)
+    {
+      <li class="app-step-nav__step js-step" id="check-you-re-allowed-to-drive">
+        <div class="app-step-nav__header js-toggle-panel" data-position="@version.Version">
+          <h2 class="app-step-nav__title">
+            <span class="app-step-nav__circle app-step-nav__circle--number">
+              <span class="app-step-nav__circle-inner">
+                <span class="app-step-nav__circle-background">
+                  <span class="govuk-visually-hidden govuk-!-display-none-print">Step</span> @version.Version<span class="govuk-visually-hidden govuk-!-display-none-print" aria-hidden="true">:</span>
+                </span>
+              </span>
+            </span>
+
+            <span class="js-step-title" data-hint-text="by @version.CreatedBy" data-created-at="@($"{version.CreatedAt:d MMMM yyyy 'at' h:mmtt}")">
+              @(version.ChangeDescription ?? "Version: " + version.Version)
+            </span>
+          </h2>
+        </div>
+
+        <div class="app-step-nav__panel js-panel" id="step-panel-check-you-re-allowed-to-drive-1">
+          <p class="app-step-nav__paragraph">The following are the list of changes since the last publish.</p>
+
+          <ol class="app-step-nav__list " data-length="@version.ChangeLog?.Count ?? 0">
+            @foreach (var changeData in version.ChangeLog ?? [])
+            {
+              <li class="app-step-nav__list-item js-list-item ">
+                @switch (changeData.Kind)
+                {
+                  case ChangeKind.Modified:
+                    <span class="diff-modified">@changeData.Path was modified from '@changeData.ThisValue' to '@changeData.ThatValue'</span>
+                    break;
+                  case ChangeKind.Added:
+                    <span class="diff-added">'@changeData.ThisValue' was added to @changeData.Path</span>
+                    break;
+                  case ChangeKind.Removed:
+                    <span class="diff-removed">'@changeData.ThisValue' was from @changeData.Path</span>
+                    break;
+                }
+              </li>
+            }
+          </ol>
+        </div>
+
+      </li>
+    }
+  </ol>
+</div>
+
+
+@section Scripts {
+  <script type="text/javascript">
+
+    GOVUK.Modules.AppStepNav.prototype.addButtonstoSteps = function () {
+      for (let i = 0; i < this.$module.steps.length; i++) {
+        const thisel = this.$module.steps[i];
+        const title = thisel.querySelectorAll('.js-step-title')[0];
+        const hint = title.getAttribute('data-hint-text') || '';
+        const createdAt = title.getAttribute('data-created-at') || '';
+        const contentId = thisel.querySelectorAll('.js-panel')[0].getAttribute('id');
+        const titleText = title.textContent || title.innerText; // IE8 fallback
+
+        title.outerHTML =
+          '<span class="js-step-title">' +
+          '<button ' +
+          'class="app-step-nav__button app-step-nav__button--title js-step-title-button" ' +
+          'aria-expanded="false" aria-controls="' + contentId + '">' +
+          '<span class="app-step-nav____title-text-focus">' +
+          '<span style="display: flex; flex-direction: column;">' +
+          '<span>' +
+          '<span class="app-step-nav__title-text js-step-title-text">' + titleText + '</span>' +
+          (hint ? '<span class="govuk-hint">' + hint +'</span>' : '') +
+          '<span class="govuk-visually-hidden app-step-nav__section-heading-divider">, </span>' +
+          '</span>' +
+          '<span class="govuk-hint">' + createdAt + '</span>' +
+          '</span>' +
+          '</span>' +
+          '</button>' +
+          '</span>'
+      }
+    }
+    
+    const $element = document.querySelector('#step-by-step-navigation');
+    const stepByStepNavigation = new GOVUK.Modules.AppStepNav($element).init();
+  </script>
+}

@@ -9,6 +9,7 @@ export class AnswerBuilder {
     private _destinationUrl: string;
     private _destinationType?: AnswerDestinationType;
     private _destinationQuestionId: string;
+    private _destinationContentId: string;
     private _score: number;
 
     constructor(questionId: string, questionnaireId: string) {
@@ -19,6 +20,7 @@ export class AnswerBuilder {
         this._description = `Default answer description - ${timestamp}`;
         this._destinationUrl = `https://example.com/destination-url-${timestamp}`;
         this._destinationType = undefined; // this and '_destinationQuestionId' need to both be defined
+        this._destinationContentId = '';
         this._destinationQuestionId = '';
         this._score = 0.0; //set to default
     }
@@ -26,6 +28,12 @@ export class AnswerBuilder {
     withDestinationQuestionId(destinationQuestionId?: string) {
         if (destinationQuestionId !== undefined)
             this._destinationQuestionId = destinationQuestionId;
+        return this;
+    }
+
+    withDestinationContentId(destinationContentId: string | undefined) {
+        if (destinationContentId !== undefined)
+            this._destinationContentId = destinationContentId;
         return this;
     }
     withContent(content?: string) {
@@ -71,6 +79,10 @@ export class AnswerBuilder {
 
         if (this._destinationQuestionId && this._destinationQuestionId.trim() !== '') {
             answer.destinationQuestionId = this._destinationQuestionId;
+        }
+
+        if (this._destinationContentId && this._destinationContentId.trim() !== '') {
+            answer.destinationContentId = this._destinationContentId;
         }
         return answer;
     }

@@ -90,6 +90,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                 Priority = request.Priority,
                 DestinationUrl = request.DestinationUrl,
                 DestinationQuestionId = request.DestinationQuestionId,
+                DestinationContentId = request.DestinationContentId,
                 DestinationType = request.DestinationType,
                 CreatedBy = userId,
                 CreatedAt = DateTime.UtcNow,
@@ -221,6 +222,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
             answer.DestinationUrl = request.DestinationUrl ?? answer.DestinationUrl;
             answer.DestinationType = request.DestinationType ?? answer.DestinationType;
             answer.DestinationQuestionId = request.DestinationQuestionId ?? answer.DestinationQuestionId;
+            answer.DestinationContentId = request.DestinationContentId ?? answer.DestinationContentId;
             answer.Priority = request.Priority ?? answer.Priority;
             answer.UpdatedAt = DateTime.UtcNow;
 

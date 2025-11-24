@@ -19,8 +19,8 @@ test.describe('POST /api/questionnaires/{id}/clones', () => {
     test('clones questionnaire (201) with new id and copies questions/answers', async ({ request }) => {
         // Arrange original questionnaire with 2 questions and answers
         const { questionnaire } = await createQuestionnaire(request);
-        const { question: q1 } = await createQuestion(request, questionnaire.id, undefined, 'Q1', QuestionType.SINGLE);
-        const { question: q2 } = await createQuestion(request, questionnaire.id, undefined, 'Q2', QuestionType.MULTIPLE);
+        const { question: q1 } = await createQuestion(request, questionnaire.id, undefined, 'Q1', QuestionType.SingleSelect);
+        const { question: q2 } = await createQuestion(request, questionnaire.id, undefined, 'Q2', QuestionType.MultiSelect);
 
         await createAnswer(request, questionnaire.id, q1.id, 'A1', 'D1', 1);
         await createAnswer(request, questionnaire.id, q1.id, 'A2', 'D2', 2);

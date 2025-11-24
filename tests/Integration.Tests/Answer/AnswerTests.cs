@@ -328,6 +328,7 @@ public class AnswerTests(ApiFixture factory) :
                    content = "A0",
                    description = "D0",
                    priority = 1,
+                   destinationType = DestinationType.ExternalLink,
                    destinationUrl = "https://url.com",
                }))
         {

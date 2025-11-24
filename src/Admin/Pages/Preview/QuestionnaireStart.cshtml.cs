@@ -3,16 +3,16 @@ using Common.Client;
 using Common.Domain;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Frontend.Pages.Questionnaire;
+namespace Admin.Pages.Preview;
 
 [IgnoreAntiforgeryToken]
 public class QuestionnaireStart(IApiClient apiClient, ILogger<QuestionnaireStart> logger) : QuestionnairesPageModel
 {
+    [FromRoute(Name = "questionnaireId")] 
+    [BindProperty] public required Guid QuestionnaireId { get; set; }
+
     [BindProperty] public required bool IsEmbedded { get; set; }
     [BindProperty] public required QuestionnaireInfoDto Questionnaire { get; set; }
-    
-    [FromRoute(Name = "questionnaireSlug")] 
-    public new string? QuestionnaireSlug { get; set; }
 
     [FromQuery(Name = "embed")] 
     public bool Embed { get; set; }
@@ -21,33 +21,35 @@ public class QuestionnaireStart(IApiClient apiClient, ILogger<QuestionnaireStart
     {
         try
         {
-            if (QuestionnaireSlug == null)
-                return NotFound();
-            
             if (!ModelState.IsValid)
             {
                 return Page();
             }
             
-            var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireSlug);
+            var questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId);
             
             if (questionnaire == null)
                 return NotFound();
-
-            // if the display title is not defined, redirect to the first question
-            if (!questionnaire.HasStartPage)
-            {
-                return Redirect($"/questionnaires/{QuestionnaireSlug}/next?embed={Embed}");
-            }
-            
-            Questionnaire = questionnaire;
             
             IsEmbedded = Embed;
+
+            // if the display title is not defined, redirect to the first question
+            if (string.IsNullOrWhiteSpace(questionnaire.DisplayTitle))
+            {
+                return Redirect($"/admin/questionnaires/{QuestionnaireId}/next-preview?embed={Embed}");
+            }
+            
+            Questionnaire = new QuestionnaireInfoDto()
+            {
+                Id = questionnaire.Id,
+                DisplayTitle = questionnaire.DisplayTitle ?? questionnaire.Title,
+                Slug = questionnaire.Slug
+            };
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error creating questionnaire. Error: {EMessage}", e.Message);
-            throw;
+            return RedirectToPage("/Error");
         }
         return Page();
     }

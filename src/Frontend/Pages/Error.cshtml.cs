@@ -16,6 +16,8 @@ public class Error(ILogger<Error> logger) : BasePageModel
     {
         if (ErrorCode != null)
         {
+            Response.StatusCode = ErrorCode.Value;
+            
             ErrorMessage = ErrorCode switch
             {
                 (int) HttpStatusCode.NotFound => "Page not found.",

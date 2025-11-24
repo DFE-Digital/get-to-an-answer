@@ -12,7 +12,6 @@ public class QuestionnaireVersionDto
     public Guid QuestionnaireId { get; set; }
     
     public int Version { get; set; }
-    public string? QuestionnaireJson { get; set; }
     public string? ChangeDescription { get; set; }
     public List<ChangeData>? ChangeLog { get; set; }
     public string? CreatedBy { get; set; }

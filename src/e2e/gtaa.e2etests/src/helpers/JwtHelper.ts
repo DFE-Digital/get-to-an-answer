@@ -93,7 +93,7 @@ export class JwtHelper {
     public static readonly NoRecordsToken = () => JwtHelper.generateToken({
         [ClaimTypes.Subject]: 'test-subject',
         [ClaimTypes.Name]: 'Test User',
-        [ClaimTypes.Email]: `other-user${Math.round(Math.random() * 10000)}@education.gov.uk`,
+        [ClaimTypes.Email]: `other-user${Math.round(Math.random() * 10000000)}@education.gov.uk`,
         [ClaimTypes.Role]: ['Admin'],
         [ClaimTypes.Expiration]: new SimpleDate().addDate({days: 1}).ToSeconds()
     })
