@@ -54,11 +54,11 @@ test.describe('PUT Update question api request', () => {
 
     test('Validate PUT update question type', async ({request}) => {
         const {questionnaire} = await createQuestionnaire(request);
-        const {question} = await createQuestion(request, questionnaire.id, undefined, 'Original content', QuestionType.SINGLE);
+        const {question} = await createQuestion(request, questionnaire.id, undefined, 'Original content', QuestionType.SingleSelect);
 
         const updatePayload = {
             ...question,
-            type: QuestionType.MULTIPLE
+            type: QuestionType.MultiSelect
         };
 
         const {updatedQuestionPostResponse} = await updateQuestion(
@@ -71,7 +71,7 @@ test.describe('PUT Update question api request', () => {
         expect200HttpStatusCode(updatedQuestionPostResponse, 204);
         
         const {questionGetBody} = await getQuestion(request, question.id);
-        expect(questionGetBody.type).toBe(QuestionType.MULTIPLE);
+        expect(questionGetBody.type).toBe(QuestionType.MultiSelect);
     });
 
     test('Validate access to another question not permitted', async ({request}) => {
@@ -147,7 +147,7 @@ test.describe('PUT Update question api request', () => {
             questionnaireId: questionnaire.id,
             content: 'Updated content',
             description: 'Updated description',
-            type: QuestionType.SINGLE
+            type: QuestionType.SingleSelect
         };
 
         const {updatedQuestionPostResponse} = await updateQuestion(
@@ -255,7 +255,7 @@ test.describe('PUT Update question api request', () => {
             questionnaireId,
             undefined,
             duplicateContent,
-            QuestionType.SINGLE,
+            QuestionType.SingleSelect,
             'First question description'
         );
 
@@ -265,7 +265,7 @@ test.describe('PUT Update question api request', () => {
             questionnaireId,
             undefined,
             'What is your gender?',
-            QuestionType.SINGLE,
+            QuestionType.SingleSelect,
             'Second question description'
         );
 

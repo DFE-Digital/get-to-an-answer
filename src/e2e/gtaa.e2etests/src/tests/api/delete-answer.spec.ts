@@ -71,7 +71,7 @@ test.describe('DELETE Answer API request', () => {
             questionnaire.id,
             ownerToken,
             'Question owned by another user',
-            QuestionType.SINGLE
+            QuestionType.SingleSelect
         );
 
         const {

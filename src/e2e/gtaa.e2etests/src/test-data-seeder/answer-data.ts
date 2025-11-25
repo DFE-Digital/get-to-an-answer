@@ -41,6 +41,7 @@ interface CreateAnswerRequest {
     questionId: string;
     questionnaireId: string;
     destinationQuestionId?: string;
+    destinationContentId?: string;
     content?: string;
     description?: string;
     answerPrefix?: string;
@@ -56,6 +57,7 @@ export async function createSingleAnswer(
 ) {
     const payload = new AnswerBuilder(answerRequest.questionId, answerRequest.questionnaireId)
         .withDestinationQuestionId(answerRequest.destinationQuestionId)
+        .withDestinationContentId(answerRequest.destinationContentId)
         .withContent(answerRequest.content)
         .withDescription(answerRequest.description)
         .withDestinationUrl(answerRequest.destinationUrl)
@@ -89,12 +91,14 @@ export async function createAnswer(
     priority?: number,
     destinationType?: AnswerDestinationType,
     destinationQuestionId?: string,
+    destinationContentId?: string,
     destinationUrl?: string,
 ) {
     return await createSingleAnswer(request, {
         questionId,
         questionnaireId,
         destinationQuestionId,
+        destinationContentId,
         content,
         description,
         priority,

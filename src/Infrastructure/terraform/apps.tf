@@ -123,6 +123,7 @@ resource "azurerm_private_endpoint" "api_pe" {
 }
 # Staging slot for API (deploy here first; swap into production)
 resource "azurerm_linux_web_app_slot" "gettoananswer-api-staging" {
+  count          = var.is_api_deployment ? 1 : 0
   name           = "staging"
   app_service_id = azurerm_linux_web_app.gettoananswer-api.id
 
@@ -220,6 +221,7 @@ resource "azurerm_linux_web_app" "gettoananswer-admin" {
 
 # Staging slot for Admin
 resource "azurerm_linux_web_app_slot" "gettoananswer-admin-staging" {
+  count          = var.is_admin_deployment ? 1 : 0
   name           = "staging"
   app_service_id = azurerm_linux_web_app.gettoananswer-admin.id
 
@@ -317,6 +319,7 @@ resource "azurerm_linux_web_app" "gettoananswer-frontend" {
 
 # Staging slot for Frontend
 resource "azurerm_linux_web_app_slot" "gettoananswer-frontend-staging" {
+  count          = var.is_frontend_deployment ? 1 : 0
   name           = "staging"
   app_service_id = azurerm_linux_web_app.gettoananswer-frontend.id
 

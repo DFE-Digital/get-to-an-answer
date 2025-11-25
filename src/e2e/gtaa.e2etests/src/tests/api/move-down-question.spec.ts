@@ -7,9 +7,9 @@ test.describe('PATCH /api/questionnaires/{questionnaireId}/questions/{questionId
     test('moves a middle question down by one (204) and orders reflect change', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
 
-        const { question: q1 } = await createQuestion(request, questionnaire.id, undefined, 'Q1', QuestionType.MULTIPLE);
-        const { question: q2 } = await createQuestion(request, questionnaire.id, undefined, 'Q2', QuestionType.MULTIPLE);
-        const { question: q3 } = await createQuestion(request, questionnaire.id, undefined, 'Q3', QuestionType.MULTIPLE);
+        const { question: q1 } = await createQuestion(request, questionnaire.id, undefined, 'Q1', QuestionType.MultiSelect);
+        const { question: q2 } = await createQuestion(request, questionnaire.id, undefined, 'Q2', QuestionType.MultiSelect);
+        const { question: q3 } = await createQuestion(request, questionnaire.id, undefined, 'Q3', QuestionType.MultiSelect);
 
         // Move Q2 up -> it should swap with Q1
         const res = await moveDownQuestion(request, questionnaire.id, q2.id);
@@ -27,8 +27,8 @@ test.describe('PATCH /api/questionnaires/{questionnaireId}/questions/{questionId
     test('moving the last question down returns 400', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
 
-        const { question: first } = await createQuestion(request, questionnaire.id, undefined, 'First', QuestionType.SINGLE);
-        const { question: last } = await createQuestion(request, questionnaire.id, undefined, 'Last', QuestionType.SINGLE);
+        const { question: first } = await createQuestion(request, questionnaire.id, undefined, 'First', QuestionType.SingleSelect);
+        const { question: last } = await createQuestion(request, questionnaire.id, undefined, 'Last', QuestionType.SingleSelect);
 
         const res = await moveDownQuestion(request, questionnaire.id, last.id);
         expect(res.status()).toBe(400);
@@ -49,7 +49,7 @@ test.describe('PATCH /api/questionnaires/{questionnaireId}/questions/{questionId
 
     test('invalid token returns 401', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
-        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Q', QuestionType.SINGLE);
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Q', QuestionType.SingleSelect);
 
         const res = await moveDownQuestion(request, questionnaire.id, question.id, JwtHelper.InvalidToken);
         expect(res.status()).toBe(401);
@@ -60,8 +60,8 @@ test.describe('PATCH /api/questionnaires/{questionnaireId}/questions/{questionId
         const other = JwtHelper.UnauthorizedToken;
 
         const { questionnaire } = await createQuestionnaire(request, owner);
-        const { question: q1 } = await createQuestion(request, questionnaire.id, owner, 'Q1', QuestionType.SINGLE);
-        const { question: q2 } = await createQuestion(request, questionnaire.id, owner, 'Q2', QuestionType.SINGLE);
+        const { question: q1 } = await createQuestion(request, questionnaire.id, owner, 'Q1', QuestionType.SingleSelect);
+        const { question: q2 } = await createQuestion(request, questionnaire.id, owner, 'Q2', QuestionType.SingleSelect);
 
         const res = await moveDownQuestion(request, questionnaire.id, q2.id, other);
         expect([403, 404]).toContain(res.status());
@@ -76,7 +76,7 @@ test.describe('PATCH /api/questionnaires/{questionnaireId}/questions/{questionId
 
     test('expired token returns 401', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
-        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Q', QuestionType.SINGLE);
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Q', QuestionType.SingleSelect);
 
         const res = await moveDownQuestion(request, questionnaire.id, question.id, JwtHelper.ExpiredToken);
         expect(res.status()).toBe(401);

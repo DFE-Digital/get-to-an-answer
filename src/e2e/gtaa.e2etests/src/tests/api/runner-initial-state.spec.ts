@@ -14,7 +14,7 @@ test.describe('GET /api/questionnaires/{questionnaireId}/initial-state', () => {
     test('returns initial question for published questionnaire (200)', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
         // seed at least one question to allow publish
-        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Start Q', QuestionType.SINGLE);
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Start Q', QuestionType.SingleSelect);
         
         await createSingleAnswer(request, {
             questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
@@ -34,7 +34,7 @@ test.describe('GET /api/questionnaires/{questionnaireId}/initial-state', () => {
 
     test('preview=true returns initial question for draft questionnaire (200)', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
-        await createQuestion(request, questionnaire.id, undefined, 'Draft Q', QuestionType.MULTIPLE);
+        await createQuestion(request, questionnaire.id, undefined, 'Draft Q', QuestionType.MultiSelect);
 
         // Ensure not published
         await updateQuestionnaire(request, questionnaire.id, { title: 'Remain Draft' });
@@ -62,7 +62,7 @@ test.describe('GET /api/questionnaires/{questionnaireId}/initial-state', () => {
 
     test('unpublished questionnaire without preview returns 400/404', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
-        await createQuestion(request, questionnaire.id, undefined, 'Q', QuestionType.SINGLE);
+        await createQuestion(request, questionnaire.id, undefined, 'Q', QuestionType.SingleSelect);
 
         const { response: res } = await getInitialState(request, questionnaire.id, false)
         expect([400, 404]).toContain(res.status());

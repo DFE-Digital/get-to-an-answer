@@ -47,10 +47,9 @@ public class QuestionnaireVersionService(GetToAnAnswerDbContext db, ILogger<Ques
             {
                 var previousVersion = db.QuestionnaireVersions
                     .Where(q => q.QuestionnaireId == questionnaireId)
-                    .Select(q => new QuestionnaireVersionDto
+                    .Select(q => new
                     {
-                        Version = q.Version,
-                        QuestionnaireJson = q.QuestionnaireJson,
+                        q.Version, q.QuestionnaireJson
                     })
                     .OrderByDescending(q => q.Version)
                     .First();

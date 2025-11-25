@@ -31,10 +31,10 @@ public class MsGraphClient : IMsGraphClient
         return contributor;
     }
 
-    public async Task<GraphUsers> GetGraphUsersAsync(params string?[] contributorEmailAddresses)
+    public async Task<GraphUsers> GetGraphUsersAsync(params string?[] contributorUserIds)
     {
-        var contributorQuery = contributorEmailAddresses
-            .Select(EmailCondition).Aggregate(AggregateConditions);
+        var contributorQuery = contributorUserIds
+            .Select(id => $"id eq '{id}'").Aggregate(AggregateConditions);
         
         if (string.IsNullOrWhiteSpace(contributorQuery)) 
             return new GraphUsers();
@@ -45,9 +45,6 @@ public class MsGraphClient : IMsGraphClient
 
         return await response.Content.ReadFromJsonAsync<GraphUsers>() ?? new GraphUsers();
     }
-    
-    private string EmailCondition(string? email) => email is null ? string.Empty : 
-        $"id eq '{email}'";
     
     private string AggregateConditions(string a, string b) => a + " or " + b;
 }

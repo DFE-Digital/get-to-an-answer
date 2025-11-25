@@ -24,6 +24,7 @@ export interface AnswerModel {
     questionId: string;
     questionnaireId: string;
     destinationQuestionId?: string;
+    destinationContentId?: string;
     content: string;
     description: string;
     destinationUrl: string;
