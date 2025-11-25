@@ -27,6 +27,7 @@ public interface IQuestionnaireService
     ServiceResult GetQuestionnaires(string userId);
 
     Task<ServiceResult> UpdateQuestionnaire(string userId, Guid id, UpdateQuestionnaireRequestDto request);
+    Task<ServiceResult> UpdateQuestionnaireLookAndFeel(string userId, Guid id, UpdateLookAndFeelRequestDto request);
     Task<ServiceResult> PublishQuestionnaire(string userId, Guid id);
     Task<ServiceResult> UnpublishQuestionnaire(string userId, Guid id);
     Task<ServiceResult> DeleteQuestionnaire(string userId, Guid id);
@@ -195,6 +196,11 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             logger.LogError(ex, "UpdateQuestionnaire failed QuestionnaireId={QuestionnaireId}", id);
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
+    }
+
+    public Task<ServiceResult> UpdateQuestionnaireLookAndFeel(string userId, Guid id, UpdateLookAndFeelRequestDto request)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<ServiceResult> PublishQuestionnaire(string userId, Guid id)
