@@ -118,6 +118,9 @@ No modules.
 | <a name="input_env"></a> [env](#input\_env) | Environment (dev, test, prod) | `string` | n/a | yes |
 | <a name="input_frontend_custom_domain"></a> [frontend\_custom\_domain](#input\_frontend\_custom\_domain) | The public subdomain for the frontend service | `string` | n/a | yes |
 | <a name="input_frontend_image_name"></a> [frontend\_image\_name](#input\_frontend\_image\_name) | The repository name and tag for the frontend container. | `string` | n/a | yes |
+| <a name="input_is_admin_deployment"></a> [is\_admin\_deployment](#input\_is\_admin\_deployment) | Only prepare the slot for Admin | `bool` | `false` | no |
+| <a name="input_is_api_deployment"></a> [is\_api\_deployment](#input\_is\_api\_deployment) | Only prepare the slot for Api | `bool` | `false` | no |
+| <a name="input_is_frontend_deployment"></a> [is\_frontend\_deployment](#input\_is\_frontend\_deployment) | Only prepare the slot for Frontend | `bool` | `false` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | `"uksouth"` | no |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix for resource names | `string` | `"s213"` | no |
 | <a name="input_product"></a> [product](#input\_product) | Name of the project | `string` | `"Find Education and Training"` | no |
