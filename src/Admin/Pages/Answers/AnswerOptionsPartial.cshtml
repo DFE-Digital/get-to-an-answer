@@ -171,24 +171,25 @@
       </div>
     </div>
   </fieldset>
+  
   @{
     if (Model.QuestionType == QuestionType.MultiSelect)
     {
-      <label class="govuk-label govuk-label--s" for="@Id(contentIdSuffix)">
+      <label class="govuk-label govuk-label--s govuk-!-margin-top-5" for="@Id(contentIdSuffix)">
         Rank priority (optional)
       </label>
 
       <div class="govuk-hint" id="@Id(contentHintIdSuffix)">
-        You can rank options to set a priority order.
-        If people select more than one option, they will be sent to the destination of the highest ranked option.
-        Add 1 for the highest priority answer, add 2 for the highest priority answer, and so on.
+        <p>You can rank options to set a priority order. </p>
+        <p>If people select more than one option, they will be sent to the destination of the highest ranked option.</p>
+        <p>Add 1 for the highest priority answer, add 2 for the highest priority answer, and so on.</p>
       </div>
 
       <govuk-input id="@Id("RankPriority")"
                    class="govuk-input"
                    type="number"
                    asp-for="@Model.RankPriority"
-                   govuk-error-for="@Id($"RankPriority-error")"/>
+                   govuk-error-for="@Id("RankPriority-error")"/>
     }
   }
 

@@ -9,7 +9,7 @@ public class AnswerOptionsViewModel
 {
     public int OptionNumber { get; set; }
     
-    public QuestionType QuestionType { get; set; }
+    public QuestionType? QuestionType { get; set; }
     
     [AnswerOptionRequired(fieldType : "content")]
     public string? OptionContent { get; set; } = string.Empty;

@@ -24,7 +24,8 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
     [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
     
-    public QuestionType QuestionType { get; set; }
+    [BindProperty]
+    public QuestionType? RetrievedQuestionType { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
@@ -34,7 +35,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             && rawValue is int intVal
             && Enum.IsDefined(typeof(QuestionType), intVal))
         {
-            QuestionType = (QuestionType)intVal;
+            RetrievedQuestionType = (QuestionType)intVal;
         }
         
         await HydrateFields();
@@ -96,7 +97,8 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
                     DestinationQuestionId = !string.IsNullOrEmpty(option.SelectedDestinationQuestion)
                         ? Guid.Parse(option.SelectedDestinationQuestion)
                         : null,
-                    DestinationUrl = option.ResultPageUrl
+                    DestinationUrl = option.ResultPageUrl,
+                    Priority = Convert.ToSingle(option.RankPriority)
                 });
             }
 
@@ -121,7 +123,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
         foreach (var option in Options)
         {
-            option.QuestionType = QuestionType;
+            option.QuestionType = RetrievedQuestionType;
             option.QuestionSelectList = questionSelect;
             // option.ResultsPageSelectList = resultsSelect;
         }

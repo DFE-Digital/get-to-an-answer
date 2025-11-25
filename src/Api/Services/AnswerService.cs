@@ -5,6 +5,7 @@ using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services;
 
@@ -30,21 +31,29 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                 return NotFound(ProblemTrace("We could not find that question", 404));
             if (access == EntityAccess.Deny)
                 return Forbid(ProblemTrace("You do not have permission to do this", 403));
-
-            var isQuestionFromQuestionnaire = db.Questions.Any(q =>
-                q.Id == request.QuestionId &&
-                q.QuestionnaireId == request.QuestionnaireId &&
-                !q.IsDeleted);
-
+            
+            var question = await db.Questions
+                .FirstOrDefaultAsync(q => q.Id == request.QuestionId 
+                                          && q.QuestionnaireId == request.QuestionnaireId 
+                                          && !q.IsDeleted);
+            
+            var isQuestionFromQuestionnaire = question != null;
+            
             if (!isQuestionFromQuestionnaire)
                 return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
                 {
                     ["questionId"] = ["The question must belong to the specified questionnaire."]
                 }));
-
+            
+            var questionHasNextOne = await db.Questions
+                .AnyAsync(q => q.QuestionnaireId == request.QuestionnaireId &&
+                               !q.IsDeleted 
+                               && question != null 
+                               && q.Order == question.Order + 1);
+            
             switch (request.DestinationType)
             {
-                case DestinationType.Question when request.DestinationQuestionId == null:
+                case DestinationType.Question when request.DestinationQuestionId == null && questionHasNextOne:
                     return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
                     {
                         ["destinationQuestionId"] = ["The DestinationQuestionId field is required when DestinationType is Question."]
