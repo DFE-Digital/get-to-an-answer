@@ -30,8 +30,12 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     {
         BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId);
 
-        if (TempData.TryGetValue("QuestionType", out var rawValue) && rawValue is QuestionType questionType)
-            QuestionType = questionType;
+        if (TempData.TryGetValue("QuestionType", out var rawValue)
+            && rawValue is int intVal
+            && Enum.IsDefined(typeof(QuestionType), intVal))
+        {
+            QuestionType = (QuestionType)intVal;
+        }
         
         await HydrateFields();
         ReassignOptionNumbers();
