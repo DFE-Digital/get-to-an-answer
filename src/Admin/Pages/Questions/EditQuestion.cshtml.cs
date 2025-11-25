@@ -23,7 +23,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     [BindProperty]
     public QuestionType QuestionType { get; set; }
 
-    public List<AnswerSummaryViewModel> Answers { get; } = new();
+    public List<AnswerSummaryViewModel> Answers { get; } = [];
 
     public string QuestionNumber => "1";
     

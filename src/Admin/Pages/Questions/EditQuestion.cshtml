@@ -66,12 +66,12 @@
             }
         </div>
 
-        <div class="govuk-summary-card app-summary-card">
+        <div class="govuk-summary-card app-summary-card govuk-!-margin-top-6">
             <div class="govuk-summary-card__title-wrapper">
                 <h2 class="govuk-summary-card__title">Answers</h2>
                 <ul class="govuk-summary-card__actions">
                     <li class="govuk-summary-card__action">
-                        <a class="govuk-link" href="/admin/questionnaires/@Model?.QuestionnaireId/questions/@Model?.UpdateQuestion?.Id/answers/edit">Edit</a>
+                        <a class="govuk-link" href="/admin/questionnaires/@Model?.QuestionnaireId/questions/@Model?.QuestionId/answers/edit">Edit</a>
                     </li>
                 </ul>
             </div>
@@ -90,7 +90,7 @@
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell">@answer.Content</td>
                         <td class="govuk-table__cell">@answer.Priority</td>
-                        <td class="govuk-table__cell">@answer.DestinationType</td>
+                        <td class="govuk-table__cell">@answer.Destination</td>
                     </tr>
                     }
                     </tbody>
