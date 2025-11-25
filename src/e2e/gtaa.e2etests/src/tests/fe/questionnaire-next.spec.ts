@@ -1,10 +1,16 @@
 import {expect, test} from "@playwright/test";
 import {QuestionnaireNextPage} from "../../pages/fe/QuestionnaireNextPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
-import {createQuestionnaire, publishQuestionnaire} from "../../test-data-seeder/questionnaire-data";
+import {
+    createQuestionnaire,
+    publishQuestionnaire,
+    updateQuestionnaire
+} from "../../test-data-seeder/questionnaire-data";
 import {createQuestion} from "../../test-data-seeder/question-data";
-import {createAnswer} from "../../test-data-seeder/answer-data";
-import {QuestionType} from "../../constants/test-data-constants";
+import {createAnswer, createSingleAnswer} from "../../test-data-seeder/answer-data";
+import {AnswerDestinationType, QuestionType} from "../../constants/test-data-constants";
+import {createContent} from "../../test-data-seeder/content-data";
+import {QuestionnaireStartPage} from "../../pages/fe/QuestionnaireStartPage";
 
 test.describe('Questionnaire Next Page - Single Select Questions', () => {
     let questionnaireNextPage: QuestionnaireNextPage;
@@ -16,37 +22,68 @@ test.describe('Questionnaire Next Page - Single Select Questions', () => {
     test.beforeEach(async ({request, page}) => {
         token = JwtHelper.NoRecordsToken();
 
-        // Create questionnaire
+        // Create and publish a questionnaire via API
         const {questionnaire} = await createQuestionnaire(request, token);
         questionnaireId = questionnaire.id;
-        questionnaireSlug = questionnaire.slug;
+        questionnaireSlug = 'test-questionnaire-start-page-' + Math.floor(Math.random() * 1000000) + '';
 
-        // Create a single-select question
+        await updateQuestionnaire(request, questionnaireId, {
+            slug: questionnaireSlug,
+            displayTitle: 'Test Questionnaire Start Page',
+            description: 'This is a test questionnaire for the start page.'
+        }, token);
+
+        // Create a multi-select question
         const {question} = await createQuestion(request, questionnaireId, token,
-            'What is your preferred option?',
-            QuestionType.SINGLE, 
-            'Please select one option'
+            'Question 1?',
+            QuestionType.MultiSelect,
+            'You can choose multiple options'
         );
-        questionId = question.id;
+        const questionId = question.id;
+
+        const {question: question2} = await createQuestion(request, questionnaireId, token,
+            'Question 2?',
+            QuestionType.MultiSelect,
+            'You can choose multiple options'
+        );
+        const question2Id = question2.id;
 
         // Create answer options
-        await createAnswer(request, questionId, token,
-            'Option A',
-            'This is option A',
-            1
-        );
-        await createAnswer(request, questionId, token, 
-           'Option B',
-            'This is option B',
-            2
-        );
-        await createAnswer(request, questionId, token, 
-           'Option C',
-            undefined,
-            3
-        );
+        await createSingleAnswer(request, {
+            questionnaireId,
+            questionId,
+            content: 'First choice',
+            priority: 1,
+            destinationType: AnswerDestinationType.Question,
+            destinationQuestionId: question2.id
+        }, token);
 
-        // Publish questionnaire
+        await createSingleAnswer(request, {
+            questionnaireId,
+            questionId,
+            content: 'Second choice',
+            priority: 2,
+            destinationType: AnswerDestinationType.ExternalLink,
+            destinationUrl: 'https://dev-admin.get-to-an-answer.education.gov.uk'
+        }, token);
+
+        const {content} = await createContent(request, {
+            questionnaireId: questionnaireId,
+            title: 'Test Content',
+            content: 'This is a test content for the start page.',
+            referenceName: 'test-content'
+        }, token)
+
+        await createSingleAnswer(request, {
+            questionnaireId,
+            questionId: question2Id,
+            content: 'Third choice',
+            priority: 3,
+            destinationType: AnswerDestinationType.CustomContent,
+            destinationContentId: content.id
+        }, token);
+
+        // Publish the questionnaire so it's available on frontend
         await publishQuestionnaire(request, questionnaireId, token);
 
         questionnaireNextPage = new QuestionnaireNextPage(page);
@@ -185,7 +222,7 @@ test.describe('Questionnaire Next Page - Multi Select Questions', () => {
         // Create a multi-select question
         const {question} = await createQuestion(request, questionnaireId, token, 
            'Select all that apply',
-            QuestionType.MULTIPLE,
+            QuestionType.MultiSelect,
             'You can choose multiple options'
         );
         questionId = question.id;
@@ -283,7 +320,7 @@ test.describe('Questionnaire Next Page - Multi Select Questions', () => {
 
         test('Multi-select question type is correctly detected', async ({page}) => {
             await page.goto(`/questionnaires/${questionnaireSlug}/next`);
-            await questionnaireNextPage.expectQuestionType(QuestionType.MULTIPLE);
+            await questionnaireNextPage.expectQuestionType(QuestionType.MultiSelect);
         });
     });
 });
@@ -306,7 +343,7 @@ test.describe('Questionnaire Next Page - Dropdown Select Questions', () => {
         // Create a dropdown-select question
         const {question} = await createQuestion(request, questionnaireId, token, 
            'Select from dropdown',
-            QuestionType.DROPDOWN,
+            QuestionType.DropdownSelect,
             'Choose one option from the list'
         );
         questionId = question.id;
@@ -390,7 +427,7 @@ test.describe('Questionnaire Next Page - Dropdown Select Questions', () => {
 
         test('Dropdown question type is correctly detected', async ({page}) => {
             await page.goto(`/questionnaires/${questionnaireSlug}/next`);
-            await questionnaireNextPage.expectQuestionType(QuestionType.DROPDOWN);
+            await questionnaireNextPage.expectQuestionType(QuestionType.DropdownSelect);
         });
     });
 });
@@ -408,7 +445,7 @@ test.describe('Questionnaire Next Page - Accessibility', () => {
 
         const {question} = await createQuestion(request, questionnaire.id, token,
             'Accessibility test question',
-            QuestionType.SINGLE
+            QuestionType.SingleSelect
         );
 
         await createAnswer(request, question.id, token, 

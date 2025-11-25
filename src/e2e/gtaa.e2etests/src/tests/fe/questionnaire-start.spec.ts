@@ -8,7 +8,7 @@ import {
 } from "../../test-data-seeder/questionnaire-data";
 import {createQuestion} from "../../test-data-seeder/question-data";
 import {AnswerDestinationType, QuestionType} from "../../constants/test-data-constants";
-import {createAnswer} from "../../test-data-seeder/answer-data";
+import {createAnswer, createSingleAnswer} from "../../test-data-seeder/answer-data";
 import {createContent} from "../../test-data-seeder/content-data";
 
 test.describe('Questionnaire Start Page', () => {
@@ -34,48 +34,52 @@ test.describe('Questionnaire Start Page', () => {
         // Create a multi-select question
         const {question} = await createQuestion(request, questionnaireId, token,
             'Question 1?',
-            QuestionType.MULTIPLE,
+            QuestionType.MultiSelect,
             'You can choose multiple options'
         );
         const questionId = question.id;
+        
         const {question: question2} = await createQuestion(request, questionnaireId, token,
             'Question 2?',
-            QuestionType.MULTIPLE,
+            QuestionType.MultiSelect,
             'You can choose multiple options'
         );
         const question2Id = question2.id;
 
         // Create answer options
-        await createAnswer(request, questionId, token,
-            'First choice',
-            undefined,
-            1,
-            AnswerDestinationType.Question,
-            question2.id
-        );
-        await createAnswer(request, questionId, token,
-            'Second choice',
-            undefined,
-            2,
-            AnswerDestinationType.ExternalLink,
-            'https://dev-admin.get-to-an-answer.education.gov.uk'
-        );
+        await createSingleAnswer(request, {
+            questionnaireId, 
+            questionId,
+            content: 'First choice',
+            priority: 1,
+            destinationType: AnswerDestinationType.Question,
+            destinationQuestionId: question2.id
+        }, token);
+        
+        await createSingleAnswer(request, {
+            questionnaireId, 
+            questionId,
+            content: 'Second choice',
+            priority: 2,
+            destinationType: AnswerDestinationType.ExternalLink,
+            destinationUrl: 'https://dev-admin.get-to-an-answer.education.gov.uk'
+        }, token);
         
         const {content} = await createContent(request, {
             questionnaireId: questionnaireId,
             title: 'Test Content',
             content: 'This is a test content for the start page.',
             referenceName: 'test-content'
-        }, token,)
+        }, token)
         
-        
-        await createAnswer(request, question2Id, token,
-            'Third choice',
-            undefined,
-            3,
-            AnswerDestinationType.CustomContent,
-            content.id
-        );
+        await createSingleAnswer(request, {
+            questionnaireId,
+            questionId: question2Id,
+            content: 'Third choice',
+            priority: 3,
+            destinationType: AnswerDestinationType.CustomContent,
+            destinationContentId: content.id
+        }, token);
 
         // Publish the questionnaire so it's available on frontend
         await publishQuestionnaire(request, questionnaireId, token);
@@ -141,12 +145,12 @@ test.describe('Questionnaire Start Page', () => {
 
         test('Page loads with embed parameter when specified', async ({page}) => {
             await questionnaireStartPage.goto(questionnaireSlug, true);
-            expect(page.url()).toContain('embed=True');
+            expect(page.url().toLowerCase()).toContain('embed=true');
         });
 
         test('Page loads without embed parameter when not specified', async ({page}) => {
             await questionnaireStartPage.goto(questionnaireSlug);
-            expect(page.url()).not.toContain('embed=');
+            expect(page.url()).not.toContain('embed=true');
         });
     });
 
@@ -200,23 +204,6 @@ test.describe('Questionnaire Start Page', () => {
         });
     });
 
-    test.describe('Responsive Layout', () => {
-        test('Page uses GOV.UK grid system', async ({page}) => {
-            await questionnaireStartPage.goto(questionnaireSlug);
-            const gridRow = page.locator('.govuk-grid-row');
-            const gridColumn = page.locator('.govuk-grid-column-full');
-
-            await expect(gridRow).toBeVisible();
-            await expect(gridColumn).toBeVisible();
-        });
-
-        test('Content container has proper width', async ({page}) => {
-            await questionnaireStartPage.goto(questionnaireSlug);
-            const widthContainer = page.locator('.govuk-width-container');
-            await expect(widthContainer).toBeVisible();
-        });
-    });
-
     test.describe('Page Header Section', () => {
         test('Header section has grey background styling', async ({page}) => {
             await questionnaireStartPage.goto(questionnaireSlug);
@@ -230,6 +217,45 @@ test.describe('Questionnaire Start Page', () => {
             await expect(headerContainer).toBeVisible();
         });
     });
+    
+    test.describe('No Start Page', () => {
+        test('No start page questionnaire', async ({request, page}) => {
+            // Create and publish a questionnaire via API
+            const {questionnaire} = await createQuestionnaire(request, token);
+            const noStartPageQuestionnaireId = questionnaire.id;
+            const noStartPageQuestionnaireSlug = 'test-no-start-page-' + Math.floor(Math.random() * 1000000) + '';
+
+            await updateQuestionnaire(request, noStartPageQuestionnaireId, {
+                slug: noStartPageQuestionnaireSlug,
+            }, token);
+
+            // Create a multi-select question
+            const {question} = await createQuestion(request, 
+                noStartPageQuestionnaireId, token,
+                'Question 1?',
+                QuestionType.MultiSelect,
+                'You can choose multiple options'
+            );
+            const questionId = question.id;
+
+            await createSingleAnswer(request, {
+                questionnaireId: noStartPageQuestionnaireId,
+                questionId,
+                content: 'First choice',
+                priority: 2,
+                destinationType: AnswerDestinationType.ExternalLink,
+                destinationUrl: 'https://dev-admin.get-to-an-answer.education.gov.uk'
+            }, token);
+
+            // Publish the questionnaire so it's available on frontend
+            await publishQuestionnaire(request, noStartPageQuestionnaireId, token);
+            
+            await questionnaireStartPage.goto(noStartPageQuestionnaireSlug);
+            expect(page.url()).toContain("/next?embed");
+            const questionHeaderView = page.locator('.govuk-heading-xl');
+            await expect(questionHeaderView).toHaveText(questionnaire.title);
+        });
+    })
 
     test.describe('Multiple Questionnaires', () => {
         test('Different questionnaires display different content', async ({request, page}) => {

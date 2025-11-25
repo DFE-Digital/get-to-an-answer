@@ -34,21 +34,22 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             var questionnaireVersionJson =  await GetDraftOrLatestPublishedVersion(questionnaireSlug: questionnaireSlug);
 
             if (questionnaireVersionJson == null)
-                return BadRequest(ProblemTrace("No published version found for this questionnaire.", 400));
+                return NotFound(ProblemTrace("No published version found for this questionnaire.", 404));
 
             var questionnaire = ToQuestionnaire(questionnaireVersionJson);
             
             if (questionnaire == null)
-                return BadRequest(ProblemTrace("Failed to read questionnaire meta.", 400));
+                return NotFound(ProblemTrace("Failed to read questionnaire meta.", 404));
 
             logger.LogInformation("GetLastPublishedQuestionnaireInfo succeeded Slug={Slug} QuestionnaireId={QuestionnaireId}", questionnaireSlug, questionnaire.Id);
             
             return Ok(new QuestionnaireInfoDto
             {
                 Id = questionnaire.Id,
-                DisplayTitle = questionnaire.DisplayTitle,
+                DisplayTitle = questionnaire.DisplayTitle ?? questionnaire.Title,
                 Description = questionnaire.Description,
                 Slug = questionnaireSlug,
+                HasStartPage = !string.IsNullOrWhiteSpace(questionnaire.DisplayTitle)
             });
         }
         catch (Exception ex)

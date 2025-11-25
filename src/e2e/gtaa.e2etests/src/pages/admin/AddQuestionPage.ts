@@ -1,14 +1,8 @@
 import {expect, Locator, Page} from '@playwright/test';
 import {BasePage} from '../BasePage';
-import {ErrorMessages} from "../../constants/test-data-constants";
+import {ErrorMessages, QuestionType} from "../../constants/test-data-constants";
 
 type Mode = 'create' | 'edit';
-
-export enum QuestionType {
-    SingleSelect = 'SingleSelect',
-    DropdownSelect = 'DropdownSelect',
-    MultiSelect = 'MultiSelect'
-}
 
 export class AddQuestionPage extends BasePage {
     private readonly radioName = 'Type';

@@ -12,7 +12,7 @@ test.describe('PATCH Unpublish questionnaire api request', () => {
     test('unpublishes a published questionnaire (204) and status becomes Private', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
 
-        await createQuestion(request, questionnaire.id, undefined, 'Q', QuestionType.MULTIPLE, undefined);
+        await createQuestion(request, questionnaire.id, undefined, 'Q', QuestionType.MultiSelect, undefined);
         await publishQuestionnaire(request, questionnaire.id);
 
         const { response } = await unpublishQuestionnaire(request, questionnaire.id);

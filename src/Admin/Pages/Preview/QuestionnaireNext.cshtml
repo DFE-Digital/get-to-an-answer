@@ -1,7 +1,7 @@
-@page "/questionnaires/{questionnaireSlug}/next"
+@page "/admin/questionnaires/{questionnaireId:guid}/next-preview"
 @using Common.Custom
 @using Common.Enum
-@model Frontend.Pages.Questionnaire.QuestionnaireNext
+@model Admin.Pages.Preview.QuestionnaireNext
 
 @{
     Layout = "Shared/_Layout";
@@ -73,7 +73,7 @@
         <input type="hidden" name="Destination.Question.Description" value="@Model?.Destination?.Question.Description" autocomplete="off">
         @{
           var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
-          
+
           var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
           var inputGroupId = $"q-{Model.Destination.Question.Id}";
         }
@@ -99,20 +99,20 @@
             @if (Model.Destination.Question.Type == QuestionType.SingleSelect)
             {
               var answers = Model.Destination.Question.Answers;
-              
+
               <div class="govuk-radios" data-module="govuk-radios">
                 @for (var a = 0; a < answers.Count; a++)
                 {
                   var answer = Model?.Destination?.Question.Answers[a];
-                  
+
                   var inputId = $"{inputGroupId}-a-{answer?.Id}";
                   var itemHintId = $"{inputId}-hint";
-                  
+
                   <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer.Id" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer.Priority" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer.Content" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description" autocomplete="off">
-                  
+
                   <div class="govuk-radios__item">
                     <input type="hidden" name="Scores.@answer.Id" value="@answer.Priority" autocomplete="off">
                     <input
@@ -138,17 +138,17 @@
             else if (Model.Destination.Question.Type == QuestionType.MultiSelect)
             {
               var answers = Model.Destination.Question.Answers;
-              
+
               <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                 @for (var a = 0; a < answers.Count; a++)
                 {
                   var answer = Model?.Destination?.Question.Answers[a];
-                  
+
                   <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer.Id" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer.Priority" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer.Content" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description" autocomplete="off">
-                  
+
                   var inputId = $"{inputGroupId}-a-{answer.Id}";
                   var itemHintId = $"{inputId}-hint";
                   <div class="govuk-checkboxes__item">
@@ -176,7 +176,7 @@
             else if (Model.Destination.Question.Type == QuestionType.DropdownSelect)
             {
               var answers = Model.Destination.Question.Answers;
-              
+
               <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
                 @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
                 {
@@ -190,7 +190,7 @@
                 @for (var a = 0; a < answers.Count; a++)
                 {
                   var answer = Model?.Destination?.Question.Answers[a];
-                  
+
                   <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer?.Id" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer?.Priority" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer?.Content" autocomplete="off">

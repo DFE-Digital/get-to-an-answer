@@ -1,8 +1,8 @@
 // ===== API related test data =====
 export enum QuestionType {
-    SINGLE = 1,
-    MULTIPLE = 2,
-    DROPDOWN = 3
+    SingleSelect = 1,
+    MultiSelect = 2,
+    DropdownSelect = 3
 }
 
 export enum AnswerDestinationType {
