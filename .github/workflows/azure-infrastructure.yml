@@ -8,6 +8,21 @@ on:
         required: true
         default: 'Development'
         type: string
+      is_api_deployment:
+        description: "Whether the deployment is for the API"
+        required: false
+        default: false
+        type: boolean
+      is_admin_deployment:
+        description: "Whether the deployment is for the Admin"
+        required: false
+        default: false
+        type: boolean
+      is_frontend_deployment:
+        description: "Whether the deployment is for the Frontend"
+        required: false
+        default: false
+        type: boolean
   workflow_dispatch:
     inputs:
       environment:
@@ -36,8 +51,11 @@ jobs:
       TF_VAR_admin_custom_domain: ${{ vars.ADMIN_CUSTOM_DOMAIN }}
       TF_VAR_frontend_custom_domain: ${{ vars.FRONTEND_CUSTOM_DOMAIN }}
       TF_VAR_support_alert_email: ${{ secrets.SUPPORT_ALERT_EMAIL }}
-      ENVIRONMENT: ${{ github.event.inputs.environment || 'Development' }}
-    environment: ${{ github.event.inputs.environment || 'Development' }}
+      TF_VAR_is_api_deployment: ${{ inputs.is_api_deployment || false }}
+      TF_VAR_is_admin_deployment: ${{ inputs.is_admin_deployment || false }}
+      TF_VAR_is_frontend_deployment: ${{ inputs.is_frontend_deployment || false }}
+      ENVIRONMENT: ${{ github.event.inputs.environment || inputs.environment || 'Development' }}
+    environment: ${{ github.event.inputs.environment || inputs.environment || 'Development' }}
     defaults:
       run:
         working-directory: ./src/Infrastructure/terraform
