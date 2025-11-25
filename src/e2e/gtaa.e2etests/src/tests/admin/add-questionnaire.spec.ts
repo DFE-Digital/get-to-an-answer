@@ -66,6 +66,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await addQuestionnairePage.validateTitleFormGroup();
     });
     
+    // TBC, aria-described by id's need correction (CARE-1546)
     test('Submit a new questionnaire with invalid title to validate aria-describedby', async ({page}) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
 
