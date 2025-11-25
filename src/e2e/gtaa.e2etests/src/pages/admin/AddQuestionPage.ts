@@ -7,8 +7,8 @@ type Mode = 'create' | 'update';
 
 export enum QuestionType {
     SingleSelectShort = 'SingleSelect',
-    SingleSelectLong  = 'DropdownSelect',
-    MultiSelect       = 'Multiselect'
+    SingleSelectLong = 'DropdownSelect',
+    MultiSelect = 'Multiselect'
 }
 
 export class AddQuestionPage extends BasePage {
@@ -41,7 +41,7 @@ export class AddQuestionPage extends BasePage {
     private readonly inlineQuestionTypeError: Locator;
     private readonly inlineUpdateQuestionTypeError: Locator;
     private readonly fieldset: Locator;
-    
+
     // ===== Constructor =====
     constructor(page: Page, mode: Mode = 'create') {
         super(page);
@@ -90,22 +90,22 @@ export class AddQuestionPage extends BasePage {
         this.errorLinkQuestionContent = this.page.locator('a[href="#QuestionContent"]');
         this.errorLinkQuestionType = this.page.locator('a[href="#QuestionType"]');
         this.errorSummaryLinks = this.errorSummary.locator('.govuk-error-summary__list a');
-        
+
         this.questionInputFormGroup = this.form.locator(
             '.govuk-form-group:has(input[name="QuestionContent"])'
         );
         this.questionInputError = this.questionInputFormGroup.locator('.govuk-error-message');
-        
+
         this.inlineQuestionContentError = this.questionContentFormGroup.locator(
             '#QuestionContent-error'
         );
         this.inlineUpdateQuestionContentError = this.questionContentFormGroup.locator(
             '#QuestionContent-error-xxx'
         );
-        
+
         this.inlineQuestionTypeError = this.radiosFormGroup.locator('#QuestionType-error');
         this.inlineUpdateQuestionTypeError = this.radiosFormGroup.locator('#QuestionType-error-xxx');
-        this.fieldset =  this.form.locator('fieldset[aria-describedby*="QuestionType-hint"]');
+        this.fieldset = this.form.locator('fieldset[aria-describedby*="QuestionType-hint"]');
     }
 
     // ===== Validations =====
@@ -116,6 +116,7 @@ export class AddQuestionPage extends BasePage {
             await expect(this.addQuestionHeading, `❌ Add question heading text does not match: expected "${expectedText}"`).toHaveText(expectedText);
         }
     }
+
     async VerifyQuestionInputAndHintTextarea(): Promise<void> {
         await expect(this.questionInput, '❌ Question input not visible').toBeVisible();
         await expect(this.hintTextarea, '❌ Hint textarea not visible').toBeVisible();
@@ -124,13 +125,13 @@ export class AddQuestionPage extends BasePage {
     async verifyBackLinkPresent(): Promise<void> {
         await expect(this.backLink, '❌ Back link not visible').toBeVisible();
     }
-    
+
     async validateMissingAllFieldsErrorMessageSummary(browserName: string) {
         await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
         await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
         await expect(this.errorSummary, '❌ Attribute tabIndex is missing').toHaveAttribute('tabindex', '-1');
         await expect(this.errorSummary, '❌ Error summary not focused').toBeFocused();
-        
+
         await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_CONTENT);
         await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_TYPE);
 
@@ -141,17 +142,16 @@ export class AddQuestionPage extends BasePage {
         await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_CONTENT);
         await this.clickErrorLinkAndValidateFocus(this.errorLinkQuestionContent, browserName);
     }
-    
+
     async validateMissingQuestionTypeErrorMessageSummary(browserName: string) {
         await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_TYPE);
         await this.clickErrorLinkAndValidateFocus(this.errorLinkQuestionType, browserName);
     }
-    
+
     async validateInlineQuestionContentError(): Promise<void> {
         if (this.mode === 'update') {
             await expect(this.inlineUpdateQuestionContentError, '❌ Inline question content error not visible').toBeVisible();
         } else {
-            
             await expect(this.inlineQuestionContentError, '❌ Inline question content error not visible').toBeVisible();
         }
     }
@@ -164,7 +164,7 @@ export class AddQuestionPage extends BasePage {
             await expect(this.inlineQuestionTypeError, '❌ Inline question type error not visible').toBeVisible();
         }
     }
-    
+
     async validateQuestionTextFormGroup() {
         // TODO: implement when requirements are known
     }
@@ -172,7 +172,7 @@ export class AddQuestionPage extends BasePage {
     async validateQuestionTypeFormGroup() {
         // TODO: implement when requirements are known
     }
-    
+
     async assertPageElements() {
         await this.verifyHeaderLinks();
         await this.verifyFooterLinks();
@@ -247,7 +247,7 @@ export class AddQuestionPage extends BasePage {
         await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
         await expect(this.errorSummary, '❌ Attribute tabIndex is missing').toHaveAttribute('tabindex', '-1');
         await expect(this.errorSummary, '❌ Error summary not focused').toBeFocused();
-        
+
         const href = await link.getAttribute('href');
         const targetId = href?.replace('#', '');
 
@@ -283,7 +283,12 @@ export class AddQuestionPage extends BasePage {
     async clearQuestionHintText(): Promise<void> {
         await this.hintTextarea.clear();
     }
-
+    
+    async enterInvalidContent(): Promise<void> {
+        await this.questionInput.clear();
+        await this.questionInput.fill(`${' '.repeat(10)}`);
+    }
+    
     async chooseQuestionType(type: QuestionType): Promise<void> {
         switch (type) {
             case QuestionType.SingleSelectShort:
@@ -301,7 +306,7 @@ export class AddQuestionPage extends BasePage {
     async clickSaveAndContinue(): Promise<void> {
         await this.saveAndContinueButton.click();
     }
-    
+
     // Convenience helper for typical flow
     async createQuestion(
         question: string,
