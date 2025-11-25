@@ -46,8 +46,8 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                 }));
             
             var questionHasNextOne = await db.Questions
-                .AnyAsync(q => q.QuestionnaireId == request.QuestionnaireId &&
-                               !q.IsDeleted 
+                .AnyAsync(q => q.QuestionnaireId == request.QuestionnaireId 
+                               && !q.IsDeleted 
                                && question != null 
                                && q.Order == question.Order + 1);
             
