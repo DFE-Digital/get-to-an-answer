@@ -51,6 +51,16 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.UpdateQuestionnaire(userId, id, request)).ToActionResult();
     }
 
+    [HttpPut("{id:guid}/look-and-feel")]
+    public async Task<IActionResult> UpdateQuestionnaireLookAndFeel(Guid id, UpdateQuestionnaireRequestDto request)
+    {
+        var userId = User.GetIdClaim()!;
+        
+        return (await questionnaireService.UpdateQuestionnaire(userId, id, request)).ToActionResult();
+    }
+    
+    
+
     [HttpPatch("{id:guid}")]
     public async Task<IActionResult> PublishQuestionnaire(Guid id, [FromQuery] [EnumDefined] QuestionnaireAction action)
     {

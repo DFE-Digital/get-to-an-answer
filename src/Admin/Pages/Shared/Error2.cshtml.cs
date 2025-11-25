@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Admin.Pages.Shared;
 
-public class Error : PageModel
+public class Error2 : PageModel
 {
     public ErrorViewModel ViewModel { get; } = new();
     
