@@ -1,5 +1,6 @@
 using Admin.Attributes;
 using Common.Domain;
+using Common.Enum;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Admin.Models;
@@ -7,6 +8,8 @@ namespace Admin.Models;
 public class AnswerOptionsViewModel
 {
     public int OptionNumber { get; set; }
+    
+    public QuestionType QuestionType { get; set; }
     
     [AnswerOptionRequired(fieldType : "content")]
     public string? OptionContent { get; set; } = string.Empty;
@@ -26,4 +29,6 @@ public class AnswerOptionsViewModel
     public string? SelectedDestinationQuestion { get; set; }
 
     public string? ExternalLink { get; set; }
+    
+    public string? RankPriority { get; set; } 
 }

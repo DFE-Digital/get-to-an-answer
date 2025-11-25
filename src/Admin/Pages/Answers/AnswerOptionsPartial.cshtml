@@ -1,4 +1,5 @@
 @using Admin.Models
+@using Common.Enum
 @addTagHelper *, Common
 @model Admin.Models.AnswerOptionsViewModel
 
@@ -7,7 +8,7 @@
     .Replace("[", "-")
     .Replace("]", "")
     .Replace(".", "-");
-  
+
   string Id(string suffix) => $"{prefix}-{suffix}";
 
 
@@ -19,7 +20,7 @@
   var destinationFormGroupErrorId = Id(destinationIdSuffix);
 }
 
-<input type="hidden" asp-for="OptionNumber" />
+<input type="hidden" asp-for="OptionNumber"/>
 
 <govuk-form-group asp-for="OptionContent">
   <label class="govuk-label govuk-label--s" for="@Id(contentIdSuffix)">
@@ -43,7 +44,7 @@
   <div class="govuk-hint" id="@Id(contentHintIdSuffix)">
     You can add a short description to help people understand what this option is.
   </div>
-  
+
   <textarea class="govuk-textarea"
             id="@Id(contentHintIdSuffix)"
             rows="4"
@@ -52,7 +53,8 @@
 </govuk-form-group>
 
 <govuk-form-group asp-for="AnswerDestination" specific-id-for-form-group-error="@destinationFormGroupErrorId">
-  <fieldset class="govuk-fieldset" aria-describedby="@($"{Id($"{destinationIdSuffix}-hint")} {Id($"{destinationIdSuffix}-error")}")">
+  <fieldset class="govuk-fieldset"
+            aria-describedby="@($"{Id($"{destinationIdSuffix}-hint")} {Id($"{destinationIdSuffix}-error")}")">
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
       Destination
     </legend>
@@ -99,7 +101,7 @@
 
           @* <govuk-field-error asp-for="SelectedQuestion" error-id="@Id(destinationSpecificSelectErrorId)"> *@
           @* </govuk-field-error> *@
-          
+
           @if (ViewData.ModelState.TryGetValue($"{prefix}-destination-specific", out var specificEntry) && specificEntry?.Errors.Count > 0)
           {
             <p id="@Id($"{destinationIdSuffix}-specific-error")" class="govuk-error-message">
@@ -164,9 +166,31 @@
           </label>
           <input class="govuk-input equal-input-width"
                  id="@Id("destination-external-link")"
-                 asp-for="ExternalLink" />
+                 asp-for="ExternalLink"/>
         </div>
       </div>
     </div>
   </fieldset>
+  @{
+    if (Model.QuestionType == QuestionType.MultiSelect)
+    {
+      <label class="govuk-label govuk-label--s" for="@Id(contentIdSuffix)">
+        Rank priority (optional)
+      </label>
+
+      <div class="govuk-hint" id="@Id(contentHintIdSuffix)">
+        You can rank options to set a priority order.
+        If people select more than one option, they will be sent to the destination of the highest ranked option.
+        Add 1 for the highest priority answer, add 2 for the highest priority answer, and so on.
+      </div>
+
+      <govuk-input id="@Id("RankPriority")"
+                   class="govuk-input"
+                   type="number"
+                   asp-for="@Model.RankPriority"
+                   govuk-error-for="@Id($"RankPriority-error")"/>
+    }
+  }
+
+
 </govuk-form-group>

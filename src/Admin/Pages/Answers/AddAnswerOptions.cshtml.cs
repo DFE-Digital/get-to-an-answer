@@ -23,12 +23,17 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
 
     [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
+    
+    public QuestionType QuestionType { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId);
 
-        await HydrateOptionListsAsync();
+        if (TempData.TryGetValue("QuestionType", out var rawValue) && rawValue is QuestionType questionType)
+            QuestionType = questionType;
+        
+        await HydrateFields();
         ReassignOptionNumbers();
 
         return Page();
@@ -42,7 +47,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         if (!ModelState.IsValid)
         {
             // RemoveGenericOptionErrors();
-            await HydrateOptionListsAsync();
+            await HydrateFields();
             return Page();
         }
 
@@ -53,7 +58,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             OptionNumber = OptionNumber
         });
 
-        await HydrateOptionListsAsync();
+        await HydrateFields();
         ReassignOptionNumbers();
 
         // Re-render page with the extra option
@@ -68,7 +73,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         if (!ModelState.IsValid)
         {
             // RemoveGenericOptionErrors();
-            await HydrateOptionListsAsync();
+            await HydrateFields();
             ReassignOptionNumbers();
             return Page();
         }
@@ -102,7 +107,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         }
     }
 
-    private async Task HydrateOptionListsAsync()
+    private async Task HydrateFields()
     {
         var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
         // var resultsPages = await apiClient.GetResultsPagesAsync(QuestionnaireId);
@@ -112,6 +117,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
         foreach (var option in Options)
         {
+            option.QuestionType = QuestionType;
             option.QuestionSelectList = questionSelect;
             // option.ResultsPageSelectList = resultsSelect;
         }
@@ -183,7 +189,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         Options.RemoveAt(index);
         RemoveModelStateEntriesForOption(index);
 
-        await HydrateOptionListsAsync();
+        await HydrateFields();
         ReassignOptionNumbers();
         return Page();
     }
