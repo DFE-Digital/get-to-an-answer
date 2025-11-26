@@ -5,7 +5,7 @@ import {defineConfig, devices} from '@playwright/test';
 import {loadEnvConfig, EnvType} from './src/config/environment-config';
 
 // Choose an environment: 'local' or 'test'
-const ENV_NAME: 'local' | 'test' = 'test'; //default local
+const ENV_NAME: 'local' | 'test' = 'local'; // Set the environment here
 process.env.ENV_NAME = ENV_NAME as EnvType;
 
 const EnvConfig = loadEnvConfig(process.env.ENV_NAME as EnvType);

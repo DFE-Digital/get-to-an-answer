@@ -25,7 +25,6 @@ test.describe('Get to an answer - fe test data generation', () => {
     test.beforeEach(async ({request}) => {
         token = JwtHelper.NoRecordsToken();
         
-        // Read JSON using absolute path
         const jsonFilePath = path.join(__dirname, '../../helpers/fedataseeder/questionnaire.json');
         const jsonText = await fs.readFile(jsonFilePath, 'utf8');
         data = JSON.parse(jsonText);
@@ -57,12 +56,6 @@ test.describe('Get to an answer - fe test data generation', () => {
     });
 
     test('seed questionnaire from JSON file for front-end', async ({request}) => {
-        let questionId: string | undefined;
-        let destinationType: AnswerDestinationType | undefined;
-        let destinationUrl: string | undefined;
-        let destinationContentId: string | undefined;
-        let destinationQuestionId: string | undefined;
-
         // Create all questions first
         const questionIds: Record<string, string> = {};
 
@@ -76,65 +69,47 @@ test.describe('Get to an answer - fe test data generation', () => {
 
         // Create answers for every question
         for (const q of data.questions) {
-            questionId = questionIds[q.key];
+            const questionId = questionIds[q.key];
             let priority = 1;
 
             for (const answer of q.answers) {
                 const nav = answer.navigation;
 
                 if (nav) {
+                    let destinationType: AnswerDestinationType | undefined;
+                    let destinationQuestionId: string | undefined;
+                    let destinationContentId: string | undefined;
+                    let destinationUrl: string | undefined;
+
+                    // Determine navigation type and set appropriate values
                     if (nav.type === 'next-question') {
                         destinationType = AnswerDestinationType.Question;
                         destinationQuestionId = questionIds[nav.targetQuestionKey];
-                        await createSingleAnswer(request, {
-                            questionId,
-                            questionnaireId,
-                            destinationQuestionId,
-                            destinationContentId,
-                            content: answer.text,
-                            description: undefined,
-                            priority,
-                            destinationType,
-                            destinationUrl
-                        }, token);
-
-                    }
-
-                    if (nav.type === 'external-link') {
+                    } else if (nav.type === 'external-link') {
                         destinationType = AnswerDestinationType.ExternalLink;
                         destinationUrl = nav.url;
-                        await createSingleAnswer(request,
-                            {
-                                questionId,
-                                questionnaireId,
-                                content: answer.text,
-                                description: undefined,
-                                priority,
-                                destinationType,
-                                destinationUrl,
-                            }, token);
-
-                    }
-
-                    if (nav.type === 'internal-link') {
+                    } else if (nav.type === 'internal-link') {
                         destinationType = AnswerDestinationType.CustomContent;
-
-                        await createSingleAnswer(request, {
-                            questionId,
-                            questionnaireId,
-                            content: answer.text,
-                            description: undefined,
-                            priority,
-                            destinationType: AnswerDestinationType.CustomContent,
-                            destinationContentId: internalContentId
-                        }, token);
+                        destinationContentId = internalContentId;
                     }
+                    
+                    await createSingleAnswer(request, {
+                        questionId,
+                        questionnaireId,
+                        content: answer.text,
+                        description: undefined,
+                        priority,
+                        destinationType,
+                        destinationQuestionId,
+                        destinationContentId,
+                        destinationUrl
+                    }, token);
                 }
+
                 priority++;
             }
         }
         console.log('Seeding completed for questionnaire:', questionnaireId);
-
         await publishQuestionnaire(request, questionnaireId, token);
     });
 });

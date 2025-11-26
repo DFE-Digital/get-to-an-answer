@@ -5,7 +5,7 @@
     {
       "key": "q1",
       "text": "Which of these arrangements apply to you?",
-      "type": 2, 
+      "type": 2,
       "answers": [
         {
           "text": "I am in or have been in care",
@@ -15,10 +15,17 @@
           }
         },
         {
+          "text": "I'm currently or have been looked after for a short time",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q2"
+          }
+        },
+        {
           "text": "I arrived in the UK alone to seek asylum",
           "navigation": {
             "type": "external-link",
-            "url": "https://dev-api.get-to-an-answer.education.gov.uk"
+            "url": "https://dev.get-to-an-answer.education.gov.uk"
           }
         },
         {
@@ -26,17 +33,9 @@
           "navigation": {
             "type": "internal-link"
           }
-        },
-        {
-          "text": "I'm currently or have been looked after for a short time",
-          "navigation": {
-            "type": "next-question",
-            "targetQuestionKey": "q2"
-          }
         }
       ]
     },
-
     {
       "key": "q2",
       "text": "How old are you?",
@@ -156,10 +155,88 @@
         }
       ]
     },
-
     {
       "key": "q6",
       "text": "Were you in care or looked after for at least 13 weeks (just over 3 months) after your 14th birthday?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q7"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "internal-link"
+          }
+        }
+      ]
+    },
+    {
+      "key": "q7",
+      "text": "Were you in care or looked after for at least 5 weeks (just less than 3 months) after your 14th birthday?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q8"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "internal-link"
+          }
+        }
+      ]
+    },
+    {
+      "key": "q8",
+      "text": "Were you in care or looked after for at least 1 week (just less than 1 month) after your 14th birthday?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q9"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://dev.get-to-an-answer.education.gov.uk"
+          }
+        }
+      ]
+    },
+    {
+      "key": "q9",
+      "text": "Were you in care or looked after for at least 1 day after your 14th birthday?",
       "type": 1,
       "answers": [
         {
@@ -177,7 +254,8 @@
         {
           "text": "I don't know",
           "navigation": {
-            "type": "internal-link"
+            "type": "external-link",
+            "url": "https://dev.get-to-an-answer.education.gov.uk"
           }
         }
       ]
