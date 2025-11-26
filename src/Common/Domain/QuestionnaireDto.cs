@@ -25,6 +25,21 @@ public class QuestionnaireDto
     public int Version { get; set; }
 
     public List<QuestionDto> Questions { get; set; } = new();
+    
+    // ~~~ Look and feel ~~~
+    
+    public string? TextColor { get; set; } = "#0b0c0c";
+    public string? BackgroundColor { get; set; } = "#ffffff";
+    public string? PrimaryButtonColor { get; set; } = "#00703c";
+    public string? SecondaryButtonColor { get; set; } = "#1d70b8";
+    public string? StateColor { get; set; } = "#ffdd00";
+    public string? ErrorMessageColor { get; set; } = "#c3432b";
+    
+    public string? DecorativeImage { get; set; }
+
+    public bool IsAccessibilityAgreementAccepted { get; set; } = false;
+    public string? ContinueButtonText { get; set; }
+    public Dictionary<string, bool>? CompletionTrackingMap { get; set; }
 }
 
 public class QuestionnaireInfoDto
@@ -38,4 +53,16 @@ public class QuestionnaireInfoDto
     public string? Description { get; set; }
     
     public bool HasStartPage { get; set; }
+    
+    // ~~~ Look and feel ~~~
+    
+    public string? TextColor { get; set; } = "#0b0c0c";
+    public string? BackgroundColor { get; set; } = "#ffffff";
+    public string? PrimaryButtonColor { get; set; } = "#00703c";
+    public string? SecondaryButtonColor { get; set; } = "#1d70b8";
+    public string? StateColor { get; set; } = "#ffdd00";
+    public string? ErrorMessageColor { get; set; } = "#c3432b";
+    
+    public string? DecorativeImage { get; set; }
+    public string? ContinueButtonText { get; set; } = "Continue";
 }

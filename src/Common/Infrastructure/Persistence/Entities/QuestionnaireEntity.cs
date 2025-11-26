@@ -59,4 +59,21 @@ public class QuestionnaireEntity
     
     // Custom content final pages
     public ICollection<ContentEntity> Contents { get; set; } = new List<ContentEntity>();
+    
+    // ~~~ Completion ~~~
+
+    [Column(TypeName = "nvarchar(max)")] public Dictionary<string, bool>? CompletionTrackingMap { get; set; } = new();
+    
+    // ~~~ Look and feel ~~~
+    
+    [MaxLength(7)] public string? TextColor { get; set; } = "#0b0c0c";
+    [MaxLength(7)] public string? BackgroundColor { get; set; } = "#ffffff";
+    [MaxLength(7)] public string? PrimaryButtonColor { get; set; } = "#00703c";
+    [MaxLength(7)] public string? SecondaryButtonColor { get; set; } = "#1d70b8";
+    [MaxLength(7)] public string? StateColor { get; set; } = "#ffdd00";
+    [MaxLength(7)] public string? ErrorMessageColor { get; set; } = "#c3432b";
+    
+    [MaxLength(250)] public string? DecorativeImage { get; set; }
+    [MaxLength(50)] public string? ContinueButtonText { get; set; } = "Continue";
+    public bool IsAccessibilityAgreementAccepted { get; set; }
 }
