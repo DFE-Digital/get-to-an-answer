@@ -28,6 +28,11 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
 
     [TempData(Key = "QuestionSaved")] public bool QuestionSaved { get; set; }
 
+    [TempData(Key = "CurrentQuestionHasNextOne")]
+    public bool CurrentQuestionHasNextOne { get; set; }
+    
+    [TempData(Key = "NextQuestionId")] public Guid? NextQuestionId { get; set; }
+
     public async Task<IActionResult> OnGetAsync()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
@@ -86,6 +91,15 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
 
             PopulateFields(question);
             QuestionSaved = true;
+
+            var questionForQuestionnaire = await apiClient.GetQuestionsAsync(QuestionnaireId);
+            var nextQuestionInOrder = questionForQuestionnaire.SingleOrDefault(q => q.Order == question.Order + 1);
+
+            if (nextQuestionInOrder != null)
+            {
+                CurrentQuestionHasNextOne = true;
+                NextQuestionId = nextQuestionInOrder.Id;
+            }
         }
         catch (Exception e)
         {

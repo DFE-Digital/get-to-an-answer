@@ -26,12 +26,24 @@
                     <h3 class="govuk-notification-banner__heading">
                         Your questionnaire has been saved.
                     </h3>
-                    <button class="govuk-button govuk-button--start" type="submit" href="@string.Format(Routes.AddQuestion, Model.QuestionnaireId)">Add a
-                        question
-                    </button>
 
+                    @if (Model.CurrentQuestionHasNextOne)
+                    {
+                        <p>
+                            <a href="@string.Format(Routes.EditQuestion, Model.QuestionnaireId, Model.NextQuestionId)">Continue
+                                to the next question</a>
+                        </p>
+                    }
+                    else
+                    {
+                        <button class="govuk-button govuk-button--start" type="submit"
+                                href="@string.Format(Routes.AddQuestion, Model.QuestionnaireId)">Add a
+                            question
+                        </button>
+                    }
                     <p>
-                        <a href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to your questions</a>
+                        <a href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to
+                            your questions</a>
                     </p>
                 </div>
             </div>
