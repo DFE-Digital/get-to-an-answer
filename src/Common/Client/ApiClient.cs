@@ -235,7 +235,7 @@ public class ApiClient : IApiClient
         var response = await _httpClient.PutAsJsonAsync($"{Questions}/{questionId}", request);
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<string>();
+        return await response.Content.ReadAsStringAsync();
     }
 
     public async Task<string?> UpdateQuestionStatusAsync(Guid questionId, UpdateQuestionStatusRequestDto request)

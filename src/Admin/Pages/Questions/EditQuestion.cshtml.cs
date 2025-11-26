@@ -1,5 +1,6 @@
 using System.Globalization;
 using Common.Client;
+using Common.Domain;
 using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Models;
@@ -15,34 +16,39 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
     [FromRoute(Name = "questionId")] public Guid QuestionId { get; set; }
 
-    [BindProperty]
-    public string QuestionContent { get; set; } = string.Empty;
+    [BindProperty] public string QuestionContent { get; set; } = string.Empty;
 
-    [BindProperty]
-    public string? QuestionHintText { get; set; }
+    [BindProperty] public string? QuestionHintText { get; set; }
 
-    [BindProperty]
-    public QuestionType QuestionType { get; set; }
+    [BindProperty] public QuestionType QuestionType { get; set; }
 
     public List<AnswerSummaryViewModel> Answers { get; } = [];
 
     public string QuestionNumber => "1";
-    
+
+    [TempData(Key = "QuestionSaved")] public bool QuestionSaved { get; set; }
+
     public async Task<IActionResult> OnGetAsync()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
 
-        var question = await apiClient.GetQuestionAsync(QuestionId);
-        if (question == null)
+        try
         {
-            logger.LogWarning("Question {QuestionId} not found", QuestionId);
-            RedirectToErrorPage();
-            return Page();
-        }
+            var question = await GetQuestion();
 
-        QuestionContent = question.Content;
-        QuestionHintText = question.Description;
-        QuestionType = question.Type;
+            if (question == null)
+            {
+                logger.LogWarning("Question {QuestionId} not found", QuestionId);
+                throw new Exception($"Question {QuestionId} not found");
+            }
+
+            PopulateFields(question);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return RedirectToErrorPage();
+        }
 
         var answers = await apiClient.GetAnswersAsync(QuestionId);
         Answers.Clear();
@@ -52,26 +58,45 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
             Priority = Convert.ToString(a.Priority, CultureInfo.CurrentCulture),
             Destination = a.DestinationType.ToString() ?? string.Empty
         }));
-        
+
         return Page();
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostSaveQuestion()
     {
-        if (!ModelState.IsValid)
-            return Page();
+        try
+        {
+            if (!ModelState.IsValid)
+                return Page();
 
-        // await apiClient.UpdateQuestionAsync(QuestionId, new UpdateQuestionRequestDto
-        // {
-        //     Title = QuestionContent,
-        //     Description = QuestionHintText,
-        //     Type = QuestionType
-        // });
+            await apiClient.UpdateQuestionAsync(QuestionId, new UpdateQuestionRequestDto
+            {
+                Content = QuestionContent,
+                Description = QuestionHintText,
+                Type = QuestionType
+            });
 
-        return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
+            var question = await GetQuestion();
+
+            if (question == null)
+            {
+                logger.LogWarning("Question {QuestionId} not found", QuestionId);
+                throw new Exception($"Question {QuestionId} not found");
+            }
+
+            PopulateFields(question);
+            QuestionSaved = true;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return RedirectToErrorPage();
+        }
+
+        return Page();
     }
 
-    public async Task<IActionResult> OnPostDelete()
+    public async Task<IActionResult> OnPostDeleteQuestion()
     {
         await apiClient.DeleteQuestionAsync(QuestionId);
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
@@ -94,6 +119,16 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
             QuestionType.MultiSelect => "Use this when people can select more than one option.",
             _ => string.Empty
         };
+
+
+    private async Task<QuestionDto?> GetQuestion() => await apiClient.GetQuestionAsync(QuestionId);
+
+    private void PopulateFields(QuestionDto question)
+    {
+        QuestionContent = question.Content;
+        QuestionHintText = question.Description;
+        QuestionType = question.Type;
+    }
 }
 
 public class AnswerSummaryViewModel

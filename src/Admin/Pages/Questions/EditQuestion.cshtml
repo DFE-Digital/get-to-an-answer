@@ -1,6 +1,7 @@
 @page "/admin/questionnaires/{questionnaireId:guid}/questions/{questionId:guid}/edit"
 @addTagHelper *, Common
 @using Common.Enum
+@using Common.Models
 @model Admin.Pages.Questions.EditQuestion
 
 @{
@@ -9,6 +10,35 @@
 
     var displayAnswerPriorities = Model.Answers.Any(x => !string.IsNullOrEmpty(x.Priority));
 }
+
+@if (Model.QuestionSaved)
+{
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-notification-banner govuk-notification-banner--success" role="alert"
+                 aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                        Success
+                    </h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <h3 class="govuk-notification-banner__heading">
+                        Your questionnaire has been saved.
+                    </h3>
+                    <button class="govuk-button govuk-button--start" type="submit" asp-page-handler="SaveQuestion">Add a
+                        question
+                    </button>
+
+                    <p>
+                        <a href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to your questions</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -110,8 +140,11 @@
             </div>
 
             <div class="govuk-!-margin-top-6 govuk-!-display-flex govuk-!-gap-3" style="justify-content: start;">
-                <button class="govuk-button govuk-button--start" type="submit">Save question</button>
-                <button class="govuk-button govuk-button--warning" type="submit" formaction="?handler=Delete">Delete
+                <button class="govuk-button govuk-button--start" type="submit" asp-page-handler="SaveQuestion">Save
+                    question
+                </button>
+                <button class="govuk-button govuk-button--warning" type="submit" asp-page-handler="DeleteQuestion">
+                    Delete
                     question
                 </button>
             </div>
