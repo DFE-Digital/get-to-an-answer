@@ -70,7 +70,6 @@ test.describe('Get to an answer - fe test data generation', () => {
         // Create answers for every question
         for (const q of data.questions) {
             const questionId = questionIds[q.key];
-            let priority = 1;
 
             for (const answer of q.answers) {
                 const nav = answer.navigation;
@@ -98,15 +97,13 @@ test.describe('Get to an answer - fe test data generation', () => {
                         questionnaireId,
                         content: answer.text,
                         description: undefined,
-                        priority,
+                        priority: undefined,
                         destinationType,
                         destinationQuestionId,
                         destinationContentId,
                         destinationUrl
                     }, token);
                 }
-
-                priority++;
             }
         }
         console.log('Seeding completed for questionnaire:', questionnaireId);
