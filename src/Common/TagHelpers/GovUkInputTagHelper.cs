@@ -72,7 +72,8 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
             output.Attributes.SetAttribute("type", "text");
         }
 
-        var typeAttribute = output.Attributes.FirstOrDefault(a => string.Equals(a.Name, "type", StringComparison.OrdinalIgnoreCase));
+        var typeAttribute =
+            output.Attributes.FirstOrDefault(a => string.Equals(a.Name, "type", StringComparison.OrdinalIgnoreCase));
         var typeValue = GetAttributeStringValue(typeAttribute);
 
         // Ensure the govuk-input base class is present (or preserve checkbox class if used that way)
@@ -104,13 +105,29 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
             ? fullName[(fullName.LastIndexOf('.') + 1)..]
             : fullName;
 
+        var modelValue = For.Model;
+
         if (string.Equals(typeValue, "radio", StringComparison.OrdinalIgnoreCase)
             && output.Attributes.TryGetAttribute("value", out var valueAttr))
         {
             var radioValue = GetAttributeStringValue(valueAttr);
-            if (!string.IsNullOrEmpty(effectiveValue) && string.Equals(effectiveValue, radioValue, StringComparison.Ordinal))
+            if (!string.IsNullOrEmpty(effectiveValue) &&
+                string.Equals(effectiveValue, radioValue, StringComparison.Ordinal))
             {
                 output.Attributes.SetAttribute("checked", "checked");
+            }
+            else if (modelValue != null)
+            {
+                var modelType = modelValue.GetType();
+                if (modelType.IsEnum && System.Enum.TryParse(modelType, modelValue.ToString(), out var enumValue))
+                {
+                    var numericVal = Convert.ToInt32(enumValue);
+
+                    if (numericVal == Convert.ToInt32(radioValue))
+                    {
+                        output.Attributes.SetAttribute("checked", "checked");
+                    }
+                }
             }
             else
             {
