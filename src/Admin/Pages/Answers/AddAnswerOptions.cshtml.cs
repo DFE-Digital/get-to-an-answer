@@ -23,9 +23,8 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
 
     [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
-    
-    [BindProperty]
-    public QuestionType? RetrievedQuestionType { get; set; }
+
+    [BindProperty] public QuestionType? RetrievedQuestionType { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
@@ -37,7 +36,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         {
             RetrievedQuestionType = (QuestionType)intVal;
         }
-        
+
         await HydrateFields();
         ReassignOptionNumbers();
 
@@ -82,7 +81,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             ReassignOptionNumbers();
             return Page();
         }
-        
+
         try
         {
             foreach (var option in Options)
@@ -118,7 +117,8 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
         // var resultsPages = await apiClient.GetResultsPagesAsync(QuestionnaireId);
 
-        var questionSelect = questions.Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
+        var questionSelect = questions.Where(x => x.Id != QuestionId)
+            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
         // var resultsSelect = resultsPages.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
 
         foreach (var option in Options)
