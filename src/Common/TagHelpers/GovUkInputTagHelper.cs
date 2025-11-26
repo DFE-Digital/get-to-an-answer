@@ -116,23 +116,15 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
             {
                 output.Attributes.SetAttribute("checked", "checked");
             }
-            else if (modelValue != null)
-            {
-                var modelType = modelValue.GetType();
-                if (modelType.IsEnum && System.Enum.TryParse(modelType, modelValue.ToString(), out var enumValue))
-                {
-                    var numericVal = Convert.ToInt32(enumValue);
 
-                    if (numericVal == Convert.ToInt32(radioValue))
-                    {
-                        output.Attributes.SetAttribute("checked", "checked");
-                    }
-                }
-            }
-            else
+            if (modelValue != null && IsEnumRadioValueChecked(modelValue, radioValue))
             {
-                output.Attributes.RemoveAll("checked");
+                output.Attributes.SetAttribute("checked", "checked");
             }
+        }
+        else
+        {
+            output.Attributes.RemoveAll("checked");
         }
 
         if (hasError)
@@ -173,5 +165,20 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
                 output.Attributes.SetAttribute("class", "govuk-input govuk-input--error");
             }
         }
+    }
+
+    private static bool IsEnumRadioValueChecked(object? modelValue, string radioValue)
+    {
+        if (modelValue is null)
+            return false;
+
+        var modelType = modelValue.GetType();
+        if (modelType.IsEnum && System.Enum.TryParse(modelType, modelValue.ToString(), out var enumValue) && enumValue is int)
+        {
+            var numericValue = Convert.ToInt32(enumValue);
+            return numericValue == Convert.ToInt32(radioValue);
+        }
+
+        return modelValue.ToString() == radioValue;
     }
 }

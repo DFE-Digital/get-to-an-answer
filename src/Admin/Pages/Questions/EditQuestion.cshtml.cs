@@ -1,3 +1,4 @@
+using System.Globalization;
 using Common.Client;
 using Common.Domain.Request.Update;
 using Common.Enum;
@@ -43,15 +44,15 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         QuestionHintText = question.Description;
         QuestionType = question.Type;
 
-        // var answers = await apiClient.GetAnswersAsync(QuestionId);
-        // Answers.Clear();
-        // Answers.AddRange(answers.Select(a => new AnswerSummaryViewModel
-        // {
-        //     Content = a.Content,
-        //     Priority = a.Priority?.ToString() ?? "0",
-        //     Destination = a.DestinationType.ToString()
-        // }));
-        //
+        var answers = await apiClient.GetAnswersAsync(QuestionId);
+        Answers.Clear();
+        Answers.AddRange(answers.Select(a => new AnswerSummaryViewModel
+        {
+            Content = a.Content,
+            Priority = Convert.ToString(a.Priority, CultureInfo.CurrentCulture),
+            Destination = a.DestinationType.ToString() ?? string.Empty
+        }));
+        
         return Page();
     }
 
