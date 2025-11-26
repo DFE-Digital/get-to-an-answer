@@ -55,9 +55,31 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    @if (Model?.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
+    
+    @if (Model?.IsRedirectConfirmation ?? false)
     {
-      <form action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
+      <form action="/admin/questionnaires/@Model.Questionnaire.Id/next-preview?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
+        <input type="hidden" id="confirm-redirect-input" name="IsRedirectConfirmation" value="true">
+        <div class="govuk-form-group">
+         <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
+           <div class="govuk-radios__item">
+             <input id="confirm-redirect-yes-input" aria-describedby="pages-selection-type-input-only-one-option-true-hint"
+                    class="govuk-radios__input" type="radio" value="true" name="ConfirmRedirect">
+             <label for="confirm-redirect-yes-input" class="govuk-label govuk-radios__label">Yes</label>
+           </div>
+           <div class="govuk-radios__item">
+             <input id="confirm-redirect-no-input" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
+                    class="govuk-radios__input" type="radio" value="false" name="ConfirmRedirect">
+             <label for="confirm-redirect-no-input" class="govuk-label govuk-radios__label">No</label>
+           </div>
+         </div>
+        </div>
+        <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
+      </form>
+    }
+    else if (Model?.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
+    {
+      <form action="/admin/questionnaires/@Model.Questionnaire.Id/next-preview?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
         @Html.AntiForgeryToken()
         <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id" autocomplete="off">
         <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order" autocomplete="off">
@@ -210,25 +232,6 @@
         </div>
         <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
       </form>
-    }
-    else if (Model?.IsRedirectConfirmation ?? false)
-    {
-      <input type="hidden" id="confirm-redirect-input" name="IsRedirectConfirmation" value="true">
-      <div class="govuk-form-group">
-        <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
-          <div class="govuk-radios__item">
-            <input id="confirm-redirect-yes-input" aria-describedby="pages-selection-type-input-only-one-option-true-hint"
-                   class="govuk-radios__input" type="radio" value="true" name="ConfirmRedirect">
-            <label for="confirm-redirect-yes-input" class="govuk-label govuk-radios__label">Yes</label>
-          </div>
-          <div class="govuk-radios__item">
-            <input id="confirm-redirect-no-input" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
-                   class="govuk-radios__input" type="radio" value="false" name="ConfirmRedirect">
-            <label for="confirm-redirect-no-input" class="govuk-label govuk-radios__label">No</label>
-          </div>
-        </div>
-      </div>
-      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
     }
     else if (Model?.Destination?.Type == DestinationType.CustomContent)
     {

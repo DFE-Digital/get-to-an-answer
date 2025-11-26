@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
+        <PackageReference Include="Azure.Storage.Blobs" />
         <PackageReference Include="HtmlSanitizer" />
         <PackageReference Include="Markdig" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />

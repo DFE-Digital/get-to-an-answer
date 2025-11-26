@@ -16,6 +16,7 @@ locals {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
     ASPNETCORE_FORWARDEDHEADERS_ENABLED   = "true"
     ApplicationInsights__ConnectionString = azurerm_application_insights.application-insights.connection_string
+    BlogStorage__ConnectionString         = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.bs_connection_string.versionless_id})"
     ApiSettings__BaseUrl                  = "https://${azurerm_linux_web_app.gettoananswer-api.default_hostname}"
     AzureAd__Domain                       = "Educationgovuk.onmicrosoft.com"
     AzureAd__TenantId                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.ad_tenant_id.versionless_id})"
