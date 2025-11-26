@@ -1,8 +1,8 @@
 resource "azurerm_storage_account" "sa" {
-  name                     = "${var.prefix}bsa-uks-images"
-  resource_group_name      = azurerm_resource_group.gettoananswer-rg
-  location                 = var.location
-  account_tier             = "Standard"
+  name                = "${var.prefix}bsa-uks-images"
+  resource_group_name = azurerm_resource_group.gettoananswer-rg
+  location            = var.location
+  account_tier        = "Standard"
   # LRS is Locally Redundant Storage, good for development/testing
   account_replication_type = "LRS"
 }
