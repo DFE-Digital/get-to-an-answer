@@ -5,10 +5,18 @@ import {defineConfig, devices} from '@playwright/test';
 import {loadEnvConfig, EnvType} from './src/config/environment-config';
 
 // Choose an environment: 'local' or 'test'
-const ENV_NAME: 'local' | 'test' = 'local'; //default local
+const ENV_NAME: 'local' | 'test' = 'test'; //default local
 process.env.ENV_NAME = ENV_NAME as EnvType;
 
 const EnvConfig = loadEnvConfig(process.env.ENV_NAME as EnvType);
+
+const feTestDataBase = {
+    testDir: './src/tests/fetestdata',
+    testMatch: '**/*.spec.ts',
+    use: {
+        baseURL: process.env.API_URL || EnvConfig.API_URL,
+    },
+} as const;
 
 const healthBase = {
     testDir: './src/tests/health',
@@ -144,6 +152,11 @@ export default defineConfig({
                 browserName: 'webkit',
                 ...devices['iPhone 15']
             }
-         }
-    ],
+         },
+        {
+            name: 'testdataonly',
+            ...feTestDataBase,
+            use: {...feTestDataBase.use},
+        }
+    ]
 });
