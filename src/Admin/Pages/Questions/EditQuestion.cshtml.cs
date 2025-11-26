@@ -115,6 +115,8 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         await apiClient.DeleteQuestionAsync(QuestionId);
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
     }
+    
+    public IActionResult OnPostAddAQuestion() => Redirect(string.Format(Routes.AddQuestion, QuestionnaireId));
 
     public string QuestionTypeFriendly(QuestionType type) =>
         type switch

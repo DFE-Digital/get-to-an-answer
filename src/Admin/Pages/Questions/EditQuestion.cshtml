@@ -36,10 +36,13 @@
                     }
                     else
                     {
-                        <button class="govuk-button govuk-button--start" type="submit"
-                                href="@string.Format(Routes.AddQuestion, Model.QuestionnaireId)">Add a
-                            question
-                        </button>
+                        <form>
+                            <button class="govuk-button govuk-button--start" type="button"
+                                    asp-page-handler="AddAQuestion">Add a
+                                question
+                            </button>
+                        </form>
+                        
                     }
                     <p>
                         <a href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to
