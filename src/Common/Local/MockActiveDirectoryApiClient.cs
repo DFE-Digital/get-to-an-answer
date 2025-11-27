@@ -114,6 +114,10 @@ internal sealed class MockAuthenticationHandler(
             {
                 { ".Token.id_token", token },
             }), Scheme.Name);
+            
+            ticket.Properties.IssuedUtc = DateTimeOffset.UtcNow;
+            ticket.Properties.ExpiresUtc = DateTimeOffset.FromUnixTimeSeconds(expiration);
+            
             return Task.FromResult(AuthenticateResult.Success(ticket));
         }
         catch (Exception ex)

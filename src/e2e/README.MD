@@ -97,6 +97,18 @@ Key `playwright.config.ts` settings:
   ```
 - For .NET build/runtime issues: build and run/debug locally, or attach a debugger to the container
 
+## Image Storage
+The mock to the image storage behaviour we are going to use Azurite (a.k.a. local Azure Blob Storage) for local development.
+
+1) Run the container standalone (or via docker compose):
+```bash
+docker run -d -p 10000:10000 mcr.microsoft.com/azure-storage/azurite azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck
+```
+
+2) Set the `BlobStorage__ConnectionString` environment variable to:
+```
+DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;
+```
 ## Notes
 
 - Keep `.env` up to date and out of source control

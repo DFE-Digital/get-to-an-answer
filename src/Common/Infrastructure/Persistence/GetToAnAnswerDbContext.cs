@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Common.Enum;
 using Common.Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,20 @@ public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> opt
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        modelBuilder.Entity<QuestionnaireEntity>()
+            .Property(e => e.CompletionTrackingMap)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                v => JsonSerializer.Deserialize<Dictionary<string, bool>>(v, (JsonSerializerOptions)null) ?? new Dictionary<string, bool>()
+            )
+            .Metadata.SetValueComparer(
+                new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<Dictionary<string, bool>>(
+                    (c1, c2) => c1.SequenceEqual(c2),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToDictionary(k => k.Key, v => v.Value)
+                )
+            );
     }
     
     public EntityAccess HasAccessToEntity<TEntityType>(string userId, Guid id)
