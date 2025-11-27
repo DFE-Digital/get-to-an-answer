@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 namespace Common.Client;
 
 using Azure.Storage.Blobs;
@@ -5,77 +7,107 @@ using Azure.Storage.Blobs.Models;
 using System.IO;
 using System.Threading.Tasks;
 
-public class ImageStorageClient
+public interface IImageStorageClient
 {
-    private readonly string _connectionString;
-    private readonly string _containerName;
+    Task UploadImageAsync(Stream fileStream, string blobFileName, string contentType);
+    Task<Stream> DownloadImageAsync(string blobFileName);
+    Task DeleteImageAsync(string blobFileName);
+}
 
-    public ImageStorageClient(string connectionString, string containerName)
+public class ImageStorageClient : IImageStorageClient
+{
+    private readonly ILogger<ImageStorageClient> _logger;
+    
+    private readonly string _containerName;
+    private readonly BlobContainerClient _containerClient;
+
+    public ImageStorageClient(string connectionString, string containerName, ILogger<ImageStorageClient> logger)
     {
-        _connectionString = connectionString;
         _containerName = containerName;
+        
+        logger.LogInformation($"ImageStorageClient initialized with connection string '{connectionString}' and container '{containerName}'.");
+        
+        _logger = logger;
+        
+        // 1. Get a reference to the container client
+        _containerClient = new BlobContainerClient(connectionString, _containerName);
     }
 
     /// <summary>
-    /// Uploads an image from a local file path to the blob storage.
+    /// Uploads an image
     /// </summary>
-    /// <param name="localFilePath">Path to the image file on disk.</param>
-    /// <param name="blobFileName">The desired name for the file in blob storage.</param>
-    public async Task UploadImageAsync(string localFilePath, string blobFileName)
+    public async Task UploadImageAsync(Stream fileStream, string blobFileName, string contentType)
     {
-        // 1. Get a reference to the container client
-        BlobContainerClient containerClient = new BlobContainerClient(_connectionString, _containerName);
-        
-        // Ensure the container exists (optional, as Terraform created it)
-        await containerClient.CreateIfNotExistsAsync(); 
+        await _containerClient.CreateIfNotExistsAsync(); 
 
         // 2. Get a reference to the blob client
-        BlobClient blobClient = containerClient.GetBlobClient(blobFileName);
+        BlobClient blobClient = _containerClient.GetBlobClient(blobFileName);
 
-        // 3. Set content type and upload the file
-        // We assume it's a JPEG or PNG and set the content type
-        string contentType = Path.GetExtension(localFilePath).ToLower() switch
-        {
-            ".jpg" or ".jpeg" => "image/jpeg",
-            ".png" => "image/png",
-            _ => "application/octet-stream"
-        };
-
+        // 3. Set content type
         var uploadOptions = new BlobUploadOptions
         {
-            HttpHeaders = new BlobHttpHeaders { ContentType = contentType }
+            // Use the content type passed from the web request (e.g., "image/jpeg")
+            HttpHeaders = new BlobHttpHeaders { ContentType = contentType } 
         };
 
-        using (FileStream uploadFileStream = File.OpenRead(localFilePath))
-        {
-            await blobClient.UploadAsync(uploadFileStream, uploadOptions);
-        }
-
-        System.Console.WriteLine($"Image uploaded: {blobFileName}");
+        // Use the stream passed into the function directly
+        await blobClient.UploadAsync(fileStream, uploadOptions);
+        
+        _logger.LogInformation($"Image uploaded: {blobFileName}");
     }
 
-    /// <summary>
-    /// Retrieves an image from blob storage and saves it to a local file path.
-    /// </summary>
-    /// <param name="blobFileName">The name of the file in blob storage.</param>
-    /// <param name="downloadFilePath">The path where the file should be saved locally.</param>
-    public async Task DownloadImageAsync(string blobFileName, string downloadFilePath)
+    public async Task<Stream> DownloadImageAsync(string blobFileName)
     {
-        // 1. Get a reference to the container client
-        BlobContainerClient containerClient = new BlobContainerClient(_connectionString, _containerName);
-
+        await CheckContainerExists();
+        
         // 2. Get a reference to the blob client
-        BlobClient blobClient = containerClient.GetBlobClient(blobFileName);
+        BlobClient blobClient = _containerClient.GetBlobClient(blobFileName);
 
         if (!await blobClient.ExistsAsync())
         {
-            System.Console.WriteLine($"Error: Blob '{blobFileName}' does not exist.");
-            return;
+            // Throw an exception or return null if the image doesn't exist
+            throw new FileNotFoundException($"Blob '{blobFileName}' not found.");
         }
+    
+        // 3. Download the blob content into a Stream
+        // The DownloadContentAsync method returns a Response<BlobDownloadResult>
+        var response = await blobClient.DownloadContentAsync();
 
-        // 3. Download the blob content to a local file path
-        await blobClient.DownloadToAsync(downloadFilePath);
+        // The Content.ToStream() returns a ReadOnlyStream from the response, 
+        // which holds the downloaded image data.
+        return response.Value.Content.ToStream();
+    }
 
-        System.Console.WriteLine($"Image downloaded to: {downloadFilePath}");
+    public async Task DeleteImageAsync(string blobFileName)
+    {
+        await CheckContainerExists();
+        
+        // 2. Get a reference to the blob client
+        BlobClient blobClient = _containerClient.GetBlobClient(blobFileName);
+
+        // 3. Delete the blob if it exists
+        // DeleteIfExistsAsync returns true if the blob was deleted, false if it didn't exist.
+        bool deleted = await blobClient.DeleteIfExistsAsync();
+
+        if (deleted)
+        {
+            _logger.LogInformation($"Image deleted successfully: {blobFileName}");
+        }
+        else
+        {
+            // This is useful for logging, but not strictly an error if we wanted it gone anyway
+            _logger.LogInformation($"Image not found (no deletion required): {blobFileName}");
+        }
+    }
+    
+    private async Task CheckContainerExists()
+    {
+        var existsResponse = await _containerClient.ExistsAsync();
+
+        if (!existsResponse.Value)
+        {
+            _logger.LogError($"Container '{_containerName}' not found.");
+            throw new FileNotFoundException($"Container '{_containerName}' not found.");
+        }
     }
 }

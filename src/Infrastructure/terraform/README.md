@@ -71,6 +71,13 @@ az storage account create \
 az storage container create --name tfstate --account-name gtaatfstatesa --auth-mode login
 ```
 
+4) Add Backend to Terraform configuration:
+```terraform
+terraform {
+  backend "azurerm" {}
+}
+```
+
 ## Set up for local development
 1) Sign in to Azure and select a subscription:
 ```bash

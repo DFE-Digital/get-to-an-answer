@@ -24,10 +24,13 @@ public interface IQuestionnaireService
 
     ServiceResult GetQuestionnaire(string userId, Guid id);
 
-    ServiceResult GetQuestionnaires(string userId);
+    Task<ServiceResult> GetQuestionnaires(string userId);
 
     Task<ServiceResult> UpdateQuestionnaire(string userId, Guid id, UpdateQuestionnaireRequestDto request);
     Task<ServiceResult> UpdateQuestionnaireLookAndFeel(string userId, Guid id, UpdateLookAndFeelRequestDto request);
+    Task<ServiceResult> UpdateQuestionnaireContinueButton(string userId, Guid id,
+        UpdateContinueButtonRequestDto request);
+    Task<ServiceResult> DeleteQuestionnaireDecorativeImage(string userId, Guid id);
     Task<ServiceResult> PublishQuestionnaire(string userId, Guid id);
     Task<ServiceResult> UnpublishQuestionnaire(string userId, Guid id);
     Task<ServiceResult> DeleteQuestionnaire(string userId, Guid id);
@@ -96,17 +99,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (questionnaire == null)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             
-            return Ok(new QuestionnaireDto
-            {
-                Id = questionnaire.Id,
-                Title = questionnaire.Title,
-                Description = questionnaire.Description,
-                Slug = questionnaire.Slug,
-                Status = questionnaire.Status,
-                Version = questionnaire.Version,
-                CreatedAt = questionnaire.CreatedAt,
-                UpdatedAt = questionnaire.UpdatedAt
-            });
+            return Ok(ToDto(questionnaire, includeCustomisations: true));
         }
         catch (Exception ex)
         {
@@ -115,7 +108,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public ServiceResult GetQuestionnaires(string userId)
+    public async Task<ServiceResult> GetQuestionnaires(string userId)
     {
         try
         {
@@ -125,21 +118,10 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 .Where(q => q.Contributors.Contains(userId)
                             && q.Status != EntityStatus.Deleted);
 
-            var questionnaires = questionnairesQuery.Select(q => new QuestionnaireDto
-            {
-                Id = q.Id,
-                Title = q.Title,
-                Description = q.Description,
-                Slug = q.Slug,
-                Status = q.Status,
-                Version = q.Version,
-                CreatedAt = q.CreatedAt,
-                UpdatedAt = q.UpdatedAt,
-                CreatedBy = q.CreatedBy
-            }).ToList();
+            var questionnaires = await questionnairesQuery.ToListAsync();
 
             logger.LogInformation("GetQuestionnaires succeeded Count={Count}", questionnaires.Count);
-            return Ok(questionnaires);
+            return Ok(questionnaires.Select(q => ToDto(q, true)).ToList());
         }
         catch (Exception ex)
         {
@@ -198,9 +180,119 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public Task<ServiceResult> UpdateQuestionnaireLookAndFeel(string userId, Guid id, UpdateLookAndFeelRequestDto request)
+    public async Task<ServiceResult> UpdateQuestionnaireLookAndFeel(string userId, Guid id, UpdateLookAndFeelRequestDto request)
     {
-        throw new NotImplementedException();
+        try
+        {
+            logger.LogInformation("UpdateQuestionnaireLookAndFeel started QuestionnaireId={QuestionnaireId}", id);
+
+            if (request.TextColor == null && request.BackgroundColor == null && request.PrimaryButtonColor == null && 
+                request.SecondaryButtonColor == null && request.StateColor == null && request.ErrorMessageColor == null)
+            {
+                return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
+                {
+                    ["request"] = ["No fields to update."]
+                }));
+            }
+            
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
+            if (access == EntityAccess.NotFound)
+                return NotFound(ProblemTrace("We could not find that questionnaire", 404));
+            if (access == EntityAccess.Deny)
+                return Forbid(ProblemTrace("You do not have permission to do this", 403));
+            
+            var questionnaire = await db.Questionnaires
+                .FirstOrDefaultAsync(q => q.Id == id);
+            
+            if (questionnaire == null) 
+                return NotFound(ProblemTrace("We could not find that questionnaire", 404));
+
+            questionnaire.TextColor = request.TextColor ?? questionnaire.TextColor;
+            questionnaire.BackgroundColor = request.BackgroundColor ?? questionnaire.BackgroundColor;
+            questionnaire.PrimaryButtonColor = request.PrimaryButtonColor ?? questionnaire.PrimaryButtonColor;
+            questionnaire.SecondaryButtonColor = request.SecondaryButtonColor ?? questionnaire.SecondaryButtonColor;
+            questionnaire.StateColor = request.StateColor ?? questionnaire.StateColor;
+            questionnaire.ErrorMessageColor = request.ErrorMessageColor ?? questionnaire.ErrorMessageColor;
+            questionnaire.DecorativeImage = request.DecorativeImage ?? questionnaire.DecorativeImage;
+            questionnaire.IsAccessibilityAgreementAccepted = request.IsAccessibilityAgreementAccepted;
+            questionnaire.UpdatedAt = DateTime.UtcNow;
+            
+            await db.SaveChangesAsync();
+            
+            logger.LogInformation("UpdateQuestionnaireLookAndFeel succeeded QuestionnaireId={QuestionnaireId}", id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "UpdateQuestionnaireLookAndFeel failed QuestionnaireId={QuestionnaireId}", id);
+            return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
+        }
+    }
+    
+    public async Task<ServiceResult> UpdateQuestionnaireContinueButton(string userId, Guid id, UpdateContinueButtonRequestDto request)
+    {
+        try
+        {
+            logger.LogInformation("UpdateQuestionnaireContinueButton started QuestionnaireId={QuestionnaireId}", id);
+            
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
+            if (access == EntityAccess.NotFound)
+                return NotFound(ProblemTrace("We could not find that questionnaire", 404));
+            if (access == EntityAccess.Deny)
+                return Forbid(ProblemTrace("You do not have permission to do this", 403));
+            
+            var questionnaire = await db.Questionnaires
+                .FirstOrDefaultAsync(q => q.Id == id);
+            
+            if (questionnaire == null) 
+                return NotFound(ProblemTrace("We could not find that questionnaire", 404));
+
+            questionnaire.ContinueButtonText = request.ContinueButtonText ?? questionnaire.ContinueButtonText;
+            questionnaire.UpdatedAt = DateTime.UtcNow;
+            
+            await db.SaveChangesAsync();
+            
+            logger.LogInformation("UpdateQuestionnaireContinueButton succeeded QuestionnaireId={QuestionnaireId}", id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "UpdateQuestionnaireContinueButton failed QuestionnaireId={QuestionnaireId}", id);
+            return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
+        }
+    }
+
+    public async Task<ServiceResult> DeleteQuestionnaireDecorativeImage(string userId, Guid id)
+    {
+        try
+        {
+            logger.LogInformation("UpdateQuestionnaireDecorativeImage started QuestionnaireId={QuestionnaireId}", id);
+            
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
+            if (access == EntityAccess.NotFound)
+                return NotFound(ProblemTrace("We could not find that questionnaire", 404));
+            if (access == EntityAccess.Deny)
+                return Forbid(ProblemTrace("You do not have permission to do this", 403));
+            
+            var questionnaire = await db.Questionnaires
+                .FirstOrDefaultAsync(q => q.Id == id);
+            
+            if (questionnaire == null) 
+                return NotFound(ProblemTrace("We could not find that questionnaire", 404));
+
+            questionnaire.DecorativeImage = null;
+            questionnaire.UpdatedAt = DateTime.UtcNow;
+            
+            await db.SaveChangesAsync();
+            
+            logger.LogInformation("UpdateQuestionnaireDecorativeImage succeeded QuestionnaireId={QuestionnaireId}", id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "UpdateQuestionnaireDecorativeImage failed QuestionnaireId={QuestionnaireId}", id);
+            return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
+        }
     }
 
     public async Task<ServiceResult> PublishQuestionnaire(string userId, Guid id)
@@ -430,7 +522,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             await db.SaveChangesAsync();
             
             logger.LogInformation("CloneQuestionnaire succeeded OriginalId={OriginalId} NewId={NewId}", id, cloneQuestionnaireId);
-            return Created(EntityToDto(cloneQuestionnaire));
+            return Created(ToNestedDto(cloneQuestionnaire));
         }
         catch (Exception ex)
         {
@@ -638,7 +730,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
     
-    private QuestionnaireDto EntityToDto(QuestionnaireEntity entity)
+    private QuestionnaireDto ToNestedDto(QuestionnaireEntity entity)
     {
         return new QuestionnaireDto
         {
@@ -717,5 +809,38 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             logger.LogError(ex, "GetBranchingMap failed QuestionnaireId={QuestionnaireId}", questionnaireId);
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
+    }
+    
+    private QuestionnaireDto ToDto(QuestionnaireEntity q, bool includeCreatedBy = false, bool includeCustomisations = false)
+    {
+        var dto = new QuestionnaireDto
+        {
+            Id = q.Id,
+            Title = q.Title,
+            Description = q.Description,
+            Slug = q.Slug,
+            Status = q.Status,
+            Version = q.Version,
+            CreatedAt = q.CreatedAt,
+            UpdatedAt = q.UpdatedAt,
+            CreatedBy = includeCreatedBy ? q.CreatedBy : null,
+            
+            CompletionTrackingMap = !includeCreatedBy ? q.CompletionTrackingMap : new()
+        };
+
+        if (includeCustomisations)
+        {
+            dto.TextColor = q.TextColor;
+            dto.BackgroundColor = q.BackgroundColor;
+            dto.PrimaryButtonColor = q.PrimaryButtonColor;
+            dto.SecondaryButtonColor = q.SecondaryButtonColor;
+            dto.StateColor = q.StateColor;
+            dto.ErrorMessageColor = q.ErrorMessageColor;
+            dto.DecorativeImage = q.DecorativeImage;
+            dto.ContinueButtonText = q.ContinueButtonText;
+            dto.IsAccessibilityAgreementAccepted = q.IsAccessibilityAgreementAccepted;
+        }
+
+        return dto;
     }
 }

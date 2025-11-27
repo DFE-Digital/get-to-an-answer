@@ -49,7 +49,16 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
                 DisplayTitle = questionnaire.DisplayTitle ?? questionnaire.Title,
                 Description = questionnaire.Description,
                 Slug = questionnaireSlug,
-                HasStartPage = !string.IsNullOrWhiteSpace(questionnaire.DisplayTitle)
+                HasStartPage = !string.IsNullOrWhiteSpace(questionnaire.DisplayTitle),
+                
+                TextColor = questionnaire.TextColor,
+                BackgroundColor = questionnaire.BackgroundColor,
+                PrimaryButtonColor = questionnaire.PrimaryButtonColor,
+                SecondaryButtonColor = questionnaire.SecondaryButtonColor,
+                StateColor = questionnaire.StateColor,
+                ErrorMessageColor = questionnaire.ErrorMessageColor,
+                DecorativeImage = questionnaire.DecorativeImage,
+                ContinueButtonText = questionnaire.ContinueButtonText,
             });
         }
         catch (Exception ex)
