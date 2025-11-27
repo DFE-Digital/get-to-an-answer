@@ -1,0 +1,34 @@
+@page "/admin/questionnaires/{questionnaireId:guid}/unpublish-confirmation"
+@model Admin.Pages.Confirmations.ConfirmUnpublishQuestionnaire
+
+@{
+    ViewData["Title"] = "Unpublish the questionnaire";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <h1 class="govuk-heading-l">Are you sure you want to unpublish this questionnaire?</h1>
+        <p class="govuk-body">By submitting this application you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
+        <form action="/admin/questionnaires/@Model.QuestionnaireId/unpublish-confirmation" method="post" novalidate>
+            @Html.AntiForgeryToken()
+            <div class="govuk-form-group">
+                <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
+                    <div class="govuk-radios__item">
+                        <input id="unpublish-questionnaire-yes-input" aria-describedby="pages-selection-type-input-only-one-option-true-hint"
+                               class="govuk-radios__input" type="radio" value="true" name="UnpublishQuestionnaire">
+                        <label for="unpublish-questionnaire-yes-input" class="govuk-label govuk-radios__label">Yes</label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input id="unpublish-questionnaire-no-input" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
+                               class="govuk-radios__input" type="radio" value="false" name="UnpublishQuestionnaire">
+                        <label for="unpublish-questionnaire-no-input" class="govuk-label govuk-radios__label">No</label>
+                    </div>
+                </div>
+            </div>
+      
+            <div class="govuk-button-group">
+                <button class="govuk-button govuk-button--primary" type="submit">Continue</button>
+            </div>
+        </form>
+    </div>
+</div>

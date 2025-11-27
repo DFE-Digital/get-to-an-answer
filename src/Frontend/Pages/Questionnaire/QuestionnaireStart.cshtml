@@ -10,8 +10,6 @@
   ViewData["Title"] = Model.Questionnaire.DisplayTitle;
   
   var hasErrors = Model != null && !ViewData.ModelState.IsValid;
-  
-  //var hasTitleError = Model?.ErrorFor(nameof(Model)) != null;
 }
 
 @if (hasErrors)

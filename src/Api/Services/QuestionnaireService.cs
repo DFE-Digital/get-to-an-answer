@@ -156,7 +156,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (questionnaire == null) 
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
 
-            if (request.Slug != null && await db.Questionnaires.AnyAsync(q => q.Slug == request.Slug))
+            if (request.Slug != null && await db.Questionnaires.AnyAsync(q => q.Id != id && q.Slug == request.Slug))
             {
                 return Conflict(ProblemTrace("A questionnaire with the same slug already exists", 409));
             }
@@ -215,6 +215,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             questionnaire.ErrorMessageColor = request.ErrorMessageColor ?? questionnaire.ErrorMessageColor;
             questionnaire.DecorativeImage = request.DecorativeImage ?? questionnaire.DecorativeImage;
             questionnaire.IsAccessibilityAgreementAccepted = request.IsAccessibilityAgreementAccepted;
+            questionnaire.Status = EntityStatus.Draft;
             questionnaire.UpdatedAt = DateTime.UtcNow;
             
             await db.SaveChangesAsync();
@@ -248,6 +249,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
 
             questionnaire.ContinueButtonText = request.ContinueButtonText ?? questionnaire.ContinueButtonText;
+            questionnaire.Status = EntityStatus.Draft;
             questionnaire.UpdatedAt = DateTime.UtcNow;
             
             await db.SaveChangesAsync();
@@ -281,6 +283,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
 
             questionnaire.DecorativeImage = null;
+            questionnaire.Status = EntityStatus.Draft;
             questionnaire.UpdatedAt = DateTime.UtcNow;
             
             await db.SaveChangesAsync();
@@ -653,7 +656,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             QuestionnaireJson = json,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = questionnaire.PublishedBy ?? string.Empty,
-            ChangeDescription = "TODO"
+            ChangeDescription = "Questionnaire Published"
         };
 
         db.QuestionnaireVersions.Add(snapshot);

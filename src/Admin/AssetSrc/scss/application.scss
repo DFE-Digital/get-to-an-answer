@@ -924,3 +924,7 @@ $toc-width-tablet: 210px;
   white-space: normal;        /* lets selects and textareas wrap if they can */
   overflow-wrap: anywhere;
 }
+
+.govuk-hint > .govuk-body:only-child {
+  margin-bottom: 0;
+}

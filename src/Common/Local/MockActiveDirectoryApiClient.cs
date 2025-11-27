@@ -364,12 +364,17 @@ public static class MockAzureAdExtensions
                     await context.Response.WriteAsync("Mock login failed");
                     return;
                 }
+                
+                int.TryParse(result.Principal.FindFirstValue("exp"), out var expiration);
 
+                Console.WriteLine($"Expiration: {DateTimeOffset.FromUnixTimeSeconds(expiration)}");
+                Console.WriteLine($"Now: {DateTimeOffset.UtcNow}");
+            
                 // Issue cookie
                 await context.SignInAsync(MockCookieScheme, result.Principal, new AuthenticationProperties
                 {
                     IsPersistent = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8),
+                    ExpiresUtc = DateTimeOffset.FromUnixTimeSeconds(expiration),
                     AllowRefresh = true,
                     Items =
                     {

@@ -190,20 +190,22 @@
                 </p>
                 <div class="govuk-form-group govuk-!-margin-bottom-6">
                     <label class="govuk-label" for="file-upload-1" id="file-upload-1-label">
-                        @(string.IsNullOrEmpty(Model?.UpdateRequest.DecorativeImage) ? "Upload an image" : $"Change the image: {Model?.UpdateRequest.DecorativeImage}")
+                        Upload a file
                     </label>
-                
-                    <input id="file-upload-1" class="govuk-file-upload" asp-for="UpdateRequest.DecorativeImage"
-                           value="@(Model?.UpdateRequest.DecorativeImage ?? "")" 
-                           type="file"
-                           accept="image/*">
+                    <div class="govuk-drop-zone"
+                         data-module="govuk-file-upload">
+                        <input id="file-upload-1" class="govuk-file-upload" asp-for="UpdateRequest.DecorativeImage"
+                               value="@(Model?.UpdateRequest.DecorativeImage ?? "")" 
+                               type="file"
+                               accept="image/*">
+                    </div>
                 </div>
                 
                 @if (!string.IsNullOrEmpty(Model?.UpdateRequest.DecorativeImage))
                 {
                     <button type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary" 
-                        data-module="govuk-button"data-prevent-double-click="true" data-govuk-button-init="" 
-                        name="RemoveImage" value="true">Remove Image</button>
+                            data-module="govuk-button"data-prevent-double-click="true" data-govuk-button-init="" 
+                            name="RemoveImage" value="true">Remove image</button>
                 }
             </div>
             
@@ -269,3 +271,17 @@
         </form>
     </div>
 </div>
+
+@section Scripts
+{
+    <script>
+        window.addEventListener('load', function () {
+
+            const uploadedView = document.querySelector('.govuk-file-upload-button__status');
+            
+            if (uploadedView) {
+                uploadedView.innerHTML = '@(Model?.UpdateRequest?.DecorativeImage ?? "No file chosen")';
+            }
+        })
+    </script>
+}

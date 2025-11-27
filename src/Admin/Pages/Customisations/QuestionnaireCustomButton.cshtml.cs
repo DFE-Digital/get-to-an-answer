@@ -4,11 +4,13 @@ using Common.Domain.Admin;
 using Common.Domain.Request.Update;
 using Common.Models;
 using Common.Models.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Admin.Pages.Customisations;
 
+[Authorize]
 public class QuestionnaireCustomButton(
     ILogger<QuestionnaireCustomButton> logger, 
     IApiClient apiClient) : QuestionnairesPageModel

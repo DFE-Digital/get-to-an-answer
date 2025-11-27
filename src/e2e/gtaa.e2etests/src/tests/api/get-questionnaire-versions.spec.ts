@@ -131,9 +131,9 @@ test('retrieve all versions of a questionnaire includes required fields', async 
         const v = 5 - i
         
         if (versions[i].version === 2) {
-            expect(versions[i].changeLog.length).toBe(7);
+            expect(versions[i].changeLog.length).toBe(8);
         } else if (versions[i].version === 4) {
-            expect(versions[i].changeLog.length).toBe(7);
+            expect(versions[i].changeLog.length).toBe(8);
         } else {
             expect(versions[i].changeLog.length).toBe(3);
         }
