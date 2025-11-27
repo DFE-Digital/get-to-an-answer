@@ -7,6 +7,8 @@ namespace Admin.Models;
 
 public class AnswerOptionsViewModel
 {
+    public Guid AnswerId { get; set; }
+    
     public int OptionNumber { get; set; }
     
     public QuestionType? QuestionType { get; set; }

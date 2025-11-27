@@ -1,5 +1,6 @@
 using Admin.Models;
 using Common.Client;
+using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
@@ -40,6 +41,25 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
 
         return Page();
     }
+    
+    
+    //onpostsave
+    public async Task<IActionResult> OnPostSaveOptions()
+    {
+        foreach (var option in Options)
+        {
+            await apiClient.UpdateAnswerAsync(option.AnswerId, new UpdateAnswerRequestDto
+            {
+                Content = option.OptionContent,
+                DestinationType = MapDestination(option.AnswerDestination),
+                DestinationQuestionId = option.SelectedDestinationQuestion != null ? Guid.Parse(option.SelectedDestinationQuestion) : null,
+                DestinationUrl = option.ResultPageUrl,
+                Priority = Convert.ToSingle(option.RankPriority)
+            });
+        }
+
+        return Page();
+    }
 
 
     private async Task PopulateFieldWithExistingValues()
@@ -48,10 +68,9 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
         var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
         var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
         
-        
         var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
-
+        
         // Set the selected property on the question selection list            
         questionSelectionList.Select(x => x.Selected = exitingAnswers.Any(a => a.Id.ToString() == x.Value));
 
@@ -112,5 +131,15 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             DestinationType.CustomContent => AnswerDestination.InternalResultsPage,
             DestinationType.ExternalLink => AnswerDestination.ExternalResultsPage,
             _ => throw new ArgumentOutOfRangeException(nameof(destinationType), destinationType, null)
+        };
+    
+    private static DestinationType MapDestination(AnswerDestination answerDestination) =>
+        answerDestination switch
+        {
+            AnswerDestination.NextQuestion => DestinationType.Question,
+            AnswerDestination.SpecificQuestion => DestinationType.Question,
+            AnswerDestination.InternalResultsPage => DestinationType.CustomContent,
+            AnswerDestination.ExternalResultsPage => DestinationType.ExternalLink,
+            _ => throw new ArgumentOutOfRangeException(nameof(answerDestination), answerDestination, null)
         };
 }
