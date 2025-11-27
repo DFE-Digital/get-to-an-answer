@@ -2,10 +2,12 @@ using AngleSharp.Common;
 using Common.Client;
 using Common.Domain;
 using Common.Models.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Admin.Pages.Version;
 
+[Authorize]
 public class QuestionnaireVersionHistory(IApiClient apiClient, IMsGraphClient graphClient) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] 

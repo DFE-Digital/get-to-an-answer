@@ -4,11 +4,13 @@ using Common.Domain.Admin;
 using Common.Domain.Request.Update;
 using Common.Models;
 using Common.Models.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Admin.Pages.Customisations;
 
+[Authorize]
 public class QuestionnaireLookAndFeel(
     ILogger<QuestionnaireLookAndFeel> logger, 
     IApiClient apiClient, 
@@ -81,13 +83,13 @@ public class QuestionnaireLookAndFeel(
             if (Questionnaire.DecorativeImage is not null)
             {
                 await imageStorageClient.DeleteImageAsync(
-                    $"{QuestionnaireId}/{Questionnaire.DecorativeImage}");
+                    $"{QuestionnaireId}/latest");
                 
                 await apiClient.DeleteQuestionnaireDecorativeImageAsync(QuestionnaireId);
             }
             
             await imageStorageClient.UploadImageAsync(file.OpenReadStream(), 
-                $"{QuestionnaireId}/{file.FileName}", file.ContentType);
+                $"{QuestionnaireId}/latest", file.ContentType);
             
             UpdateRequest.DecorativeImage = file.FileName;
         }

@@ -247,11 +247,11 @@ else if (questionnaireViewModel.QuestionnaireState is { JustUnpublished: true })
     <div class="govuk-button-group">
       @if (questionnaire?.Status == EntityStatus.Draft)
       {
-        <a class="govuk-button govuk-button--primary" data-module="govuk-button" href="/admin/questionnaires/@questionnaire?.Id/publish/confirm" data-govuk-button-init="">Publish questionnaire</a>
+        <a class="govuk-button govuk-button--primary" data-module="govuk-button" href="/admin/questionnaires/@questionnaire?.Id/publish-confirmation" data-govuk-button-init="">Publish questionnaire</a>
       } 
       else if (questionnaire?.Status == EntityStatus.Published)
       {
-        <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="/admin/questionnaires/@questionnaire?.Id/unpublish/confirm" data-govuk-button-init="">Unpublish questionnaire</a>
+        <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="/admin/questionnaires/@questionnaire?.Id/unpublish-confirmation" data-govuk-button-init="">Unpublish questionnaire</a>
       }
       <a class="govuk-button govuk-button--warning" data-module="govuk-button" href="/admin/questionnaires/@questionnaire?.Id/delete/confirm" data-govuk-button-init="">Delete questionnaire</a>
     </div>

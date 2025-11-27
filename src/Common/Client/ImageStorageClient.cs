@@ -12,6 +12,7 @@ public interface IImageStorageClient
     Task UploadImageAsync(Stream fileStream, string blobFileName, string contentType);
     Task<Stream> DownloadImageAsync(string blobFileName);
     Task DeleteImageAsync(string blobFileName);
+    Task DuplicateToAsync(string existingBlobFileName, string duplicateBlobFileName);
 }
 
 public class ImageStorageClient : IImageStorageClient
@@ -99,7 +100,13 @@ public class ImageStorageClient : IImageStorageClient
             _logger.LogInformation($"Image not found (no deletion required): {blobFileName}");
         }
     }
-    
+
+    public async Task DuplicateToAsync(string existingBlobFileName, string duplicateBlobFileName)
+    {
+        await _containerClient.GetBlobClient(duplicateBlobFileName)
+            .StartCopyFromUriAsync(new Uri(_containerClient.Uri, existingBlobFileName));
+    }
+
     private async Task CheckContainerExists()
     {
         var existsResponse = await _containerClient.ExistsAsync();
