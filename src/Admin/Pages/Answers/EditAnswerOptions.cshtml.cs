@@ -14,15 +14,14 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
 
     [FromRoute(Name = "questionId")] public Guid QuestionId { get; set; }
-    
-    [BindProperty]
-    public string QuestionNumber { get; set; } = "1";
-    
+
+    [BindProperty] public string? QuestionNumber { get; set; } = "1";
+
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
 
     [BindProperty] public QuestionType? RetrievedQuestionType { get; set; }
 
-    
+
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId);
@@ -33,14 +32,55 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
         {
             RetrievedQuestionType = (QuestionType)intVal;
         }
-        
-        await PopulateFieldsWithOtherOptions();
+
+        // await PopulateFieldOptions();
+        await PopulateFieldWithExistingValues();
+
         ReassignOptionNumbers();
-        
+
         return Page();
     }
-    
-    private async Task PopulateFieldsWithOtherOptions()
+
+
+    private async Task PopulateFieldWithExistingValues()
+    {
+        var exitingAnswers = await apiClient.GetAnswersAsync(QuestionId);
+        var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
+        var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
+        
+        
+        var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
+            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
+
+        // Set the selected property on the question selection list            
+        questionSelectionList.Select(x => x.Selected = exitingAnswers.Any(a => a.Id.ToString() == x.Value));
+
+        foreach (var exitingAnswer in exitingAnswers)
+        {
+            Options.Add(new AnswerOptionsViewModel
+            {
+                QuestionSelectList = questionSelectionList,
+                AnswerDestination = MapAnswerDestination(exitingAnswer.DestinationType),
+                OptionContent = exitingAnswer.Content,
+                OptionHint = exitingAnswer.Description,
+                ExternalLink = exitingAnswer.DestinationUrl,
+                SelectedDestinationQuestion = exitingAnswer.DestinationQuestionId?.ToString(),
+                OptionNumber = exitingAnswers.Count - 1,
+                QuestionType = currentQuestion?.Type,
+                RankPriority = exitingAnswer.Priority.ToString(),
+                ResultPageUrl = exitingAnswer.DestinationUrl,
+                //ResultsPageSelectList =
+                //SelectedResultsPage = 
+            });
+        }
+
+        // foreach (var option in Options)
+        // {
+        //     option.QuestionSelectList.Select(x => x.Selected = exitingAnswers.Any(a => a.Id.ToString() == x.Value));
+        // }
+    }
+
+    private async Task PopulateFieldOptions()
     {
         var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
         // var resultsPages = await apiClient.GetResultsPagesAsync(QuestionnaireId);
@@ -56,7 +96,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             // option.ResultsPageSelectList = resultsSelect;
         }
     }
-    
+
     private void ReassignOptionNumbers()
     {
         for (var index = 0; index < Options.Count; index++)
@@ -64,5 +104,13 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             Options[index].OptionNumber = index + 1;
         }
     }
-
+    
+    private static AnswerDestination MapAnswerDestination(DestinationType? destinationType) =>
+        destinationType switch
+        {
+            DestinationType.Question => AnswerDestination.NextQuestion,
+            DestinationType.CustomContent => AnswerDestination.InternalResultsPage,
+            DestinationType.ExternalLink => AnswerDestination.ExternalResultsPage,
+            _ => throw new ArgumentOutOfRangeException(nameof(destinationType), destinationType, null)
+        };
 }
