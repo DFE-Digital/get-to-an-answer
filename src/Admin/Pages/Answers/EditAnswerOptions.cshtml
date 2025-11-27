@@ -1,19 +1,85 @@
-@page
+@page "/admin/questionnaires/{questionnaireId:guid}/questions/{questionId:guid}/answers/edit"
+@addTagHelper *, Common
+@using Admin.Models
+@using Common.Enum
 @model Admin.Pages.Answers.EditAnswerOptions
 
 @{
-    Layout = null;
+  Layout = "_Layout";
+  ViewData["Title"] = "Edit answer options";
 }
 
-<!DOCTYPE html>
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
+}
 
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-<div>
-    
+@if (Model!.HasErrors())
+{
+  @await Html.PartialAsync("_ErrorSummary")
+}
+
+
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
+    <h1 class="govuk-heading-l">Create a list of answer options</h1>
+
+    <p class="govuk-body">
+      People will be able to select one option from your list.
+    </p>
+    <p class="govuk-body">
+      You can add your options individually below, or you can
+      <a class="govuk-link" href="#">enter all the options into one text box</a>.
+    </p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">Add answer options to your list</h2>
+
+    <form method="post" accept-charset="UTF-8">
+      <input type="hidden" asp-for="RetrievedQuestionType"/>
+
+      @for (var i = 0; i < Model.Options.Count; i++)
+      {
+        var viewData = new ViewDataDictionary(ViewData)
+        {
+          TemplateInfo =
+          {
+            HtmlFieldPrefix = $"Options[{i}]"
+          }
+        };
+
+        @await Html.PartialAsync("AnswerOptionsPartial", Model.Options[i], viewData)
+
+        <button class="govuk-button govuk-button--secondary govuk-!-margin-top-3"
+                type="submit"
+                asp-page-handler="RemoveOption">
+          Remove
+        </button>
+      }
+
+      <div class="govuk-!-margin-top-3 govuk-!-display-flex govuk-!-gap-3 govuk-!-flex-wrap">
+        <button class="govuk-button govuk-button--secondary"
+                type="submit"
+                asp-page-handler="AddOption">
+          Add another option
+        </button>
+        <a class="govuk-link govuk-!-margin-left-4" href="#">
+          Enter all the options into one text box
+        </a>
+      </div>
+
+      <button class="govuk-button govuk-!-margin-top-6"
+              asp-page-handler="Continue"
+              type="submit"
+              formnovalidate="formnovalidate"
+              data-module="govuk-button"
+              data-prevent-double-click="true"
+              data-govuk-button-init="">
+        Continue
+      </button>
+    </form>
+
+  </div>
 </div>
-</body>
-</html>
