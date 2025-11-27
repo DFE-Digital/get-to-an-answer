@@ -1,5 +1,6 @@
 import {expect, Locator, Page} from '@playwright/test';
 import {Timeouts} from "../../../constants/timeouts";
+import { formatTimestampToLongDate } from '../../../helpers/utils';
 
 export class ViewQuestionnaireTable {
     // ===== Locators =====
@@ -32,9 +33,10 @@ export class ViewQuestionnaireTable {
     }
 
     async verifyHeaders(): Promise<void> {
-        await expect(this.headers).toHaveCount(3);
+        await expect(this.headers).toHaveCount(4);
         await expect(this.table.getByRole('columnheader', {name: 'Name'})).toBeVisible();
         await expect(this.table.getByRole('columnheader', {name: 'Created by'})).toBeVisible();
+        await expect(this.table.getByRole('columnheader', {name: 'Last updated'})).toBeVisible();
         await expect(this.table.getByRole('columnheader', {name: 'Status'})).toBeVisible();
     }
 
@@ -62,13 +64,18 @@ export class ViewQuestionnaireTable {
         return text.replace(/\s+/g, ' ').trim();
     }
 
-    async verifyTableData(expectedRows: { title: string; createdBy: string; status: string }[]): Promise<void> {
+    async verifyTableData(expectedRows: {
+        title: string;
+        createdBy: string;
+        status: string;
+        updatedAt: string
+    }[]): Promise<void> {
         const rows = this.table.locator('tbody tr');
 
         // ✅ Wait for at least one row to appear
         await expect(rows.first()).toBeVisible();
         await expect(rows).toHaveCount(expectedRows.length);
-        
+
         const rowCount = await rows.count();
 
         expect(rowCount, `Expected ${expectedRows.length} rows but found ${rowCount}`).toBe(expectedRows.length);
@@ -79,17 +86,21 @@ export class ViewQuestionnaireTable {
 
             const titleText = this.cleanText(await row.locator('td').nth(0).innerText());
             const createdByText = this.cleanText(await row.locator('td').nth(1).innerText());
-            const statusText = this.cleanText(await row.locator('td').nth(2).innerText());
+            const lastpdatedAtText = this.cleanText(await row.locator('td').nth(2).innerText());
+            const statusText = this.cleanText(await row.locator('td').nth(3).innerText());
 
             const expected = expectedRows[i];
 
             expect(titleText, `Row ${i + 1}: title mismatch`).toBe(expected.title);
             const emailPrefix = expected.createdBy.split('@')[0];
-            
+
             // Normalize both strings: replace hyphens with spaces for comparison
             const normalizedCreatedByText = createdByText.toLowerCase().replace(/-/g, ' ');
             const normalizedEmailPrefix = emailPrefix.toLowerCase().replace(/-/g, ' ');
             expect(normalizedCreatedByText).toContain(normalizedEmailPrefix);
+
+            const date = formatTimestampToLongDate(expected.updatedAt);
+            expect(lastpdatedAtText, `Row ${i + 1}: last updated mismatch`).toBe(date);
             expect(statusText, `Row ${i + 1}: status mismatch`).toBe(expected.status);
         }
     }

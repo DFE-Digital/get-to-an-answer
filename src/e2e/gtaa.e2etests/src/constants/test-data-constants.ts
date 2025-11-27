@@ -37,6 +37,15 @@ export const ErrorMessages = {
     ERROR_MESSAGE_INVALID_TITLE: 'Enter a valid title',
     
     ERROR_MESSAGE_TERMS_OF_USE: 'You need to accept the agreement to continue',
-    ERROR_MESSAGE_MISSING_QUESTION_TEXT: 'Enter a question text',
-    ERROR_MESSAGE_MISSING_QUESTION_TYPE: 'Enter a question type',
+
+    ERROR_MESSAGE_MISSING_QUESTION_TYPE: 'Select question type',
+    ERROR_MESSAGE_MISSING_QUESTION_CONTENT: 'Enter a question',
+
+    ERROR_MESSAGE_MISSING_OPTION_CONTENT: 'The OptionContent field is required.',
+}
+
+export const PageHeadings = {
+    VIEW_QUESTION_PAGE_HEADING: 'Add and edit your questions',
+    ADD_QUESTION_PAGE_HEADING: 'Add a question',
+    ADD_ANSWER_PAGE_HEADING: 'Create a list of answer options',
 }
