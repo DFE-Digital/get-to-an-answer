@@ -32,7 +32,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
 
         return Page();
     }
-
+    
 
     public async Task<IActionResult> OnPostAddOption()
     {
@@ -40,7 +40,6 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
 
         if (!ModelState.IsValid)
         {
-            await PopulateFieldWithExistingValues();
             return Page();
         }
 
@@ -60,6 +59,12 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
     public async Task<IActionResult> OnPostSaveAnswerOptions()
     {
         ValidateSelectedQuestionsIfAny();
+
+        if (!ModelState.IsValid)
+        {
+            await PopulateFieldWithExistingValues();
+            return Page();
+        }
         
         try
         {

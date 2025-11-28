@@ -22,6 +22,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
     // Bind a collection of options
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
+    
 
     [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
 
