@@ -109,7 +109,7 @@ export class AddQuestionPage extends BasePage {
     }
 
     // ===== Validations =====
-    async expectQuestionHeadingOnPage(expectedText?: string): Promise<void> {
+    async expectAddQuestionHeadingOnPage(expectedText?: string): Promise<void> {
         await expect(this.addQuestionHeading, '❌ Add question heading not visible').toBeVisible();
 
         if (expectedText) {

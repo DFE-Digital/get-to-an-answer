@@ -1,22 +1,34 @@
-import { expect, Locator, Page } from '@playwright/test';
+import {expect, Locator, Page} from '@playwright/test';
 
 export class ViewQuestionTable {
     // ===== Locators =====
-    private readonly list: Locator; 
-    private readonly rows: Locator; 
-    private readonly keys: Locator; 
+    private readonly list: Locator;
+    private readonly rows: Locator;
+    private readonly keys: Locator;
     private readonly values: Locator;
+    private readonly moveUpLinks: Locator;
+    private readonly moveDownLinks: Locator;
+    private readonly editLinks: Locator;
+    private readonly page: Page;
+
 
     // ===== Constructor =====
-    constructor(private readonly page: Page) {
-        const section = page.getByRole('heading', { level: 2, name: 'Your questions' }).locator('..'); // parent
-        this.list = section.locator('dl.govuk-summary-list');
-        this.rows = this.list.locator('div.govuk-summary-list__row');
-        this.keys = this.rows.locator('dt.govuk-summary-list__key');
-        this.values = this.rows.locator('dd.govuk-summary-list__value');
+    constructor(page: Page) {
+        this.page = page;
+
+        const section = page
+            .getByRole('heading', {level: 2, name: 'Your questions'})
+            .locator('..');
+        this.list = section.locator('ul.govuk-list');
+        this.rows = this.list.locator('li');
+        this.keys = this.rows.locator('div.govuk-grid-column-two-thirds p.govuk-body');
+        this.values = this.rows.locator('div.govuk-grid-column-one-third');
+        this.moveUpLinks = this.rows.locator('a, button').filter({hasText: /Move up/i});
+        this.moveDownLinks = this.rows.locator('a, button').filter({hasText: /Move down/i});
+        this.editLinks = this.rows.getByRole('link', {name: /Edit/i});
     }
 
-    // ===== Basic validation =====
+    // ===== Validation =====
     async verifyVisible(): Promise<void> {
         await expect(this.list).toBeVisible();
     }
@@ -25,9 +37,29 @@ export class ViewQuestionTable {
         return this.rows.count();
     }
 
-    // ===== Text helpers =====
+    async expectReorderControlsOnRowByIndex(index: number): Promise<void> {
+        const row = this.rowByIndex(index);
+        await expect(row).toBeVisible();
+
+        const rowContent = await row.innerHTML();
+        console.log(`Row ${index} HTML:`, rowContent);
+
+        const moveUpLink = this.getMoveUpLinkForRow(row);
+        const moveDownLink = this.getMoveDownLinkForRow(row);
+
+        await expect(moveUpLink, `❌ Move up button not visible on row ${index}`).toBeVisible();
+        await expect(moveDownLink, `❌ Move down button not visible on row ${index}`).toBeVisible();
+    }
+
+    private getMoveUpLinkForRow(row: Locator): Locator {
+        return row.locator('a, button').filter({hasText: /Move up/i}).first();
+    }
+
+    private getMoveDownLinkForRow(row: Locator): Locator {
+        return row.locator('a, button').filter({hasText: /Move down/i}).first();
+    }
+
     async textByIndex(index: number): Promise<string> {
-        // 1-based index, returns the key text (e.g. “question 1”)
         return (await this.keys.nth(index - 1).innerText()).trim();
     }
 
@@ -47,32 +79,37 @@ export class ViewQuestionTable {
 
     private rowByName(partialText: string): Locator {
         // Matches by the key/value text contained in the row
-        return this.rows.filter({ hasText: partialText }).first();
+        return this.rows.filter({hasText: partialText}).first();
     }
 
     // ===== Actions =====
     async clickEditByIndex(index: number): Promise<void> {
-        const link = this.rowByIndex(index).getByRole('link', { name: /Edit/i });
+        const link = this.rowByIndex(index).getByRole('link', {name: /Edit/i});
         await expect(link).toBeVisible();
         await link.click();
     }
 
     async moveUpByIndex(index: number): Promise<void> {
-        const link = this.rowByIndex(index).getByRole('link', { name: /Move up/i });
-        await expect(link).toBeVisible();
-        await link.click();
-    }
-
-    async moveDownByIndex(index: number): Promise<void> {
-        const link = this.rowByIndex(index).getByRole('link', { name: /Move down/i });
+        const row = this.rowByIndex(index);
+        const link = this.getMoveUpLinkForRow(row);
         await expect(link).toBeVisible();
         await link.click();
     }
     
+    async moveDownByIndex(index: number): Promise<void> {
+        const row = this.rowByIndex(index);
+        const link = this.getMoveDownLinkForRow(row);
+        await expect(link).toBeVisible();
+        await link.click();
+    }
+
+
     async moveByName(direction: 'up' | 'down', partialText: string): Promise<void> {
         const row = this.rowByName(partialText);
         await expect(row).toBeVisible();
-        const link = row.getByRole('link', { name: direction === 'up' ? /Move up/i : /Move down/i });
+        const link = direction === 'up'
+            ? this.getMoveUpLinkForRow(row)
+            : this.getMoveDownLinkForRow(row);
         await expect(link).toBeVisible();
         await link.click();
     }
@@ -81,7 +118,7 @@ export class ViewQuestionTable {
         await expect(this.rowByName(name)).toBeVisible();
     }
 
-    // Optional getters if you need values
+    // ===== Getters =====
     async valueTextByIndex(index: number): Promise<string> {
         return (await this.values.nth(index - 1).innerText()).trim();
     }
