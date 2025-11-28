@@ -44,7 +44,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
     
     
     //onpostsave
-    public async Task<IActionResult> OnPostSaveOptions()
+    public async Task<IActionResult> OnPostSaveAnswerOptions()
     {
         foreach (var option in Options)
         {
@@ -64,32 +64,38 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
 
     private async Task PopulateFieldWithExistingValues()
     {
-        var exitingAnswers = await apiClient.GetAnswersAsync(QuestionId);
+        var existingAnswers = await apiClient.GetAnswersAsync(QuestionId);
         var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
+        
         var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
         
-        var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
-            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
+        var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId).Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
         
         // Set the selected property on the question selection list            
-        questionSelectionList.Select(x => x.Selected = exitingAnswers.Any(a => a.Id.ToString() == x.Value));
-
-        foreach (var exitingAnswer in exitingAnswers)
+        questionSelectionList.Select(x => x.Selected = existingAnswers.Any(a => a.DestinationQuestionId.ToString() == x.Value));
+        
+        var resultsPages = apiClient.GetContentsAsync(QuestionnaireId);
+        var resultsPagesForSelection = resultsPages.Result.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
+        
+        resultsPagesForSelection.Select(x => x.Selected = existingAnswers.Any(a => a.Id.ToString() == x.Value));
+        
+        foreach (var existingAnswer in existingAnswers)
         {
             Options.Add(new AnswerOptionsViewModel
             {
+                AnswerId = existingAnswer.Id,
                 QuestionSelectList = questionSelectionList,
-                AnswerDestination = MapAnswerDestination(exitingAnswer.DestinationType),
-                OptionContent = exitingAnswer.Content,
-                OptionHint = exitingAnswer.Description,
-                ExternalLink = exitingAnswer.DestinationUrl,
-                SelectedDestinationQuestion = exitingAnswer.DestinationQuestionId?.ToString(),
-                OptionNumber = exitingAnswers.Count - 1,
+                AnswerDestination = MapAnswerDestination(existingAnswer.DestinationType, existingAnswer.DestinationQuestionId),
+                OptionContent = existingAnswer.Content,
+                OptionHint = existingAnswer.Description,
+                ExternalLink = existingAnswer.DestinationUrl,
+                SelectedDestinationQuestion = existingAnswer.DestinationQuestionId?.ToString(),
+                OptionNumber = existingAnswers.Count - 1,
                 QuestionType = currentQuestion?.Type,
-                RankPriority = exitingAnswer.Priority.ToString(),
-                ResultPageUrl = exitingAnswer.DestinationUrl,
-                //ResultsPageSelectList =
-                //SelectedResultsPage = 
+                RankPriority = existingAnswer.Priority.ToString(),
+                ResultPageUrl = existingAnswer.DestinationUrl,
+                ResultsPageSelectList = resultsPagesForSelection,
+                // SelectedResultsPage =  
             });
         }
 
@@ -124,9 +130,10 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
         }
     }
     
-    private static AnswerDestination MapAnswerDestination(DestinationType? destinationType) =>
+    private static AnswerDestination MapAnswerDestination(DestinationType? destinationType, Guid? destinationQuestionId = null) =>
         destinationType switch
         {
+            DestinationType.Question when destinationQuestionId != null => AnswerDestination.SpecificQuestion,
             DestinationType.Question => AnswerDestination.NextQuestion,
             DestinationType.CustomContent => AnswerDestination.InternalResultsPage,
             DestinationType.ExternalLink => AnswerDestination.ExternalResultsPage,
