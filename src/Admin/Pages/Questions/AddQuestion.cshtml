@@ -18,9 +18,12 @@
   @await Html.PartialAsync("_ErrorSummary")
 }
 
+
+<input type="hidden" asp-for="QuestionNumber"/>
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-
+    
     <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
     <h1 class="govuk-heading-l">Add a question</h1>
 

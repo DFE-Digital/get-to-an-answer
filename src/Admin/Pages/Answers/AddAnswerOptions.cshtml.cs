@@ -115,17 +115,17 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     private async Task HydrateFields()
     {
         var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
-        // var resultsPages = await apiClient.GetResultsPagesAsync(QuestionnaireId);
+        var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
 
         var questionSelect = questions.Where(x => x.Id != QuestionId)
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
-        // var resultsSelect = resultsPages.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
+        var resultsSelect = resultsPages.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
 
         foreach (var option in Options)
         {
             option.QuestionType = RetrievedQuestionType;
             option.QuestionSelectList = questionSelect;
-            // option.ResultsPageSelectList = resultsSelect;
+            option.ResultsPageSelectList = resultsSelect;
         }
     }
 
