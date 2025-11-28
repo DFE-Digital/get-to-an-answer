@@ -28,9 +28,15 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
     [Required(ErrorMessage = "Select question type")]
     public QuestionType QuestionType { get; set; }
 
-    public IActionResult OnGet()
+    public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
+        
+        var existingQuestions = await apiClient.GetQuestionsAsync(QuestionnaireId);
+
+        if (existingQuestions.Count > 0)
+            QuestionNumber = (existingQuestions.Max(q => q.Order) + 1).ToString();
+        
         return Page();
     }
 
