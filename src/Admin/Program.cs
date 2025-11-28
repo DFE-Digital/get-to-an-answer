@@ -80,12 +80,18 @@ if (!string.IsNullOrEmpty(appInsightsConnectionString))
 
 builder.Services.AddHttpContextAccessor();
 
+#region GTAA Api Client
+
 builder.Services.AddTransient(sp =>
     new BearerTokenHandler(sp.GetRequiredService<IHttpContextAccessor>()));
 
 // Register an HttpClient with a pre-configured base address
 builder.Services.AddHttpClient<IApiClient, ApiClient>(client => client.BaseAddress = new Uri(apiBaseUrl))
     .AddHttpMessageHandler<BearerTokenHandler>();
+
+#endregion
+
+#region Microsoft Graph
 
 builder.Services.AddTransient(sp =>
     new MsGraphHandler(sp.GetRequiredService<IHttpContextAccessor>()));
@@ -95,17 +101,26 @@ var msGraphBaseUrl = builder.Configuration.GetSection("MsGraph:BaseUrl").Value!;
 builder.Services.AddHttpClient<IMsGraphClient, MsGraphClient>(client => client.BaseAddress = new Uri(msGraphBaseUrl))
     .AddHttpMessageHandler<MsGraphHandler>();
 
-// TODO remove and test no regression
+#endregion
+
+#region Blob Storage
+
+var blobStorageConnectionString = builder.Configuration.GetSection("BlobStorage:ConnectionString").Value!;
+var blobStorageContainerName = builder.Configuration.GetSection("BlobStorage:ContainerName").Value!;
+
+builder.Services.AddSingleton<IImageStorageClient>(sp => 
+    new ImageStorageClient(blobStorageConnectionString, blobStorageContainerName, 
+        sp.GetRequiredService<ILogger<ImageStorageClient>>()));
+
+#endregion
+
 builder.Services.AddControllersWithViews().AddMicrosoftIdentityUI(); 
 
 // Add services to the container.
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AddPageRoute("/Home/Index", "/");
-    options.Conventions.AddPageRoute("/Shared/Error", "/error");
 });
-
-//builder.AddLogging();
     
 builder.Services.AddHealthChecks();
 
@@ -117,15 +132,26 @@ SiteConfiguration.Rebrand = app.Configuration.GetValue<bool>("Rebrand") || DateT
 
 #endregion
 
-//app.UseLogEnrichment();
+#region Error Handling
 
 // Configure the HTTP request pipeline.
 if (!builderIsLocalEnvironment)
 {
-    app.UseExceptionHandler("/error");
+    // Configure the HTTP request pipeline.
+    app.UseExceptionHandler("/error/404");
+
+    // Handle non-existing routes (404)
+    app.UseStatusCodePagesWithReExecute("/error/{0}");
+    
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+else
+{
+    app.UseDeveloperExceptionPage();
+}
+
+#endregion
 
 app.MapHealthChecks("/health");
 
@@ -147,6 +173,8 @@ else if (builder.Environment.IsDevelopment())
 {
     app.UseDevMvcTokenEndpoints();
 }
+
+app.MapControllers();
 
 app.MapStaticAssets();
 app.MapRazorPages();

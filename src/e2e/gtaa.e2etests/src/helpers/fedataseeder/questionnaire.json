@@ -1,0 +1,264 @@
+{
+  "title": "Arrangements questionnaire - asylum journey",
+  "description": "User journey covering care history, age, asylum, and unknown arrangements.",
+  "questions": [
+    {
+      "key": "q1",
+      "text": "Which of these arrangements apply to you?",
+      "type": 2,
+      "answers": [
+        {
+          "text": "I am in or have been in care",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q2"
+          }
+        },
+        {
+          "text": "I'm currently or have been looked after for a short time",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q2"
+          }
+        },
+        {
+          "text": "I arrived in the UK alone to seek asylum",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://dev.get-to-an-answer.education.gov.uk"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "internal-link"
+          }
+        }
+      ]
+    },
+    {
+      "key": "q2",
+      "text": "How old are you?",
+      "type": 3,
+      "answers": [
+        {
+          "text": "15 or younger",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "16 or 17",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q3"
+          }
+        },
+        {
+          "text": "18 to 24",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q5"
+          }
+        },
+        {
+          "text": "25 or older",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "internal-link"
+          }
+        }
+      ]
+    },
+
+    {
+      "key": "q3",
+      "text": "Were you in care or looked after on or after your 16th birthday?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q4"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "internal-link"
+          }
+        }
+      ]
+    },
+
+    {
+      "key": "q4",
+      "text": "Were you in care or looked after for at least 13 weeks (just over 3 months) after your 14th birthday?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "internal-link"
+          }
+        }
+      ]
+    },
+
+    {
+      "key": "q5",
+      "text": "Were you in care or looked after on or after your 16th birthday?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q6"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "internal-link"
+          }
+        }
+      ]
+    },
+    {
+      "key": "q6",
+      "text": "Were you in care or looked after for at least 13 weeks (just over 3 months) after your 14th birthday?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q7"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "internal-link"
+          }
+        }
+      ]
+    },
+    {
+      "key": "q7",
+      "text": "Were you in care or looked after for at least 5 weeks (just less than 3 months) after your 14th birthday?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q8"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "internal-link"
+          }
+        }
+      ]
+    },
+    {
+      "key": "q8",
+      "text": "Were you in care or looked after for at least 1 week (just less than 1 month) after your 14th birthday?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q9"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://dev.get-to-an-answer.education.gov.uk"
+          }
+        }
+      ]
+    },
+    {
+      "key": "q9",
+      "text": "Were you in care or looked after for at least 1 day after your 14th birthday?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "internal-link"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://dev.get-to-an-answer.education.gov.uk"
+          }
+        }
+      ]
+    }
+  ]
+}

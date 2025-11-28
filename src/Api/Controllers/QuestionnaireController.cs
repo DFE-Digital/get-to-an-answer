@@ -36,11 +36,11 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
     }
     
     [HttpGet]
-    public IActionResult GetQuestionnaires()
+    public async Task<IActionResult> GetQuestionnaires()
     {
         var userId = User.GetIdClaim()!;
         
-        return questionnaireService.GetQuestionnaires(userId).ToActionResult();
+        return (await questionnaireService.GetQuestionnaires(userId)).ToActionResult();
     }
 
     [HttpPut("{id:guid}")]
@@ -49,6 +49,30 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         var userId = User.GetIdClaim()!;
         
         return (await questionnaireService.UpdateQuestionnaire(userId, id, request)).ToActionResult();
+    }
+
+    [HttpPatch("{id:guid}/look-and-feel")]
+    public async Task<IActionResult> UpdateQuestionnaireLookAndFeel(Guid id, UpdateLookAndFeelRequestDto request)
+    {
+        var userId = User.GetIdClaim()!;
+        
+        return (await questionnaireService.UpdateQuestionnaireLookAndFeel(userId, id, request)).ToActionResult();
+    }
+    
+    [HttpPatch("{id:guid}/continue-button")]
+    public async Task<IActionResult> UpdateQuestionnaireContinueButton(Guid id, UpdateContinueButtonRequestDto request)
+    {
+        var userId = User.GetIdClaim()!;
+        
+        return (await questionnaireService.UpdateQuestionnaireContinueButton(userId, id, request)).ToActionResult();
+    }
+
+    [HttpPatch("{id:guid}/decorative-image")]
+    public async Task<IActionResult> DeleteQuestionnaireDecorativeImage(Guid id)
+    {
+        var userId = User.GetIdClaim()!;
+        
+        return (await questionnaireService.DeleteQuestionnaireDecorativeImage(userId, id)).ToActionResult();
     }
 
     [HttpPatch("{id:guid}")]

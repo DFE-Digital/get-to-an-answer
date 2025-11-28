@@ -21,6 +21,9 @@ public interface IApiClient
     Task<List<QuestionnaireDto>> GetQuestionnairesAsync();
     Task<QuestionnaireDto?> CreateQuestionnaireAsync(CreateQuestionnaireRequestDto request);
     Task<string?> UpdateQuestionnaireAsync(Guid questionnaireId, UpdateQuestionnaireRequestDto request);
+    Task<string?> UpdateQuestionnaireLookAndFeelAsync(Guid questionnaireId, UpdateLookAndFeelRequestDto request);
+    Task<string?> UpdateContinueButtonAsync(Guid questionnaireId, UpdateContinueButtonRequestDto request);
+    Task<string?> DeleteQuestionnaireDecorativeImageAsync(Guid questionnaireId);
     Task<string?> PublishQuestionnaireAsync(Guid questionnaireId);
     Task<string?> UnpublishQuestionnaireAsync(Guid questionnaireId);
     Task<QuestionnaireDto?> CloneQuestionnaireAsync(Guid questionnaireId, CloneQuestionnaireRequestDto request);
@@ -137,6 +140,36 @@ public class ApiClient : IApiClient
     public async Task<string?> UpdateQuestionnaireAsync(Guid questionnaireId, UpdateQuestionnaireRequestDto request)
     {
         var response = await _httpClient.PutAsJsonAsync($"{Questionnaires}/{questionnaireId}", request);
+
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadAsStringAsync();
+
+        return null;
+    }
+
+    public async Task<string?> UpdateQuestionnaireLookAndFeelAsync(Guid questionnaireId, UpdateLookAndFeelRequestDto request)
+    {
+        var response = await _httpClient.PatchAsJsonAsync($"{Questionnaires}/{questionnaireId}/look-and-feel", request);
+
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadAsStringAsync();
+
+        return null;
+    }
+
+    public async Task<string?> UpdateContinueButtonAsync(Guid questionnaireId, UpdateContinueButtonRequestDto request)
+    {
+        var response = await _httpClient.PatchAsJsonAsync($"{Questionnaires}/{questionnaireId}/continue-button", request);
+
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadAsStringAsync();
+
+        return null;
+    }
+
+    public async Task<string?> DeleteQuestionnaireDecorativeImageAsync(Guid questionnaireId)
+    {
+        var response = await _httpClient.PatchAsync($"{Questionnaires}/{questionnaireId}/decorative-image", null);
 
         if (response.IsSuccessStatusCode)
             return await response.Content.ReadAsStringAsync();

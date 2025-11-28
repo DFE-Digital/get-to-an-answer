@@ -1,10 +1,10 @@
+using System.Text.Json;
 using Common.Models.PageModels;
 using Common.Client;
 using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Frontend.Pages.Questionnaire;
 
@@ -52,17 +52,16 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
         {
             if (QuestionnaireSlug == null)
                 return NotFound();
-            
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
 
             if (IsRedirectConfirmation)
             {
+                IsRedirectConfirmation = false;
+                
+                ModelState.Clear();
+                
                 if (confirmRedirect)
                 {
-                    var nextDestination = TempData["NextDestination"] as DestinationDto;
+                    var nextDestination = JsonSerializer.Deserialize<DestinationDto>(TempData["NextDestination"]?.ToString() ?? "{}");
                     
                     if (nextDestination is null)
                     {
@@ -72,14 +71,28 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
                     IsEmbedded = Embed;
                     Destination = nextDestination;
                     NextStateRequest = new GetNextStateRequest();
-                    
-                    if (Destination is { Type: DestinationType.ExternalLink, Content: not null })
-                    {
-                        return Redirect(Destination.Content);
-                    }
+                    Questionnaire = JsonSerializer.Deserialize<QuestionnaireInfoDto>(TempData["Questionnaire"]?.ToString() ?? "{}")!;
 
-                    return Page(); // display custom content page
+                    if (!Embed)
+                    {
+                        if (Destination is { Type: DestinationType.ExternalLink, Content: not null })
+                        {
+                            return Redirect(Destination.Content);
+                        }
+                    }
                 }
+                else
+                {
+                    Questionnaire = JsonSerializer.Deserialize<QuestionnaireInfoDto>(TempData["Questionnaire"]?.ToString() ?? "{}")!;
+                    Destination = JsonSerializer.Deserialize<DestinationDto>(TempData["CurrDestination"]?.ToString() ?? "{}")!;
+                }
+
+                return Page();
+            }
+            
+            if (!ModelState.IsValid)
+            {
+                return Page();
             }
 
             if (NextStateRequest.SelectedAnswerIds.Count > 1)
@@ -93,17 +106,16 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             if (destination == null)
                 return NotFound();
 
-            if (!Embed)
+            if (destination is { Type: DestinationType.ExternalLink, Content: not null } ||
+                destination is { Type: DestinationType.CustomContent, Title: not null, Content: not null })
             {
-                if (destination is { Type: DestinationType.ExternalLink, Content: not null } ||
-                    destination is { Type: DestinationType.CustomContent, Title: not null, Content: not null })
-                {
-                    IsRedirectConfirmation = true;
+                IsRedirectConfirmation = true;
                     
-                    TempData["NextDestination"] = destination;
+                TempData["Questionnaire"] = JsonSerializer.Serialize(Questionnaire);
+                TempData["CurrDestination"] = JsonSerializer.Serialize(Destination);
+                TempData["NextDestination"] = JsonSerializer.Serialize(destination);
                     
-                    return Page();
-                }
+                return Page();
             }
 
             IsEmbedded = Embed;

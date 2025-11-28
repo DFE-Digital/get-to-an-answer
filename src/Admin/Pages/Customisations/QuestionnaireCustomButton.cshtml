@@ -1,0 +1,66 @@
+@page "/admin/questionnaires/{questionnaireId:guid}/edit-continue-button"
+@addTagHelper *, Common
+@model Admin.Pages.Customisations.QuestionnaireCustomButton
+
+@{
+    Layout = "Shared/_Layout";
+    
+    ViewData["Title"] = "Questionnaire look and feel";
+
+    const string continueButtonTextId = "continue-button-text";
+}
+
+@section BeforeContent
+{
+    <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model?.Questionnaire?.Id/track">Back
+        to questionnaire '@Model?.Questionnaire?.Title'</a>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">@Model.Questionnaire.Title</span>
+            Edit text on 'continue' buttons
+        </h1>
+
+        <div class="govuk-hint">
+            Buttons that say 'Continue' appear at the bottom of every question.   
+
+            You can customise this text for specific purposes. 
+        </div>
+
+        <div class="govuk-warning-text govuk-!-margin-bottom-9">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-visually-hidden">Warning</span>
+                Do not edit the button text unless there is a clear user or business need.
+            </strong>
+        </div>
+
+        <form accept-charset="UTF-8" method="post">
+            <govuk-form-group asp-for="@Model.UpdateRequest.ContinueButtonText">
+                <label for="@continueButtonTextId" class="govuk-label govuk-label--m">
+                    Button text
+                </label>
+
+                <div class="govuk-hint" id="@continueButtonTextId-hint">
+                    Add what text to appear instead of 'Continue'.
+                </div>
+
+                <govuk-field-error asp-for="@Model.UpdateRequest.ContinueButtonText" error-id="@continueButtonTextId-error"/>
+
+                <govuk-input id="@continueButtonTextId"
+                             class="govuk-input"
+                             aria-describedby="@continueButtonTextId-hint"
+                             type="text"
+                             asp-for="@Model.UpdateRequest.ContinueButtonText"
+                             value="@(Model?.UpdateRequest.ContinueButtonText ?? "")"
+                             govuk-error-for="@Model?.UpdateRequest.ContinueButtonText"/>
+            </govuk-form-group>
+
+            <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button"
+                    data-prevent-double-click="true" data-govuk-button-init="">Save and continue
+            </button>
+        </form>
+    </div>
+</div>

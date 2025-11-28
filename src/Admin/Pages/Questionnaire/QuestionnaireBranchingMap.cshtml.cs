@@ -9,7 +9,7 @@ namespace Admin.Pages.Questionnaire;
 public class QuestionnaireBranchingMap(IApiClient apiClient) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] 
-    [BindProperty] public required Guid QuestionnaireId { get; set; }
+    public required Guid QuestionnaireId { get; set; }
 
     [BindProperty] public required QuestionnaireBranchingMapDto QuestionnaireBranchingMapDto { get; set; }
     

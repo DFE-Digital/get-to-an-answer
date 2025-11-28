@@ -9,7 +9,7 @@ namespace Admin.Pages.Version;
 public class QuestionnaireVersionHistory(IApiClient apiClient, IMsGraphClient graphClient) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] 
-    [BindProperty] public required Guid QuestionnaireId { get; set; }
+    public required Guid QuestionnaireId { get; set; }
 
     [BindProperty] public required List<QuestionnaireVersionDto> QuestionnaireVersions { get; set; }
     

@@ -55,12 +55,13 @@ test.describe('Get to an answer update questionnaire', () => {
         await addQuestionnairePage.validateTitleFormGroup();
     });
 
+    // TBC, aria-described by id's need correction (CARE-1546)
     test('Accessible aria-describedby includes hint id and error message id', async ({page}) => {
         await addQuestionnairePage.enterTitle('');
         await addQuestionnairePage.clickSaveAndContinue();
         await addQuestionnairePage.validateTitleFieldAriaDescribedBy();
     });
-    
+
     test('Successful submit updates title and validation', async ({request, page}) => {
         const newTitle = `Updated questionnaire title - ${Date.now()}`;
         await addQuestionnairePage.enterTitle(newTitle);
@@ -87,6 +88,7 @@ test.describe('Get to an answer update questionnaire', () => {
             {
                 title: questionnaireGetResponse.questionnaireGetBody.title,
                 createdBy: firstQuestionnaire.createdBy,
+                updatedAt: questionnaireGetResponse.questionnaireGetBody.updatedAt,
                 status: statusName
             }
         ];

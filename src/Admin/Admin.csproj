@@ -16,6 +16,7 @@
 
     <ItemGroup>
       <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
+      <PackageReference Include="Azure.Storage.Blobs" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
       <PackageReference Include="Microsoft.Identity.Abstractions" />
       <PackageReference Include="Microsoft.Identity.Web" />
@@ -35,10 +36,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Common\Common.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <AdditionalFiles Include="Pages\Error.cshtml" />
     </ItemGroup>
 
 </Project>

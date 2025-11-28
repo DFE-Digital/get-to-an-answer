@@ -1,0 +1,271 @@
+@page "/admin/questionnaires/{questionnaireId}/look-and-feel"
+@addTagHelper *, Common
+@model Admin.Pages.Customisations.QuestionnaireLookAndFeel
+
+@{
+    Layout = "Shared/_Layout";
+    
+    ViewData["Title"] = "Questionnaire look and feel";
+
+    const string textColorId = "text-color";
+    const string backgroundColorId = "background-color";
+    const string primaryButtonColorId = "primary-button-color";
+    const string secondaryButtonColorId = "secondary-button-color";
+    const string stateColorId = "state-color";
+    const string errorMessageColorId = "error-color";
+}
+
+@section BeforeContent
+{
+    <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model?.Questionnaire?.Id/track">Back
+        to questionnaire '@Model?.Questionnaire?.Title'</a>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">@Model.Questionnaire.Title</span>
+            Edit look and feel of your questionnaire
+        </h1>
+
+        <div class="govuk-hint">
+            <p>The default look and feel for questionnaires use DfE styling.</p>
+            <p>You can customise the look and feel for specific purposes, like to match campaign branding.</p>
+        </div>
+
+        <div class="govuk-warning-text govuk-!-margin-bottom-9">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-visually-hidden">Warning</span>
+                Do not edit the look and feel unless there is a clear user or business need.
+            </strong>
+        </div>
+
+        <form accept-charset="UTF-8" method="post" enctype="multipart/form-data">
+            <govuk-form-group asp-for="@Model.UpdateRequest.TextColor">
+                <label for="@textColorId" class="govuk-label govuk-label--m">
+                    Text colour
+                </label>
+
+                <div class="govuk-hint" id="@textColorId-hint">
+                    Add a hex code for the main text colour
+                </div>
+
+                <govuk-field-error asp-for="@Model.UpdateRequest.TextColor" error-id="@textColorId-error"/>
+
+                <govuk-input id="@textColorId"
+                             class="govuk-input"
+                             aria-describedby="@textColorId-hint"
+                             type="text"
+                             asp-for="@Model.UpdateRequest.TextColor"
+                             value="@(Model?.UpdateRequest.TextColor ?? "")"
+                             govuk-error-for="@Model?.UpdateRequest.TextColor"/>
+            </govuk-form-group>
+
+            <govuk-form-group asp-for="@Model.UpdateRequest.BackgroundColor">
+                <h2 class="govuk-label-wrapper">
+                    <label for="@backgroundColorId" class="govuk-label govuk-label--m">
+                        Background colour
+                    </label>
+                </h2>
+
+                <div class="govuk-hint" id="@backgroundColorId-hint">
+                    Add a hex code for the background
+                </div>
+
+                <govuk-field-error asp-for="@Model.UpdateRequest.BackgroundColor" error-id="@backgroundColorId-error"/>
+
+                <govuk-input id="@backgroundColorId"
+                             class="govuk-input"
+                             aria-describedby="@backgroundColorId-hint"
+                             type="text"
+                             asp-for="@Model.UpdateRequest.BackgroundColor"
+                             value="@(Model?.UpdateRequest.BackgroundColor ?? "")"
+                             govuk-error-for="@Model?.UpdateRequest.BackgroundColor"/>
+            </govuk-form-group>
+
+            <govuk-form-group asp-for="@Model.UpdateRequest.PrimaryButtonColor">
+                <h2 class="govuk-label-wrapper">
+                    <label for="@primaryButtonColorId" class="govuk-label govuk-label--m">
+                        Primary button colour
+                    </label>
+                </h2>
+
+                <div class="govuk-hint" id="@primaryButtonColorId-hint">
+                    Add a hex code for the primary button colour
+                </div>
+
+                <govuk-field-error asp-for="@Model.UpdateRequest.PrimaryButtonColor"
+                                   error-id="@primaryButtonColorId-error"/>
+
+                <govuk-input id="@primaryButtonColorId"
+                             class="govuk-input"
+                             aria-describedby="@primaryButtonColorId-hint"
+                             type="text"
+                             asp-for="@Model.UpdateRequest.PrimaryButtonColor"
+                             value="@(Model?.UpdateRequest.PrimaryButtonColor ?? "")"
+                             govuk-error-for="@Model?.UpdateRequest.PrimaryButtonColor"/>
+            </govuk-form-group>
+
+            <govuk-form-group asp-for="@Model.UpdateRequest.SecondaryButtonColor">
+                <h2 class="govuk-label-wrapper">
+                    <label for="@secondaryButtonColorId" class="govuk-label govuk-label--m">
+                        Secondary button colour
+                    </label>
+                </h2>
+
+                <div class="govuk-hint" id="@secondaryButtonColorId-hint">
+                    Add a hex code for the secondary button colour
+                </div>
+
+                <govuk-field-error asp-for="@Model.UpdateRequest.SecondaryButtonColor"
+                                   error-id="@secondaryButtonColorId-error"/>
+
+                <govuk-input id="@secondaryButtonColorId"
+                             class="govuk-input"
+                             aria-describedby="@secondaryButtonColorId-hint"
+                             type="text"
+                             asp-for="@Model.UpdateRequest.SecondaryButtonColor"
+                             value="@(Model?.UpdateRequest.SecondaryButtonColor ?? "")"
+                             govuk-error-for="@Model?.UpdateRequest.SecondaryButtonColor"/>
+            </govuk-form-group>
+
+            <govuk-form-group asp-for="@Model.UpdateRequest.StateColor">
+                <h2 class="govuk-label-wrapper">
+                    <label for="@stateColorId" class="govuk-label govuk-label--m">
+                        State colour (interaction indicator) 
+                    </label>
+                </h2>
+
+                <div class="govuk-hint" id="@stateColorId-hint">
+                    Add a hex code for the state colour
+                </div>
+
+                <govuk-field-error asp-for="@Model.UpdateRequest.StateColor" error-id="@stateColorId-error"/>
+
+                <govuk-input id="@stateColorId"
+                             class="govuk-input"
+                             aria-describedby="@stateColorId-hint"
+                             type="text"
+                             asp-for="@Model.UpdateRequest.StateColor"
+                             value="@(Model?.UpdateRequest.StateColor ?? "")"
+                             govuk-error-for="@Model?.UpdateRequest.StateColor"/>
+            </govuk-form-group>
+
+            <govuk-form-group asp-for="@Model.UpdateRequest.ErrorMessageColor">
+                <h2 class="govuk-label-wrapper">
+                    <label for="@errorMessageColorId" class="govuk-label govuk-label--m">
+                        Error message colour
+                    </label>
+                </h2>
+
+                <div class="govuk-hint" id="@errorMessageColorId-hint">
+                    Add a hex code for the error message colour
+                </div>
+
+                <govuk-field-error asp-for="@Model.UpdateRequest.ErrorMessageColor"
+                                   error-id="@errorMessageColorId-error"/>
+
+                <govuk-input id="@errorMessageColorId"
+                             class="govuk-input"
+                             aria-describedby="@errorMessageColorId-hint"
+                             type="text"
+                             asp-for="@Model.UpdateRequest.ErrorMessageColor"
+                             value="@(Model?.UpdateRequest.ErrorMessageColor ?? "")"
+                             govuk-error-for="@Model?.UpdateRequest.ErrorMessageColor"/>
+            </govuk-form-group>
+            
+            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-label--m">
+                    Decorative image
+                </label>
+                <p class="govuk-hint">
+                    This can be a generic image which does not give any additional information to the content. It will appear on the start page or thumbnail.
+
+                    Follow GOV.UK guidance on copyright standards when choosing an image.
+
+                    Upload or enter a URL for an image. Images can be JPEG, PNG, SVG or GIF files. 
+                </p>
+                <div class="govuk-form-group govuk-!-margin-bottom-6">
+                    <label class="govuk-label" for="file-upload-1" id="file-upload-1-label">
+                        @(string.IsNullOrEmpty(Model?.UpdateRequest.DecorativeImage) ? "Upload an image" : $"Change the image: {Model?.UpdateRequest.DecorativeImage}")
+                    </label>
+                
+                    <input id="file-upload-1" class="govuk-file-upload" asp-for="UpdateRequest.DecorativeImage"
+                           value="@(Model?.UpdateRequest.DecorativeImage ?? "")" 
+                           type="file"
+                           accept="image/*">
+                </div>
+                
+                @if (!string.IsNullOrEmpty(Model?.UpdateRequest.DecorativeImage))
+                {
+                    <button type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary" 
+                        data-module="govuk-button"data-prevent-double-click="true" data-govuk-button-init="" 
+                        name="RemoveImage" value="true">Remove Image</button>
+                }
+            </div>
+            
+            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-label--m" for="file-upload">
+                    Reset to DfE styling
+                </label>
+                <p class="govuk-hint">
+                    Use this to reset the look and feel to DfE styling.
+                </p>
+                <button id="file-upload" type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary" 
+                        data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="" 
+                        name="ResetStyling" value="true">Reset to DfE styling</button>
+            </div>
+            
+            @if (!(Model?.UpdateRequest?.IsAccessibilityAgreementAccepted ?? true))
+            {
+                <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+                
+                <govuk-form-group asp-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted">
+                    <fieldset class="govuk-fieldset" aria-describedby="accessibility-accepted-hint">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            <h2 class="govuk-fieldset__heading">
+                                Accessibility standards
+                            </h2>
+                        </legend>
+                        <div id="accessibility-accepted-hint" class="govuk-hint">
+                            If you customise the look and feel it is your responsibility to ensure the font and colours meet accessibility standards.
+                        </div>
+
+                        <govuk-field-error asp-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted"
+                                           error-id="forms-name-input-name-field-error"/>
+
+                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <govuk-input asp-for="UpdateRequest.IsAccessibilityAgreementAccepted"
+                                             class="govuk-checkboxes__input"
+                                             id="Agreed"
+                                             type="checkbox"
+                                             value="true"
+                                             aria-describedby="agreed-checkbox-item-hint"
+                                             govuk-error-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted"/>
+                                <label class="govuk-label govuk-checkboxes__label" for="Agreed">
+                                    I agree to confirm the customised look and feel meet accessibility standards
+                                </label>
+                                <div id="agreed-checkbox-item-hint" class="govuk-hint govuk-checkboxes__hint">
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </govuk-form-group>
+            }
+            else
+            {
+                <input type="hidden" name="UpdateRequest.IsAccessibilityAgreementAccepted" value="true"/>
+            }
+
+            <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button"
+                    data-prevent-double-click="true" data-govuk-button-init="">Save and continue
+            </button>
+        </form>
+    </div>
+</div>

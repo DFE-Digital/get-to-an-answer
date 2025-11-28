@@ -52,11 +52,25 @@ if (!string.IsNullOrEmpty(appInsightsConnectionString))
 
 #endregion
 
+#region GTAA Api Client
 
 var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
 
 // Register an HttpClient with a pre-configured base address
 builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAddress = new Uri(apiBaseUrl); });
+
+#endregion
+
+#region Blob Storage
+
+var blobStorageConnectionString = builder.Configuration.GetSection("BlobStorage:ConnectionString").Value!;
+var blobStorageContainerName = builder.Configuration.GetSection("BlobStorage:ContainerName").Value!;
+
+builder.Services.AddSingleton<IImageStorageClient>(sp => 
+    new ImageStorageClient(blobStorageConnectionString, blobStorageContainerName, 
+        sp.GetRequiredService<ILogger<ImageStorageClient>>()));
+
+#endregion
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -88,7 +102,7 @@ app.Use(async (context, next) =>
     await next();
 });
 
-if (builderIsLocalEnvironment)
+if (!builderIsLocalEnvironment)
 {
     // Configure the HTTP request pipeline.
     app.UseExceptionHandler("/error/404");
@@ -114,6 +128,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.MapStaticAssets();
 app.MapRazorPages();

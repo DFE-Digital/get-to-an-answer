@@ -22,40 +22,41 @@
   ViewData["Title"] = "Create a new questionnaire";
 }
 
-@section BeforeContainer
-{
-  <section class="dfe-page-grey" id="main-content-header">
-    <div class="govuk-width-container" id="main-header-container">
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          @if (Model?.IsRedirectConfirmation ?? false)
-          {
-            <h1 class="govuk-heading-l">You're being redirected to some relevant content. Would you like to proceed?</h1>
-            <p class="govuk-body">This page will show you content related to your answer(s).</p>
-          }
-          else
-          {
-            <h1 class="govuk-heading-xl">
-
-              @if (Model?.Destination?.Type == DestinationType.CustomContent)
-              {
-                @Model?.Destination.Title
-              }
-              else
-              {
-                @Model?.Questionnaire?.DisplayTitle
-              }
-            </h1>
-          }
-        </div>
-      </div>
-    </div>
-  </section>
-}
-
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    @if (Model?.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
+    
+    @if (Model?.IsRedirectConfirmation ?? false)
+    {
+      <form action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
+        <input type="hidden" id="confirm-redirect-input" name="IsRedirectConfirmation" value="true">
+        <div class="govuk-form-group">
+          <fieldset class="govuk-fieldset" aria-describedby="confirmation-hint">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h1 class="govuk-fieldset__heading">
+              You're being redirected to some relevant content. Would you like to proceed?
+            </h1>
+          </legend>
+          <div id="confirmation-hint" class="govuk-hint">
+            This page will show you content related to your answer(s).
+          </div>
+          <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
+            <div class="govuk-radios__item">
+              <input id="confirm-redirect-yes-input" aria-describedby="pages-selection-type-input-only-one-option-true-hint"
+                     class="govuk-radios__input" type="radio" value="true" name="ConfirmRedirect">
+              <label for="confirm-redirect-yes-input" class="govuk-label govuk-radios__label">Yes</label>
+            </div>
+            <div class="govuk-radios__item">
+              <input id="confirm-redirect-no-input" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
+                     class="govuk-radios__input" type="radio" value="false" name="ConfirmRedirect">
+              <label for="confirm-redirect-no-input" class="govuk-label govuk-radios__label">No</label>
+            </div>
+          </div>
+          </fieldset>
+        </div>
+        <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
+      </form>
+    }
+    else if (Model?.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
     {
       <form action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
         @Html.AntiForgeryToken()
@@ -73,7 +74,7 @@
         <input type="hidden" name="Destination.Question.Description" value="@Model?.Destination?.Question.Description" autocomplete="off">
         @{
           var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
-          
+
           var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
           var inputGroupId = $"q-{Model.Destination.Question.Id}";
         }
@@ -99,20 +100,20 @@
             @if (Model.Destination.Question.Type == QuestionType.SingleSelect)
             {
               var answers = Model.Destination.Question.Answers;
-              
+
               <div class="govuk-radios" data-module="govuk-radios">
                 @for (var a = 0; a < answers.Count; a++)
                 {
                   var answer = Model?.Destination?.Question.Answers[a];
-                  
+
                   var inputId = $"{inputGroupId}-a-{answer?.Id}";
                   var itemHintId = $"{inputId}-hint";
-                  
+
                   <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer.Id" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer.Priority" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer.Content" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description" autocomplete="off">
-                  
+
                   <div class="govuk-radios__item">
                     <input type="hidden" name="Scores.@answer.Id" value="@answer.Priority" autocomplete="off">
                     <input
@@ -138,17 +139,17 @@
             else if (Model.Destination.Question.Type == QuestionType.MultiSelect)
             {
               var answers = Model.Destination.Question.Answers;
-              
+
               <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                 @for (var a = 0; a < answers.Count; a++)
                 {
                   var answer = Model?.Destination?.Question.Answers[a];
-                  
+
                   <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer.Id" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer.Priority" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer.Content" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description" autocomplete="off">
-                  
+
                   var inputId = $"{inputGroupId}-a-{answer.Id}";
                   var itemHintId = $"{inputId}-hint";
                   <div class="govuk-checkboxes__item">
@@ -176,7 +177,7 @@
             else if (Model.Destination.Question.Type == QuestionType.DropdownSelect)
             {
               var answers = Model.Destination.Question.Answers;
-              
+
               <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
                 @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
                 {
@@ -190,7 +191,7 @@
                 @for (var a = 0; a < answers.Count; a++)
                 {
                   var answer = Model?.Destination?.Question.Answers[a];
-                  
+
                   <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer?.Id" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer?.Priority" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer?.Content" autocomplete="off">
@@ -210,25 +211,6 @@
         </div>
         <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
       </form>
-    }
-    else if (Model?.IsRedirectConfirmation ?? false)
-    {
-      <input type="hidden" id="confirm-redirect-input" name="IsRedirectConfirmation" value="true">
-      <div class="govuk-form-group">
-        <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
-          <div class="govuk-radios__item">
-            <input id="confirm-redirect-yes-input" aria-describedby="pages-selection-type-input-only-one-option-true-hint"
-                   class="govuk-radios__input" type="radio" value="true" name="ConfirmRedirect">
-            <label for="confirm-redirect-yes-input" class="govuk-label govuk-radios__label">Yes</label>
-          </div>
-          <div class="govuk-radios__item">
-            <input id="confirm-redirect-no-input" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
-                   class="govuk-radios__input" type="radio" value="false" name="ConfirmRedirect">
-            <label for="confirm-redirect-no-input" class="govuk-label govuk-radios__label">No</label>
-          </div>
-        </div>
-      </div>
-      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
     }
     else if (Model?.Destination?.Type == DestinationType.CustomContent)
     {

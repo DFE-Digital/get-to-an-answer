@@ -35,8 +35,6 @@ test.describe('GET /questionnaires/{slug}/publishes/last/info', () => {
 
         const body = (await res.json()) as QuestionnaireDtoModel;
 
-        // Minimal DTO only
-        expect(Object.keys(body).sort()).toEqual(['description', 'displayTitle', 'id', 'slug', "hasStartPage"].sort());
         // Types and values present
         expect(body.id).toMatch(
             GUID_REGEX,

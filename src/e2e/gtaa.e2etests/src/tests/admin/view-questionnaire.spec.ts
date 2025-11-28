@@ -72,6 +72,7 @@ test.describe('Get to an answer views questionnaire', () => {
             {
                 title: questionnaireResponse.questionnaireGetBody.title,
                 createdBy: firstQuestionnaire.createdBy,
+                updatedAt: firstQuestionnaire.updatedAt,
                 status: statusName
             }
         ];

@@ -95,3 +95,24 @@ resource "azurerm_key_vault_secret" "connection_string" {
     azurerm_role_assignment.kv_admin_sp
   ]
 }
+
+resource "azurerm_key_vault_secret" "bs_connection_string" {
+  name         = "${var.prefix}kv-uks-bs-conn-str"
+  value        = azurerm_storage_account.sa.primary_connection_string
+  key_vault_id = azurerm_key_vault.kv.id
+
+  content_type = "text/plain"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+
+  tags = local.common_tags
+
+  depends_on = [
+    azurerm_role_assignment.kv_officer,
+    azurerm_role_assignment.kv_administrator,
+    azurerm_role_assignment.kv_admin_sp
+  ]
+}
+
