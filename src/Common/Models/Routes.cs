@@ -31,4 +31,5 @@ public static class Routes
     public const string AddAnswerOptions = AdminRoot + "/questionnaires/{0}/questions/{1}/answers/add";
     
     public const string AddAndEditQuestionsAndAnswers = AdminRoot + "/questionnaires/{0}/questions";
+    public const string EditQuestion = AdminRoot + "/questionnaires/{0}/questions/{1}/edit";
 }

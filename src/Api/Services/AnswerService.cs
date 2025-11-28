@@ -5,6 +5,7 @@ using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services;
 
@@ -23,7 +24,8 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
     {
         try
         {
-            logger.LogInformation("CreateAnswer started QuestionnaireId={QuestionnaireId} QuestionId={QuestionId}", request.QuestionnaireId, request.QuestionId);
+            logger.LogInformation("CreateAnswer started QuestionnaireId={QuestionnaireId} QuestionId={QuestionId}",
+                request.QuestionnaireId, request.QuestionId);
 
             var access = db.HasAccessToEntity<QuestionEntity>(userId, request.QuestionId);
             if (access == EntityAccess.NotFound)
@@ -31,10 +33,12 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
             if (access == EntityAccess.Deny)
                 return Forbid(ProblemTrace("You do not have permission to do this", 403));
 
-            var isQuestionFromQuestionnaire = db.Questions.Any(q =>
-                q.Id == request.QuestionId &&
-                q.QuestionnaireId == request.QuestionnaireId &&
-                !q.IsDeleted);
+            var question = await db.Questions
+                .FirstOrDefaultAsync(q => q.Id == request.QuestionId
+                                          && q.QuestionnaireId == request.QuestionnaireId
+                                          && !q.IsDeleted);
+
+            var isQuestionFromQuestionnaire = question != null;
 
             if (!isQuestionFromQuestionnaire)
                 return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
@@ -42,22 +46,31 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                     ["questionId"] = ["The question must belong to the specified questionnaire."]
                 }));
 
+            var questionHasNextOne = await db.Questions
+                .AnyAsync(q => q.QuestionnaireId == request.QuestionnaireId
+                               && !q.IsDeleted
+                               && question != null
+                               && q.Order == question.Order + 1);
+
             switch (request.DestinationType)
             {
-                case DestinationType.Question when request.DestinationQuestionId == null:
+                case DestinationType.Question when request.DestinationQuestionId == null && questionHasNextOne:
                     return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
                     {
-                        ["destinationQuestionId"] = ["The DestinationQuestionId field is required when DestinationType is Question."]
+                        ["destinationQuestionId"] =
+                            ["The DestinationQuestionId field is required when DestinationType is Question."]
                     }));
                 case DestinationType.ExternalLink when request.DestinationUrl == null:
                     return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
                     {
-                        ["destinationUrl"] = ["The DestinationUrl field is required when DestinationType is ExternalLink."]
+                        ["destinationUrl"] =
+                            ["The DestinationUrl field is required when DestinationType is ExternalLink."]
                     }));
                 case DestinationType.CustomContent when request.DestinationContentId == null:
                     return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
                     {
-                        ["destinationContentId"] = ["The DestinationContentId field is required when DestinationType is CustomContent."]
+                        ["destinationContentId"] =
+                            ["The DestinationContentId field is required when DestinationType is CustomContent."]
                     }));
             }
 
@@ -77,7 +90,8 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                 if (!isDestQuestionFromQuestionnaire)
                     return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
                     {
-                        ["destinationQuestionId"] = ["The destination question must belong to the specified questionnaire."]
+                        ["destinationQuestionId"] =
+                            ["The destination question must belong to the specified questionnaire."]
                     }));
             }
 
@@ -183,17 +197,20 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                 case DestinationType.Question when request.DestinationQuestionId == null:
                     return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
                     {
-                        ["destinationQuestionId"] = ["The DestinationQuestionId field is required when DestinationType is Question."]
+                        ["destinationQuestionId"] =
+                            ["The DestinationQuestionId field is required when DestinationType is Question."]
                     }));
                 case DestinationType.ExternalLink when request.DestinationUrl == null:
                     return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
                     {
-                        ["destinationUrl"] = ["The DestinationUrl field is required when DestinationType is ExternalLink."]
+                        ["destinationUrl"] =
+                            ["The DestinationUrl field is required when DestinationType is ExternalLink."]
                     }));
                 case DestinationType.CustomContent when request.DestinationContentId == null:
                     return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
                     {
-                        ["destinationContentId"] = ["The DestinationContentId field is required when DestinationType is CustomContent."]
+                        ["destinationContentId"] =
+                            ["The DestinationContentId field is required when DestinationType is CustomContent."]
                     }));
             }
 
@@ -213,7 +230,8 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                 if (!isQuestionFromQuestionnaire)
                     return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
                     {
-                        ["destinationQuestionId"] = ["The destination question must belong to the specified questionnaire."]
+                        ["destinationQuestionId"] =
+                            ["The destination question must belong to the specified questionnaire."]
                     }));
             }
 
@@ -260,7 +278,8 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
 
             await db.SaveChangesAsync();
 
-            logger.LogInformation("DeleteAnswer succeeded AnswerId={AnswerId} traceId={TraceId}", id, Activity.Current?.TraceId.ToString());
+            logger.LogInformation("DeleteAnswer succeeded AnswerId={AnswerId} traceId={TraceId}", id,
+                Activity.Current?.TraceId.ToString());
             return NoContent();
         }
         catch (Exception ex)

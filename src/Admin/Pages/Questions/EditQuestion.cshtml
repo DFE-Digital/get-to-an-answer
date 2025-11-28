@@ -1,0 +1,168 @@
+@page "/admin/questionnaires/{questionnaireId:guid}/questions/{questionId:guid}/edit"
+@addTagHelper *, Common
+@using Common.Enum
+@using Common.Models
+@model Admin.Pages.Questions.EditQuestion
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Edit question";
+
+    var displayAnswerPriorities = Model.Answers.Any(x => !string.IsNullOrEmpty(x.Priority));
+}
+
+@if (Model.QuestionSaved)
+{
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-notification-banner govuk-notification-banner--success" role="alert"
+                 aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                        Success
+                    </h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <h3 class="govuk-notification-banner__heading">
+                        Your questionnaire has been saved.
+                    </h3>
+
+                    @if (Model.CurrentQuestionHasNextOne)
+                    {
+                        <p>
+                            <a href="@string.Format(Routes.EditQuestion, Model.QuestionnaireId, Model.NextQuestionId)">Continue
+                                to the next question</a>
+                        </p>
+                    }
+                    else
+                    {
+                        <form>
+                            <button class="govuk-button govuk-button--start" type="button"
+                                    asp-page-handler="AddAQuestion">Add a
+                                question
+                            </button>
+                        </form>
+                        
+                    }
+                    <p>
+                        <a href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to
+                            your questions</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <a class="govuk-back-link" asp-page="/Admin/Pages/Questions/AddEditQuestionsAndAnswers"
+           asp-route-questionnaireId="@Model.QuestionnaireId">
+            Back
+        </a>
+
+        <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
+        <h1 class="govuk-heading-l">Edit question</h1>
+
+        <form method="post">
+            <govuk-form-group asp-for="QuestionContent">
+                <label class="govuk-label govuk-label--s" for="QuestionContent">What's your question?</label>
+                <govuk-field-error asp-for="QuestionContent" error-id="QuestionContent-error"/>
+                <govuk-input id="QuestionContent"
+                             asp-for="QuestionContent"
+                             class="govuk-input"
+                             govuk-error-for="QuestionContent-error"/>
+                <span class="govuk-hint">
+                Ask the question the way you would in person. For example, “Which of these countries have you lived in?”
+            </span>
+            </govuk-form-group>
+
+            <govuk-form-group asp-for="QuestionHintText">
+                <label class="govuk-label govuk-label--s" for="QuestionHintText">Hint text (optional)</label>
+                <govuk-hint>
+                    You can add a short hint to help people understand the question. For multi-select questions, explain
+                    that they can select more than one answer.
+                </govuk-hint>
+                <textarea class="govuk-textarea"
+                          id="QuestionHintText"
+                          asp-for="QuestionHintText"
+                          rows="4"></textarea>
+            </govuk-form-group>
+
+            <h2 class="govuk-heading-m govuk-!-margin-top-6">Question type</h2>
+            <p class="govuk-body">Choose how many options people will be able to select to answer.</p>
+
+            <div class="govuk-radios" data-module="govuk-radios">
+                @{
+                    QuestionType[] options = [QuestionType.SingleSelect, QuestionType.DropdownSelect, QuestionType.MultiSelect];
+                    foreach (var option in options)
+                    {
+                        <div class="govuk-radios__item">
+                            <govuk-input class="govuk-radios__input"
+                                         asp-for="QuestionType"
+                                         type="radio"
+                                         value="@(option)"
+                                         id="@($"{option}-radio")"/>
+                            <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
+                                @Model.QuestionTypeFriendly(option)
+                            </label>
+                            <div class="govuk-hint govuk-radios__hint">
+                                @Model.QuestionTypeHint(option)
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+            <div class="govuk-summary-card app-summary-card govuk-!-margin-top-6">
+                <div class="govuk-summary-card__title-wrapper">
+                    <h2 class="govuk-summary-card__title">Answers</h2>
+                    <ul class="govuk-summary-card__actions">
+                        <li class="govuk-summary-card__action">
+                            <a class="govuk-link"
+                               href="/admin/questionnaires/@Model?.QuestionnaireId/questions/@Model?.QuestionId/answers/edit">Edit</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="govuk-summary-card__content">
+                    <table class="govuk-table">
+                        <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header">Answer</th>
+                            @if (displayAnswerPriorities)
+                            {
+                                <th scope="col" class="govuk-table__header">Priority</th>
+                            }
+                            <th scope="col" class="govuk-table__header">Target Type</th>
+                        </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                        @foreach (var answer in Model?.Answers ?? [])
+                        {
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell">@answer.Content</td>
+                                @if (displayAnswerPriorities)
+                                {
+                                    <td class="govuk-table__cell">@answer.Priority</td>
+                                }
+                                <td class="govuk-table__cell">@answer.Destination</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="govuk-!-margin-top-6 govuk-!-display-flex govuk-!-gap-3" style="justify-content: start;">
+                <button class="govuk-button govuk-button--start" type="submit" asp-page-handler="SaveQuestion">Save
+                    question
+                </button>
+                <button class="govuk-button govuk-button--warning" type="submit" asp-page-handler="DeleteQuestion">
+                    Delete
+                    question
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

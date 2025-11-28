@@ -18,9 +18,12 @@
   @await Html.PartialAsync("_ErrorSummary")
 }
 
+
+<input type="hidden" asp-for="QuestionNumber"/>
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-
+    
     <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
     <h1 class="govuk-heading-l">Add a question</h1>
 
@@ -88,7 +91,7 @@
                      id="QuestionType"           
                      asp-for="QuestionType"
                      type="radio"
-                     value="@QuestionType.SingleSelect"
+                     value="@((int)QuestionType.SingleSelect)"
                      govuk-error-for="@Model.QuestionType" />
               <label class="govuk-label govuk-radios__label" for="QuestionType">
                 One option only (radio button)
@@ -103,7 +106,7 @@
                      id="QuestionType-Dropdown"
                      asp-for="QuestionType"
                      type="radio"
-                     value="@QuestionType.DropdownSelect"
+                     value="@((int)QuestionType.DropdownSelect)"
                      govuk-error-for="@Model.QuestionType" />
               <label class="govuk-label govuk-radios__label" for="QuestionType-Dropdown">
                 One option only (drop-down)
@@ -118,7 +121,7 @@
                      id="QuestionType-MultiSelect"
                      asp-for="QuestionType"
                      type="radio"
-                     value="@QuestionType.MultiSelect"
+                     value="@((int)QuestionType.MultiSelect)"
                      govuk-error-for="@Model.QuestionType" />
               <label class="govuk-label govuk-radios__label" for="QuestionType-MultiSelect">
                 One or more options (multi-select)

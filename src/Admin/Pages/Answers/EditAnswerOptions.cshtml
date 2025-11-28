@@ -1,12 +1,12 @@
-@page "/admin/questionnaires/{questionnaireId:guid}/questions/{questionId:guid}/answers/add"
+@page "/admin/questionnaires/{questionnaireId:guid}/questions/{questionId:guid}/answers/edit"
 @addTagHelper *, Common
 @using Admin.Models
 @using Common.Enum
-@model Admin.Pages.Answers.AddAnswerOptions
+@model Admin.Pages.Answers.EditAnswerOptions
 
 @{
   Layout = "_Layout";
-  ViewData["Title"] = "Create a list of answer options";
+  ViewData["Title"] = "Edit answer options";
 }
 
 @section BeforeContent

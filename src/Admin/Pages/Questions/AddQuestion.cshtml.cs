@@ -25,7 +25,7 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
     public string? QuestionHintText { get; set; } = "";
 
     [BindProperty] 
-    [Required(ErrorMessage = "Select question type")] 
+    [Required(ErrorMessage = "Select question type")]
     public QuestionType QuestionType { get; set; }
 
     public IActionResult OnGet()
@@ -49,7 +49,9 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
                 Description = QuestionHintText,
                 Type = QuestionType
             });
-
+            
+            TempData["QuestionType"] = (int)QuestionType;
+         
             return Redirect(string.Format(Routes.AddAnswerOptions, QuestionnaireId, response?.Id));
         }
         catch (Exception e)
