@@ -17,7 +17,8 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
     [FromRoute(Name = "questionId")] public Guid QuestionId { get; set; }
 
-    public string QuestionNumber { get; set; } = "1";
+    [BindProperty]
+    public string? QuestionNumber { get; set; } = "1";
 
     // Bind a collection of options
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
@@ -50,7 +51,6 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
         if (!ModelState.IsValid)
         {
-            // RemoveGenericOptionErrors();
             await HydrateFields();
             return Page();
         }
@@ -76,7 +76,6 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
         if (!ModelState.IsValid)
         {
-            // RemoveGenericOptionErrors();
             await HydrateFields();
             ReassignOptionNumbers();
             return Page();
@@ -117,6 +116,8 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
         var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
 
+        QuestionNumber = questions.MaxBy(x => x.Order + 1)?.ToString();
+        
         var questionSelect = questions.Where(x => x.Id != QuestionId)
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
         var resultsSelect = resultsPages.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
@@ -173,23 +174,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
         }
     }
-
-    private void RemoveGenericOptionErrors()
-    {
-        foreach (var key in ModelState.Keys.ToList())
-        {
-            if (key.StartsWith("Options[", StringComparison.Ordinal) && ModelState.TryGetValue(key, out var entry))
-            {
-                var custom = entry.Errors.FirstOrDefault(e => e.ErrorMessage.Contains("Option "));
-                if (custom != null)
-                {
-                    entry.Errors.Clear();
-                    entry.Errors.Add(custom);
-                }
-            }
-        }
-    }
-
+    
     public async Task<IActionResult> OnPostRemoveOption(int index)
     {
         Options.RemoveAt(index);

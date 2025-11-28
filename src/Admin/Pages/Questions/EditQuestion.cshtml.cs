@@ -23,8 +23,9 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     [BindProperty] public QuestionType QuestionType { get; set; }
 
     public List<AnswerSummaryViewModel> Answers { get; } = [];
-
-    public string QuestionNumber => "1";
+    
+    [BindProperty]
+    public string QuestionNumber { get; set; } = 1.ToString();
 
     [TempData(Key = "QuestionSaved")] public bool QuestionSaved { get; set; }
 
@@ -144,6 +145,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         QuestionContent = question.Content;
         QuestionHintText = question.Description;
         QuestionType = question.Type;
+        QuestionNumber = question.Order.ToString();
     }
 }
 
