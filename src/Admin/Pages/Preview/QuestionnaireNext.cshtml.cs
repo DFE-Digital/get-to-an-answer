@@ -36,6 +36,17 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             Id = questionnaire.Id,
             DisplayTitle = questionnaire.DisplayTitle ?? questionnaire.Title,
             Slug = questionnaire.Slug,
+            
+            DecorativeImage = questionnaire.DecorativeImage,
+            
+            TextColor = questionnaire.TextColor,
+            BackgroundColor = questionnaire.BackgroundColor,
+            PrimaryButtonColor = questionnaire.PrimaryButtonColor,
+            SecondaryButtonColor = questionnaire.SecondaryButtonColor,
+            StateColor = questionnaire.StateColor,
+            ErrorMessageColor = questionnaire.ErrorMessageColor,
+            
+            ContinueButtonText = questionnaire.ContinueButtonText
         };
         IsEmbedded = Embed;
         Destination = new DestinationDto

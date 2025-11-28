@@ -22,6 +22,24 @@
   ViewData["Title"] = "Create a new questionnaire";
 }
 
+@section BeforeContainer
+{
+  @if (Model?.Destination?.Type == DestinationType.CustomContent)
+  {
+    <section class="dfe-page-grey" id="main-content-header">
+      <div class="govuk-width-container" id="main-header-container">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-xl">
+              @Model?.Destination.Title
+            </h1>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+}
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     
@@ -209,7 +227,10 @@
             }
           </fieldset>
         </div>
-        <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
+        <button type="submit" formnovalidate="formnovalidate" class="govuk-button"
+                data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
+          @(Model?.Questionnaire?.ContinueButtonText ?? "Continue")
+        </button>
       </form>
     }
     else if (Model?.Destination?.Type == DestinationType.CustomContent)

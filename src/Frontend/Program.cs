@@ -63,8 +63,9 @@ builder.Services.AddHttpClient<IApiClient, ApiClient>(client => { client.BaseAdd
 
 #region Blob Storage
 
-var blobStorageConnectionString = builder.Configuration.GetSection("BlobStorage:ConnectionString").Value!;
-var blobStorageContainerName = builder.Configuration.GetSection("BlobStorage:ContainerName").Value!;
+var blogStorageConfig = builder.Configuration.GetSection("BlobStorage");
+var blobStorageConnectionString = blogStorageConfig.GetValue<string>("ConnectionString")!;
+var blobStorageContainerName = blogStorageConfig.GetValue<string>("ContainerName")!;
 
 builder.Services.AddSingleton<IImageStorageClient>(sp => 
     new ImageStorageClient(blobStorageConnectionString, blobStorageContainerName, 

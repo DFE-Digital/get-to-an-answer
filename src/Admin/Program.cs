@@ -47,36 +47,39 @@ if (!builderIsLocalEnvironment)
     });
 }
 
-Log.Logger = new LoggerConfiguration()
-    .ConfigureLogging(Environment.GetEnvironmentVariable("ApplicationInsights__ConnectionString"))
-    .CreateBootstrapLogger();
-    
-#region Additional Logging and Application Insights
-    
-Log.Logger.Information("Starting application");
-Log.Logger.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
-    
-builder.Services.AddSerilog((_, lc) => lc
-    .ConfigureLogging(builder.Configuration["ApplicationInsights:ConnectionString"]));
-
-var appInsightsConnectionString = builder.Configuration.GetValue<string>("ApplicationInsights:ConnectionString");
-
-if (!string.IsNullOrEmpty(appInsightsConnectionString))
+if (!builderIsLocalEnvironment)
 {
-    builder.Services.AddOpenTelemetry()
-        .WithTracing(tracing => tracing
-            .AddAspNetCoreInstrumentation()
-            .AddProcessor<RouteTelemetryProcessor>()
-            .AddEntityFrameworkCoreInstrumentation()
-        )
-        .WithMetrics(metrics => metrics
-            .AddAspNetCoreInstrumentation()
-            .AddHttpClientInstrumentation()
-        )
-        .UseAzureMonitor(monitor => monitor.ConnectionString = appInsightsConnectionString);
-}
+    Log.Logger = new LoggerConfiguration()
+        .ConfigureLogging(Environment.GetEnvironmentVariable("ApplicationInsights__ConnectionString"))
+        .CreateBootstrapLogger();
 
-#endregion
+    #region Additional Logging and Application Insights
+
+    Log.Logger.Information("Starting application");
+    Log.Logger.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
+
+    builder.Services.AddSerilog((_, lc) => lc
+        .ConfigureLogging(builder.Configuration["ApplicationInsights:ConnectionString"]));
+
+    var appInsightsConnectionString = builder.Configuration.GetValue<string>("ApplicationInsights:ConnectionString");
+
+    if (!string.IsNullOrEmpty(appInsightsConnectionString))
+    {
+        builder.Services.AddOpenTelemetry()
+            .WithTracing(tracing => tracing
+                .AddAspNetCoreInstrumentation()
+                .AddProcessor<RouteTelemetryProcessor>()
+                .AddEntityFrameworkCoreInstrumentation()
+            )
+            .WithMetrics(metrics => metrics
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+            )
+            .UseAzureMonitor(monitor => monitor.ConnectionString = appInsightsConnectionString);
+    }
+
+    #endregion
+}
 
 builder.Services.AddHttpContextAccessor();
 
@@ -105,8 +108,9 @@ builder.Services.AddHttpClient<IMsGraphClient, MsGraphClient>(client => client.B
 
 #region Blob Storage
 
-var blobStorageConnectionString = builder.Configuration.GetSection("BlobStorage:ConnectionString").Value!;
-var blobStorageContainerName = builder.Configuration.GetSection("BlobStorage:ContainerName").Value!;
+var blobStorageConfig = builder.Configuration.GetSection("BlobStorage");
+var blobStorageConnectionString = blobStorageConfig.GetValue<string>("ConnectionString")!;
+var blobStorageContainerName = blobStorageConfig.GetValue<string>("ContainerName")!;
 
 builder.Services.AddSingleton<IImageStorageClient>(sp => 
     new ImageStorageClient(blobStorageConnectionString, blobStorageContainerName, 
