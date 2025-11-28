@@ -20,72 +20,106 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
 
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
 
-    [BindProperty] public QuestionType? RetrievedQuestionType { get; set; }
-
+    [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId);
 
-        if (TempData.TryGetValue("QuestionType", out var rawValue)
-            && rawValue is int intVal
-            && Enum.IsDefined(typeof(QuestionType), intVal))
-        {
-            RetrievedQuestionType = (QuestionType)intVal;
-        }
-
-        // await PopulateFieldOptions();
         await PopulateFieldWithExistingValues();
 
         ReassignOptionNumbers();
 
         return Page();
     }
-    
-    
-    //onpostsave
-    public async Task<IActionResult> OnPostSaveAnswerOptions()
+
+
+    public async Task<IActionResult> OnPostAddOption()
     {
-        foreach (var option in Options)
+        ValidateSelectedQuestionsIfAny();
+
+        if (!ModelState.IsValid)
         {
-            await apiClient.UpdateAnswerAsync(option.AnswerId, new UpdateAnswerRequestDto
-            {
-                Content = option.OptionContent,
-                DestinationType = MapDestination(option.AnswerDestination),
-                DestinationQuestionId = option.SelectedDestinationQuestion != null ? Guid.Parse(option.SelectedDestinationQuestion) : null,
-                DestinationUrl = option.ResultPageUrl,
-                Priority = Convert.ToSingle(option.RankPriority)
-            });
+            await PopulateFieldWithExistingValues();
+            return Page();
         }
+
+        OptionNumber++;
+
+        Options.Add(new AnswerOptionsViewModel
+        {
+            OptionNumber = OptionNumber
+        });
+
+        await PopulateFieldWithExistingValues();
+        ReassignOptionNumbers();
 
         return Page();
     }
 
+    public async Task<IActionResult> OnPostSaveAnswerOptions()
+    {
+        ValidateSelectedQuestionsIfAny();
+        
+        try
+        {
+            foreach (var option in Options)
+            {
+                await apiClient.UpdateAnswerAsync(option.AnswerId, new UpdateAnswerRequestDto
+                {
+                    Content = option.OptionContent,
+                    DestinationType = MapDestination(option.AnswerDestination),
+                    DestinationQuestionId = option.SelectedDestinationQuestion != null
+                        ? Guid.Parse(option.SelectedDestinationQuestion)
+                        : null,
+                    DestinationUrl = option.ResultPageUrl,
+                    Priority = Convert.ToSingle(option.RankPriority),
+                    DestinationContentId = option.SelectedResultsPage != null
+                        ? Guid.Parse(option.SelectedResultsPage)
+                        : null,
+                    Description = option.OptionHint
+                });
+            }
+            
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error updating answer options");
+            return RedirectToErrorPage();
+        }
+
+        return Redirect(string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId));
+    }
 
     private async Task PopulateFieldWithExistingValues()
     {
         var existingAnswers = await apiClient.GetAnswersAsync(QuestionId);
         var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
-        
+
         var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
-        
-        var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId).Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
-        
+
+        var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
+            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
+
         // Set the selected property on the question selection list            
-        questionSelectionList.Select(x => x.Selected = existingAnswers.Any(a => a.DestinationQuestionId.ToString() == x.Value));
-        
+        questionSelectionList.Select(x =>
+            x.Selected = existingAnswers.Any(a => a.DestinationQuestionId.ToString() == x.Value));
+
         var resultsPages = apiClient.GetContentsAsync(QuestionnaireId);
-        var resultsPagesForSelection = resultsPages.Result.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
-        
-        resultsPagesForSelection.Select(x => x.Selected = existingAnswers.Any(a => a.Id.ToString() == x.Value));
-        
+        var resultsPagesForSelection =
+            resultsPages.Result.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
+
+        resultsPagesForSelection.Select(x =>
+            x.Selected = existingAnswers.Any(a => a.DestinationContentId.ToString() == x.Value));
+
         foreach (var existingAnswer in existingAnswers)
         {
             Options.Add(new AnswerOptionsViewModel
             {
                 AnswerId = existingAnswer.Id,
                 QuestionSelectList = questionSelectionList,
-                AnswerDestination = MapAnswerDestination(existingAnswer.DestinationType, existingAnswer.DestinationQuestionId),
+                AnswerDestination =
+                    MapAnswerDestination(existingAnswer.DestinationType, existingAnswer.DestinationQuestionId),
                 OptionContent = existingAnswer.Content,
                 OptionHint = existingAnswer.Description,
                 ExternalLink = existingAnswer.DestinationUrl,
@@ -95,32 +129,47 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
                 RankPriority = existingAnswer.Priority.ToString(),
                 ResultPageUrl = existingAnswer.DestinationUrl,
                 ResultsPageSelectList = resultsPagesForSelection,
-                // SelectedResultsPage =  
+                SelectedResultsPage = existingAnswer.DestinationContentId.ToString()
             });
         }
-
-        // foreach (var option in Options)
-        // {
-        //     option.QuestionSelectList.Select(x => x.Selected = exitingAnswers.Any(a => a.Id.ToString() == x.Value));
-        // }
     }
 
-    private async Task PopulateFieldOptions()
+    private void ValidateSelectedQuestionsIfAny()
     {
-        var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
-        // var resultsPages = await apiClient.GetResultsPagesAsync(QuestionnaireId);
+        var optionsWithSpecificQuestionNoSelection =
+            Options.Where(x =>
+                x.AnswerDestination == AnswerDestination.SpecificQuestion &&
+                string.IsNullOrEmpty(x.SelectedDestinationQuestion));
 
-        var questionSelect = questions.Where(x => x.Id != QuestionId)
-            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
-        // var resultsSelect = resultsPages.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
-
-        foreach (var option in Options)
+        foreach (var specificQuestion in optionsWithSpecificQuestionNoSelection)
         {
-            option.QuestionType = RetrievedQuestionType;
-            option.QuestionSelectList = questionSelect;
-            // option.ResultsPageSelectList = resultsSelect;
+            var index = specificQuestion.OptionNumber - 1;
+            var errorMessage = $"Please select a question for option {specificQuestion.OptionNumber}";
+
+            var destinationKey = $"Options-{index}-AnswerDestination";
+            var specificQuestionRadioInputId = $"Options-{index}-destination-specific";
+
+            ModelState.AddModelError(destinationKey, string.Empty);
+            ModelState.AddModelError(specificQuestionRadioInputId, errorMessage);
+        }
+
+        var optionsWithResultsPageNoSelection = Options.Where(o =>
+            o.AnswerDestination == AnswerDestination.InternalResultsPage &&
+            string.IsNullOrEmpty(o.SelectedResultsPage));
+
+        foreach (var resultsPage in optionsWithResultsPageNoSelection)
+        {
+            var index = resultsPage.OptionNumber - 1;
+            var errorMessage = $"Please select a results page for option {resultsPage.OptionNumber}";
+
+            var selectKey = $"Options[{index}].SelectedResultsPage";
+            var resultsPageRadioInputId = $"Options-{index}-destination-internal";
+
+            ModelState.AddModelError(selectKey, string.Empty);
+            ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
         }
     }
+
 
     private void ReassignOptionNumbers()
     {
@@ -129,8 +178,9 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             Options[index].OptionNumber = index + 1;
         }
     }
-    
-    private static AnswerDestination MapAnswerDestination(DestinationType? destinationType, Guid? destinationQuestionId = null) =>
+
+    private static AnswerDestination MapAnswerDestination(DestinationType? destinationType,
+        Guid? destinationQuestionId = null) =>
         destinationType switch
         {
             DestinationType.Question when destinationQuestionId != null => AnswerDestination.SpecificQuestion,
@@ -139,7 +189,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             DestinationType.ExternalLink => AnswerDestination.ExternalResultsPage,
             _ => throw new ArgumentOutOfRangeException(nameof(destinationType), destinationType, null)
         };
-    
+
     private static DestinationType MapDestination(AnswerDestination answerDestination) =>
         answerDestination switch
         {

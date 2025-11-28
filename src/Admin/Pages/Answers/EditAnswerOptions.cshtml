@@ -38,7 +38,6 @@
     <h2 class="govuk-heading-m govuk-!-margin-top-6">Add answer options to your list</h2>
 
     <form method="post" accept-charset="UTF-8">
-      <input type="hidden" asp-for="RetrievedQuestionType"/>
 
       @for (var i = 0; i < Model.Options.Count; i++)
       {
@@ -77,7 +76,7 @@
               data-module="govuk-button"
               data-prevent-double-click="true"
               data-govuk-button-init="">
-        Continue
+        Save answers
       </button>
     </form>
 
