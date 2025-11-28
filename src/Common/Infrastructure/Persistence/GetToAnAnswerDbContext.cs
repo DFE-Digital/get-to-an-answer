@@ -22,10 +22,10 @@ public class GetToAnAnswerDbContext(DbContextOptions<GetToAnAnswerDbContext> opt
             .Property(e => e.CompletionTrackingMap)
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                v => JsonSerializer.Deserialize<Dictionary<string, bool>>(v, (JsonSerializerOptions)null) ?? new Dictionary<string, bool>()
+                v => JsonSerializer.Deserialize<Dictionary<CompletableTask, CompletionStatus>>(v, (JsonSerializerOptions)null) ?? new Dictionary<CompletableTask, CompletionStatus>()
             )
             .Metadata.SetValueComparer(
-                new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<Dictionary<string, bool>>(
+                new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<Dictionary<CompletableTask, CompletionStatus>>(
                     (c1, c2) => c1.SequenceEqual(c2),
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                     c => c.ToDictionary(k => k.Key, v => v.Value)

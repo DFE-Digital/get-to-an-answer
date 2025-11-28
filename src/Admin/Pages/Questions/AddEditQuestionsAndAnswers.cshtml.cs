@@ -1,5 +1,8 @@
+using System.Text.Json;
 using Common.Client;
 using Common.Domain;
+using Common.Domain.Request.Update;
+using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
@@ -18,9 +21,16 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
     [BindProperty]
     public bool FinishedEditing { get; set; }
     
+    public EntityStatus Status { get; set; } = EntityStatus.Draft;
+    
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
+
+        if (TempData.TryGetValue("QuestionnaireStatus", out var statusObj) && statusObj is int status)
+        {
+            Status = (EntityStatus) status;
+        }
 
         try
         {
@@ -28,12 +38,30 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
             var response = await apiClient.GetQuestionsAsync(QuestionnaireId);
 
             Questions = response.OrderBy(q => q.Order).ToList();
+            
+            TempData["QuestionCount"] = Questions.Count;
 
             // If a move error message was set during a previous POST, surface it in ModelState
             if (TempData.TryGetValue("MoveError", out var moveErrorObj) && moveErrorObj is string moveError &&
                 !string.IsNullOrWhiteSpace(moveError))
             {
                 ModelState.AddModelError("QuestionMoveError", moveError);
+            }
+            
+            if (TempData.TryGetValue("CompletionTrackingMap", out var trackingMapObj) && 
+                trackingMapObj is string trackingMapJson)
+            {
+                try
+                {
+                    var trackingMap = JsonSerializer
+                        .Deserialize<Dictionary<CompletableTask, CompletionStatus>>(trackingMapJson);
+                    FinishedEditing = trackingMap?[CompletableTask.AddQuestionsAndAnswers] ==
+                                      CompletionStatus.Completed;
+                } 
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Error deserializing completion tracking map");
+                }
             }
         }
         catch (Exception e)
@@ -45,10 +73,16 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
         return Page();
     }
 
-
-    //TODO: Implement task status update
-    public IActionResult OnPostSaveAndContinueAsync()
+    public async Task<IActionResult> OnPostSaveAndContinueAsync()
     {
+        await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+        {
+            Task = CompletableTask.AddQuestionsAndAnswers,
+            Status = FinishedEditing ? CompletionStatus.Completed : 
+                TempData.TryGetValue("QuestionCount", out var countObj) && countObj is > 0 ? 
+                    CompletionStatus.InProgress : CompletionStatus.NotStarted
+        });
+        
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
     }
     

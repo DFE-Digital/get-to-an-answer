@@ -37,8 +37,9 @@ public interface IQuestionnaireService
     Task<ServiceResult> CloneQuestionnaire(string userId, Guid id, CloneQuestionnaireRequestDto request);
     Task<ServiceResult> GetContributors(string userId, Guid questionnaireId);
     Task<ServiceResult> AddContributor(string userId, Guid id, AddContributorRequestDto request);
-    Task<ServiceResult> RemoveContributor(string userId, Guid id, string contributorEmail);
+    Task<ServiceResult> RemoveContributor(string userId, Guid id, string contributorId);
     Task<ServiceResult> GetBranchingMap(string userId, Guid questionnaireId);
+    Task<ServiceResult> UpdateCompletionState(string userId, Guid id, UpdateCompletionStateRequestDto request);
 }
 
 public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<QuestionnaireService> logger) : AbstractService, IQuestionnaireService
@@ -424,6 +425,9 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             await db.Answers.Where(q => q.QuestionnaireId == id)
                 .ExecuteUpdateAsync(s => s.SetProperty(b => b.IsDeleted, true));
             
+            await db.Contents.Where(q => q.QuestionnaireId == id)
+                .ExecuteUpdateAsync(s => s.SetProperty(b => b.IsDeleted, true));
+            
             return await UpdateQuestionnaireStatus(userId, id, EntityStatus.Deleted);
         }
         catch (Exception ex)
@@ -594,11 +598,11 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public async Task<ServiceResult> RemoveContributor(string userId, Guid id, string contributorEmail)
+    public async Task<ServiceResult> RemoveContributor(string userId, Guid id, string contributorId)
     {
         try
         {
-            logger.LogInformation("RemoveContributor started QuestionnaireId={QuestionnaireId} Contributor={Contributor}", id, contributorEmail);
+            logger.LogInformation("RemoveContributor started QuestionnaireId={QuestionnaireId} ContributorId={ContributorId}", id, contributorId);
 
             var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
             if (access == EntityAccess.NotFound)
@@ -611,9 +615,9 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (questionnaire == null)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
 
-            if (questionnaire.Contributors.Count > 2 && questionnaire.Contributors.Contains(contributorEmail))
+            if (questionnaire.Contributors.Count > 2 && questionnaire.Contributors.Contains(contributorId))
             {
-                questionnaire.Contributors.Remove(contributorEmail);
+                questionnaire.Contributors.Remove(contributorId);
                 await db.SaveChangesAsync();
             }
             else if (!questionnaire.Contributors.Contains(userId))
@@ -813,7 +817,42 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
     }
-    
+
+    public async Task<ServiceResult> UpdateCompletionState(string userId, Guid id, UpdateCompletionStateRequestDto request)
+    {
+        try
+        {
+            logger.LogInformation("UpdateCompletionState started QuestionnaireId={QuestionnaireId}", id);
+            
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
+            if (access == EntityAccess.NotFound)
+                return NotFound(ProblemTrace("We could not find that questionnaire", 404));
+            if (access == EntityAccess.Deny)
+                return Forbid(ProblemTrace("You do not have permission to do this", 403));
+            
+            var questionnaire = await db.Questionnaires
+                .FirstOrDefaultAsync(q => q.Id == id);
+            
+            if (questionnaire == null) 
+                return NotFound(ProblemTrace("We could not find that questionnaire", 404));
+
+            questionnaire.CompletionTrackingMap ??= new Dictionary<CompletableTask, CompletionStatus>();
+            questionnaire.CompletionTrackingMap[request.Task] = request.Status;
+            // Doesn't need to be set to draft: questionnaire.Status = EntityStatus.Draft;
+            questionnaire.UpdatedAt = DateTime.UtcNow;
+            
+            await db.SaveChangesAsync();
+            
+            logger.LogInformation("UpdateCompletionState succeeded QuestionnaireId={QuestionnaireId}", id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "UpdateCompletionState failed QuestionnaireId={QuestionnaireId}", id);
+            return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
+        }
+    }
+
     private QuestionnaireDto ToDto(QuestionnaireEntity q, bool includeCreatedBy = false, bool includeCustomisations = false)
     {
         var dto = new QuestionnaireDto

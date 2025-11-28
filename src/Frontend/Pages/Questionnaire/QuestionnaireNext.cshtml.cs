@@ -114,6 +114,8 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
                 TempData["Questionnaire"] = JsonSerializer.Serialize(Questionnaire);
                 TempData["CurrDestination"] = JsonSerializer.Serialize(Destination);
                 TempData["NextDestination"] = JsonSerializer.Serialize(destination);
+                
+                IsEmbedded = Embed;
                     
                 return Page();
             }

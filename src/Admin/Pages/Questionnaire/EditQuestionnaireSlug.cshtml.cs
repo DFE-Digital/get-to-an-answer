@@ -12,21 +12,21 @@ using Newtonsoft.Json;
 namespace Admin.Pages.Questionnaire;
 
 [Authorize]
-public class EditQuestionnaireName(IApiClient apiClient, ILogger<EditQuestionnaireName> logger) : QuestionnairesPageModel
+public class EditQuestionnaireSlug(IApiClient apiClient, ILogger<EditQuestionnaireSlug> logger) : QuestionnairesPageModel
 {
     [FromRoute(Name = "questionnaireId")]
     public Guid QuestionnaireId { get; set; }
     
-    [BindProperty(Name = "Title")]
-    [Required(ErrorMessage = "Enter a questionnaire title")]
+    [BindProperty(Name = "Slug")]
+    [Required(ErrorMessage = "Enter a questionnaire slug")]
     [GdsTitle]
-    public string? Title { get; set; }
+    public string? Slug { get; set; }
     
     public IActionResult OnGet()
     {
-        if (TempData.TryGetValue("QuestionnaireTitle", out var title))
+        if (TempData.TryGetValue("QuestionnaireSlug", out var title))
         {
-            Title = title?.ToString();
+            Slug = title?.ToString();
         }
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
         return Page();
@@ -41,15 +41,28 @@ public class EditQuestionnaireName(IApiClient apiClient, ILogger<EditQuestionnai
                 return Page();
             }
             
-            var updateQuestionnaireRequest = new UpdateQuestionnaireRequestDto { Title = Title };
-            
-            await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, updateQuestionnaireRequest);
+            var updateQuestionnaireRequest = new UpdateQuestionnaireRequestDto { Slug = Slug };
+
+            try
+            {
+                await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, updateQuestionnaireRequest);
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                ModelState.AddModelError(nameof(Slug), "A questionnaire with this slug already exists");
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error updating questionnaire {QuestionnaireId}", QuestionnaireId);
+                return RedirectToErrorPage();
+            }
             
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
             
             await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
             {
-                Task = CompletableTask.EditQuestionnaireName,
+                Task = CompletableTask.EditQuestionnaireSlug,
                 Status = CompletionStatus.Completed // given the title is required
             });
             

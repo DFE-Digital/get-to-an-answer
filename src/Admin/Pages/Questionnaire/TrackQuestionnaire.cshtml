@@ -1,12 +1,25 @@
 @page "/admin/questionnaires/{questionnaireId:guid}/track"
 @model Admin.Pages.Questionnaire.TrackQuestionnaires
+@using AngleSharp.Common
 @using Common.Enum
 @using Common.Models
+@using Microsoft.AspNetCore.Html
 
 @{
   ViewData["Title"] = "Home Page";
   var questionnaireViewModel = Model.ViewModel;
-  var questionnaire = questionnaireViewModel.Questionnaire;
+  var questionnaire = Model.Questionnaire;
+  
+  IHtmlContent TaskStatusTag(CompletableTask task, CompletionStatus defStatus = CompletionStatus.NotStarted ) => 
+    Html.Raw(Model.Questionnaire?.CompletionTrackingMap?.GetOrDefault(task, defStatus) switch
+  {
+    CompletionStatus.NotStarted => 
+      "<strong class=\"govuk-tag govuk-tag--blue\">Not started</strong>",
+    CompletionStatus.InProgress => 
+      "<strong class=\"govuk-tag govuk-tag--light-blue\">In progress</strong>",
+    CompletionStatus.Completed => "Completed",
+    _ => "<strong class=\"govuk-tag govuk-tag--blue\">Not started</strong>"
+  });
 }
 
 @section BeforeContent
@@ -133,119 +146,131 @@ else if (questionnaireViewModel.QuestionnaireState is { JustUnpublished: true })
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
-      <span class="govuk-caption-l">@questionnaireViewModel.Questionnaire?.Title</span><span class="govuk-visually-hidden"> - </span>
-      Edit your questionnaire
+      <span class="govuk-caption-l">@Model.Questionnaire?.Title</span><span class="govuk-visually-hidden"> - </span>
+      Create and edit your questionnaire
     </h1>
     <dl class="govuk-!-margin-bottom-7">
       <dt class="govuk-visually-hidden">Status</dt>
       <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@questionnaire?.Status">@questionnaire?.Status</strong>
       </dd>
     </dl>
-    <div class="govuk-!-margin-bottom-9">
-      <p>
-        <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/start-preview" target="_blank">Preview this questionnaire</a>
-      </p>
-      <p>
-        <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/deployment" target="_blank">How to deploy questionnaire</a>
-      </p>
-      <p>
-        <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/branching-map" target="_blank" rel="noopener">View branching map</a>
-      </p>
-    </div>
-    <p class="app-task-list__summary">
-      You’ve completed 1 of 8 tasks.
-    </p>
     <div class="app-task-list">
       <h2 class="govuk-heading-m">
-        1. Create your questionnaire
+        Edit your questionnaire
       </h2>
       <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@questionnaire?.Id/edit-name">Edit the title of your questionnaire</a></div>
-          <div class="govuk-task-list__status" id="create-your-questionnaire-1-status">Completed</div>
+          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="edit-your-questionnaire-name-status" href="/admin/questionnaires/@questionnaire?.Id/edit-name">Edit the name of your questionnaire</a></div>
+          <div class="govuk-task-list__status" id="edit-your-questionnaire-name-status">@TaskStatusTag(CompletableTask.EditQuestionnaireName)</div>
         </li>
-        <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="edit-slug-status" href="/admin/questionnaires/@questionnaire?.Id/slug/edit">Edit the slug of your questionnaire</a></div>
-          <div class="govuk-task-list__status" id="edit-slug-status"><strong class="govuk-tag govuk-tag--light-blue">In progress</strong></div>
-        </li>
-        <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-2-status" href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Add and edit your questions</a></div>
-          <div class="govuk-task-list__status" id="create-your-questionnaire-2-status"><strong class="govuk-tag govuk-tag--light-blue">In progress</strong></div>
-        </li>
-      </ul>
-      <h3 class="govuk-heading-s">Optional task</h3>
-      <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link" aria-describedby="optional-task-1-status" href="/admin/questionnaires/@questionnaire?.Id/start-page/edit">
-              Add a start page
+              Add and edit start page
             </a>
           </div>
           <div class="govuk-task-list__status" id="optional-task-1-status">
             <strong class="govuk-tag govuk-tag--grey">Optional</strong>
           </div>
         </li>
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-2-status" href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Add and edit questions and answers</a></div>
+          <div class="govuk-task-list__status" id="create-your-questionnaire-2-status">@TaskStatusTag(CompletableTask.AddQuestionsAndAnswers)</div>
+        </li>
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" 
+               href="/admin/questionnaires/@questionnaire?.Id/contents">Add and edit end results</a>
+          </div>
+          <div class="govuk-task-list__status" id="create-your-questionnaire-1-status">
+            <strong class="govuk-tag govuk-tag--grey">Optional</strong>
+          </div>
+        </li>
+      </ul>
+      <h3 class="govuk-heading-s">Customise look and feel</h3>
+      <ul class="govuk-task-list">
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@questionnaire?.Id/look-and-feel">Edit look and feel of your questionnaire</a>
+          </div>
+          <div class="govuk-task-list__status" id="create-your-questionnaire-1-status"><strong class="govuk-tag govuk-tag--grey">Optional</strong></div>
+        </li>
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@questionnaire?.Id/edit-continue-button">Edit text on 'continue' buttons</a>
+          </div>
+          <div class="govuk-task-list__status" id="create-your-questionnaire-1-status"><strong class="govuk-tag govuk-tag--grey">Optional</strong></div>
+        </li>
+      </ul>
+      <h3 class="govuk-heading-s">Add contact details</h3>
+      <ul class="govuk-task-list">
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            <a class="govuk-link govuk-task-list__link" aria-describedby="provide-privacy-and-contact-details-2-status" href="/forms/262709/contact-details">Provide contact details for support</a>
+          </div>
+          <div class="govuk-task-list__status" id="provide-privacy-and-contact-details-2-status">
+            <strong class="govuk-tag govuk-tag--grey">Optional</strong>
+          </div>
+        </li>
+      </ul>
+      <h2 class="govuk-heading-m">
+        Check and review
+      </h2>
+      <ul class="govuk-task-list">
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            <a class="govuk-link govuk-task-list__link" href="/admin/questionnaires/@questionnaire?.Id/start-preview" 
+               target="_blank">Preview this questionnaire (opens in new tab)</a>
+          </div>
+        </li>
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/branching-map" target="_blank" 
+               rel="noopener">View branching map (opens in new tab)</a>
+          </div>
+        </li>
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/version-history">View questionnaire versions</a>
+          </div>
+        </li>
+      </ul>
+      <h2 class="govuk-heading-m">
+        Manage questionnaire
+      </h2>
+      <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link" aria-describedby="optional-task-1-status" href="/admin/questionnaires/@questionnaire?.Id/contributors">
               Add or remove contributors
             </a>
           </div>
-          <div class="govuk-task-list__status" id="optional-task-1-status">
-            <strong class="govuk-tag govuk-tag--grey">Optional</strong>
+        </li>
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/clone">Clone this questionnaire</a>
           </div>
         </li>
       </ul>
       <h2 class="govuk-heading-m">
-        2. Customisations and Branding
+        Set up questionnaire on your service
       </h2>
       <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@questionnaire?.Id/edit-continue-button">Edit the branding and theme of your questionnaire</a>
+            <a class="govuk-link govuk-task-list__link" aria-describedby="edit-slug-status" href="/admin/questionnaires/@questionnaire?.Id/edit-slug">Edit the slug of your questionnaire</a>
           </div>
-          <div class="govuk-task-list__status" id="create-your-questionnaire-1-status">Completed</div>
+          <div class="govuk-task-list__status" id="edit-slug-status">@TaskStatusTag(CompletableTask.EditQuestionnaireSlug)</div>
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@questionnaire?.Id/look-and-feel">Customise the button text, error messages, etc. of your questionnaire</a>
-          </div>
-          <div class="govuk-task-list__status" id="create-your-questionnaire-1-status">Completed</div>
-        </li>
-      </ul>
-      <h2 class="govuk-heading-m">
-        3. Answer Content
-      </h2>
-      <ul class="govuk-task-list">
-        <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@questionnaire?.Id/contents">Add and edit answer content of your questionnaire</a></div>
-          <div class="govuk-task-list__status" id="create-your-questionnaire-1-status">Completed</div>
-        </li>
-      </ul>
-      <h2 class="govuk-heading-m">
-        4. Provide privacy and contact details
-      </h2>
-      <ul class="govuk-task-list">
-        <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="provide-privacy-and-contact-details-1-status" href="/forms/262709/privacy-policy">Provide a link to privacy information for this questionnaire</a>
-          </div>
-          <div class="govuk-task-list__status" id="provide-privacy-and-contact-details-1-status">
-            <strong class="govuk-tag govuk-tag--blue">Not started</strong>
-          </div>
-        </li>
-        <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="provide-privacy-and-contact-details-2-status" href="/forms/262709/contact-details">Provide contact details for support</a>
-          </div>
-          <div class="govuk-task-list__status" id="provide-privacy-and-contact-details-2-status">
-            <strong class="govuk-tag govuk-tag--blue">Not started</strong>
+            <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/deployment" target="_blank">Set up questionnaire on your service</a>
           </div>
         </li>
       </ul>
     </div>
     <div class="govuk-button-group">
-      @if (questionnaire?.Status == EntityStatus.Draft)
+      @if (questionnaire?.Status is EntityStatus.Draft or EntityStatus.Private)
       {
         <a class="govuk-button govuk-button--primary" data-module="govuk-button" href="/admin/questionnaires/@questionnaire?.Id/publish-confirmation" data-govuk-button-init="">Publish questionnaire</a>
       } 
@@ -255,11 +280,5 @@ else if (questionnaireViewModel.QuestionnaireState is { JustUnpublished: true })
       }
       <a class="govuk-button govuk-button--warning" data-module="govuk-button" href="/admin/questionnaires/@questionnaire?.Id/delete/confirm" data-govuk-button-init="">Delete questionnaire</a>
     </div>
-    <p>
-      <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/version-history">View questionnaire versions</a>
-    </p>
-    <p>
-      <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/clone">Clone this questionnaire</a>
-    </p>
   </div>
 </div>

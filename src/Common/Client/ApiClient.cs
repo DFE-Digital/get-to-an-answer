@@ -32,6 +32,7 @@ public interface IApiClient
     Task<string?> AddQuestionnaireContributor(Guid questionnaireId, AddContributorRequestDto request);
     Task<string[]> GetQuestionnaireContributors(Guid questionnaireId);
     Task<string?> RemoveQuestionnaireContributor(Guid questionnaireId, string contributorEmail);
+    Task<string?> UpdateCompletionStateAsync(Guid questionnaireId, UpdateCompletionStateRequestDto request);
 
     // === For Questions ===
 
@@ -69,10 +70,6 @@ public interface IApiClient
 
     Task<QuestionDto?> GetInitialQuestion(Guid questionnaireId, bool preview = false);
     Task<DestinationDto?> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool preview = false);
-
-    // === For Inviting Contributors ===
-
-    Task<string?> AddSelfToQuestionnaireContributorAsync(Guid questionnaireId);
 }
 
 public class ApiClient : IApiClient
@@ -182,6 +179,12 @@ public class ApiClient : IApiClient
     {
         var response =
             await _httpClient.DeleteAsync($"{Questionnaires}/{questionnaireId}/contributors/{contributorEmail}");
+        return await GetResponse<string>(response);
+    }
+
+    public async Task<string?> UpdateCompletionStateAsync(Guid questionnaireId, UpdateCompletionStateRequestDto request)
+    {
+        var response = await _httpClient.PatchAsJsonAsync($"{Questionnaires}/{questionnaireId}/completion-state", request);
         return await GetResponse<string>(response);
     }
 
@@ -343,12 +346,6 @@ public class ApiClient : IApiClient
         return await GetResponse<DestinationDto>(response);
     }
 
-    public async Task<string?> AddSelfToQuestionnaireContributorAsync(Guid questionnaireId)
-    {
-        var response = await _httpClient.PutAsync($"{Questionnaires}/{questionnaireId}/contributors/self", null);
-        return await GetResponse<string>(response);
-    }
-
     private async Task<TResponse?> GetResponse<TResponse>(HttpResponseMessage response) where TResponse : class
     {
         if (response.IsSuccessStatusCode)
@@ -373,12 +370,13 @@ public class ApiClient : IApiClient
 
             // Throw a custom exception or return an alternative response.
             throw new HttpRequestException(
-                $"API request failed with status code {response.StatusCode} and message: {problemDetails?.Detail}");
+                $"API request failed with status code {response.StatusCode} and message: {problemDetails?.Detail}", 
+                null, response.StatusCode);
         }
         catch (Exception)
         {
             _logger.LogError($"API request '{response.RequestMessage?.RequestUri?.AbsolutePath}' failed with status code '{response.StatusCode}', error: '{errorBody}'");
-            return null;
+            throw;
         }
     }
 }

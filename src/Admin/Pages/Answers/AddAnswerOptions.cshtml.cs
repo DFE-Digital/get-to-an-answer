@@ -216,10 +216,10 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         }
     }
 
-    private static DestinationType MapDestination(AnswerDestination answerDestination) =>
+    private static DestinationType? MapDestination(AnswerDestination answerDestination) =>
         answerDestination switch
         {
-            AnswerDestination.NextQuestion => DestinationType.Question,
+            AnswerDestination.NextQuestion => null,
             AnswerDestination.SpecificQuestion => DestinationType.Question,
             AnswerDestination.InternalResultsPage => DestinationType.CustomContent,
             AnswerDestination.ExternalResultsPage => DestinationType.ExternalLink,

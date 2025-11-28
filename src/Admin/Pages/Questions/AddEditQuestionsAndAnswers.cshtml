@@ -30,7 +30,7 @@
 
                 @*TODO: add status here *@
                 <p class="govuk-body">
-                    <strong class="govuk-tag govuk-tag--yellow">Draft</strong>
+                    <strong class="govuk-tag" data-status="@Model.Status">@Model.Status</strong>
                 </p>
 
                 <div class="govuk-button-group">
@@ -102,7 +102,7 @@
                         <div class="govuk-radios" data-module="govuk-radios">
                             <div class="govuk-radios__item">
                                 <input class="govuk-radios__input" id="finished-yes" name="FinishedEditing" type="radio" asp-for="@Model.FinishedEditing"
-                                       value="Yes">
+                                       value="true">
                                 <label class="govuk-label govuk-radios__label" for="finished-yes">
                                     Yes
                                 </label>
@@ -110,7 +110,7 @@
 
                             <div class="govuk-radios__item">
                                 <input class="govuk-radios__input" id="finished-no" name="FinishedEditing" type="radio" asp-for="@Model.FinishedEditing"
-                                       value="No">
+                                       value="false">
                                 <label class="govuk-label govuk-radios__label" for="finished-no">
                                     No, I’ll come back later
                                 </label>
