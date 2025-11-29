@@ -7,17 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace Admin.Pages.Confirmations;
 
 [Authorize]
-public class ConfirmDeleteContent(IApiClient apiClient) : QuestionnairesPageModel
+public class ConfirmDeleteQuestionnaire(IApiClient apiClient) : QuestionnairesPageModel
 {
     [FromRoute(Name = "questionnaireId")]
     public Guid QuestionnaireId { get; set; }
-    
-    [FromRoute(Name = "contentId")]
-    public Guid ContentId { get; set; }
 
     public string? QuestionnaireTitle { get; set; }
     
-    [BindProperty] public bool DeleteContent { get; set; }
+    [BindProperty] public bool DeleteQuestionnaire { get; set; }
 
     public void OnGet()
     {
@@ -29,13 +26,13 @@ public class ConfirmDeleteContent(IApiClient apiClient) : QuestionnairesPageMode
 
     public async Task<IActionResult> OnPostContinueAsync()
     {
-        if (DeleteContent)
+        if (DeleteQuestionnaire)
         {
-            await apiClient.DeleteContentAsync(ContentId);
+            await apiClient.DeleteQuestionnaireAsync(QuestionnaireId);
             
             TempData[nameof(QuestionnaireState)] = new QuestionnaireState { JustDeleted = true };
         }
         
-        return Redirect(string.Format(Routes.AddAndEditResultPages, QuestionnaireId));
+        return Redirect(Routes.QuestionnairesManage);
     }
 }

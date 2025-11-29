@@ -36,6 +36,8 @@ public class ConfirmUnpublishQuestionnaire(IApiClient apiClient, IImageStorageCl
             }
 
             await apiClient.UnpublishQuestionnaireAsync(QuestionnaireId);
+            
+            TempData[nameof(QuestionnaireState)] = new QuestionnaireState { JustUnpublished = true };
         }
         
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));

@@ -37,6 +37,8 @@ public class ConfirmPublishQuestionnaire(IApiClient apiClient, IImageStorageClie
             }
 
             await apiClient.PublishQuestionnaireAsync(QuestionnaireId);
+            
+            TempData[nameof(QuestionnaireState)] = new QuestionnaireState { JustPublished = true };
         }
         
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));

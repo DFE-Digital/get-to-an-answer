@@ -328,11 +328,11 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (questionnaire.Status == EntityStatus.Published)
                 return BadRequest(ProblemTrace("The questionnaire is already published", 400));
 
-            var branchingHealth = IsBranchingHealthy(questionnaire);
+            var (branchingHealth, healthMessage) = IsBranchingHealthy(questionnaire);
 
             if (branchingHealth != BranchingHealthType.Ok)
             {
-                return BadRequest(ProblemTrace("Branching is not healthy", 400));       
+                return BadRequest(ProblemTrace(healthMessage, 400));
             }
             
             return await UpdateQuestionnaireStatus(userId, id, EntityStatus.Published);
@@ -344,25 +344,25 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    internal static BranchingHealthType IsBranchingHealthy(QuestionnaireEntity current)
+    internal static (BranchingHealthType BranchingHealth, string HealthMessage) IsBranchingHealthy(QuestionnaireEntity current)
     {
         var questionMap = current.Questions.ToDictionary(q => q.Id, q => q);
         var contentMap = current.Contents.ToDictionary(q => q.Id, q => q);
 
         foreach (var question in current.Questions)
         {
-            var branchingHealth = IsBranchingHealthy(question, new Dictionary<Guid, bool>(), questionMap, contentMap);
+            var (branchingHealth, healthMessage) = IsBranchingHealthy(question, new Dictionary<Guid, bool>(), questionMap, contentMap);
             
             if (branchingHealth != BranchingHealthType.Ok)
-                return branchingHealth;
+                return (branchingHealth, healthMessage);
         }
         
-        return BranchingHealthType.Ok;
+        return (BranchingHealthType.Ok, "Ok");
     }
 
     // make visible for unit testing
     
-    internal static BranchingHealthType IsBranchingHealthy(
+    internal static (BranchingHealthType BranchingHealth, string HealthMessage) IsBranchingHealthy(
         QuestionEntity current, 
         Dictionary<Guid, bool> visited, 
         Dictionary<Guid, QuestionEntity> questionMap,
@@ -370,7 +370,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
     {
         if (visited.ContainsKey(current.Id))
         {
-            return BranchingHealthType.Cyclic;
+            return (BranchingHealthType.Cyclic, $"Question {current.Order} was be referenced twice in the same flow.");
         }
         
         var visitedList = new Dictionary<Guid, bool>(visited) { { current.Id, true } };
@@ -379,11 +379,11 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         {
             if (answer is { DestinationType: DestinationType.Question, DestinationQuestionId: { } id })
             {
-                var type = IsBranchingHealthy(questionMap[id], 
+                var (type, message) = IsBranchingHealthy(questionMap[id], 
                     new Dictionary<Guid, bool>(visitedList), questionMap, contentMap);
                 
                 if (type != BranchingHealthType.Ok)
-                    return type;
+                    return (type, message);
             }
             else if (answer is { DestinationType: DestinationType.CustomContent, DestinationContentId: not null } && 
                          contentMap.ContainsKey(answer.DestinationContentId.Value))
@@ -392,11 +392,12 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             }  
             else if (answer.DestinationType != DestinationType.ExternalLink && current.Order == questionMap.Count)
             {
-                return BranchingHealthType.Broken; 
+                return (BranchingHealthType.Broken, 
+                    $"Answer '{answer.Content}' of question '{current.Order}' has no destination."); 
             }    
         }
 
-        return BranchingHealthType.Ok;
+        return (BranchingHealthType.Ok, "Ok");
     }
 
     public async Task<ServiceResult> UnpublishQuestionnaire(string userId, Guid id)

@@ -1,10 +1,10 @@
-﻿@page "/admin/questionnaires/{questionnaireId:guid}/contents/{contentId:guid}/delete-confirmation"
+﻿@page "/admin/questionnaires/{questionnaireId:guid}/delete-confirmation"
 @addTagHelper *, Common
 @using Common.Enum
-@model Admin.Pages.Confirmations.ConfirmDeleteContent
+@model Admin.Pages.Confirmations.ConfirmDeleteQuestionnaire
 
 @{
-  ViewData["Title"] = "Delete the end result content";
+  ViewData["Title"] = "Delete your questionnaire";
 }
 
 <div class="govuk-grid-row">
@@ -14,17 +14,17 @@
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                 <h1 class="govuk-fieldset__heading">
                     <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-                    Are you sure you want to delete this result page?
+                    Are you sure you want to delete this questionnaire?
                 </h1>
             </legend>
 
             <div id="finished-hint" class="govuk-hint">
-                By deleting this result page, existing answers using this result page will be broken.
+                By deleting this questionnaire, it will no longer be available to service users.
             </div>
 
             <div class="govuk-radios" data-module="govuk-radios">
                 <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="finished-yes" name="DeleteContent" type="radio" asp-for="@Model.DeleteContent"
+                    <input class="govuk-radios__input" id="finished-yes" name="DeleteQuestionnaire" type="radio" asp-for="@Model.DeleteQuestionnaire"
                            value="true">
                     <label class="govuk-label govuk-radios__label" for="finished-yes">
                         Yes
@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="finished-no" name="DeleteContent" type="radio" asp-for="@Model.DeleteContent"
+                    <input class="govuk-radios__input" id="finished-no" name="DeleteQuestionnaire" type="radio" asp-for="@Model.DeleteQuestionnaire"
                            value="false">
                     <label class="govuk-label govuk-radios__label" for="finished-no">
                         No, I’ll come back later
