@@ -7,13 +7,13 @@
 
 @section BeforeContent
 {
-    <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.QuestionnaireBranchingMapDto.QuestionnaireId/track">Back to questionnaire '@Model.QuestionnaireBranchingMapDto.QuestionnaireTitle'</a>
+    <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.QuestionnaireBranchingMapDto?.QuestionnaireId/track">Back to questionnaire '@Model.QuestionnaireBranchingMapDto.QuestionnaireTitle'</a>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <h1 class="govuk-heading-l">
-            <span class="govuk-caption-l">@Model.QuestionnaireBranchingMapDto.QuestionnaireTitle</span>
+            <span class="govuk-caption-l">@Model.QuestionnaireBranchingMapDto?.QuestionnaireTitle</span>
             Branching map
         </h1>
 
@@ -21,7 +21,7 @@
 
         <div id="diagram-wrapper" class="govuk-!-margin-top-4">
             <div id="diagram" class="mermaid">
-                @Model.QuestionnaireBranchingMapDto.Source
+                @Model.QuestionnaireBranchingMapDto?.Source
             </div>
         </div>
     </div>
