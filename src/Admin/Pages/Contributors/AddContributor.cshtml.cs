@@ -25,7 +25,7 @@ public class AddContributor(ILogger<AddContributor> logger,
 
     public IActionResult OnGet()
     {
-        BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
+        BackLinkSlug = string.Format(Routes.AddAndEditQuestionnaireContributors, QuestionnaireId);
         QuestionnaireTitle = TempData.Peek("QuestionnaireTitle") as string;
         return Page();
     }
@@ -47,7 +47,7 @@ public class AddContributor(ILogger<AddContributor> logger,
             TempData[nameof(QuestionnaireState)] =
                 JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
 
-            return Page();
+            return Redirect(string.Format(Routes.AddAndEditQuestionnaireContributors, QuestionnaireId));
         }
         catch (MsGraphException)
         {

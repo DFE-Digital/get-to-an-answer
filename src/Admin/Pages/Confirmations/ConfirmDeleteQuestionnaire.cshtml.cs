@@ -3,6 +3,7 @@ using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Admin.Pages.Confirmations;
 
@@ -30,9 +31,11 @@ public class ConfirmDeleteQuestionnaire(IApiClient apiClient) : QuestionnairesPa
         {
             await apiClient.DeleteQuestionnaireAsync(QuestionnaireId);
             
-            TempData[nameof(QuestionnaireState)] = new QuestionnaireState { JustDeleted = true };
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustDeleted = true });
+        
+            return Redirect(Routes.QuestionnairesManage);
         }
         
-        return Redirect(Routes.QuestionnairesManage);
+        return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
     }
 }

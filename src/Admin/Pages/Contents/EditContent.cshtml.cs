@@ -55,7 +55,7 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
         return Page();
     }
 
-    public async Task<IActionResult> OnPostSaveContent()
+    public async Task<IActionResult> OnPostSaveContentAsync()
     {
         try
         {
@@ -69,14 +69,14 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
             });
             
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+            
+            return Redirect(string.Format(Routes.AddAndEditResultPages, QuestionnaireId));
         }
         catch (Exception e)
         {
             logger.LogError(e, e.Message);
             return RedirectToErrorPage();
         }
-
-        return Page();
     }
 
     public IActionResult OnPostDeleteContent()

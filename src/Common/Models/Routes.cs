@@ -12,6 +12,7 @@ public static class Routes
     public const string AddAndEditResultPages = AdminRoot + "/questionnaires/{0}/contents";
     public const string AddContent = AdminRoot + "/questionnaires/{0}/contents/add";
     public const string ConfirmDeleteContent = AdminRoot + "/questionnaires/{0}/contents/{1}/delete-confirmation";
+    public const string EditResultPage = AdminRoot + "/questionnaires/{0}/contents/{1}/edit";
 
     // Contributors
     public const string AddAndEditQuestionnaireContributors= AdminRoot + "/questionnaires/{0}/contributors";

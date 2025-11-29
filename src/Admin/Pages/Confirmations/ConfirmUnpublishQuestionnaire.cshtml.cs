@@ -3,6 +3,7 @@ using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Admin.Pages.Confirmations;
 
@@ -37,7 +38,7 @@ public class ConfirmUnpublishQuestionnaire(IApiClient apiClient, IImageStorageCl
 
             await apiClient.UnpublishQuestionnaireAsync(QuestionnaireId);
             
-            TempData[nameof(QuestionnaireState)] = new QuestionnaireState { JustUnpublished = true };
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUnpublished = true });
         }
         
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));

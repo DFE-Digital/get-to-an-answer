@@ -3,6 +3,7 @@ using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Admin.Pages.Confirmations;
 
@@ -33,9 +34,8 @@ public class ConfirmRemoveContributor(IApiClient apiClient) : QuestionnairesPage
         {
             await apiClient.RemoveQuestionnaireContributor(QuestionnaireId, ContributorId.ToString());
                 
-            TempData[nameof(QuestionnaireState)] = new QuestionnaireState { JustUpdated = true };
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
         }
-        
-        return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
+        return Redirect(string.Format(Routes.AddAndEditQuestionnaireContributors, QuestionnaireId));
     }
 }

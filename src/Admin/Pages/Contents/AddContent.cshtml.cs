@@ -58,7 +58,7 @@ public class AddContent(ILogger<AddContent> logger, IApiClient apiClient) : Base
             
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
 
-            return Page();
+            return Redirect(string.Format(Routes.AddAndEditResultPages, QuestionnaireId));
         }
         catch (Exception e)
         {
