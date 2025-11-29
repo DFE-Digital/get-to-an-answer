@@ -26,8 +26,9 @@
         <h1 class="govuk-label-wrapper">
           <label for="@inputId" class="govuk-label govuk-label--l">@title</label>
         </h1> 
-        <div class="govuk-hint" id="@inputId-hint">The questionnaire will be shown at the top of each page.
-          Use a name that describes what it helps people to do. For example 'Check your care leaver support'.
+        <div class="govuk-hint" id="@inputId-hint">
+          <p>The questionnaire will be shown at the top of each page.</p>
+          <p>Use a name that describes what it helps people to do. For example 'Check your care leaver support'.</p>
         </div>
         <govuk-field-error asp-for="@Model.Slug" error-id="@inputId-field-error"></govuk-field-error>
         
