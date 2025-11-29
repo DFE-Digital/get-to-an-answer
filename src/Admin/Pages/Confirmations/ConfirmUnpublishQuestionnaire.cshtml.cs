@@ -12,9 +12,11 @@ public class ConfirmUnpublishQuestionnaire(IApiClient apiClient, IImageStorageCl
     [FromRoute(Name = "questionnaireId")]
     public Guid QuestionnaireId { get; set; }
     
-    public async Task<IActionResult> OnPost([FromForm(Name = "UnpublishQuestionnaire")] bool unpublish = false)
+    [BindProperty] public bool UnpublishQuestionnaire { get; set; }
+    
+    public async Task<IActionResult> OnPostContinueAsync()
     {
-        if (unpublish)
+        if (UnpublishQuestionnaire)
         {
             var questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId);
             

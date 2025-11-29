@@ -1,9 +1,11 @@
+using System.Buffers.Text;
 using System.Text.Json;
 using Common.Models.PageModels;
 using Common.Client;
 using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
+using Frontend.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Frontend.Pages.Questionnaire;
@@ -22,6 +24,8 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 
     [FromQuery(Name = "embed")] 
     public bool Embed { get; set; }
+    
+    [BindProperty] public string? StateCacheString { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
@@ -58,10 +62,17 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
                 IsRedirectConfirmation = false;
                 
                 ModelState.Clear();
+
+                if (StateCacheString == null)
+                {
+                    return NotFound();
+                }
+                
+                var stateCache = JsonSerializer.Deserialize<StateCache>(Convert.FromBase64String(StateCacheString));
                 
                 if (confirmRedirect)
                 {
-                    var nextDestination = JsonSerializer.Deserialize<DestinationDto>(TempData["NextDestination"]?.ToString() ?? "{}");
+                    var nextDestination = stateCache?.NextDestination;
                     
                     if (nextDestination is null)
                     {
@@ -83,8 +94,8 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
                 }
                 else
                 {
-                    Questionnaire = JsonSerializer.Deserialize<QuestionnaireInfoDto>(TempData["Questionnaire"]?.ToString() ?? "{}")!;
-                    Destination = JsonSerializer.Deserialize<DestinationDto>(TempData["CurrDestination"]?.ToString() ?? "{}")!;
+                    Questionnaire = stateCache?.Questionnaire!;
+                    Destination = stateCache?.CurrDestination!;
                 }
 
                 return Page();
@@ -110,10 +121,13 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
                 destination is { Type: DestinationType.CustomContent, Title: not null, Content: not null })
             {
                 IsRedirectConfirmation = true;
-                    
-                TempData["Questionnaire"] = JsonSerializer.Serialize(Questionnaire);
-                TempData["CurrDestination"] = JsonSerializer.Serialize(Destination);
-                TempData["NextDestination"] = JsonSerializer.Serialize(destination);
+                
+                StateCacheString = Convert.ToBase64String(JsonSerializer.SerializeToUtf8Bytes(new StateCache
+                {
+                    Questionnaire = Questionnaire,
+                    CurrDestination = Destination,
+                    NextDestination = destination
+                }));
                 
                 IsEmbedded = Embed;
                     

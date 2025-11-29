@@ -12,9 +12,11 @@ public class ConfirmPublishQuestionnaire(IApiClient apiClient, IImageStorageClie
     [FromRoute(Name = "questionnaireId")]
     public Guid QuestionnaireId { get; set; }
     
-    public async Task<IActionResult> OnPost([FromForm(Name = "PublishQuestionnaire")] bool publish = false)
+    [BindProperty] public bool PublishQuestionnaire { get; set; }
+    
+    public async Task<IActionResult> OnPostContinueAsync()
     {
-        if (publish)
+        if (PublishQuestionnaire)
         {
             var questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId);
             

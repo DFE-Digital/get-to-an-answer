@@ -15,6 +15,8 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
     : BasePageModel
 {
     [FromRoute] public Guid QuestionnaireId { get; set; }
+    
+    public string? QuestionnaireTitle { get; set; } 
 
     [BindProperty] public List<QuestionDto> Questions { get; set; } = [];
     
@@ -27,9 +29,14 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
 
-        if (TempData.TryGetValue("QuestionnaireStatus", out var statusObj) && statusObj is int status)
+        if (TempData.Peek("QuestionnaireStatus") is int status)
         {
             Status = (EntityStatus) status;
+        }
+            
+        if (TempData.Peek("QuestionnaireTitle") is string title)
+        {
+            QuestionnaireTitle = title;
         }
 
         try

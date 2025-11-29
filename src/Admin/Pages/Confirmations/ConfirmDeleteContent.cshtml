@@ -1,0 +1,49 @@
+﻿@page "/admin/questionnaires/{questionnaireId:guid}/contents/{contentId:guid}/delete-confirmation"
+@addTagHelper *, Common
+@using Common.Enum
+@model Admin.Pages.Confirmations.ConfirmDeleteContent
+
+@{
+  ViewData["Title"] = "Delete the end result content";
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds-from-desktop">
+    <form method="post" class="govuk-!-margin-top-6">
+        <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                <h2 class="govuk-fieldset__heading">
+                    Are you sure you want to delete this content?
+                </h2>
+            </legend>
+
+            <div id="finished-hint" class="govuk-hint">
+                By deleting this content, existing answers with this end result content will be broken.
+            </div>
+
+            <div class="govuk-radios" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="finished-yes" name="DeleteContent" type="radio" asp-for="@Model.DeleteContent"
+                           value="true">
+                    <label class="govuk-label govuk-radios__label" for="finished-yes">
+                        Yes
+                    </label>
+                </div>
+
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="finished-no" name="DeleteContent" type="radio" asp-for="@Model.DeleteContent"
+                           value="false">
+                    <label class="govuk-label govuk-radios__label" for="finished-no">
+                        No, I’ll come back later
+                    </label>
+                </div>
+            </div>
+        </fieldset>
+
+        <button class="govuk-button govuk-!-margin-top-4" data-module="govuk-button" type="submit"
+                asp-page-handler="Continue">
+            Continue
+        </button>
+    </form>
+  </div>
+</div>

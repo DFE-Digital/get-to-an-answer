@@ -7,28 +7,42 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <h1 class="govuk-heading-l">Are you sure you want to publish this questionnaire?</h1>
-        <p class="govuk-body">By submitting this application you are confirming that, to the best of your knowledge, the details you are providing are correct.</p>
-        <form action="/admin/questionnaires/@Model.QuestionnaireId/publish-confirmation" method="post" novalidate>
+        <form method="post" class="govuk-!-margin-top-6">
             @Html.AntiForgeryToken()
-            <div class="govuk-form-group">
-                <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
+            <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                    <h2 class="govuk-fieldset__heading">
+                        Are you sure you want to publish this questionnaire?
+                    </h2>
+                </legend>
+
+                <div id="finished-hint" class="govuk-hint">
+                    By publishing this questionnaire, it will be available to service users.
+                </div>
+
+                <div class="govuk-radios" data-module="govuk-radios">
                     <div class="govuk-radios__item">
-                        <input id="publish-questionnaire-yes-input" aria-describedby="pages-selection-type-input-only-one-option-true-hint"
-                               class="govuk-radios__input" type="radio" value="true" name="PublishQuestionnaire">
-                        <label for="publish-questionnaire-yes-input" class="govuk-label govuk-radios__label">Yes</label>
+                        <input class="govuk-radios__input" id="finished-yes" name="PublishQuestionnaire" type="radio" asp-for="@Model.PublishQuestionnaire"
+                               value="true">
+                        <label class="govuk-label govuk-radios__label" for="finished-yes">
+                            Yes
+                        </label>
                     </div>
+
                     <div class="govuk-radios__item">
-                        <input id="publish-questionnaire-no-input" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
-                               class="govuk-radios__input" type="radio" value="false" name="PublishQuestionnaire">
-                        <label for="publish-questionnaire-no-input" class="govuk-label govuk-radios__label">No</label>
+                        <input class="govuk-radios__input" id="finished-no" name="PublishQuestionnaire" type="radio" asp-for="@Model.PublishQuestionnaire"
+                               value="false">
+                        <label class="govuk-label govuk-radios__label" for="finished-no">
+                            No, I’ll come back later
+                        </label>
                     </div>
                 </div>
-            </div>
+            </fieldset>
 
-            <div class="govuk-button-group">
-                <button class="govuk-button govuk-button--primary" type="submit">Continue</button>
-            </div>
+            <button class="govuk-button govuk-!-margin-top-4" data-module="govuk-button" type="submit"
+                    asp-page-handler="Continue">
+                Continue
+            </button>
         </form>
     </div>
 </div>
