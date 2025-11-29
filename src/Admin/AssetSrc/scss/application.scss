@@ -928,3 +928,21 @@ $toc-width-tablet: 210px;
 .govuk-hint > .govuk-body:only-child {
   margin-bottom: 0;
 }
+
+.govuk-table__cell {
+  form {
+    margin-bottom: 0;
+    button {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.govuk-table__row-v-centered {
+  .govuk-table__cell {
+    vertical-align: middle;
+    &:last-child  {
+      text-align: right;
+    }
+  }
+}

@@ -31,7 +31,7 @@ public interface IApiClient
     Task<string?> DeleteQuestionnaireAsync(Guid questionnaireId);
     Task<string?> AddQuestionnaireContributor(Guid questionnaireId, AddContributorRequestDto request);
     Task<string[]> GetQuestionnaireContributors(Guid questionnaireId);
-    Task<string?> RemoveQuestionnaireContributor(Guid questionnaireId, string contributorEmail);
+    Task<string?> RemoveQuestionnaireContributor(Guid questionnaireId, string contributorId);
     Task<string?> UpdateCompletionStateAsync(Guid questionnaireId, UpdateCompletionStateRequestDto request);
 
     // === For Questions ===
@@ -175,10 +175,10 @@ public class ApiClient : IApiClient
         return await GetResponse<string[]>(response) ?? [];
     }
 
-    public async Task<string?> RemoveQuestionnaireContributor(Guid questionnaireId, string contributorEmail)
+    public async Task<string?> RemoveQuestionnaireContributor(Guid questionnaireId, string contributorId)
     {
         var response =
-            await _httpClient.DeleteAsync($"{Questionnaires}/{questionnaireId}/contributors/{contributorEmail}");
+            await _httpClient.DeleteAsync($"{Questionnaires}/{questionnaireId}/contributors/{contributorId}");
         return await GetResponse<string>(response);
     }
 
