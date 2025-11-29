@@ -44,9 +44,9 @@ public class AddEditEndResultContents(ILogger<AddEditEndResultContents> logger, 
 
             Contents = contents;
             
-            if (TempData.TryGetValue("QuestionnaireTitle", out var title))
+            if (TempData.Peek("QuestionnaireTitle") is string title)
             {
-                QuestionnaireTitle = title?.ToString();
+                QuestionnaireTitle = title;
             }
             
             if (TempData.TryGetValue("CompletionTrackingMap", out var trackingMapObj) && 

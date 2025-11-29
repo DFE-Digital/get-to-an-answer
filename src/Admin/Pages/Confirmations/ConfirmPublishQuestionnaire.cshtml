@@ -10,10 +10,11 @@
         <form method="post" class="govuk-!-margin-top-6">
             @Html.AntiForgeryToken()
             <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                    <h2 class="govuk-fieldset__heading">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h1 class="govuk-fieldset__heading">
+                        <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
                         Are you sure you want to publish this questionnaire?
-                    </h2>
+                    </h1>
                 </legend>
 
                 <div id="finished-hint" class="govuk-hint">

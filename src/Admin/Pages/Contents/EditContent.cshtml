@@ -21,15 +21,19 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-l">Add new end result content</h1>
+    <h1 class="govuk-heading-l">
+      <p class="govuk-caption-l">@Model.QuestionnaireTitle</p>
+      Edit your result page
+    </h1>
+    
     <form method="post" accept-charset="UTF-8">
       <!-- Content title -->
       <govuk-form-group asp-for="@Model.ContentTitle">
         <label class="govuk-label govuk-label--m" for="ContentTitle">
-          What's the title of your content?
+          Add a title of the result page
         </label>
         <div class="govuk-hint" id="ContentTitle-hint">
-          @* todo: add hint text *@
+          This will appear at the top of your result page and should summarise the answer.
         </div>
 
         <govuk-field-error asp-for="@Model.ContentTitle" error-id="ContentTitle-error">
@@ -41,16 +45,18 @@
                      type="text"
                      asp-for="ContentTitle"
                      value="@Model.ContentTitle"
-                     govuk-error-for="@Model.ContentTitle" />
+                     govuk-error-for="@Model.ContentTitle"/>
       </govuk-form-group>
 
-      <!-- Hint text -->
+      <!-- Main content -->
       <govuk-form-group asp-for="@Model.ContentValue">
         <label class="govuk-label govuk-label--m" for="ContentValue">
-          Content
+          Add detail about the result
         </label>
         <div class="govuk-hint" id="ContentValue-hint">
-          @* todo: add hint text *@
+          You could explain the result based on people's answers. 
+
+          It could include links to an onward journey. 
         </div>
 
         <govuk-field-error asp-for="@Model.ContentValue" error-id="ContentValue-error">
@@ -66,10 +72,12 @@
       <!-- Question text -->
       <govuk-form-group asp-for="@Model.ContentRefName">
         <label class="govuk-label govuk-label--m" for="ContentRefName">
-          What's the reference name for your content?
+          Give your result a reference
         </label>
         <div class="govuk-hint" id="ContentRefName-hint">
-          @* todo: add hint text *@
+          You can add a reference name to make it easier for you to identify results when choosing destinations for question answers. 
+
+          If you do not add a reference, the default will be the result title. 
         </div>
 
         <govuk-field-error asp-for="@Model.ContentRefName" error-id="ContentRefName-error">
@@ -81,13 +89,20 @@
                      type="text"
                      asp-for="ContentRefName"
                      value="@Model.ContentRefName"
-                     govuk-error-for="@Model.ContentRefName" />
+                     govuk-error-for="@Model.ContentRefName"/>
       </govuk-form-group>
 
-      <button class="govuk-button" type="submit" formnovalidate="formnovalidate" data-module="govuk-button"
-              data-prevent-double-click="true" asp-page-handler="SaveAndContinue">
-        Save and continue
-      </button>
+      <div class="govuk-button-group">
+        <button class="govuk-button" type="submit" formnovalidate="formnovalidate" data-module="govuk-button"
+                data-prevent-double-click="true" asp-page-handler="SaveAndContinue">
+          Save and continue
+        </button>
+        
+        <button class="govuk-button govuk-button--warning" type="submit" formnovalidate="formnovalidate" 
+                data-module="govuk-button"data-prevent-double-click="true" asp-page-handler="DeleteContent">
+          Delete result page
+        </button>
+      </div>
     </form>
   </div>
 </div>

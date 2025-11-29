@@ -11,8 +11,18 @@ public class ConfirmUnpublishQuestionnaire(IApiClient apiClient, IImageStorageCl
 {
     [FromRoute(Name = "questionnaireId")]
     public Guid QuestionnaireId { get; set; }
+
+    public string? QuestionnaireTitle { get; set; }
     
     [BindProperty] public bool UnpublishQuestionnaire { get; set; }
+
+    public void OnGet()
+    {
+        if (TempData.Peek("QuestionnaireTitle") is string title)
+        {
+            QuestionnaireTitle = title;
+        }
+    }
     
     public async Task<IActionResult> OnPostContinueAsync()
     {

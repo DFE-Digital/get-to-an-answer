@@ -9,8 +9,14 @@ public static class Routes
     public static readonly string QuestionnairesCreate = AdminRoot + "/questionnaires/create";
     
     // Contents
-    public const string AddAndEditEndResultContents = AdminRoot + "/questionnaires/{0}/contents";
+    public const string AddAndEditResultPages = AdminRoot + "/questionnaires/{0}/contents";
     public const string AddContent = AdminRoot + "/questionnaires/{0}/contents/add";
+    public const string ConfirmDeleteContent = AdminRoot + "/questionnaires/{0}/contents/{1}/delete-confirmation";
+
+    // Contributors
+    public const string AddAndEditQuestionnaireContributors= AdminRoot + "/questionnaires/{0}/contributors";
+    public const string AddContributor = AdminRoot + "/questionnaires/{0}/contributors/add";
+    public const string ConfirmRemoveContributor = AdminRoot + "/questionnaires/{0}/contributors/{1}/remove-confirmation";
 
     // Track a specific questionnaire (format with id)
     // Usage: string.Format(Routes.QuestionnaireTrackById, questionnaireId)
