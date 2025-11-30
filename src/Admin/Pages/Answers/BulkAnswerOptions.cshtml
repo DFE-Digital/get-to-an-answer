@@ -1,19 +1,43 @@
-@page
+@page "/admin/questionnaires/{questionnaireId}/questions/{questionId}/answers/add/bulk"
 @model Admin.Pages.Answers.BulkAnswerOptions
 
 @{
     Layout = "_Layout";
 }
 
-<!DOCTYPE html>
+@section BeforeContent
+{
+    <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
+}
 
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-<div>
+
+@if (Model!.HasErrors())
+{
+    @await Html.PartialAsync("_ErrorSummary")
+}
+
+
+<input type="hidden" asp-for="QuestionNumber"/>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
+        <h1 class="govuk-heading-l">Enter all options into one text box</h1>
+        <p class="govuk-body">
+            People will be able to select one option from your list.
+        </p>
+        
+        <h2 class="govuk-heading-l">Enter answer options for your list</h2>
+        <p class="govuk-body">
+            Enter each option on a new line
+        </p>
+        
+        <textarea class="govuk-textarea"
+                  id="BulkAnswerOptions"
+                  rows="4"
+                  asp-for="@Model.BulkAnswerOptionsRawText"
+                  aria-describedby="BulksAnswerOptions-hint"></textarea>
+        
+    </div>
     
 </div>
-</body>
-</html>

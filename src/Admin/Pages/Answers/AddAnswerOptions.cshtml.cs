@@ -23,7 +23,6 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     // Bind a collection of options
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
     
-
     [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
 
     [BindProperty] public QuestionType? RetrievedQuestionType { get; set; }
@@ -31,10 +30,9 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId);
-
-        if (TempData.TryGetValue("QuestionType", out var rawValue)
-            && rawValue is int intVal
-            && Enum.IsDefined(typeof(QuestionType), intVal))
+        
+        var questionTypeValue = TempData.Peek("QuestionType");
+        if (questionTypeValue is int intVal && Enum.IsDefined(typeof(QuestionType), intVal))
         {
             RetrievedQuestionType = (QuestionType)intVal;
         }

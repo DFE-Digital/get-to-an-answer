@@ -97,6 +97,22 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
 
         return Redirect(string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId));
     }
+    
+    private void RemoveModelStateEntriesForOption(int index)
+    {
+        var prefixBracket = $"Options[{index}]";
+        var prefixDash = $"Options-{index}-";
+        var keysToRemove = ModelState.Keys
+            .Where(key =>
+                key.StartsWith(prefixBracket, StringComparison.Ordinal) ||
+                key.StartsWith(prefixDash, StringComparison.Ordinal))
+            .ToList();
+
+        foreach (var key in keysToRemove)
+        {
+            ModelState.Remove(key);
+        }
+    }
 
     private async Task CreateAnswer(AnswerOptionsViewModel option)
     {
