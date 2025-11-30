@@ -124,11 +124,19 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.AddContributor(userId, id, request)).ToActionResult();
     }
 
-    [HttpDelete("{id:guid}/contributors/{contributorEmailAddress}")]
-    public async Task<IActionResult> RemoveContributor(Guid id, string contributorEmailAddress)
+    [HttpDelete("{id:guid}/contributors/{contributorId}")]
+    public async Task<IActionResult> RemoveContributor(Guid id, string contributorId)
     {
         var currentUserId = User.GetIdClaim()!;
         
-        return (await questionnaireService.RemoveContributor(currentUserId, id, contributorEmailAddress)).ToActionResult();
+        return (await questionnaireService.RemoveContributor(currentUserId, id, contributorId)).ToActionResult();
+    }
+
+    [HttpPatch("{id:guid}/completion-state")]
+    public async Task<IActionResult> UpdateCompletionState(Guid id, UpdateCompletionStateRequestDto request)
+    {
+        var currentUserId = User.GetIdClaim()!;
+        
+        return (await questionnaireService.UpdateCompletionState(currentUserId, id, request)).ToActionResult();
     }
 }

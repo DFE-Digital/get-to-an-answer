@@ -37,8 +37,9 @@ public interface IQuestionnaireService
     Task<ServiceResult> CloneQuestionnaire(string userId, Guid id, CloneQuestionnaireRequestDto request);
     Task<ServiceResult> GetContributors(string userId, Guid questionnaireId);
     Task<ServiceResult> AddContributor(string userId, Guid id, AddContributorRequestDto request);
-    Task<ServiceResult> RemoveContributor(string userId, Guid id, string contributorEmail);
+    Task<ServiceResult> RemoveContributor(string userId, Guid id, string contributorId);
     Task<ServiceResult> GetBranchingMap(string userId, Guid questionnaireId);
+    Task<ServiceResult> UpdateCompletionState(string userId, Guid id, UpdateCompletionStateRequestDto request);
 }
 
 public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<QuestionnaireService> logger) : AbstractService, IQuestionnaireService
@@ -327,11 +328,11 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (questionnaire.Status == EntityStatus.Published)
                 return BadRequest(ProblemTrace("The questionnaire is already published", 400));
 
-            var branchingHealth = IsBranchingHealthy(questionnaire);
+            var (branchingHealth, healthMessage) = IsBranchingHealthy(questionnaire);
 
             if (branchingHealth != BranchingHealthType.Ok)
             {
-                return BadRequest(ProblemTrace("Branching is not healthy", 400));       
+                return BadRequest(ProblemTrace(healthMessage, 400));
             }
             
             return await UpdateQuestionnaireStatus(userId, id, EntityStatus.Published);
@@ -343,25 +344,25 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    internal static BranchingHealthType IsBranchingHealthy(QuestionnaireEntity current)
+    internal static (BranchingHealthType BranchingHealth, string HealthMessage) IsBranchingHealthy(QuestionnaireEntity current)
     {
         var questionMap = current.Questions.ToDictionary(q => q.Id, q => q);
         var contentMap = current.Contents.ToDictionary(q => q.Id, q => q);
 
         foreach (var question in current.Questions)
         {
-            var branchingHealth = IsBranchingHealthy(question, new Dictionary<Guid, bool>(), questionMap, contentMap);
+            var (branchingHealth, healthMessage) = IsBranchingHealthy(question, new Dictionary<Guid, bool>(), questionMap, contentMap);
             
             if (branchingHealth != BranchingHealthType.Ok)
-                return branchingHealth;
+                return (branchingHealth, healthMessage);
         }
         
-        return BranchingHealthType.Ok;
+        return (BranchingHealthType.Ok, "Ok");
     }
 
     // make visible for unit testing
     
-    internal static BranchingHealthType IsBranchingHealthy(
+    internal static (BranchingHealthType BranchingHealth, string HealthMessage) IsBranchingHealthy(
         QuestionEntity current, 
         Dictionary<Guid, bool> visited, 
         Dictionary<Guid, QuestionEntity> questionMap,
@@ -369,7 +370,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
     {
         if (visited.ContainsKey(current.Id))
         {
-            return BranchingHealthType.Cyclic;
+            return (BranchingHealthType.Cyclic, $"Question {current.Order} was be referenced twice in the same flow.");
         }
         
         var visitedList = new Dictionary<Guid, bool>(visited) { { current.Id, true } };
@@ -378,11 +379,11 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         {
             if (answer is { DestinationType: DestinationType.Question, DestinationQuestionId: { } id })
             {
-                var type = IsBranchingHealthy(questionMap[id], 
+                var (type, message) = IsBranchingHealthy(questionMap[id], 
                     new Dictionary<Guid, bool>(visitedList), questionMap, contentMap);
                 
                 if (type != BranchingHealthType.Ok)
-                    return type;
+                    return (type, message);
             }
             else if (answer is { DestinationType: DestinationType.CustomContent, DestinationContentId: not null } && 
                          contentMap.ContainsKey(answer.DestinationContentId.Value))
@@ -391,11 +392,12 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             }  
             else if (answer.DestinationType != DestinationType.ExternalLink && current.Order == questionMap.Count)
             {
-                return BranchingHealthType.Broken; 
+                return (BranchingHealthType.Broken, 
+                    $"Answer '{answer.Content}' of question '{current.Order}' has no destination."); 
             }    
         }
 
-        return BranchingHealthType.Ok;
+        return (BranchingHealthType.Ok, "Ok");
     }
 
     public async Task<ServiceResult> UnpublishQuestionnaire(string userId, Guid id)
@@ -422,6 +424,9 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 .ExecuteUpdateAsync(s => s.SetProperty(b => b.IsDeleted, true));
             
             await db.Answers.Where(q => q.QuestionnaireId == id)
+                .ExecuteUpdateAsync(s => s.SetProperty(b => b.IsDeleted, true));
+            
+            await db.Contents.Where(q => q.QuestionnaireId == id)
                 .ExecuteUpdateAsync(s => s.SetProperty(b => b.IsDeleted, true));
             
             return await UpdateQuestionnaireStatus(userId, id, EntityStatus.Deleted);
@@ -594,11 +599,11 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public async Task<ServiceResult> RemoveContributor(string userId, Guid id, string contributorEmail)
+    public async Task<ServiceResult> RemoveContributor(string userId, Guid id, string contributorId)
     {
         try
         {
-            logger.LogInformation("RemoveContributor started QuestionnaireId={QuestionnaireId} Contributor={Contributor}", id, contributorEmail);
+            logger.LogInformation("RemoveContributor started QuestionnaireId={QuestionnaireId} ContributorId={ContributorId}", id, contributorId);
 
             var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
             if (access == EntityAccess.NotFound)
@@ -611,9 +616,9 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (questionnaire == null)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
 
-            if (questionnaire.Contributors.Count > 2 && questionnaire.Contributors.Contains(contributorEmail))
+            if (questionnaire.Contributors.Count > 2 && questionnaire.Contributors.Contains(contributorId))
             {
-                questionnaire.Contributors.Remove(contributorEmail);
+                questionnaire.Contributors.Remove(contributorId);
                 await db.SaveChangesAsync();
             }
             else if (!questionnaire.Contributors.Contains(userId))
@@ -813,13 +818,49 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
     }
-    
+
+    public async Task<ServiceResult> UpdateCompletionState(string userId, Guid id, UpdateCompletionStateRequestDto request)
+    {
+        try
+        {
+            logger.LogInformation("UpdateCompletionState started QuestionnaireId={QuestionnaireId}", id);
+            
+            var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
+            if (access == EntityAccess.NotFound)
+                return NotFound(ProblemTrace("We could not find that questionnaire", 404));
+            if (access == EntityAccess.Deny)
+                return Forbid(ProblemTrace("You do not have permission to do this", 403));
+            
+            var questionnaire = await db.Questionnaires
+                .FirstOrDefaultAsync(q => q.Id == id);
+            
+            if (questionnaire == null) 
+                return NotFound(ProblemTrace("We could not find that questionnaire", 404));
+
+            questionnaire.CompletionTrackingMap ??= new Dictionary<CompletableTask, CompletionStatus>();
+            questionnaire.CompletionTrackingMap[request.Task] = request.Status;
+            // Doesn't need to be set to draft: questionnaire.Status = EntityStatus.Draft;
+            questionnaire.UpdatedAt = DateTime.UtcNow;
+            
+            await db.SaveChangesAsync();
+            
+            logger.LogInformation("UpdateCompletionState succeeded QuestionnaireId={QuestionnaireId}", id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "UpdateCompletionState failed QuestionnaireId={QuestionnaireId}", id);
+            return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
+        }
+    }
+
     private QuestionnaireDto ToDto(QuestionnaireEntity q, bool includeCreatedBy = false, bool includeCustomisations = false)
     {
         var dto = new QuestionnaireDto
         {
             Id = q.Id,
             Title = q.Title,
+            DisplayTitle = q.DisplayTitle,
             Description = q.Description,
             Slug = q.Slug,
             Status = q.Status,

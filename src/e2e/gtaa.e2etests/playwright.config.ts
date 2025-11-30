@@ -10,6 +10,14 @@ process.env.ENV_NAME = ENV_NAME as EnvType;
 
 const EnvConfig = loadEnvConfig(process.env.ENV_NAME as EnvType);
 
+const pa11yBase = {
+    testDir: './src/tests/pa11y',
+    testMatch: '**/*.spec.ts',
+    use: {
+        baseURL: process.env.API_URL || EnvConfig.API_URL,
+    },
+} as const;
+
 const feTestDataBase = {
     testDir: './src/tests/fetestdata',
     testMatch: '**/*.spec.ts',
@@ -157,6 +165,11 @@ export default defineConfig({
             name: 'testdataonly',
             ...feTestDataBase,
             use: {...feTestDataBase.use},
+        },
+        {
+            name: 'accessibility',
+            ...pa11yBase,
+            use: {...pa11yBase.use},
         }
     ]
 });

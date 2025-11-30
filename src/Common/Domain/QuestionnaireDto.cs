@@ -39,7 +39,7 @@ public class QuestionnaireDto
 
     public bool IsAccessibilityAgreementAccepted { get; set; } = false;
     public string? ContinueButtonText { get; set; }
-    public Dictionary<string, bool>? CompletionTrackingMap { get; set; }
+    public Dictionary<CompletableTask, CompletionStatus>? CompletionTrackingMap { get; set; }
 }
 
 public class QuestionnaireInfoDto

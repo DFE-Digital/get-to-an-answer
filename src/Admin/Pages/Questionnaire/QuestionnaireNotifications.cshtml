@@ -1,0 +1,163 @@
+@model Admin.Pages.Questionnaire.TrackQuestionnaires
+@using AngleSharp.Common
+@using Common.Enum
+@using Common.Models
+@using Microsoft.AspNetCore.Html
+
+@{
+  var questionnaireViewModel = Model.ViewModel;
+}
+
+@if (questionnaireViewModel.QuestionnaireState is { InviteAccepted: true })
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            You've been added as a contributor.
+          </h3>
+          <p class="govuk-body">We are glad to have you on the team.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+} 
+else if (questionnaireViewModel.QuestionnaireState is { JustCreated: true })
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            Your questionnaire has been created.
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+else if (questionnaireViewModel.QuestionnaireState is { JustUpdated: true })
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            Your changes have been saved.
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+else if (questionnaireViewModel.QuestionnaireState is { JustCloned: true })
+{
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <h3 class="govuk-notification-banner__heading">
+          Your clone questionnaire has been created.
+        </h3>
+      </div>
+    </div>
+  </div>
+</div>
+}
+else if (questionnaireViewModel.QuestionnaireState is { JustPublished: true })
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            Your questionnaire has been published.
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+else if (questionnaireViewModel.QuestionnaireState is { JustUnpublished: true })
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            Your questionnaire has been unpublished.
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+else if (questionnaireViewModel.QuestionnaireState is { JustAddedStartPage: true })
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            Your start page has been saved
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+else if (questionnaireViewModel.QuestionnaireState is { JustRemovedStartPage: true })
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 class="govuk-notification-banner__heading">
+            Your start page has been removed
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+}

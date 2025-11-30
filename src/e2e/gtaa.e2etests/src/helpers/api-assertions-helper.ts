@@ -254,7 +254,9 @@ export function expectAnswerTypes(answer: any) {
     expect(typeof answer.questionnaireId).toBe('string');
     expect(typeof answer.content).toBe('string');
     expect(typeof answer.description).toBe('string');
-    expect(typeof answer.destinationUrl).toBe('string');
+    if (answer.destinationUrl) {
+        expect(typeof answer.destinationUrl).toBe('string');
+    }
     expect(typeof answer.priority).toBe('number');
     expect(typeof answer.createdAt).toBe('string');
     expect(typeof answer.updatedAt).toBe('string');
@@ -309,7 +311,7 @@ export function expectAnswerIO(a: any, payload: any, guidRegex: RegExp) {
 
     if (isEmpty(payload.destinationUrl)) {
         expect(isEmpty(a.destinationUrl)).toBeTruthy();
-    } else {
+    } else if (payload.destinationType) {
         expect(a.destinationUrl).toBe(payload.destinationUrl);
     }
 

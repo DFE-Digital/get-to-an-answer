@@ -10,7 +10,7 @@ public class QuestionnaireContent
     public string? Description { get; set; }
     public EntityStatus? Status { get; set; }
     
-    public Dictionary<string, bool>? CompletionTrackingMap { get; set; }
+    public Dictionary<CompletableTask, CompletionStatus>? CompletionTrackingMap { get; set; }
     
     public string? TextColor { get; set; }
     public string? BackgroundColor { get; set; }

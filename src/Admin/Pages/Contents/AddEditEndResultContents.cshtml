@@ -1,0 +1,146 @@
+﻿@page "/admin/questionnaires/{questionnaireId:guid}/contents"
+@using Admin.Models
+@using Common.Models
+@model Admin.Pages.Contents.AddEditEndResultContents
+
+@{
+  Layout = "_Layout";
+  ViewData["Title"] = "Add and edit your end result contents";
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
+}
+
+@if (Model!.HasErrors())
+{
+  @await Html.PartialAsync("_ErrorSummary")
+}
+
+@if (Model.QuestionnaireState is { JustCreated: true })
+{
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <h3 class="govuk-notification-banner__heading">
+          Your result page has been created.
+        </h3>
+      </div>
+    </div>
+  </div>
+</div>
+}
+else if (Model.QuestionnaireState is { JustUpdated: true })
+{
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <h3 class="govuk-notification-banner__heading">
+          Your changes have been saved.
+        </h3>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
+      <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
+      Add and edit your result pages
+    </h1>
+    <dl class="govuk-!-margin-bottom-7">
+      <dt class="govuk-visually-hidden">Status</dt>
+      <dd class="govuk-!-margin-0">
+        <strong class="govuk-tag" data-status="@Model.Status">@Model.Status</strong>
+      </dd>
+    </dl>
+    <div class="govuk-button-group">
+      <a class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" 
+         href="@string.Format(Routes.AddContent, Model.QuestionnaireId)">Add a result page</a>
+    </div>
+    <h2 class="govuk-heading-m govuk-!-margin-top-7 govuk-!-margin-bottom-0">Your result pages</h2>
+    <div class="app-page-list">
+      @if (Model.Contents is { } contents)
+      {
+        <dl class="govuk-summary-list govuk-!-static-margin-top-3">
+        
+        @for (var i = 0; i < contents.Count; i++)
+        {
+          var content = contents[i];
+          
+          <div id="content-@(i+1)" class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key app-page-list__key govuk-summary-list__key-s">
+              @(i+1)
+            </dt>
+            <dd class="govuk-summary-list__value">
+              @content.Title
+            </dd>
+            <dd class="govuk-summary-list__actions govuk-summary-list__actions-m">
+              <ul class="govuk-summary-list__actions-list">
+                <li class="govuk-summary-list__actions-list-item">
+                  <a class="govuk-link" href="/admin/questionnaires/@content.QuestionnaireId/contents/@content.Id/edit">Edit</a>
+                </li>
+              </ul>
+            </dd>
+          </div>
+        }
+      </dl>
+      }
+    </div>
+    <form method="post" class="govuk-!-margin-top-6">
+      <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+              <h2 class="govuk-fieldset__heading">
+                  Have you finished adding your result pages?
+              </h2>
+          </legend>
+
+          <div id="finished-hint" class="govuk-hint">
+              Selecting “Yes” will mark this task as complete. You’ll still be able to make changes if you
+              need to.
+          </div>
+
+          <div class="govuk-radios" data-module="govuk-radios">
+              <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="finished-yes" name="FinishedEditing" type="radio"
+                         asp-for="@Model.FinishedEditing"
+                         value="true">
+                  <label class="govuk-label govuk-radios__label" for="finished-yes">
+                      Yes
+                  </label>
+              </div>
+
+              <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="finished-no" name="FinishedEditing" type="radio"
+                         asp-for="@Model.FinishedEditing"
+                         value="false">
+                  <label class="govuk-label govuk-radios__label" for="finished-no">
+                      No, I’ll come back later
+                  </label>
+              </div>
+          </div>
+      </fieldset>
+
+      <button class="govuk-button govuk-!-margin-top-4" data-module="govuk-button" type="submit"
+              asp-page-handler="SaveAndContinue">
+          Save and continue
+      </button>
+  </form>
+
+  </div>
+</div>

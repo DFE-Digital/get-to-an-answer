@@ -35,7 +35,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
 
     public async Task<IActionResult> OnGetAsync()
     {
-        BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
+        BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId);
 
         try
         {

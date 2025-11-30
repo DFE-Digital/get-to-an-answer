@@ -54,8 +54,14 @@ gulp.task("images", function() {
         .pipe(gulp.dest(paths.dist + 'assets'));
 })
 
+gulp.task("gtaa-js", function() {
+    return gulp.src(paths.src + '/js/**/*', {encoding:false})
+        .pipe(gulp.dest(paths.dist + 'js'));
+})
+
 gulp.task("dev",
     gulp.series(
+        "gtaa-js",
         "govuk-assets",
         "govuk-js",
         "govuk-css",

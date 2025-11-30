@@ -22,7 +22,8 @@ public class QuestionnaireVersionHistory(IApiClient apiClient, IMsGraphClient gr
         var contributors = await graphClient.GetGraphUsersAsync(
             questionnaireVersions.Select(v => v.CreatedBy).ToArray());
 
-        var contributorMap = contributors.Value.ToDictionary(g => g.Id, g => g.DisplayName);
+        var contributorMap = contributors.Value
+            .DistinctBy(g => g.Id).ToDictionary(g => g.Id, g => g.DisplayName);
         
         questionnaireVersions.ForEach(q => q.CreatedBy = contributorMap.GetOrDefault(q.CreatedBy!, q.CreatedBy));
 

@@ -62,7 +62,7 @@ public class QuestionnaireEntity
     
     // ~~~ Completion ~~~
 
-    [Column(TypeName = "nvarchar(max)")] public Dictionary<string, bool>? CompletionTrackingMap { get; set; } = new();
+    [Column(TypeName = "nvarchar(max)")] public Dictionary<CompletableTask, CompletionStatus>? CompletionTrackingMap { get; set; } = new();
     
     // ~~~ Look and feel ~~~
     
