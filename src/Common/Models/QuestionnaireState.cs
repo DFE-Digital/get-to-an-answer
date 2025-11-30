@@ -5,6 +5,8 @@ public class QuestionnaireState
     public bool JustCreated { get; set; }
     public bool JustCloned { get; set; }
     public bool JustUpdated { get; set; }
+    public bool JustAddedStartPage { get; set; }
+    public bool JustRemovedStartPage { get; set; }
     public bool JustDeleted { get; set; }
     public bool JustMovedUp { get; set; }
     public bool JustMovedDown { get; set; }

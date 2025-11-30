@@ -384,44 +384,44 @@ test.describe('PUT Update answer', () => {
     });
 
     //possibly a bug as api should return false and update should not happen
-    // test('Validate update answer with soft deleted question id', async ({ request }) => {
-    //     const token = JwtHelper.NoRecordsToken();
-    //    
-    //     const { questionnaire } = await createQuestionnaire(request, token);
-    //     const { question } = await createQuestion(request, questionnaire.id, token);
-    //
-    //     // Create an answer with question as a parent
-    //     const { answer: createdAnswer } = await createSingleAnswer(request, {
-    //         questionId: question.id,
-    //         questionnaireId: questionnaire.id,
-    //         content: 'Original content',
-    //     }, token);
-    //
-    //     // Soft-delete question using the delete endpoint
-    //     const {deleteQuestionResponse} = await deleteQuestion(request, question.id, token);
-    //     expect([200, 204]).toContain(deleteQuestionResponse.status());
-    //
-    //     // Verify question is soft-deleted (should return 404)
-    //     const {questionGetResponse} = await getQuestion(request, question.id, token);
-    //     expect(questionGetResponse.status()).toBe(404);
-    //
-    //     // Attempt to update an answer to reference the soft-deleted question as destination
-    //     const updatePayload = {
-    //         ...createdAnswer,
-    //         content: 'Updated content',
-    //     };
-    //
-    //     const {updatedAnswerPostResponse} = await updateAnswer(
-    //         request,
-    //         createdAnswer.id,
-    //         updatePayload,
-    //         token
-    //     );
-    //
-    //     // --- HTTP-level checks ---
-    //     expect(updatedAnswerPostResponse.ok()).toBeFalsy();
-    //     expect([400, 404]).toContain(updatedAnswerPostResponse.status());
-    // });
+    test('Validate update answer with soft deleted question id', async ({ request }) => {
+        const token = JwtHelper.NoRecordsToken();
+
+        const { questionnaire } = await createQuestionnaire(request, token);
+        const { question } = await createQuestion(request, questionnaire.id, token);
+
+        // Create an answer with question as a parent
+        const { answer: createdAnswer } = await createSingleAnswer(request, {
+            questionId: question.id,
+            questionnaireId: questionnaire.id,
+            content: 'Original content',
+        }, token);
+
+        // Soft-delete question using the delete endpoint
+        const {deleteQuestionResponse} = await deleteQuestion(request, question.id, token);
+        expect([200, 204]).toContain(deleteQuestionResponse.status());
+
+        // Verify question is soft-deleted (should return 404)
+        const {questionGetResponse} = await getQuestion(request, question.id, token);
+        expect(questionGetResponse.status()).toBe(404);
+
+        // Attempt to update an answer to reference the soft-deleted question as destination
+        const updatePayload = {
+            ...createdAnswer,
+            content: 'Updated content',
+        };
+
+        const {updatedAnswerPostResponse} = await updateAnswer(
+            request,
+            createdAnswer.id,
+            updatePayload,
+            token
+        );
+
+        // --- HTTP-level checks ---
+        expect(updatedAnswerPostResponse.ok()).toBeFalsy();
+        expect([400, 404]).toContain(updatedAnswerPostResponse.status());
+    });
 
     test('Validate update answer with soft deleted questionnaire id', async ({request}) => {
         const {questionnaire} = await createQuestionnaire(request);

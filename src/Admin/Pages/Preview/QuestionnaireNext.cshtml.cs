@@ -68,6 +68,8 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             {
                 IsRedirectConfirmation = false;
                 
+                ModelState.Clear();
+                
                 if (confirmRedirect)
                 {
                     var nextDestination = JsonSerializer.Deserialize<DestinationDto>(TempData["NextDestination"]?.ToString() ?? "{}");

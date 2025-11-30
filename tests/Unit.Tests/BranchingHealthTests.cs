@@ -64,7 +64,7 @@ public class BranchingHealthTests
             DestinationQuestionId = question1.Id,
         })).Value as AnswerDto;
 
-        var result = QuestionnaireService.IsBranchingHealthy(db.Questionnaires.First());
+        var (result, message) = QuestionnaireService.IsBranchingHealthy(db.Questionnaires.First());
         result.Should().Be(BranchingHealthType.Cyclic);
     }
     
@@ -117,7 +117,7 @@ public class BranchingHealthTests
             Content = "Test",
         });
 
-        var result = QuestionnaireService.IsBranchingHealthy(db.Questionnaires.First());
+        var (result, message) = QuestionnaireService.IsBranchingHealthy(db.Questionnaires.First());
         result.Should().Be(BranchingHealthType.Broken);
     }
     
@@ -172,7 +172,7 @@ public class BranchingHealthTests
             DestinationUrl = "https://test.com",
         })).Value as AnswerDto;
 
-        var result = QuestionnaireService.IsBranchingHealthy(db.Questionnaires.First());
+        var (result, message) = QuestionnaireService.IsBranchingHealthy(db.Questionnaires.First());
         result.Should().Be(BranchingHealthType.Ok);
     }
 

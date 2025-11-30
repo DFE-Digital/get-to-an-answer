@@ -212,6 +212,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             if (isPreview)
             {
                 questionEntity = await db.Questions.Where(destination)
+                    .Include(x => x.Answers.Where(a => !a.IsDeleted))
                     .FirstOrDefaultAsync();
                 
             }

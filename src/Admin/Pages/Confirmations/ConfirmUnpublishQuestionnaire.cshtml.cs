@@ -3,6 +3,7 @@ using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Admin.Pages.Confirmations;
 
@@ -11,10 +12,22 @@ public class ConfirmUnpublishQuestionnaire(IApiClient apiClient, IImageStorageCl
 {
     [FromRoute(Name = "questionnaireId")]
     public Guid QuestionnaireId { get; set; }
+
+    public string? QuestionnaireTitle { get; set; }
     
-    public async Task<IActionResult> OnPost([FromForm(Name = "UnpublishQuestionnaire")] bool unpublish = false)
+    [BindProperty] public bool UnpublishQuestionnaire { get; set; }
+
+    public void OnGet()
     {
-        if (unpublish)
+        if (TempData.Peek("QuestionnaireTitle") is string title)
+        {
+            QuestionnaireTitle = title;
+        }
+    }
+    
+    public async Task<IActionResult> OnPostContinueAsync()
+    {
+        if (UnpublishQuestionnaire)
         {
             var questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId);
             
@@ -24,6 +37,8 @@ public class ConfirmUnpublishQuestionnaire(IApiClient apiClient, IImageStorageCl
             }
 
             await apiClient.UnpublishQuestionnaireAsync(QuestionnaireId);
+            
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUnpublished = true });
         }
         
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
