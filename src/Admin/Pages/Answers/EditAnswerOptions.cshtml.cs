@@ -20,7 +20,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
 
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
 
-    [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
+    [BindProperty] public int OptionNumber { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
@@ -32,7 +32,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
 
         return Page();
     }
-    
+
 
     public async Task<IActionResult> OnPostAddOption()
     {
@@ -40,6 +40,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
 
         if (!ModelState.IsValid)
         {
+            await EnsureSelectListsForOptions();
             return Page();
         }
 
@@ -50,7 +51,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             OptionNumber = OptionNumber
         });
 
-        await PopulateFieldWithExistingValues();
+        await EnsureSelectListsForOptions();
         ReassignOptionNumbers();
 
         return Page();
@@ -65,7 +66,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             await PopulateFieldWithExistingValues();
             return Page();
         }
-        
+
         try
         {
             foreach (var option in Options)
@@ -85,7 +86,6 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
                     Description = option.OptionHint
                 });
             }
-            
         }
         catch (Exception e)
         {
@@ -98,24 +98,19 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
 
     private async Task PopulateFieldWithExistingValues()
     {
+        Options.Clear();
+
         var existingAnswers = await apiClient.GetAnswersAsync(QuestionId);
         var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
-
-        var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
+        var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
 
         var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
 
-        // Set the selected property on the question selection list            
-        questionSelectionList.Select(x =>
-            x.Selected = existingAnswers.Any(a => a.DestinationQuestionId.ToString() == x.Value));
+        var resultsPagesForSelection = resultsPages
+            .Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
 
-        var resultsPages = apiClient.GetContentsAsync(QuestionnaireId);
-        var resultsPagesForSelection =
-            resultsPages.Result.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
-
-        resultsPagesForSelection.Select(x =>
-            x.Selected = existingAnswers.Any(a => a.DestinationContentId.ToString() == x.Value));
+        var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
 
         foreach (var existingAnswer in existingAnswers)
         {
@@ -139,6 +134,24 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
         }
     }
 
+    private async Task EnsureSelectListsForOptions()
+    {
+        var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
+        var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
+
+        var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
+            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
+
+        var resultsPagesForSelection = resultsPages
+            .Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
+
+        foreach (var option in Options)
+        {
+            option.QuestionSelectList = questionSelectionList;
+            option.ResultsPageSelectList = resultsPagesForSelection;
+        }
+    }
+    
     private void ValidateSelectedQuestionsIfAny()
     {
         var optionsWithSpecificQuestionNoSelection =
