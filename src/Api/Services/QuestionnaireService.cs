@@ -860,6 +860,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         {
             Id = q.Id,
             Title = q.Title,
+            DisplayTitle = q.DisplayTitle,
             Description = q.Description,
             Slug = q.Slug,
             Status = q.Status,

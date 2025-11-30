@@ -21,9 +21,9 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
 
     [BindProperty] public string ContentTitle { get; set; } = string.Empty;
 
-    [BindProperty] public string? ContentValue { get; set; }
+    [BindProperty] public string ContentValue { get; set; }
 
-    [BindProperty] public string? ContentRefName { get; set; }
+    [BindProperty] public string ContentRefName { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -92,6 +92,6 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
     {
         ContentTitle = content.Title;
         ContentValue = content.Content;
-        ContentRefName = content.ReferenceName;
+        ContentRefName = content.ReferenceName!;
     }
 }

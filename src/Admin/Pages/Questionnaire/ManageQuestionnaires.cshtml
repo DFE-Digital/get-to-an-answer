@@ -8,20 +8,6 @@
   var questionnaires = Model.ViewModel.Questionnaires;
 }
 
-@section BeforeContainer
-{
-  <section class="dfe-page-grey" id="main-content-header">
-    <div class="govuk-width-container" id="main-header-container">
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          <h1 class="govuk-heading-xl">Help users to get to an answer</h1>
-          <p class="govuk-body">Create questionnaires to help users get to an answer.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-}
-
 @if (Model.ViewModel.QuestionnaireState is { JustDeleted: true })
 {
   <div class="govuk-grid-row">
