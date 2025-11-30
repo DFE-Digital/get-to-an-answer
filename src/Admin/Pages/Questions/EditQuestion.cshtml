@@ -11,6 +11,11 @@
     var displayAnswerPriorities = Model.Answers.Any(x => !string.IsNullOrEmpty(x.Priority));
 }
 
+@section BeforeContent
+{
+    <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
+}
+
 @if (Model.QuestionSaved)
 {
     <div class="govuk-grid-row">
@@ -56,13 +61,11 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <a class="govuk-back-link" asp-page="/Admin/Pages/Questions/AddEditQuestionsAndAnswers"
-           asp-route-questionnaireId="@Model.QuestionnaireId">
-            Back
-        </a>
 
-        <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
-        <h1 class="govuk-heading-l">Edit question</h1>
+        <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">Question @Model.QuestionNumber</span>
+            Edit question
+        </h1>
 
         <form method="post">
             <govuk-form-group asp-for="QuestionContent">
@@ -154,7 +157,7 @@
             </div>
 
             <div class="govuk-!-margin-top-6 govuk-!-display-flex govuk-!-gap-3" style="justify-content: start;">
-                <button class="govuk-button govuk-button--start" type="submit" asp-page-handler="SaveQuestion">Save
+                <button class="govuk-button govuk-button--primary" type="submit" asp-page-handler="SaveQuestion">Save
                     question
                 </button>
                 <button class="govuk-button govuk-button--warning" type="submit" asp-page-handler="DeleteQuestion">
