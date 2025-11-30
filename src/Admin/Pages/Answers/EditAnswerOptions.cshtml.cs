@@ -1,11 +1,11 @@
 using Admin.Models;
 using Common.Client;
+using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Admin.Pages.Answers;
@@ -44,6 +44,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             return Page();
         }
 
+
         OptionNumber++;
 
         Options.Add(new AnswerOptionsViewModel
@@ -54,6 +55,13 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
         await EnsureSelectListsForOptions();
         ReassignOptionNumbers();
 
+        return Page();
+    }
+
+    public IActionResult OnPostRemoveOption(int index)
+    {
+        Options.RemoveAt(index);
+        ReassignOptionNumbers();
         return Page();
     }
 
@@ -71,20 +79,14 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
         {
             foreach (var option in Options)
             {
-                await apiClient.UpdateAnswerAsync(option.AnswerId, new UpdateAnswerRequestDto
+                if (option.AnswerId != Guid.Empty)
                 {
-                    Content = option.OptionContent,
-                    DestinationType = MapDestination(option.AnswerDestination),
-                    DestinationQuestionId = option.SelectedDestinationQuestion != null
-                        ? Guid.Parse(option.SelectedDestinationQuestion)
-                        : null,
-                    DestinationUrl = option.ResultPageUrl,
-                    Priority = Convert.ToSingle(option.RankPriority),
-                    DestinationContentId = option.SelectedResultsPage != null
-                        ? Guid.Parse(option.SelectedResultsPage)
-                        : null,
-                    Description = option.OptionHint
-                });
+                    await UpdateAnswer(option);
+                }
+                else
+                {
+                    await CreateAnswer(option);
+                }
             }
         }
         catch (Exception e)
@@ -94,6 +96,41 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
         }
 
         return Redirect(string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId));
+    }
+
+    private async Task CreateAnswer(AnswerOptionsViewModel option)
+    {
+        await apiClient.CreateAnswerAsync(new CreateAnswerRequestDto
+        {
+            QuestionnaireId = QuestionnaireId,
+            QuestionId = QuestionId,
+            Content = option.OptionContent,
+            Description = option.OptionHint,
+            DestinationType = MapDestination(option.AnswerDestination),
+            DestinationQuestionId = option.SelectedDestinationQuestion != null
+                ? Guid.Parse(option.SelectedDestinationQuestion)
+                : null,
+            DestinationUrl = option.ResultPageUrl,
+            Priority = Convert.ToSingle(option.RankPriority),
+        });
+    }
+
+    private async Task UpdateAnswer(AnswerOptionsViewModel option)
+    {
+        await apiClient.UpdateAnswerAsync(option.AnswerId, new UpdateAnswerRequestDto
+        {
+            Content = option.OptionContent,
+            DestinationType = MapDestination(option.AnswerDestination),
+            DestinationQuestionId = option.SelectedDestinationQuestion != null
+                ? Guid.Parse(option.SelectedDestinationQuestion)
+                : null,
+            DestinationUrl = option.ResultPageUrl,
+            Priority = Convert.ToSingle(option.RankPriority),
+            DestinationContentId = option.SelectedResultsPage != null
+                ? Guid.Parse(option.SelectedResultsPage)
+                : null,
+            Description = option.OptionHint
+        });
     }
 
     private async Task PopulateFieldWithExistingValues()
@@ -151,7 +188,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             option.ResultsPageSelectList = resultsPagesForSelection;
         }
     }
-    
+
     private void ValidateSelectedQuestionsIfAny()
     {
         var optionsWithSpecificQuestionNoSelection =
