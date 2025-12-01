@@ -19,6 +19,8 @@
 
 <input type="hidden" asp-for="QuestionNumber"/>
 
+<input type="hidden" name="returnUrl" value="@($"{Request.Path}{Request.QueryString}")" />
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
@@ -26,18 +28,23 @@
         <p class="govuk-body">
             People will be able to select one option from your list.
         </p>
-        
+
         <h2 class="govuk-heading-l">Enter answer options for your list</h2>
         <p class="govuk-body">
             Enter each option on a new line
         </p>
-        
-        <textarea class="govuk-textarea"
-                  id="BulkAnswerOptions"
-                  rows="4"
-                  asp-for="@Model.BulkAnswerOptionsRawText"
-                  aria-describedby="BulksAnswerOptions-hint"></textarea>
-        
+
+        <form method="post" accept-charset="UTF-8">
+            <textarea class="govuk-textarea"
+                      id="BulkAnswerOptions"
+                      rows="8"
+                      asp-for="@Model.BulkAnswerOptionsRawText"
+                      aria-describedby="BulksAnswerOptions-hint"></textarea>
+
+            <button class="govuk-button govuk-button--primary">Continue</button>
+        </form>
+
+
     </div>
-    
+
 </div>

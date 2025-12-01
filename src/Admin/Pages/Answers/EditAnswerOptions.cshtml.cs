@@ -7,6 +7,7 @@ using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 
 namespace Admin.Pages.Answers;
 
@@ -26,13 +27,21 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
     {
         BackLinkSlug = string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId);
 
+        var existingOptionsFromTempData = TempData.Peek("AnswersSnapshot");
+
+        if (existingOptionsFromTempData is string optionsJson)
+        {
+            Options = JsonConvert.DeserializeObject<List<AnswerOptionsViewModel>>(optionsJson) ?? [];
+            ReassignOptionNumbers();
+            return Page();
+        }
+
         await PopulateFieldWithExistingValues();
 
         ReassignOptionNumbers();
 
         return Page();
     }
-
 
     public async Task<IActionResult> OnPostAddOption()
     {
@@ -43,7 +52,6 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             await EnsureSelectListsForOptions();
             return Page();
         }
-
 
         OptionNumber++;
 
@@ -97,7 +105,29 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
 
         return Redirect(string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId));
     }
-    
+
+    public async Task<IActionResult> OnPostRedirectToBulkEntry(string? returnUrl)
+    {
+        ValidateSelectedQuestionsIfAny();
+
+        if (!ModelState.IsValid)
+        {
+            await EnsureSelectListsForOptions();
+            return Page();
+        }
+
+        TempData["AnswersSnapshot"] = JsonConvert.SerializeObject(Options);
+        
+        var targetUrl = Url.Page("/Answers/BulkAnswerOptions", null, new
+        {
+            questionnaireId = QuestionnaireId,
+            questionId = QuestionId,
+            returnUrl
+        });
+
+        return Redirect(targetUrl ?? string.Empty);
+    }
+
     private void RemoveModelStateEntriesForOption(int index)
     {
         var prefixBracket = $"Options[{index}]";
@@ -148,10 +178,10 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             Description = option.OptionHint
         });
     }
-
+    
     private async Task PopulateFieldWithExistingValues()
     {
-        Options.Clear();
+        Options?.Clear();
 
         var existingAnswers = await apiClient.GetAnswersAsync(QuestionId);
         var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
@@ -167,7 +197,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
 
         foreach (var existingAnswer in existingAnswers)
         {
-            Options.Add(new AnswerOptionsViewModel
+            Options?.Add(new AnswerOptionsViewModel
             {
                 AnswerId = existingAnswer.Id,
                 QuestionSelectList = questionSelectionList,
@@ -240,7 +270,6 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
         }
     }
-
 
     private void ReassignOptionNumbers()
     {

@@ -20,7 +20,7 @@
 }
 
 
-<input asp-for="OptionNumber" type="hidden" />
+<input asp-for="OptionNumber" type="hidden"/>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -65,9 +65,24 @@
                 asp-page-handler="AddOption">
           Add another option
         </button>
-        <a class="govuk-link govuk-!-margin-left-4" href="#">
-          Enter all the options into one text box
-        </a>
+        @* <a class="govuk-link govuk-!-margin-left-4" *@
+        @*    asp-page="/Answers/BulkAnswerOptions" *@
+        @*    asp-route-questionnaireId="@Model.QuestionnaireId" *@
+        @*    asp-route-questionId="@Model.QuestionId" *@
+        @*    asp-route-returnUrl="@($"{Request.Path}{Request.QueryString}")"> *@
+        @*   Enter all the options into one text box *@
+        @* </a> *@
+
+        <div class="gtaa-add-edit-questions-page">
+          <form method="post"
+                class="inline-form">
+            <input name="returnUrl" type="hidden" value="@($"{Request.Path}{Request.QueryString}")"/>
+            <button type="submit" asp-page-handler="RedirectToBulkEntry" class="govuk-button govuk-button--link govuk-!-margin-left-4">
+              Enter all the options into one text box
+            </button>
+          </form>
+        </div>
+
       </div>
 
       <button class="govuk-button govuk-!-margin-top-6"
@@ -77,6 +92,7 @@
               data-module="govuk-button"
               data-prevent-double-click="true"
               data-govuk-button-init="">
+
         Save answers
       </button>
     </form>
