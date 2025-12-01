@@ -48,36 +48,6 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAddOption()
-    {
-        ValidateSelectedQuestionsIfAny();
-
-        if (!ModelState.IsValid)
-        {
-            await EnsureSelectListsForOptions();
-            return Page();
-        }
-
-        OptionNumber++;
-
-        Options.Add(new AnswerOptionsViewModel
-        {
-            OptionNumber = OptionNumber
-        });
-
-        await EnsureSelectListsForOptions();
-        ReassignOptionNumbers();
-
-        return Page();
-    }
-
-    public IActionResult OnPostRemoveOption(int index)
-    {
-        Options.RemoveAt(index);
-        ReassignOptionNumbers();
-        return Page();
-    }
-
     public async Task<IActionResult> OnPostSaveAnswerOptions()
     {
         ValidateSelectedQuestionsIfAny();
@@ -315,7 +285,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
     private static DestinationType MapDestination(AnswerDestination answerDestination) =>
         answerDestination switch
         {
-            AnswerDestination.NextQuestion => DestinationType.Question,
+            AnswerDestination.NextQuestion => DestinationType.Auto, // is stored as null in db
             AnswerDestination.SpecificQuestion => DestinationType.Question,
             AnswerDestination.InternalResultsPage => DestinationType.CustomContent,
             AnswerDestination.ExternalResultsPage => DestinationType.ExternalLink,

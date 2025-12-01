@@ -24,19 +24,23 @@
 
 @section BeforeContainer
 {
-  @if (Model?.Destination?.Type == DestinationType.CustomContent)
+
+  @if (Model != null)
   {
-    <section class="dfe-page-grey" id="main-content-header">
-      <div class="govuk-width-container" id="main-header-container">
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-xl">
-              @Model?.Destination.Title
-            </h1>
+    @if (!Model.IsEmbedded && Model.Destination.Type == DestinationType.CustomContent)
+    {
+      <section class="dfe-page-grey" id="main-content-header">
+        <div class="govuk-width-container" id="main-header-container">
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+              <h1 class="govuk-heading-xl">
+                @Model?.Destination.Title
+              </h1>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    }
   }
 }
 
@@ -47,28 +51,29 @@
     {
       <form action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
         <input type="hidden" id="confirm-redirect-input" name="IsRedirectConfirmation" value="true">
+        <input type="hidden" name="StateCacheString" value="@Model.StateCacheString" autocomplete="off"/>
         <div class="govuk-form-group">
           <fieldset class="govuk-fieldset" aria-describedby="confirmation-hint">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-            <h1 class="govuk-fieldset__heading">
-              You're being redirected to some relevant content. Would you like to proceed?
-            </h1>
-          </legend>
-          <div id="confirmation-hint" class="govuk-hint">
-            This page will show you content related to your answer(s).
-          </div>
-          <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
-            <div class="govuk-radios__item">
-              <input id="confirm-redirect-yes-input" aria-describedby="pages-selection-type-input-only-one-option-true-hint"
-                     class="govuk-radios__input" type="radio" value="true" name="ConfirmRedirect">
-              <label for="confirm-redirect-yes-input" class="govuk-label govuk-radios__label">Yes</label>
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+              <h1 class="govuk-fieldset__heading">
+                You're being redirected to some relevant content. Would you like to proceed?
+              </h1>
+            </legend>
+            <div id="confirmation-hint" class="govuk-hint">
+              This page will show you content related to your answer(s).
             </div>
-            <div class="govuk-radios__item">
-              <input id="confirm-redirect-no-input" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
-                     class="govuk-radios__input" type="radio" value="false" name="ConfirmRedirect">
-              <label for="confirm-redirect-no-input" class="govuk-label govuk-radios__label">No</label>
+            <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
+              <div class="govuk-radios__item">
+                <input id="confirm-redirect-yes-input" aria-describedby="pages-selection-type-input-only-one-option-true-hint"
+                       class="govuk-radios__input" type="radio" value="true" name="ConfirmRedirect">
+                <label for="confirm-redirect-yes-input" class="govuk-label govuk-radios__label">Yes</label>
+              </div>
+              <div class="govuk-radios__item">
+                <input id="confirm-redirect-no-input" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
+                       class="govuk-radios__input" type="radio" value="false" name="ConfirmRedirect">
+                <label for="confirm-redirect-no-input" class="govuk-label govuk-radios__label">No</label>
+              </div>
             </div>
-          </div>
           </fieldset>
         </div>
         <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
@@ -133,7 +138,7 @@
                   <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description" autocomplete="off">
 
                   <div class="govuk-radios__item">
-                    <input type="hidden" name="Scores.@answer.Id" value="@answer.Priority" autocomplete="off">
+                    <input type="hidden" name="Priorities.@answer.Id" value="@answer.Priority" autocomplete="off">
                     <input
                       class="govuk-radios__input @(hasFieldError ? "govuk-input--error" : "")"
                       id="@inputId"
@@ -171,7 +176,7 @@
                   var inputId = $"{inputGroupId}-a-{answer.Id}";
                   var itemHintId = $"{inputId}-hint";
                   <div class="govuk-checkboxes__item">
-                    <input type="hidden" name="Scores.@answer.Id" value="@answer.Priority" autocomplete="off">
+                    <input type="hidden" name="Priorities.@answer.Id" value="@answer.Priority" autocomplete="off">
                     <input
                       class="govuk-checkboxes__input @(hasFieldError ? "govuk-input--error" : "")"
                       id="@inputId"
@@ -214,7 +219,7 @@
                   <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer?.Priority" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer?.Content" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer?.Description" autocomplete="off">
-                  <input type="hidden" name="Scores.@answer?.Id" value="@answer?.Priority" autocomplete="off">
+                  <input type="hidden" name="Priorities.@answer?.Id" value="@answer?.Priority" autocomplete="off">
                 }
                 <select class="govuk-select" id="@($"{inputGroupId}-select")" name="NextStateRequest.SelectedAnswerIds">
                   <option value="">Please select an answer</option>
@@ -235,7 +240,21 @@
     }
     else if (Model?.Destination?.Type == DestinationType.CustomContent)
     {
-      <p>@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</p>
+      @if (Model.IsEmbedded)
+      {
+        <fieldset class="govuk-fieldset" aria-describedby="@Model.Destination.Title">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h1 class="govuk-fieldset__heading">
+              @Model.Destination.Title
+            </h1>
+          </legend>
+          <p>@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</p>
+        </fieldset>
+      }
+      else
+      {
+        <p>@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</p>
+      }
     }
     else if (Model?.Destination?.Type == DestinationType.ExternalLink)
     {

@@ -7,6 +7,17 @@ public static class Routes
     public static readonly string QuestionnairesList = AdminRoot + "/questionnaires";
     public const string QuestionnairesManage = AdminRoot + "/questionnaires/manage";
     public static readonly string QuestionnairesCreate = AdminRoot + "/questionnaires/create";
+    
+    // Contents
+    public const string AddAndEditResultPages = AdminRoot + "/questionnaires/{0}/contents";
+    public const string AddContent = AdminRoot + "/questionnaires/{0}/contents/add";
+    public const string ConfirmDeleteContent = AdminRoot + "/questionnaires/{0}/contents/{1}/delete-confirmation";
+    public const string EditResultPage = AdminRoot + "/questionnaires/{0}/contents/{1}/edit";
+
+    // Contributors
+    public const string AddAndEditQuestionnaireContributors= AdminRoot + "/questionnaires/{0}/contributors";
+    public const string AddContributor = AdminRoot + "/questionnaires/{0}/contributors/add";
+    public const string ConfirmRemoveContributor = AdminRoot + "/questionnaires/{0}/contributors/{1}/remove-confirmation";
 
     // Track a specific questionnaire (format with id)
     // Usage: string.Format(Routes.QuestionnaireTrackById, questionnaireId)
@@ -32,4 +43,5 @@ public static class Routes
     
     public const string AddAndEditQuestionsAndAnswers = AdminRoot + "/questionnaires/{0}/questions";
     public const string EditQuestion = AdminRoot + "/questionnaires/{0}/questions/{1}/edit";
+    public const string EditAnswerOptions  = AdminRoot + "/questionnaires/{0}/questions/{1}/answers/edit";
 }

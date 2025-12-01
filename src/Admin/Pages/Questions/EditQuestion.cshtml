@@ -11,6 +11,11 @@
     var displayAnswerPriorities = Model.Answers.Any(x => !string.IsNullOrEmpty(x.Priority));
 }
 
+@section BeforeContent
+{
+    <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
+}
+
 @if (Model.QuestionSaved)
 {
     <div class="govuk-grid-row">
@@ -24,7 +29,7 @@
                 </div>
                 <div class="govuk-notification-banner__content">
                     <h3 class="govuk-notification-banner__heading">
-                        Your changes have been saved
+                        Your questionnaire has been saved.
                     </h3>
 
                     @if (Model.CurrentQuestionHasNextOne)
@@ -45,8 +50,7 @@
                         
                     }
                     <p>
-                        <a href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to
-                            your questions</a>
+                        <a href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back</a>
                     </p>
                 </div>
             </div>
@@ -54,16 +58,14 @@
     </div>
 }
 
-<input type="hidden" asp-for="QuestionNumber"/>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <a class="govuk-back-link" href="@Model.BackLinkSlug">
-            Back
-        </a>
 
-        <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
-        <h1 class="govuk-heading-l">Edit question</h1>
+        <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">Question @Model.QuestionNumber</span>
+            Edit question
+        </h1>
 
         <form method="post">
             <govuk-form-group asp-for="QuestionContent">

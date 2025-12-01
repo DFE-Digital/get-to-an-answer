@@ -17,7 +17,7 @@
 
 @section BeforeContent
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.QuestionnaireId/track">Back to questionnaire</a>
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.QuestionnaireId/track">Back</a>
 }
 
 <div data-module="appstepnav"id="step-by-step-navigation" class="app-step-nav js-hidden app-step-nav--large" data-show-text="Show Changes" data-hide-text="Hide Changes" data-show-all-text="Show all versions" data-hide-all-text="Hide all versions">
@@ -54,10 +54,10 @@
                     <span class="diff-modified">@changeData.Path was modified from '@changeData.ThisValue' to '@changeData.ThatValue'</span>
                     break;
                   case ChangeKind.Added:
-                    <span class="diff-added">'@changeData.ThisValue' was added to @changeData.Path</span>
+                    <span class="diff-added">'@changeData.ThatValue' was added to @changeData.Path</span>
                     break;
                   case ChangeKind.Removed:
-                    <span class="diff-removed">'@changeData.ThisValue' was from @changeData.Path</span>
+                    <span class="diff-removed">'@changeData.ThatValue' was from @changeData.Path</span>
                     break;
                 }
               </li>

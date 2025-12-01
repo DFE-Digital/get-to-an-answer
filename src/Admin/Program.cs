@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
+using Common.Accessibility;
 using Common.Client;
 using Common.Configuration;
 using Common.Extensions;
@@ -86,7 +88,8 @@ builder.Services.AddHttpContextAccessor();
 #region GTAA Api Client
 
 builder.Services.AddTransient(sp =>
-    new BearerTokenHandler(sp.GetRequiredService<IHttpContextAccessor>()));
+    new BearerTokenHandler(sp.GetRequiredService<IHttpContextAccessor>(),
+        sp.GetRequiredService<ILogger<BearerTokenHandler>>()));
 
 // Register an HttpClient with a pre-configured base address
 builder.Services.AddHttpClient<IApiClient, ApiClient>(client => client.BaseAddress = new Uri(apiBaseUrl))
@@ -115,6 +118,13 @@ var blobStorageContainerName = blobStorageConfig.GetValue<string>("ContainerName
 builder.Services.AddSingleton<IImageStorageClient>(sp => 
     new ImageStorageClient(blobStorageConnectionString, blobStorageContainerName, 
         sp.GetRequiredService<ILogger<ImageStorageClient>>()));
+
+#endregion
+
+#region Sitemap
+
+// Automatically finds the razor pages and generates a sitemap
+builder.Services.AddSingleton<SitemapService>();
 
 #endregion
 

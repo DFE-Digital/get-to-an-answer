@@ -223,6 +223,9 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
             await db.SaveChangesAsync();
             await db.ResetQuestionnaireToDraft(question.QuestionnaireId);
 
+            await db.Answers.Where(q => q.QuestionId == id)
+                .ExecuteUpdateAsync(s => s.SetProperty(b => b.IsDeleted, true));
+            
             logger.LogInformation("DeleteQuestion succeeded QuestionId={QuestionId}", id);
             return NoContent();
         }

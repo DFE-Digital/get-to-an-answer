@@ -25,7 +25,7 @@ test.describe('Get to an answer add question to questionnaire', () => {
 
         await signIn(page, token);
         addQuestionPage = await goToAddQuestionPageByUrl(page, questionnaire.id);
-        await addQuestionPage.expectQuestionHeadingOnPage(PageHeadings.ADD_QUESTION_PAGE_HEADING);
+        await addQuestionPage.expectAddQuestionHeadingOnPage(PageHeadings.ADD_QUESTION_PAGE_HEADING);
     });
 
     test('Validate presence of elements on add new question page', async ({page}) => {

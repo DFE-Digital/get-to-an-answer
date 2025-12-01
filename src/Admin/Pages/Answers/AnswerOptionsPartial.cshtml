@@ -8,7 +8,7 @@
     .Replace("[", "-")
     .Replace("]", "")
     .Replace(".", "-");
-
+  
   string Id(string suffix) => $"{prefix}-{suffix}";
 
 
@@ -45,7 +45,7 @@
   <div class="govuk-hint" id="@Id(contentHintIdSuffix)">
     You can add a short description to help people understand what this option is.
   </div>
-
+  
   <textarea class="govuk-textarea"
             id="@Id(contentHintIdSuffix)"
             rows="4"
@@ -102,7 +102,7 @@
 
           @* <govuk-field-error asp-for="SelectedQuestion" error-id="@Id(destinationSpecificSelectErrorId)"> *@
           @* </govuk-field-error> *@
-
+          
           @if (ViewData.ModelState.TryGetValue($"{prefix}-destination-specific", out var specificEntry) && specificEntry?.Errors.Count > 0)
           {
             <p id="@Id($"{destinationIdSuffix}-specific-error")" class="govuk-error-message">
@@ -167,7 +167,7 @@
           </label>
           <input class="govuk-input equal-input-width"
                  id="@Id("destination-external-link")"
-                 asp-for="ExternalLink"/>
+                 asp-for="ExternalLink" />
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 using Common.Models;
 using Common.Models.PageModels;
 using Common.Client;
+using Common.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -12,6 +13,8 @@ public class TrackQuestionnaires(IApiClient apiClient, ILogger<TrackQuestionnair
 {
     [FromRoute(Name = "questionnaireId")] 
     public new Guid? QuestionnaireId { get; set; }
+    
+    public QuestionnaireDto? Questionnaire { get; set; } = new();
 
     public async Task<IActionResult> OnGet()
     {
@@ -20,7 +23,17 @@ public class TrackQuestionnaires(IApiClient apiClient, ILogger<TrackQuestionnair
             if (QuestionnaireId == null)
                 return Page();
 
-            ViewModel.Questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId.Value);
+            Questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId.Value);
+            
+            TempData["QuestionnaireStatus"] = (int) Questionnaire?.Status!;
+            TempData.Keep("QuestionnaireStatus");
+            
+            TempData["QuestionnaireTitle"] = Questionnaire?.Title;
+            TempData.Keep("QuestionnaireTitle");
+            TempData["QuestionnaireSlug"] = Questionnaire?.Slug;
+            TempData.Keep("QuestionnaireSlug");
+            TempData["CompletionTrackingMap"] = JsonConvert.SerializeObject(Questionnaire?.CompletionTrackingMap);
+            TempData.Keep("CompletionTrackingMap");
             
             var stateFound = TempData.TryGetValue(nameof(QuestionnaireState), out var value);
 
