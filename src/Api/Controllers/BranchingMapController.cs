@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
+[Route("api")]
 [ApiController]
 public class BranchingMapController(IQuestionnaireService questionnaireService) : ControllerBase
 {

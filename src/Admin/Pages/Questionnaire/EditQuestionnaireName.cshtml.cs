@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Common.Client;
 using Common.Domain.Request.Update;
+using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
 using Common.Validation;
@@ -23,6 +24,10 @@ public class EditQuestionnaireName(IApiClient apiClient, ILogger<EditQuestionnai
     
     public IActionResult OnGet()
     {
+        if (TempData.Peek("QuestionnaireTitle") is string title)
+        {
+            Title = title;
+        }
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
         return Page();
     }
@@ -41,6 +46,12 @@ public class EditQuestionnaireName(IApiClient apiClient, ILogger<EditQuestionnai
             await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, updateQuestionnaireRequest);
             
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+            
+            await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+            {
+                Task = CompletableTask.EditQuestionnaireName,
+                Status = CompletionStatus.Completed // given the title is required
+            });
             
             return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
 

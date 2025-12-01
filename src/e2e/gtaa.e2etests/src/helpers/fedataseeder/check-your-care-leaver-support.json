@@ -1,0 +1,180 @@
+{
+  "title": "Check your care leaver support",
+  "slug": "check-your-care-leaver-support",
+  "description": "## Before you start\r\n\r\nTo check what support you have the right to, you\u0027ll need to answer questions about:\r\n\r\n- your age\r\n- how long you were in care or looked after for\r\n- how old you were when this happened\r\n- whether you\u2019re still in care or looked after \r\n\r\nAny answers you give will not be saved or shared.",
+  "questions": [
+    {
+      "key": "q1",
+      "text": "Which of these arrangements apply to you?",
+      "hint": "These arrangements relate to being in care or looked after by a local authority in England.",
+      "type": 2,
+      "answers": [
+        {
+          "text": "I'm in or have been in care",
+          "hint": "For example, in foster care, a children\u0027s home or supported accommodation",
+          "priority": 2
+        },
+        {
+          "text": "I\u0027m currently or have been looked after for a short time",
+          "hint": "For example, an emergency stay in a foster home or children\u0027s home",
+          "priority": 2
+        },
+        {
+          "text": "I\u0027m in or went into custody before 18",
+          "hint": "For example, in a youth offender institution or a secure training centre",
+          "priority": 2
+        },
+        {
+          "text": "I\u0027m in or have spent time in a secure place for my welfare",
+          "hint": "For example, in a secure children\u0027s home or a hospital",
+          "priority": 2
+        },
+        {
+          "text": "I arrived in the UK alone to seek asylum",
+          "hint": null,
+          "priority": 1,
+          "navigation": {
+            "type": "external-link",
+            "url": "https://www.support-for-care-leavers.education.gov.uk/en/results-unaccompanied-asylum-seeking-child"
+          }
+        },
+        {
+          "text": "I don't know",
+          "hint": null,
+          "priority": 3,
+          "navigation": {
+            "type": "external-link",
+            "url": "https://www.support-for-care-leavers.education.gov.uk/en/if-youre-not-sure"
+          }
+        }
+      ]
+    },
+    {
+      "key": "q2",
+      "text": "How old are you?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "15 or younger",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://www.support-for-care-leavers.education.gov.uk/en/youre-aged-15-or-younger"
+          }
+        },
+        {
+          "text": "16 or 17",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q3"
+          }
+        },
+        {
+          "text": "18 to 24",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q3"
+          }
+        },
+        {
+          "text": "25 or older",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://www.support-for-care-leavers.education.gov.uk/en/youre-aged-25-or-older"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://www.support-for-care-leavers.education.gov.uk/en/if-youre-not-sure"
+          }
+        }
+      ]
+    },
+    {
+      "key": "q3",
+      "text": "Were you in care or looked after for some time on or after your 16th birthday?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q4"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://www.support-for-care-leavers.education.gov.uk/en/you-might-be-able-to-get-some-support"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://www.support-for-care-leavers.education.gov.uk/en/if-youre-not-sure"
+          }
+        }
+      ]
+    },
+    {
+      "key": "q4",
+      "text": "Were you in care or looked after for at least 13 weeks (just over 3 months) after your 14th birthday?",
+      "hint": "This could have happened at different times or all at once.",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://www.support-for-care-leavers.education.gov.uk/en/you-have-right-to-leaving-care-support-former-relevant-child"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "next-question",
+            "targetQuestionKey": "q5"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://www.support-for-care-leavers.education.gov.uk/en/if-youre-not-sure"
+          }
+        }
+      ]
+    },
+    {
+      "key": "q5",
+      "text": "Are you still in care or being looked after?",
+      "type": 1,
+      "answers": [
+        {
+          "text": "Yes",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://www.support-for-care-leavers.education.gov.uk/en/you-have-right-to-leaving-care-support-eligible-child"
+          }
+        },
+        {
+          "text": "No",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://www.support-for-care-leavers.education.gov.uk/en/you-might-be-able-to-get-some-support-pqfaa"
+          }
+        },
+        {
+          "text": "I don't know",
+          "navigation": {
+            "type": "external-link",
+            "url": "https://www.support-for-care-leavers.education.gov.uk/en/if-youre-not-sure"
+          }
+        }
+      ]
+    }
+  ]
+}

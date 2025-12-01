@@ -8,20 +8,6 @@
   var questionnaires = Model.ViewModel.Questionnaires;
 }
 
-@section BeforeContainer
-{
-  <section class="dfe-page-grey" id="main-content-header">
-    <div class="govuk-width-container" id="main-header-container">
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          <h1 class="govuk-heading-xl">Help users to get to an answer</h1>
-          <p class="govuk-body">Create questionnaires to help users get to an answer.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-}
-
 @if (Model.ViewModel.QuestionnaireState is { JustDeleted: true })
 {
   <div class="govuk-grid-row">
@@ -75,16 +61,18 @@
       @foreach (var questionnaire in questionnaires)
       {
         <tr class="govuk-table__row">
-          <td class="govuk-table__cell"><a class="govuk-link"
-                                           href="/admin/questionnaires/@questionnaire.Id/track">@questionnaire.Title</a>
+          <td class="govuk-table__cell">
+            <a class="govuk-link" href="/admin/questionnaires/@questionnaire.Id/track">@questionnaire.Title</a>
           </td>
           <td class="govuk-table__cell">@questionnaire.CreatedBy</td>
           <td
             class="govuk-table__cell">@questionnaire.UpdatedAt.Date.ToString("d MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("en-GB"))</td>
 
           <td class="govuk-table__cell govuk-table__cell--numeric">
-            <div class="app-form-states"><strong class="govuk-tag"
-                                                 data-status="@questionnaire.Status">@questionnaire.Status</strong>
+            <div class="app-form-states">
+              <strong class="govuk-tag" data-status="@questionnaire.Status">
+                @questionnaire.Status
+              </strong>
             </div>
           </td>
         </tr>

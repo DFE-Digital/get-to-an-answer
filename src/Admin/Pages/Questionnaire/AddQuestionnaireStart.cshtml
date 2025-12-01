@@ -1,0 +1,88 @@
+﻿@page "/admin/questionnaires/{questionnaireId:guid}/start-page/edit"
+@addTagHelper *, Common
+@using Admin.Models
+@using Common.Models
+@model Admin.Pages.Questionnaire.AddQuestionnaireStart
+
+@{
+  Layout = "_Layout";
+  ViewData["Title"] = "Edit the end result content";
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
+}
+
+@if (Model!.HasErrors())
+{
+  @await Html.PartialAsync("_ErrorSummary")
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">
+      <p class="govuk-caption-l">@Model.QuestionnaireTitle</p>
+      Add and edit a start page
+    </h1>
+    <div class="govuk-inset-text">
+      You can add a start page for people to see before they answer any questions. 
+    </div>
+    
+    <form method="post" accept-charset="UTF-8">
+      <!-- Content title -->
+      <govuk-form-group asp-for="@Model.DisplayTitle">
+        <label class="govuk-label govuk-label--m" for="DisplayTitle">
+          Add a title
+        </label>
+        <div class="govuk-hint" id="DisplayTitle-hint">
+          This will appear at the top of your start page. 
+        </div>
+
+        <govuk-field-error asp-for="@Model.DisplayTitle" error-id="DisplayTitle-error">
+        </govuk-field-error>
+
+        <govuk-input id="DisplayTitle"
+                     class="govuk-input"
+                     aria-describedby="DisplayTitle-hint"
+                     type="text"
+                     asp-for="DisplayTitle"
+                     value="@Model.DisplayTitle"
+                     govuk-error-for="@Model.DisplayTitle"/>
+      </govuk-form-group>
+
+      <!-- Main content -->
+      <govuk-form-group asp-for="@Model.Description">
+        <label class="govuk-label govuk-label--m" for="Description">
+          Add a description
+        </label>
+        <div class="govuk-hint" id="Description-hint">
+          <p>Your description should give the user just enough information to help them understand what the service does and whether it will meet their need.</p>
+
+          <p>It should include any information people are likely to need to answer questions. </p>
+        </div>
+
+        <govuk-field-error asp-for="@Model.Description" error-id="Description-error">
+        </govuk-field-error>
+
+        <textarea class="govuk-textarea"
+                  id="Description"
+                  rows="4"
+                  asp-for="Description"
+                  aria-describedby="Description-hint"></textarea>
+      </govuk-form-group>
+
+      <div class="govuk-button-group">
+        <button class="govuk-button" type="submit" formnovalidate="formnovalidate" data-module="govuk-button"
+                data-prevent-double-click="true" asp-page-handler="SaveStartPage">
+          Save and continue
+        </button>
+        
+        <button class="govuk-button govuk-button--warning" type="submit" formnovalidate="formnovalidate" 
+                data-module="govuk-button"data-prevent-double-click="true" asp-page-handler="ClearStartPage">
+          Remove start page
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
