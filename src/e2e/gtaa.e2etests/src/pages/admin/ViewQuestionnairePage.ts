@@ -8,7 +8,6 @@ export class ViewQuestionnairePage extends BasePage {
     // ===== Locators  =====
     private readonly section: Locator;
     private readonly HelpUserHeading: Locator;
-    private readonly HelpUserDescription: Locator;
     private readonly questionnaireHeading: Locator;
     private readonly createNewQuestionnaireButton: Locator;
     private readonly tableCaption: Locator;
@@ -23,12 +22,7 @@ export class ViewQuestionnairePage extends BasePage {
         this.section = this.page.locator(
             'div.app-scrolling-wrapper[role="region"]'
         );
-        this.HelpUserHeading = this.page.locator(
-            'section#main-content-header h1.govuk-heading-xl'
-        );
-        this.HelpUserDescription = this.page.locator(
-            'section#main-content-header p.govuk-body'
-        );
+        this.HelpUserHeading = this.page.locator('main#main-content h1.govuk-heading-l');
         this.questionnaireHeading = this.page.locator(
             'main h1.govuk-heading-l'
         );
@@ -54,11 +48,7 @@ export class ViewQuestionnairePage extends BasePage {
     async verifyHelpUserHeadingVisible() {
         await expect(this.HelpUserHeading, '❌ Help user heading not visible').toBeVisible();
     }
-
-    async verifyHelpUserDescriptionVisible() {
-        await expect(this.HelpUserDescription, '❌ Help user description not visible').toBeVisible();
-    }
-
+    
     async verifyCreateButtonVisible() {
         await expect(this.createNewQuestionnaireButton, '❌ Create new questionnaire button not visible').toBeVisible();
     }
