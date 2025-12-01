@@ -81,7 +81,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             ReassignOptionNumbers();
             return Page();
         }
-        
+
         try
         {
             foreach (var option in Options)
@@ -117,7 +117,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
         var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
         
-        QuestionNumber = questions.MaxBy(x => x.Order + 1)?.ToString();
+        QuestionNumber = questions.Max(x => x.Order.ToString());
         
         var questionSelect = questions.Where(x => x.Id != QuestionId)
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();

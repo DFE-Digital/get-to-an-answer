@@ -23,9 +23,8 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     [BindProperty] public QuestionType QuestionType { get; set; }
 
     public List<AnswerSummaryViewModel> Answers { get; } = [];
-    
-    [BindProperty]
-    public string QuestionNumber { get; set; } = 1.ToString();
+
+    [BindProperty] public string QuestionNumber { get; set; } = 1.ToString();
 
     [TempData(Key = "QuestionSaved")] public bool QuestionSaved { get; set; }
 
@@ -111,10 +110,11 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         return Page();
     }
 
-    public async Task<IActionResult> OnPostDeleteQuestion()
+    public IActionResult OnPostDeleteQuestion()
     {
-        await apiClient.DeleteQuestionAsync(QuestionId);
-        return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
+        TempData["TitleOfQuestionToBeDeleted"] = QuestionContent;
+        TempData["NumberOfQuestionToBeDeleted"] = QuestionNumber;
+        return Redirect(string.Format(Routes.ConfirmDeleteQuestion, QuestionnaireId, QuestionId));
     }
     
     public IActionResult OnPostAddAQuestion() => Redirect(string.Format(Routes.AddQuestion, QuestionnaireId));

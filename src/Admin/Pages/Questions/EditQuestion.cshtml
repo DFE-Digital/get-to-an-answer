@@ -29,7 +29,7 @@
                 </div>
                 <div class="govuk-notification-banner__content">
                     <h3 class="govuk-notification-banner__heading">
-                        Your questionnaire has been saved.
+                        Your changes have been saved
                     </h3>
 
                     @if (Model.CurrentQuestionHasNextOne)
@@ -50,7 +50,7 @@
                         
                     }
                     <p>
-                        <a href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back</a>
+                        <a href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to your questions</a>
                     </p>
                 </div>
             </div>
