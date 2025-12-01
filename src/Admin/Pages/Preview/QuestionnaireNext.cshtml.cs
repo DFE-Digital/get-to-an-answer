@@ -59,7 +59,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
     }
 
     public async Task<IActionResult> OnPost( 
-        [FromForm(Name = "Scores")] Dictionary<Guid, float> scores, 
+        [FromForm(Name = "Priorities")] Dictionary<Guid, float> priorities, 
         [FromForm(Name = "ConfirmRedirect")] bool confirmRedirect)
     {
         try
@@ -108,7 +108,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 
             if (NextStateRequest.SelectedAnswerIds.Count > 1)
             {
-                var selectedAnswerId = scores.OrderByDescending(kv => kv.Value).First().Key;
+                var selectedAnswerId = priorities.OrderBy(kv => kv.Value).First().Key;
                 NextStateRequest.SelectedAnswerIds = [selectedAnswerId];
             } 
         

@@ -23,7 +23,7 @@ public static class MermaidExtensions
         sb.AppendLine("flowchart TD");
         sb.AppendLine("  %% Generated from Questionnaire -> Questions -> Answers");
         sb.AppendLine("  %% Destinations: Question, External Link, Custom Info Page");
-        sb.AppendLine("  %% Scores are for prioritisation only; not used for routing");
+        sb.AppendLine("  %% Priorities are used for routing for multiselect questions");
         sb.AppendLine();
 
         // Root node

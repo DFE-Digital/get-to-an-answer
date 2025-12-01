@@ -138,7 +138,7 @@
                   <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description" autocomplete="off">
 
                   <div class="govuk-radios__item">
-                    <input type="hidden" name="Scores.@answer.Id" value="@answer.Priority" autocomplete="off">
+                    <input type="hidden" name="Priorities.@answer.Id" value="@answer.Priority" autocomplete="off">
                     <input
                       class="govuk-radios__input @(hasFieldError ? "govuk-input--error" : "")"
                       id="@inputId"
@@ -176,7 +176,7 @@
                   var inputId = $"{inputGroupId}-a-{answer.Id}";
                   var itemHintId = $"{inputId}-hint";
                   <div class="govuk-checkboxes__item">
-                    <input type="hidden" name="Scores.@answer.Id" value="@answer.Priority" autocomplete="off">
+                    <input type="hidden" name="Priorities.@answer.Id" value="@answer.Priority" autocomplete="off">
                     <input
                       class="govuk-checkboxes__input @(hasFieldError ? "govuk-input--error" : "")"
                       id="@inputId"
@@ -219,7 +219,7 @@
                   <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer?.Priority" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer?.Content" autocomplete="off">
                   <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer?.Description" autocomplete="off">
-                  <input type="hidden" name="Scores.@answer?.Id" value="@answer?.Priority" autocomplete="off">
+                  <input type="hidden" name="Priorities.@answer?.Id" value="@answer?.Priority" autocomplete="off">
                 }
                 <select class="govuk-select" id="@($"{inputGroupId}-select")" name="NextStateRequest.SelectedAnswerIds">
                   <option value="">Please select an answer</option>
