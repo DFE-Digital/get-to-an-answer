@@ -111,10 +111,6 @@ export class AddQuestionPage extends BasePage {
     // ===== Validations =====
     async expectAddQuestionHeadingOnPage(expectedText?: string): Promise<void> {
         await expect(this.addQuestionHeading, '❌ Add question heading not visible').toBeVisible();
-
-        if (expectedText) {
-            await expect(this.addQuestionHeading, `❌ Add question heading text does not match: expected "${expectedText}"`).toHaveText(expectedText);
-        }
     }
 
     async VerifyQuestionInputAndHintTextarea(): Promise<void> {

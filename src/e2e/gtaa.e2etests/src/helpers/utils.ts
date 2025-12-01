@@ -5,9 +5,11 @@ export function formatTimestampToLongDate(timestamp: string): string {
         throw new Error(`Invalid timestamp: ${timestamp}`);
     }
 
-    return new Intl.DateTimeFormat("en-GB", {
-        day: "2-digit",
+    const formatted = new Intl.DateTimeFormat("en-GB", {
+        day: "numeric",
         month: "long",
         year: "numeric",
     }).format(date);
+
+    return formatted;
 }

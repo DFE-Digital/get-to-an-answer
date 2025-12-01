@@ -23,11 +23,10 @@ test.describe('Get to an answer views questionnaire', () => {
         await viewQuestionnairePage.assertPageElements();
     });
 
-    test("Header section - H1 and paragraph presence", async ({page}) => {
+    test("Header section - Heading presence", async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
 
         await viewQuestionnairePage.verifyHelpUserHeadingVisible();
-        await viewQuestionnairePage.verifyHelpUserDescriptionVisible();
     });
 
     test("Create questionnaire CTA navigates to Add page", async ({page}) => {

@@ -42,6 +42,10 @@ export const ErrorMessages = {
     ERROR_MESSAGE_MISSING_QUESTION_CONTENT: 'Enter a question',
 
     ERROR_MESSAGE_MISSING_OPTION_CONTENT: 'The OptionContent field is required.',
+
+    ERROR_MESSAGE_TOP_QUESTION_UP: 'You cannot move this question further up',
+    ERROR_MESSAGE_BOTTOM_QUESTION_DOWN: 'You cannot move this question further down'
+    
 }
 
 export const PageHeadings = {
