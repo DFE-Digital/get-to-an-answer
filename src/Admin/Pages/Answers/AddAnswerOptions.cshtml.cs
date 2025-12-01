@@ -81,7 +81,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             ReassignOptionNumbers();
             return Page();
         }
-        
+
         try
         {
             foreach (var option in Options)

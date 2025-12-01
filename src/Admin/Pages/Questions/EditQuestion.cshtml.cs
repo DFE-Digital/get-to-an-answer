@@ -30,7 +30,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
 
     [TempData(Key = "CurrentQuestionHasNextOne")]
     public bool CurrentQuestionHasNextOne { get; set; }
-
+    
     [TempData(Key = "NextQuestionId")] public Guid? NextQuestionId { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
@@ -116,7 +116,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         TempData["NumberOfQuestionToBeDeleted"] = QuestionNumber;
         return Redirect(string.Format(Routes.ConfirmDeleteQuestion, QuestionnaireId, QuestionId));
     }
-        
+    
     public IActionResult OnPostAddAQuestion() => Redirect(string.Format(Routes.AddQuestion, QuestionnaireId));
 
     public string QuestionTypeFriendly(QuestionType type) =>
