@@ -1,15 +1,14 @@
 using System.ComponentModel.DataAnnotations;
+using Admin.Models;
 using Common.Client;
 using Common.Models;
 using Common.Models.PageModels;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace Admin.Pages.Questions;
 
-public class DeleteQuestion(ILogger<DeleteQuestion> logger, IApiClient apiClient) : BasePageModel
+public class ConfirmDeleteQuestion(ILogger<ConfirmDeleteQuestion> logger, IApiClient apiClient) : BasePageModel
 {
     [FromRoute(Name = "questionId")] public Guid QuestionId { get; set; }
 
@@ -42,10 +41,10 @@ public class DeleteQuestion(ILogger<DeleteQuestion> logger, IApiClient apiClient
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
         
-        var questionTitle = TempData.Peek("QuestionTitle") as string;
+        var questionTitle = TempData.Peek("TitleOfQuestionToBeDeleted") as string;
 
         TempData["DeletedQuestion"] =
-            JsonConvert.SerializeObject(new { QuestionTitle = questionTitle, Deleted = true });
+            JsonConvert.SerializeObject(new QuestionNotificationSummary(IsDeleted: true, QuestionTitle: questionTitle));
         
         return Redirect(string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionId));
     }

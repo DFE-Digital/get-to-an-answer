@@ -110,12 +110,12 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         return Page();
     }
 
-    public async Task<IActionResult> OnPostDeleteQuestion()
+    public IActionResult OnPostDeleteQuestion()
     {
-        await apiClient.DeleteQuestionAsync(QuestionId);
-        return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
+        TempData["TitleOfQuestionToBeDeleted"] = QuestionContent;
+        return Redirect(string.Format(Routes.ConfirmDeleteQuestion, QuestionnaireId, QuestionId));
     }
-
+        
     public IActionResult OnPostAddAQuestion() => Redirect(string.Format(Routes.AddQuestion, QuestionnaireId));
 
     public string QuestionTypeFriendly(QuestionType type) =>
