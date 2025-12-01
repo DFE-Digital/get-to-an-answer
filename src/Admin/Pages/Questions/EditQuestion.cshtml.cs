@@ -113,6 +113,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     public IActionResult OnPostDeleteQuestion()
     {
         TempData["TitleOfQuestionToBeDeleted"] = QuestionContent;
+        TempData["NumberOfQuestionToBeDeleted"] = QuestionNumber;
         return Redirect(string.Format(Routes.ConfirmDeleteQuestion, QuestionnaireId, QuestionId));
     }
         

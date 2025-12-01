@@ -31,11 +31,23 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
-        
-        var existingQuestions = await apiClient.GetQuestionsAsync(QuestionnaireId);
 
-        if (existingQuestions.Count > 0)
-            QuestionNumber = (existingQuestions.Max(q => q.Order) + 1).ToString();
+        try
+        {
+            var existingQuestions = await apiClient.GetQuestionsAsync(QuestionnaireId);
+
+            if (existingQuestions.Count > 0)
+                QuestionNumber = (existingQuestions.Max(q => q.Order) + 1).ToString();
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return Page();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
         
         return Page();
     }
@@ -44,10 +56,9 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
     {
         if (!ModelState.IsValid)
             return Page();
-
+        
         try
         {
-            //TODO: based on question type, we need to create different types of questions
             var response = await apiClient.CreateQuestionAsync(new CreateQuestionRequestDto
             {
                 QuestionnaireId = QuestionnaireId,
