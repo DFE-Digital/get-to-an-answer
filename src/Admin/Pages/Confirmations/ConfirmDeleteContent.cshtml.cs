@@ -15,18 +15,8 @@ public class ConfirmDeleteContent(IApiClient apiClient) : QuestionnairesPageMode
     
     [FromRoute(Name = "contentId")]
     public Guid ContentId { get; set; }
-
-    public string? QuestionnaireTitle { get; set; }
     
     [BindProperty] public bool DeleteContent { get; set; }
-
-    public void OnGet()
-    {
-        if (TempData.Peek("QuestionnaireTitle") is string title)
-        {
-            QuestionnaireTitle = title;
-        }
-    }
 
     public async Task<IActionResult> OnPostContinueAsync()
     {

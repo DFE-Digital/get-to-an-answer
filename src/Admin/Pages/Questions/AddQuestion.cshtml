@@ -28,12 +28,16 @@
       <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
       Add a question
     </h1>
-
+    <dl class="govuk-!-margin-bottom-7">
+      <dt class="govuk-visually-hidden">Status</dt>
+      <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
+      </dd>
+    </dl>
     <form method="post" accept-charset="UTF-8">
       <!-- Question text -->
       <govuk-form-group asp-for="@Model.QuestionContent">
         <label class="govuk-label govuk-label--m" for="QuestionContent">
-          What's your question?
+          Your question
         </label>
         <div class="govuk-hint" id="QuestionContent-hint">
           Ask the question the way you would in person. For example, ‘Which of these countries have you lived in?’
@@ -57,8 +61,8 @@
           Hint text (optional)
         </label>
         <div class="govuk-hint" id="QuestionHintText-hint">
-          You can add a short hint to help people answer the question. For a question where people can select more
-          than one answer you might want to use ‘Select all that apply’.
+          You can add a short sentence to help people answer the question. 
+          For example, if someone can select one or more options, use 'Select all that apply'. 
         </div>
 
         <govuk-field-error asp-for="@Model.QuestionHintText" error-id="QuestionHintText-error">
@@ -76,7 +80,7 @@
         <fieldset class="govuk-fieldset" aria-describedby="QuestionType-hint QuestionType-error">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
             <h2 class="govuk-fieldset__heading">
-              Question type
+              Answer type
             </h2>
           </legend>
 
@@ -96,7 +100,7 @@
                      value="@((int)QuestionType.SingleSelect)"
                      govuk-error-for="@Model.QuestionType" />
               <label class="govuk-label govuk-radios__label" for="QuestionType">
-                One option only (radio button)
+                One option only (using radio button)
               </label>
               <div class="govuk-hint govuk-radios__hint">
                 Use this when you have a small list of options.
@@ -111,7 +115,7 @@
                      value="@((int)QuestionType.DropdownSelect)"
                      govuk-error-for="@Model.QuestionType" />
               <label class="govuk-label govuk-radios__label" for="QuestionType-Dropdown">
-                One option only (drop-down)
+                One option only (using a drop-down)
               </label>
               <div class="govuk-hint govuk-radios__hint">
                 Use this when you have a long list of options.
@@ -126,7 +130,7 @@
                      value="@((int)QuestionType.MultiSelect)"
                      govuk-error-for="@Model.QuestionType" />
               <label class="govuk-label govuk-radios__label" for="QuestionType-MultiSelect">
-                One or more options (multi-select)
+                One or more options (using multi-select)
               </label>
               <div class="govuk-hint govuk-radios__hint">
                 Use this when people can select more than one option.

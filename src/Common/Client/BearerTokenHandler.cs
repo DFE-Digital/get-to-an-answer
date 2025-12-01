@@ -31,7 +31,7 @@ public class BearerTokenHandler(
 
         var auth = await httpContext.AuthenticateAsync(OpenIdConnectDefaults.AuthenticationScheme);
 
-        logger.LogInformation($"Auth Cookie expiring at {auth?.Properties?.ExpiresUtc}");
+        logger.LogDebug($"Auth Cookie expiring at {auth?.Properties?.ExpiresUtc}");
         
         var idToken = auth?.Properties?.GetTokenValue("id_token");
 
@@ -50,7 +50,7 @@ public class BearerTokenHandler(
                 {
                     var expiry = DateTimeOffset.FromUnixTimeSeconds(expSeconds);
                     
-                    logger.LogInformation($"Token expires at {expiry}");
+                    logger.LogDebug($"Token expires at {expiry}");
 
                     if (expiry <= DateTimeOffset.UtcNow)
                     {
@@ -66,7 +66,7 @@ public class BearerTokenHandler(
 
         if (shouldChallenge)
         {
-            logger.LogWarning("Token expired or invalid, forcing re-authentication");
+            logger.LogDebug("Token expired or invalid, forcing re-authentication");
             
             await httpContext.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme);
             return new HttpResponseMessage(HttpStatusCode.Unauthorized);

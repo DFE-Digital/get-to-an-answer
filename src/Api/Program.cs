@@ -179,11 +179,31 @@ app.MapControllers();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
+#region Database migrations
+
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<GetToAnAnswerDbContext>();
-    await dbContext.Database.EnsureCreatedAsync();
+    try
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<GetToAnAnswerDbContext>();
+        
+        // Only run if there are pending migrations
+        if (dbContext.Database.GetPendingMigrations().Any())
+        {
+            await dbContext.Database.MigrateAsync();
+        }
+    }
+    catch (Exception ex)
+    {
+        // Decide how you want to handle failures:
+        // - log and continue (risky if schema mismatch)
+        // - log and rethrow (fail fast)
+        logger.LogError(ex, "An error occurred while applying database migrations.");
+        throw; // recommended in most cases
+    }
 }
+
+#endregion
 
 if (!appIsLocalEnvironment)
 {

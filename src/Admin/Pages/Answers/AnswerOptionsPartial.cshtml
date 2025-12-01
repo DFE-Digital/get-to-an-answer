@@ -60,7 +60,7 @@
       Destination
     </legend>
     <div id="@Id($"{destinationIdSuffix}-hint")" class="govuk-hint">
-      Choose where to send the user after they answer this option.
+      Where people go next if they select this option. 
     </div>
 
     <govuk-field-error asp-for="AnswerDestination" error-id="@Id($"{destinationIdSuffix}-error")">
@@ -128,7 +128,7 @@
                      value="@AnswerDestination.InternalResultsPage"
                      data-aria-controls="@Id("destination-internal-reveal")"/>
         <label class="govuk-label govuk-radios__label" for="@Id("destination-internal")">
-          Results page (in ‘Get to an answer’)
+          Results page
         </label>
         <div class="govuk-hint govuk-radios__hint">
           Use this to direct people to a results page created on the ‘Add and edit results’ page.
@@ -155,7 +155,7 @@
                      value="@AnswerDestination.ExternalResultsPage"
                      data-aria-controls="@Id("destination-external-reveal")"/>
         <label class="govuk-label govuk-radios__label" for="@Id("destination-external")">
-          Results page (outside of ‘Get to an answer’)
+          Link (to a page outside of the questionnaire)
         </label>
         <div class="govuk-hint govuk-radios__hint">
           Use this to add a link and direct people to a results page.

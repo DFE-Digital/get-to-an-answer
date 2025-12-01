@@ -43,38 +43,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     
-    @if (Model?.IsRedirectConfirmation ?? false)
-    {
-      <form action="/admin/questionnaires/@Model.Questionnaire.Id/next-preview?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
-        <input type="hidden" id="confirm-redirect-input" name="IsRedirectConfirmation" value="true">
-        <div class="govuk-form-group">
-          <fieldset class="govuk-fieldset" aria-describedby="confirmation-hint">
-            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-              <h1 class="govuk-fieldset__heading">
-                You're being redirected to some relevant content. Would you like to proceed?
-              </h1>
-            </legend>
-            <div id="confirmation-hint" class="govuk-hint">
-              This page will show you content related to your answer(s).
-            </div>
-            <div class="govuk-radios" data-module="govuk-radios" data-govuk-radios-init="">
-              <div class="govuk-radios__item">
-                <input id="confirm-redirect-yes-input" aria-describedby="pages-selection-type-input-only-one-option-true-hint"
-                       class="govuk-radios__input" type="radio" value="true" name="ConfirmRedirect">
-                <label for="confirm-redirect-yes-input" class="govuk-label govuk-radios__label">Yes</label>
-              </div>
-              <div class="govuk-radios__item">
-                <input id="confirm-redirect-no-input" aria-describedby="pages-selection-type-input-only-one-option-false-hint"
-                       class="govuk-radios__input" type="radio" value="false" name="ConfirmRedirect">
-                <label for="confirm-redirect-no-input" class="govuk-label govuk-radios__label">No</label>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-        <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Continue</button>
-      </form>
-    }
-    else if (Model?.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
+    @if (Model?.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
     {
       <form action="/admin/questionnaires/@Model.Questionnaire.Id/next-preview?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
         @Html.AntiForgeryToken()

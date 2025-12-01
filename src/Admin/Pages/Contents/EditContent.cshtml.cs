@@ -17,8 +17,6 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
     [FromRoute(Name = "contentId")] public Guid ContentId { get; set; }
 
-    public string? QuestionnaireTitle { get; set; }
-
     [BindProperty] public string ContentTitle { get; set; } = string.Empty;
 
     [BindProperty] public string ContentValue { get; set; }
@@ -28,11 +26,6 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
     public async Task<IActionResult> OnGetAsync()
     {
         BackLinkSlug = string.Format(Routes.AddAndEditResultPages, QuestionnaireId);
-
-        if (TempData.Peek("QuestionnaireTitle") is string title)
-        {
-            QuestionnaireTitle = title;
-        }
 
         try
         {

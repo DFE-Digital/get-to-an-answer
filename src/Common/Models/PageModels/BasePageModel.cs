@@ -1,3 +1,4 @@
+using Common.Enum;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,6 +12,31 @@ public class BasePageModel : PageModel
     private const string BackLinkTempDataKey = "BackLinkSlugTempData";
 
     protected virtual ActionResult RedirectToErrorPage() => Redirect("/error");
+
+    public EntityStatus QuestionnaireStatus
+    {
+        get
+        {
+            if (TempData.Peek("QuestionnaireStatus") is int status)
+            {
+                return (EntityStatus) status;
+            }
+
+            return EntityStatus.Draft;
+        }
+    }
+
+    public string? QuestionnaireTitle { 
+        get
+        {
+            if (TempData.Peek("QuestionnaireTitle") is string title)
+            {
+                return title;
+            }
+
+            return string.Empty;
+        } 
+    }
     
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context,
         PageHandlerExecutionDelegate next)

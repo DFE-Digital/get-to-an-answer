@@ -30,7 +30,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId);
-        
+
         var questionTypeValue = TempData.Peek("QuestionType");
         if (questionTypeValue is int intVal && Enum.IsDefined(typeof(QuestionType), intVal))
         {
@@ -91,7 +91,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
                     QuestionnaireId = QuestionnaireId,
                     QuestionId = QuestionId,
                     Content = option.OptionContent,
-                    Description = option.OptionHint,
+                    Description = option.OptionHint ?? string.Empty,
                     DestinationType = MapDestination(option.AnswerDestination),
                     DestinationQuestionId = !string.IsNullOrEmpty(option.SelectedDestinationQuestion)
                         ? Guid.Parse(option.SelectedDestinationQuestion)
@@ -138,7 +138,6 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             Options[index].OptionNumber = index + 1;
         }
     }
-
 
     private void ValidateSelectedQuestionsIfAny()
     {

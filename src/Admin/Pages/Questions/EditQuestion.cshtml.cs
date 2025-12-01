@@ -61,11 +61,19 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         {
             Content = a.Content,
             Priority = Convert.ToString(a.Priority, CultureInfo.CurrentCulture),
-            Destination = a.DestinationType.ToString() ?? string.Empty
+            Destination = ToDestDisplayName(a.DestinationType)
         }));
 
         return Page();
     }
+    
+    private static string ToDestDisplayName(DestinationType? type) => type switch
+    {
+        DestinationType.Question => "Specific question",
+        DestinationType.CustomContent => "Results page",
+        DestinationType.ExternalLink => "External link",
+        _ => "Next question",
+    };
 
     public async Task<IActionResult> OnPostSaveQuestion()
     {
