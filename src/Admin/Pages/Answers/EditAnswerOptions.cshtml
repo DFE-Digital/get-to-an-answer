@@ -59,32 +59,21 @@
         </button>
       }
 
-      <div class="govuk-!-margin-top-3 govuk-!-display-flex govuk-!-gap-3 govuk-!-flex-wrap">
+      <div class="govuk-!-margin-top-3 govuk-!-display-flex govuk-!-gap-3 govuk-!-flex-wrap gtaa-add-edit-questions-page">
         <button class="govuk-button govuk-button--secondary"
                 type="submit"
                 asp-page-handler="AddOption">
           Add another option
         </button>
-        @* <a class="govuk-link govuk-!-margin-left-4" *@
-        @*    asp-page="/Answers/BulkAnswerOptions" *@
-        @*    asp-route-questionnaireId="@Model.QuestionnaireId" *@
-        @*    asp-route-questionId="@Model.QuestionId" *@
-        @*    asp-route-returnUrl="@($"{Request.Path}{Request.QueryString}")"> *@
-        @*   Enter all the options into one text box *@
-        @* </a> *@
-
-        <div class="gtaa-add-edit-questions-page">
-          <form method="post"
-                class="inline-form">
-            <input name="returnUrl" type="hidden" value="@($"{Request.Path}{Request.QueryString}")"/>
-            <button type="submit" asp-page-handler="RedirectToBulkEntry" class="govuk-button govuk-button--link govuk-!-margin-left-4">
-              Enter all the options into one text box
-            </button>
-          </form>
-        </div>
-
+        
+          <input name="returnUrl" type="hidden" value="@($"{Request.Path}{Request.QueryString}")"/>
+          <button type="submit" asp-page-handler="RedirectToBulkEntry"
+                  class="govuk-button govuk-button--link govuk-!-margin-left-4">
+            Enter all the options into one text box
+        </button>
+        
       </div>
-
+      
       <button class="govuk-button govuk-!-margin-top-6"
               asp-page-handler="SaveAnswerOptions"
               type="submit"
@@ -92,10 +81,8 @@
               data-module="govuk-button"
               data-prevent-double-click="true"
               data-govuk-button-init="">
-
         Save answers
       </button>
     </form>
-
   </div>
 </div>

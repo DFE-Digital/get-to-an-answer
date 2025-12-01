@@ -32,8 +32,13 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
         if (existingOptionsFromTempData is string optionsJson)
         {
             Options = JsonConvert.DeserializeObject<List<AnswerOptionsViewModel>>(optionsJson) ?? [];
-            ReassignOptionNumbers();
-            return Page();
+
+            if (Options.Count != 0)
+            {
+                ReassignOptionNumbers();
+                await PopulateOptionSelectionLists();
+                return Page();
+            }
         }
 
         await PopulateFieldWithExistingValues();
@@ -117,7 +122,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
         }
 
         TempData["AnswersSnapshot"] = JsonConvert.SerializeObject(Options);
-        
+
         var targetUrl = Url.Page("/Answers/BulkAnswerOptions", null, new
         {
             questionnaireId = QuestionnaireId,
@@ -178,7 +183,25 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             Description = option.OptionHint
         });
     }
-    
+
+    private async Task PopulateOptionSelectionLists()
+    {
+        var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
+        var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
+
+        var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
+            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
+
+        var resultsPagesForSelection = resultsPages
+            .Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
+
+        foreach (var option in Options)
+        {
+            option.QuestionSelectList = questionSelectionList;
+            option.ResultsPageSelectList = resultsPagesForSelection;
+        }
+    }
+
     private async Task PopulateFieldWithExistingValues()
     {
         Options?.Clear();
@@ -202,7 +225,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
                 AnswerId = existingAnswer.Id,
                 QuestionSelectList = questionSelectionList,
                 AnswerDestination =
-                    MapAnswerDestination(existingAnswer.DestinationType, existingAnswer.DestinationQuestionId),
+                    MapAnswerDestination(existingAnswer.DestinationType),
                 OptionContent = existingAnswer.Content,
                 OptionHint = existingAnswer.Description,
                 ExternalLink = existingAnswer.DestinationUrl,
@@ -278,18 +301,17 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             Options[index].OptionNumber = index + 1;
         }
     }
-
-    private static AnswerDestination MapAnswerDestination(DestinationType? destinationType,
-        Guid? destinationQuestionId = null) =>
+    
+    private static AnswerDestination MapAnswerDestination(DestinationType? destinationType) =>
         destinationType switch
         {
-            DestinationType.Question when destinationQuestionId != null => AnswerDestination.SpecificQuestion,
             DestinationType.Question => AnswerDestination.NextQuestion,
             DestinationType.CustomContent => AnswerDestination.InternalResultsPage,
             DestinationType.ExternalLink => AnswerDestination.ExternalResultsPage,
+            null => AnswerDestination.NextQuestion,
             _ => throw new ArgumentOutOfRangeException(nameof(destinationType), destinationType, null)
         };
-
+    
     private static DestinationType MapDestination(AnswerDestination answerDestination) =>
         answerDestination switch
         {

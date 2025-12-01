@@ -46,32 +46,35 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                     ["questionId"] = ["The question must belong to the specified questionnaire."]
                 }));
 
-            var questionHasNextOne = await db.Questions
-                .AnyAsync(q => q.QuestionnaireId == request.QuestionnaireId
-                               && !q.IsDeleted
-                               && question != null
-                               && q.Order == question.Order + 1);
-
-            switch (request.DestinationType)
+            if (request.DestinationType != null)
             {
-                case DestinationType.Question when request.DestinationQuestionId == null && questionHasNextOne:
-                    return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
-                    {
-                        ["destinationQuestionId"] =
-                            ["The DestinationQuestionId field is required when DestinationType is Question."]
-                    }));
-                case DestinationType.ExternalLink when request.DestinationUrl == null:
-                    return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
-                    {
-                        ["destinationUrl"] =
-                            ["The DestinationUrl field is required when DestinationType is ExternalLink."]
-                    }));
-                case DestinationType.CustomContent when request.DestinationContentId == null:
-                    return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
-                    {
-                        ["destinationContentId"] =
-                            ["The DestinationContentId field is required when DestinationType is CustomContent."]
-                    }));
+                switch (request.DestinationType)
+                {
+                    case DestinationType.Question when request.DestinationQuestionId == null:
+                        return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
+                        {
+                            ["destinationQuestionId"] =
+                                ["The DestinationQuestionId field is required when DestinationType is Question."]
+                        }));
+                    case DestinationType.ExternalLink when request.DestinationUrl == null:
+                        return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
+                        {
+                            ["destinationUrl"] =
+                                ["The DestinationUrl field is required when DestinationType is ExternalLink."]
+                        }));
+                    case DestinationType.CustomContent when request.DestinationContentId == null:
+                        return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
+                        {
+                            ["destinationContentId"] =
+                                ["The DestinationContentId field is required when DestinationType is CustomContent."]
+                        }));
+                }
+            }
+            else
+            {
+                request.DestinationUrl = null;
+                request.DestinationQuestionId = null;
+                request.DestinationContentId = null;
             }
 
             if (request is { DestinationType: DestinationType.Question, DestinationQuestionId: not null })
