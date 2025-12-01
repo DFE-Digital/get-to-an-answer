@@ -23,15 +23,14 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     [BindProperty] public QuestionType QuestionType { get; set; }
 
     public List<AnswerSummaryViewModel> Answers { get; } = [];
-    
-    [BindProperty]
-    public string QuestionNumber { get; set; } = 1.ToString();
+
+    [BindProperty] public string QuestionNumber { get; set; } = 1.ToString();
 
     [TempData(Key = "QuestionSaved")] public bool QuestionSaved { get; set; }
 
     [TempData(Key = "CurrentQuestionHasNextOne")]
     public bool CurrentQuestionHasNextOne { get; set; }
-    
+
     [TempData(Key = "NextQuestionId")] public Guid? NextQuestionId { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
@@ -116,7 +115,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         await apiClient.DeleteQuestionAsync(QuestionId);
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
     }
-    
+
     public IActionResult OnPostAddAQuestion() => Redirect(string.Format(Routes.AddQuestion, QuestionnaireId));
 
     public string QuestionTypeFriendly(QuestionType type) =>
