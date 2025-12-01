@@ -17,7 +17,8 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
 
     [FromRoute(Name = "questionId")] public Guid QuestionId { get; set; }
 
-    public string QuestionNumber { get; set; } = "1";
+    [BindProperty]
+    public string? QuestionNumber { get; set; } = "1";
 
     // Bind a collection of options
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
@@ -29,15 +30,14 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId);
-
-        if (TempData.TryGetValue("QuestionType", out var rawValue)
-            && rawValue is int intVal
-            && Enum.IsDefined(typeof(QuestionType), intVal))
+        
+        var questionTypeValue = TempData.Peek("QuestionType");
+        if (questionTypeValue is int intVal && Enum.IsDefined(typeof(QuestionType), intVal))
         {
             RetrievedQuestionType = (QuestionType)intVal;
         }
 
-        await HydrateFields();
+        await HydrateOptionListsAsync();
         ReassignOptionNumbers();
 
         return Page();
@@ -51,7 +51,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         if (!ModelState.IsValid)
         {
             // RemoveGenericOptionErrors();
-            await HydrateFields();
+            await HydrateOptionListsAsync();
             return Page();
         }
 
@@ -62,7 +62,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             OptionNumber = OptionNumber
         });
 
-        await HydrateFields();
+        await HydrateOptionListsAsync();
         ReassignOptionNumbers();
 
         // Re-render page with the extra option
@@ -77,11 +77,11 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         if (!ModelState.IsValid)
         {
             // RemoveGenericOptionErrors();
-            await HydrateFields();
+            await HydrateOptionListsAsync();
             ReassignOptionNumbers();
             return Page();
         }
-
+        
         try
         {
             foreach (var option in Options)
@@ -112,11 +112,13 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         }
     }
 
-    private async Task HydrateFields()
+    private async Task HydrateOptionListsAsync()
     {
         var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
         var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
-
+        
+        QuestionNumber = questions.MaxBy(x => x.Order + 1)?.ToString();
+        
         var questionSelect = questions.Where(x => x.Id != QuestionId)
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
         var resultsSelect = resultsPages.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
@@ -173,29 +175,13 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
         }
     }
-
-    private void RemoveGenericOptionErrors()
-    {
-        foreach (var key in ModelState.Keys.ToList())
-        {
-            if (key.StartsWith("Options[", StringComparison.Ordinal) && ModelState.TryGetValue(key, out var entry))
-            {
-                var custom = entry.Errors.FirstOrDefault(e => e.ErrorMessage.Contains("Option "));
-                if (custom != null)
-                {
-                    entry.Errors.Clear();
-                    entry.Errors.Add(custom);
-                }
-            }
-        }
-    }
-
+    
     public async Task<IActionResult> OnPostRemoveOption(int index)
     {
         Options.RemoveAt(index);
         RemoveModelStateEntriesForOption(index);
 
-        await HydrateFields();
+        await HydrateOptionListsAsync();
         ReassignOptionNumbers();
         return Page();
     }

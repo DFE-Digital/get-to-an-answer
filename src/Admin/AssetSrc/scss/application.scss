@@ -891,6 +891,10 @@ $toc-width-tablet: 210px;
     margin: 0;
     padding: 0;
   }
+  .govuk-button.govuk-button--link {
+    box-shadow: none !important;
+  }
+  
   .govuk-button--link {
     background: none;
     border: none;

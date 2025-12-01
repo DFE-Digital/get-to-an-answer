@@ -20,6 +20,7 @@
 }
 
 
+<input asp-for="OptionNumber" type="hidden"/>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -38,8 +39,6 @@
     <h2 class="govuk-heading-m govuk-!-margin-top-6">Add answer options to your list</h2>
 
     <form method="post" accept-charset="UTF-8">
-      <input type="hidden" asp-for="RetrievedQuestionType"/>
-
       @for (var i = 0; i < Model.Options.Count; i++)
       {
         var viewData = new ViewDataDictionary(ViewData)
@@ -59,27 +58,30 @@
         </button>
       }
 
-      <div class="govuk-!-margin-top-3 govuk-!-display-flex govuk-!-gap-3 govuk-!-flex-wrap">
+      <div class="govuk-!-margin-top-3 govuk-!-display-flex govuk-!-gap-3 govuk-!-flex-wrap gtaa-add-edit-questions-page">
         <button class="govuk-button govuk-button--secondary"
                 type="submit"
                 asp-page-handler="AddOption">
           Add another option
         </button>
-        <a class="govuk-link govuk-!-margin-left-4" href="#">
-          Enter all the options into one text box
-        </a>
+        
+          <input name="returnUrl" type="hidden" value="@($"{Request.Path}{Request.QueryString}")"/>
+          <button type="submit" asp-page-handler="RedirectToBulkEntry"
+                  class="govuk-button govuk-button--link govuk-!-margin-left-4">
+            Enter all the options into one text box
+        </button>
+        
       </div>
-
+      
       <button class="govuk-button govuk-!-margin-top-6"
-              asp-page-handler="Continue"
+              asp-page-handler="SaveAnswerOptions"
               type="submit"
               formnovalidate="formnovalidate"
               data-module="govuk-button"
               data-prevent-double-click="true"
               data-govuk-button-init="">
-        Continue
+        Save answers
       </button>
     </form>
-
   </div>
 </div>
