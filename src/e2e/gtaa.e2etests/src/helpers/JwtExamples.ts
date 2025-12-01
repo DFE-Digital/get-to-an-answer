@@ -1,6 +1,6 @@
 import { JwtHelper, ClaimTypes, SimpleDate } from "./JwtHelper";
 
-function generateToken(): string {
+export function generateToken(): string {
     const claims: Record<string, unknown> = {
         [ClaimTypes.Subject]: 'test-subject',
         [ClaimTypes.Name]: 'Test User',

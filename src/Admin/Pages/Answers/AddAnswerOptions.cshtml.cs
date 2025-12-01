@@ -216,7 +216,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         }
     }
 
-    private static DestinationType? MapDestination(AnswerDestination answerDestination) =>
+    private static DestinationType? MapDestination(AnswerDestination? answerDestination) =>
         answerDestination switch
         {
             AnswerDestination.NextQuestion => null,

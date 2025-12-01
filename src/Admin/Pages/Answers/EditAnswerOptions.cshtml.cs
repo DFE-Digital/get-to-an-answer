@@ -130,6 +130,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             DestinationType.Question => AnswerDestination.NextQuestion,
             DestinationType.CustomContent => AnswerDestination.InternalResultsPage,
             DestinationType.ExternalLink => AnswerDestination.ExternalResultsPage,
+            null => AnswerDestination.NextQuestion,
             _ => throw new ArgumentOutOfRangeException(nameof(destinationType), destinationType, null)
         };
     

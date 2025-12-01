@@ -429,7 +429,11 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             await db.Contents.Where(q => q.QuestionnaireId == id)
                 .ExecuteUpdateAsync(s => s.SetProperty(b => b.IsDeleted, true));
             
-            return await UpdateQuestionnaireStatus(userId, id, EntityStatus.Deleted);
+            return await UpdateQuestionnaireStatus(userId, id, EntityStatus.Deleted, entity =>
+            {
+                // free up the unique slug for use by a new questionnaire
+                entity.Slug = entity.Id.ToString();
+            });
         }
         catch (Exception ex)
         {
@@ -688,7 +692,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         await db.SaveChangesAsync();
     }
     
-    private async Task<ServiceResult> UpdateQuestionnaireStatus(string userId, Guid id, EntityStatus status)
+    private async Task<ServiceResult> UpdateQuestionnaireStatus(string userId, Guid id, EntityStatus status, Action<QuestionnaireEntity>? preUpdateAction = null)
     {
         try
         {
@@ -716,6 +720,8 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             {
                 versionNumber = questionnaire.Version--;
             }
+            
+            preUpdateAction?.Invoke(questionnaire);
 
             questionnaire.UpdatedAt = DateTime.UtcNow;
             questionnaire.PublishedBy = userId;
