@@ -137,7 +137,7 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
     private static DestinationType MapDestination(AnswerDestination answerDestination) =>
         answerDestination switch
         {
-            AnswerDestination.NextQuestion => DestinationType.Question,
+            AnswerDestination.NextQuestion => DestinationType.Auto, // is stored as null in db
             AnswerDestination.SpecificQuestion => DestinationType.Question,
             AnswerDestination.InternalResultsPage => DestinationType.CustomContent,
             AnswerDestination.ExternalResultsPage => DestinationType.ExternalLink,

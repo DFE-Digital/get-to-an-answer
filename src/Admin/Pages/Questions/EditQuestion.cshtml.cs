@@ -77,7 +77,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
             await apiClient.UpdateQuestionAsync(QuestionId, new UpdateQuestionRequestDto
             {
                 Content = QuestionContent,
-                Description = QuestionHintText,
+                Description = QuestionHintText ?? string.Empty,
                 Type = QuestionType
             });
 

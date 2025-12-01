@@ -31,6 +31,7 @@ public class TrackQuestionnaires(IApiClient apiClient, ILogger<TrackQuestionnair
             TempData["QuestionnaireTitle"] = Questionnaire?.Title;
             TempData.Keep("QuestionnaireTitle");
             TempData["QuestionnaireSlug"] = Questionnaire?.Slug;
+            TempData.Keep("QuestionnaireSlug");
             TempData["CompletionTrackingMap"] = JsonConvert.SerializeObject(Questionnaire?.CompletionTrackingMap);
             TempData.Keep("CompletionTrackingMap");
             
