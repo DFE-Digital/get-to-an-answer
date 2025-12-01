@@ -24,9 +24,9 @@ public class EditQuestionnaireSlug(IApiClient apiClient, ILogger<EditQuestionnai
     
     public IActionResult OnGet()
     {
-        if (TempData.TryGetValue("QuestionnaireSlug", out var title))
+        if (TempData.Peek("QuestionnaireSlug") is string title)
         {
-            Slug = title?.ToString();
+            Slug = title;
         }
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
         return Page();
