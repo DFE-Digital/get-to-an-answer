@@ -20,15 +20,24 @@ public class ConfirmPublishQuestionnaire(IApiClient apiClient, IImageStorageClie
         if (PublishQuestionnaire)
         {
             var questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId);
-            
-            if (questionnaire?.DecorativeImage is not null) 
+
+            if (questionnaire?.DecorativeImage is not null)
             {
                 await imageStorageClient.DuplicateToAsync(
                     $"{QuestionnaireId}/latest", $"{QuestionnaireId}/published");
             }
 
-            await apiClient.PublishQuestionnaireAsync(QuestionnaireId);
-            
+            try
+            {
+                await apiClient.PublishQuestionnaireAsync(QuestionnaireId);
+            }
+            catch (GetToAnAnswerApiException ex)
+            {
+                TempData["ApiAction"] = "Publishing the questionnaire failed.";
+                TempData["ApiError"] = ex.ProblemDetails?.Detail;
+                return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
+            }
+
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustPublished = true });
         }
         

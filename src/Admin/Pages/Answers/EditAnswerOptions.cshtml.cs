@@ -5,12 +5,14 @@ using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 
 namespace Admin.Pages.Answers;
 
+[Authorize]
 public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient apiClient) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }

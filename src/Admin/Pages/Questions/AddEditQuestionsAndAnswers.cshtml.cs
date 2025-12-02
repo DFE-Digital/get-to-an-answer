@@ -57,7 +57,7 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
                 }
             }
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        catch (GetToAnAnswerApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
             logger.LogWarning("No questions found for Questionniare {QuestionniareId}", QuestionnaireId);
             return Page();
@@ -93,7 +93,7 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
             // PRG - redirect back to GET for the same questionnaire so refresh won't resubmit
             return RedirectToPage(new { questionnaireId });
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        catch (GetToAnAnswerApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
         {
             // Set an error message in TempData and redirect back (PRG)
             TempData["MoveError"] = "You cannot move this question further up";
@@ -115,7 +115,7 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
             // PRG - redirect back to GET for the same questionnaire so refresh won't resubmit
             return RedirectToPage(new { questionnaireId });
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        catch (GetToAnAnswerApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
         {
             // Set an error message in TempData and redirect back (PRG)
             TempData["MoveError"] = "You cannot move this question further down.";

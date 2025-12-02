@@ -47,7 +47,7 @@ public class EditQuestionnaireSlug(IApiClient apiClient, ILogger<EditQuestionnai
             {
                 await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, updateQuestionnaireRequest);
             }
-            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
+            catch (GetToAnAnswerApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
             {
                 ModelState.AddModelError(nameof(Slug), "A questionnaire with this slug already exists");
                 return Page();

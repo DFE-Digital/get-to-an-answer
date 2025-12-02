@@ -35,10 +35,17 @@
     <p class="govuk-body">
       People will be able to select one option from your list.
     </p>
-    <p class="govuk-body">
+    <div class="govuk-body gtaa-add-edit-questions-page">
       You can add your options individually below, or you can
-      <a class="govuk-link" href="#">enter all the options into one text box</a>.
-    </p>
+    
+      <form method="post" accept-charset="UTF-8">
+        <input name="returnUrl" type="hidden" value="@($"{Request.Path}{Request.QueryString}")"/>
+        <button type="submit" asp-page-handler="RedirectToBulkEntry"
+                class="govuk-button govuk-button--link govuk-!-margin-left-4">
+          enter all the options into one text box
+        </button>
+      </form>
+    </div>
 
     <h2 class="govuk-heading-m govuk-!-margin-top-6">Add answer options to your list</h2>
 
@@ -70,9 +77,13 @@
                 asp-page-handler="AddOption">
           Add another option
         </button>
-        <a class="govuk-link govuk-!-margin-left-4" href="#">
-          Enter all the options into one text box
-        </a>
+        
+          <input name="returnUrl" type="hidden" value="@($"{Request.Path}{Request.QueryString}")"/>
+          <button type="submit" asp-page-handler="RedirectToBulkEntry"
+                  class="govuk-button govuk-button--link govuk-!-margin-left-4">
+            Enter all the options into one text box
+        </button>
+        
       </div>
 
       <button class="govuk-button govuk-!-margin-top-6"
@@ -85,6 +96,5 @@
         Continue
       </button>
     </form>
-
   </div>
 </div>

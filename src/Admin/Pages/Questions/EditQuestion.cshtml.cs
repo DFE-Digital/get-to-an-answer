@@ -118,6 +118,13 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         return Page();
     }
 
+    public async Task <IActionResult> OnPostAnswerEditAsync()
+    {
+        await OnPostSaveQuestion();
+        
+        return Redirect(string.Format(Routes.EditAnswerOptions, QuestionnaireId, QuestionId));
+    }
+
     public IActionResult OnPostDeleteQuestion()
     {
         TempData["TitleOfQuestionToBeDeleted"] = QuestionContent;

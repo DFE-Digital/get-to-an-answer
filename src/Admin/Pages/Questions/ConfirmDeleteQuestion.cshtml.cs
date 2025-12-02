@@ -3,11 +3,13 @@ using Admin.Models;
 using Common.Client;
 using Common.Models;
 using Common.Models.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Admin.Pages.Questions;
 
+[Authorize]
 public class ConfirmDeleteQuestion(ILogger<ConfirmDeleteQuestion> logger, IApiClient apiClient) : BasePageModel
 {
     [FromRoute(Name = "questionId")] public Guid QuestionId { get; set; }
