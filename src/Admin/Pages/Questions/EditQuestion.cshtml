@@ -41,9 +41,10 @@
                     }
                     else
                     {
-                        <form>
-                            <button class="govuk-button govuk-button--start" type="button"
-                                    asp-page-handler="AddAQuestion">Add a
+                        <form method="post">
+                            <input type="hidden" name="QuestionnaireId" value="@Model.QuestionnaireId"/>
+                            <button class="govuk-button govuk-button--start" type="submit"
+                                    asp-page-handler="AddQuestion">Add a
                                 question
                             </button>
                         </form>
@@ -125,9 +126,12 @@
                 <div class="govuk-summary-card__title-wrapper">
                     <h2 class="govuk-summary-card__title">Answers</h2>
                     <ul class="govuk-summary-card__actions">
-                        <li class="govuk-summary-card__action">
-                            <a class="govuk-link"
-                               href="/admin/questionnaires/@Model?.QuestionnaireId/questions/@Model?.QuestionId/answers/edit">Edit</a>
+                        <li class="govuk-summary-card__action gtaa-add-edit-answer-table">
+                            <input type="hidden" name="QuestionNumber" value="@Model?.QuestionNumber"/>
+                            <input type="hidden" name="QuestionnaireId" value="@Model?.QuestionnaireId"/>
+                            <input type="hidden" name="QuestionId" value="@Model?.QuestionId"/>
+                            <button asp-page-handler="AnswerEdit" type="submit" class="govuk-link govuk-button--link" data-module="govuk-button"
+                                    data-prevent-double-click="true" data-govuk-button-init="">Edit</button>
                         </li>
                     </ul>
                 </div>

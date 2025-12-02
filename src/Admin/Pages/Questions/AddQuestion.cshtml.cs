@@ -39,7 +39,7 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
             if (existingQuestions.Count > 0)
                 QuestionNumber = (existingQuestions.Max(q => q.Order) + 1).ToString();
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        catch (GetToAnAnswerApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
             return Page();
         }

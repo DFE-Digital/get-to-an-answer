@@ -112,26 +112,27 @@
     </section>
 }
 
-@if (ViewData["ApiError"] is string apiError)
-{
-    <div class="govuk-notification-banner govuk-notification-banner--warning" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
-        <div class="govuk-notification-banner__header">
-            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
-                Error
-            </h2>
-        </div>
-        <div class="govuk-notification-banner__content">
-            <p class="govuk-notification-banner__heading">
-                @apiError
-            </p>
-        </div>
-    </div>
-}
+
 
 @await RenderSectionAsync("BeforeContainer", required: false)
 <div class="govuk-width-container @ViewBag.ContainerClasses" id="main-content-container">
     @await RenderSectionAsync("BeforeContent", required: false)
     <main class="govuk-main-wrapper @ViewBag.MainClasses" id="main-content" role="main" lang="@ViewBag.MainLang">
+        @if (Model.GtaaApiErrorMessage != null)
+        {
+            <div class="govuk-notification-banner govuk-notification-banner--warning" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                        Error: @Model.GtaaApiAction
+                    </h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-notification-banner__heading">
+                        @Model.GtaaApiErrorMessage
+                    </p>
+                </div>
+            </div>
+        }
         @RenderBody()
     </main>
 </div>

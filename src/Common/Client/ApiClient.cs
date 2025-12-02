@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -369,9 +370,9 @@ public class ApiClient : IApiClient
             _logger.LogError(problemDetails?.Detail);
 
             // Throw a custom exception or return an alternative response.
-            throw new HttpRequestException(
+            throw new GetToAnAnswerApiException(
                 $"API request failed with status code {response.StatusCode} and message: {problemDetails?.Detail}", 
-                null, response.StatusCode);
+                problemDetails, response.StatusCode);
         }
         catch (Exception)
         {
@@ -379,4 +380,21 @@ public class ApiClient : IApiClient
             throw;
         }
     }
+}
+
+public class GetToAnAnswerApiException : Exception
+{
+    public GetToAnAnswerApiException(string? message, ProblemDetails? problemDetails, HttpStatusCode? statusCode)
+        : base(message, null)
+    {
+        StatusCode = statusCode;
+        ProblemDetails = problemDetails;
+    }
+    
+    /// <value>
+    /// An HTTP status code if the exception represents a non-successful result, otherwise <c>null</c>.
+    /// </value>
+    public HttpStatusCode? StatusCode { get; }
+    
+    public ProblemDetails? ProblemDetails { get; }
 }
