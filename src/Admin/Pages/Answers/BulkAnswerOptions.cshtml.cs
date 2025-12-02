@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace Admin.Pages.Answers;
 
-public partial class BulkAnswerOptions(ILogger<AddAnswerOptions> logger) : BasePageModel
+public partial class BulkAnswerOptions(ILogger<BulkAnswerOptions> logger) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
 

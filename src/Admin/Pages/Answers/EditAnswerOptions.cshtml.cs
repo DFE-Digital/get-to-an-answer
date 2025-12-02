@@ -5,23 +5,18 @@ using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 
 namespace Admin.Pages.Answers;
 
-public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient apiClient) : BasePageModel
+[Authorize]
+public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IApiClient apiClient) : 
+    AnswerOptionsPageModel(apiClient)
 {
-    [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
-
-    [FromRoute(Name = "questionId")] public Guid QuestionId { get; set; }
-
-    [BindProperty] public string? QuestionNumber { get; set; } = "1";
-
-    [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
-
-    [BindProperty] public int OptionNumber { get; set; }
+    private readonly IApiClient _apiClient = apiClient;
 
     public async Task<IActionResult> OnGet()
     {
@@ -81,28 +76,6 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
         return Redirect(string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId));
     }
 
-    public async Task<IActionResult> OnPostRedirectToBulkEntry(string? returnUrl)
-    {
-        ValidateSelectedQuestionsIfAny();
-
-        if (!ModelState.IsValid)
-        {
-            await EnsureSelectListsForOptions();
-            return Page();
-        }
-
-        TempData["AnswersSnapshot"] = JsonConvert.SerializeObject(Options);
-
-        var targetUrl = Url.Page("/Answers/BulkAnswerOptions", null, new
-        {
-            questionnaireId = QuestionnaireId,
-            questionId = QuestionId,
-            returnUrl
-        });
-
-        return Redirect(targetUrl ?? string.Empty);
-    }
-
     private void RemoveModelStateEntriesForOption(int index)
     {
         var prefixBracket = $"Options[{index}]";
@@ -119,45 +92,10 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
         }
     }
 
-    private async Task CreateAnswer(AnswerOptionsViewModel option)
-    {
-        await apiClient.CreateAnswerAsync(new CreateAnswerRequestDto
-        {
-            QuestionnaireId = QuestionnaireId,
-            QuestionId = QuestionId,
-            Content = option.OptionContent,
-            Description = option.OptionHint,
-            DestinationType = MapDestination(option.AnswerDestination),
-            DestinationQuestionId = option.SelectedDestinationQuestion != null
-                ? Guid.Parse(option.SelectedDestinationQuestion)
-                : null,
-            DestinationUrl = option.ResultPageUrl,
-            Priority = Convert.ToSingle(option.RankPriority),
-        });
-    }
-
-    private async Task UpdateAnswer(AnswerOptionsViewModel option)
-    {
-        await apiClient.UpdateAnswerAsync(option.AnswerId, new UpdateAnswerRequestDto
-        {
-            Content = option.OptionContent,
-            DestinationType = MapDestination(option.AnswerDestination),
-            DestinationQuestionId = option.SelectedDestinationQuestion != null
-                ? Guid.Parse(option.SelectedDestinationQuestion)
-                : null,
-            DestinationUrl = option.ResultPageUrl,
-            Priority = Convert.ToSingle(option.RankPriority),
-            DestinationContentId = option.SelectedResultsPage != null
-                ? Guid.Parse(option.SelectedResultsPage)
-                : null,
-            Description = option.OptionHint
-        });
-    }
-
     private async Task PopulateOptionSelectionLists()
     {
-        var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
-        var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
+        var questionForSelection = await _apiClient.GetQuestionsAsync(QuestionnaireId);
+        var resultsPages = await _apiClient.GetContentsAsync(QuestionnaireId);
 
         var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
@@ -176,9 +114,9 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
     {
         Options?.Clear();
 
-        var existingAnswers = await apiClient.GetAnswersAsync(QuestionId);
-        var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
-        var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
+        var existingAnswers = await _apiClient.GetAnswersAsync(QuestionId);
+        var questionForSelection = await _apiClient.GetQuestionsAsync(QuestionnaireId);
+        var resultsPages = await _apiClient.GetContentsAsync(QuestionnaireId);
 
         var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
@@ -209,68 +147,6 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             });
         }
     }
-
-    private async Task EnsureSelectListsForOptions()
-    {
-        var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
-        var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
-
-        var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
-            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
-
-        var resultsPagesForSelection = resultsPages
-            .Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
-
-        foreach (var option in Options)
-        {
-            option.QuestionSelectList = questionSelectionList;
-            option.ResultsPageSelectList = resultsPagesForSelection;
-        }
-    }
-
-    private void ValidateSelectedQuestionsIfAny()
-    {
-        var optionsWithSpecificQuestionNoSelection =
-            Options.Where(x =>
-                x.AnswerDestination == AnswerDestination.SpecificQuestion &&
-                string.IsNullOrEmpty(x.SelectedDestinationQuestion));
-
-        foreach (var specificQuestion in optionsWithSpecificQuestionNoSelection)
-        {
-            var index = specificQuestion.OptionNumber - 1;
-            var errorMessage = $"Please select a question for option {specificQuestion.OptionNumber}";
-
-            var destinationKey = $"Options-{index}-AnswerDestination";
-            var specificQuestionRadioInputId = $"Options-{index}-destination-specific";
-
-            ModelState.AddModelError(destinationKey, string.Empty);
-            ModelState.AddModelError(specificQuestionRadioInputId, errorMessage);
-        }
-
-        var optionsWithResultsPageNoSelection = Options.Where(o =>
-            o.AnswerDestination == AnswerDestination.InternalResultsPage &&
-            string.IsNullOrEmpty(o.SelectedResultsPage));
-
-        foreach (var resultsPage in optionsWithResultsPageNoSelection)
-        {
-            var index = resultsPage.OptionNumber - 1;
-            var errorMessage = $"Please select a results page for option {resultsPage.OptionNumber}";
-
-            var selectKey = $"Options[{index}].SelectedResultsPage";
-            var resultsPageRadioInputId = $"Options-{index}-destination-internal";
-
-            ModelState.AddModelError(selectKey, string.Empty);
-            ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
-        }
-    }
-
-    private void ReassignOptionNumbers()
-    {
-        for (var index = 0; index < Options.Count; index++)
-        {
-            Options[index].OptionNumber = index + 1;
-        }
-    }
     
     private static AnswerDestination MapAnswerDestination(DestinationType? destinationType) =>
         destinationType switch
@@ -282,13 +158,5 @@ public class EditAnswerOptions(ILogger<EditAnswerOptions> logger, IApiClient api
             _ => throw new ArgumentOutOfRangeException(nameof(destinationType), destinationType, null)
         };
     
-    private static DestinationType MapDestination(AnswerDestination answerDestination) =>
-        answerDestination switch
-        {
-            AnswerDestination.NextQuestion => DestinationType.Auto, // is stored as null in db
-            AnswerDestination.SpecificQuestion => DestinationType.Question,
-            AnswerDestination.InternalResultsPage => DestinationType.CustomContent,
-            AnswerDestination.ExternalResultsPage => DestinationType.ExternalLink,
-            _ => throw new ArgumentOutOfRangeException(nameof(answerDestination), answerDestination, null)
-        };
+    
 }

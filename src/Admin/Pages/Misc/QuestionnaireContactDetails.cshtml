@@ -47,24 +47,50 @@
       </p>
 
       <div class="govuk-form-group">
-        <fieldset class="govuk-fieldset" aria-describedby="forms-contact-details-input-contact-details-supplied-hint"><legend class="govuk-fieldset__legend govuk-fieldset__legend--m">How can people get help with filling in this form?</legend>
-          <div class="govuk-hint" id="forms-contact-details-input-contact-details-supplied-hint">Select at least one option</div><input value="" name="forms_contact_details_input[contact_details_supplied][]" autocomplete="off" type="hidden" id="forms_contact_details_input_contact_details_supplied">
+        <fieldset class="govuk-fieldset" aria-describedby="forms-contact-details-input-contact-details-supplied-hint">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">How can people get help with filling in this form?</legend>
+          <div class="govuk-hint" id="forms-contact-details-input-contact-details-supplied-hint">Select at least one option</div>
+          <input value="" name="forms_contact_details_input[contact_details_supplied][]" autocomplete="off" type="hidden" id="forms_contact_details_input_contact_details_supplied">
           <div class="govuk-checkboxes" data-module="govuk-checkboxes" data-govuk-checkboxes-init="">
-            <div class="govuk-checkboxes__item"><input id="forms-contact-details-input-contact-details-supplied-supply-email-field" class="govuk-checkboxes__input" type="checkbox" value="supply_email" name="forms_contact_details_input[contact_details_supplied][]" aria-controls="forms-contact-details-input-contact-details-supplied-supply-email-conditional" aria-expanded="true" data-gtm-form-interact-field-id="0"><label for="forms-contact-details-input-contact-details-supplied-supply-email-field" class="govuk-label govuk-checkboxes__label">Email</label></div>
+            <div class="govuk-checkboxes__item">
+              <input id="forms-contact-details-input-contact-details-supplied-supply-email-field"
+                     class="govuk-checkboxes__input" type="checkbox" value="supply_email"
+                     name="forms_contact_details_input[contact_details_supplied][]"
+                     aria-controls="forms-contact-details-input-contact-details-supplied-supply-email-conditional" aria-expanded="true" data-gtm-form-interact-field-id="0">
+              <label for="forms-contact-details-input-contact-details-supplied-supply-email-field"
+                     class="govuk-label govuk-checkboxes__label">Email</label>
+            </div>
             <div class="govuk-checkboxes__conditional" id="forms-contact-details-input-contact-details-supplied-supply-email-conditional">
-              <div class="govuk-form-group"><label for="forms-contact-details-input-email-field" class="govuk-label">Enter the email address</label><input id="forms-contact-details-input-email-field" class="govuk-input" type="text" name="forms_contact_details_input[email]"></div>
+              <div class="govuk-form-group">
+                <label for="forms-contact-details-input-email-field" class="govuk-label">Enter the email address</label>
+                <input id="forms-contact-details-input-email-field" class="govuk-input" type="text" name="forms_contact_details_input[email]">
+              </div>
             </div>
-            <div class="govuk-checkboxes__item"><input id="forms-contact-details-input-contact-details-supplied-supply-phone-field" class="govuk-checkboxes__input" type="checkbox" value="supply_phone" name="forms_contact_details_input[contact_details_supplied][]" aria-controls="forms-contact-details-input-contact-details-supplied-supply-phone-conditional" aria-expanded="true" data-gtm-form-interact-field-id="1"><label for="forms-contact-details-input-contact-details-supplied-supply-phone-field" class="govuk-label govuk-checkboxes__label">Phone</label></div>
+            <div class="govuk-checkboxes__item">
+              <input id="forms-contact-details-input-contact-details-supplied-supply-phone-field" class="govuk-checkboxes__input" type="checkbox" value="supply_phone" name="forms_contact_details_input[contact_details_supplied][]" aria-controls="forms-contact-details-input-contact-details-supplied-supply-phone-conditional" aria-expanded="true" data-gtm-form-interact-field-id="1">
+              <label for="forms-contact-details-input-contact-details-supplied-supply-phone-field" class="govuk-label govuk-checkboxes__label">Phone</label>
+            </div>
             <div class="govuk-checkboxes__conditional" id="forms-contact-details-input-contact-details-supplied-supply-phone-conditional">
-              <div class="govuk-form-group"><label for="forms-contact-details-input-phone-field" class="govuk-label">Enter the phone number and its opening times</label><textarea id="forms-contact-details-input-phone-field" class="govuk-textarea" rows="5" name="forms_contact_details_input[phone]"></textarea></div>
+              <div class="govuk-form-group">
+                <label for="forms-contact-details-input-phone-field" class="govuk-label">Enter the phone number and its opening times</label><textarea id="forms-contact-details-input-phone-field" class="govuk-textarea" rows="5" name="forms_contact_details_input[phone]"></textarea>
+              </div>
             </div>
-            <div class="govuk-checkboxes__item"><input id="forms-contact-details-input-contact-details-supplied-supply-link-field" class="govuk-checkboxes__input" type="checkbox" value="supply_link" name="forms_contact_details_input[contact_details_supplied][]" aria-controls="forms-contact-details-input-contact-details-supplied-supply-link-conditional" aria-expanded="true" data-gtm-form-interact-field-id="2"><label for="forms-contact-details-input-contact-details-supplied-supply-link-field" class="govuk-label govuk-checkboxes__label">Online contact link</label></div>
+            <div class="govuk-checkboxes__item">
+              <input id="forms-contact-details-input-contact-details-supplied-supply-link-field" class="govuk-checkboxes__input" type="checkbox" value="supply_link" name="forms_contact_details_input[contact_details_supplied][]" aria-controls="forms-contact-details-input-contact-details-supplied-supply-link-conditional" aria-expanded="true" data-gtm-form-interact-field-id="2">
+              <label for="forms-contact-details-input-contact-details-supplied-supply-link-field" class="govuk-label govuk-checkboxes__label">Online contact link</label>
+            </div>
             <div class="govuk-checkboxes__conditional" id="forms-contact-details-input-contact-details-supplied-supply-link-conditional">
-              <div class="govuk-form-group"><label for="forms-contact-details-input-link-href-field" class="govuk-label">Enter the link</label>
-                <div class="govuk-hint" id="forms-contact-details-input-link-href-hint">For example, https://gov.uk/contact-form</div><input id="forms-contact-details-input-link-href-field" class="govuk-input" aria-describedby="forms-contact-details-input-link-href-hint" type="text" name="forms_contact_details_input[link_href]"></div>
+              <div class="govuk-form-group">
+                <label for="forms-contact-details-input-link-href-field" class="govuk-label">Enter the link</label>
+                <div class="govuk-hint" id="forms-contact-details-input-link-href-hint">For example, https://gov.uk/contact-form</div><input id="forms-contact-details-input-link-href-field" class="govuk-input" aria-describedby="forms-contact-details-input-link-href-hint" type="text" name="forms_contact_details_input[link_href]">
+              </div>
               <div class="govuk-form-group"><label for="forms-contact-details-input-link-text-field" class="govuk-label">What text should be used to describe this link?</label>
                 <div class="govuk-hint" id="forms-contact-details-input-link-text-hint">For example, ‘Online contact form’</div><input id="forms-contact-details-input-link-text-field" class="govuk-input" aria-describedby="forms-contact-details-input-link-text-hint" type="text" name="forms_contact_details_input[link_text]"></div>
-            </div></div></fieldset></div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
       <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
-    </form>  </div>
+    </form>
+  </div>
 </div>

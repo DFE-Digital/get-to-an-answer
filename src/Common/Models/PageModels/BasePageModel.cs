@@ -38,6 +38,30 @@ public class BasePageModel : PageModel
         } 
     }
     
+    public string? GtaaApiAction { 
+        get
+        {
+            if (TempData["ApiAction"] is string apiAction)
+            {
+                return apiAction;
+            }
+
+            return null;
+        } 
+    }
+
+    public string? GtaaApiErrorMessage { 
+        get
+        {
+            if (TempData["ApiError"] is string apiErrorMessage)
+            {
+                return apiErrorMessage;
+            }
+
+            return null;
+        } 
+    }
+    
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context,
         PageHandlerExecutionDelegate next)
     {

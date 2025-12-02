@@ -11,22 +11,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Admin.Pages.Answers;
 
 [Authorize]
-public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiClient) : BasePageModel
+public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApiClient apiClient) : 
+    AnswerOptionsPageModel(apiClient)
 {
-    [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
-
-    [FromRoute(Name = "questionId")] public Guid QuestionId { get; set; }
-
-    [BindProperty]
-    public string? QuestionNumber { get; set; } = "1";
-
-    // Bind a collection of options
-    [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
-
-    [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
-
-    [BindProperty] public QuestionType? RetrievedQuestionType { get; set; }
-
+    private readonly IApiClient _apiClient = apiClient;
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId);
@@ -40,32 +28,6 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         await HydrateOptionListsAsync();
         ReassignOptionNumbers();
 
-        return Page();
-    }
-
-    // Handler for clicking "Add another option"
-    public async Task<IActionResult> OnPostAddOption()
-    {
-        ValidateSelectedQuestionsIfAny();
-
-        if (!ModelState.IsValid)
-        {
-            // RemoveGenericOptionErrors();
-            await HydrateOptionListsAsync();
-            return Page();
-        }
-
-        OptionNumber++;
-
-        Options.Add(new AnswerOptionsViewModel
-        {
-            OptionNumber = OptionNumber
-        });
-
-        await HydrateOptionListsAsync();
-        ReassignOptionNumbers();
-
-        // Re-render page with the extra option
         return Page();
     }
 
@@ -86,7 +48,7 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
         {
             foreach (var option in Options)
             {
-                await apiClient.CreateAnswerAsync(new CreateAnswerRequestDto
+                await _apiClient.CreateAnswerAsync(new CreateAnswerRequestDto
                 {
                     QuestionnaireId = QuestionnaireId,
                     QuestionId = QuestionId,
@@ -109,69 +71,6 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
                 "Error creating answer options for questionnaire {QuestionnaireId}, question {QuestionId}",
                 QuestionnaireId, QuestionId);
             return RedirectToErrorPage();
-        }
-    }
-
-    private async Task HydrateOptionListsAsync()
-    {
-        var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
-        var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
-        
-        QuestionNumber = questions.Max(x => x.Order.ToString());
-        
-        var questionSelect = questions.Where(x => x.Id != QuestionId)
-            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
-        var resultsSelect = resultsPages.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
-
-        foreach (var option in Options)
-        {
-            option.QuestionType = RetrievedQuestionType;
-            option.QuestionSelectList = questionSelect;
-            option.ResultsPageSelectList = resultsSelect;
-        }
-    }
-
-    private void ReassignOptionNumbers()
-    {
-        for (var index = 0; index < Options.Count; index++)
-        {
-            Options[index].OptionNumber = index + 1;
-        }
-    }
-
-    private void ValidateSelectedQuestionsIfAny()
-    {
-        var optionsWithSpecificQuestionNoSelection =
-            Options.Where(x =>
-                x.AnswerDestination == AnswerDestination.SpecificQuestion &&
-                string.IsNullOrEmpty(x.SelectedDestinationQuestion));
-
-        foreach (var specificQuestion in optionsWithSpecificQuestionNoSelection)
-        {
-            var index = specificQuestion.OptionNumber - 1;
-            var errorMessage = $"Please select a question for option {specificQuestion.OptionNumber}";
-
-            var destinationKey = $"Options-{index}-AnswerDestination";
-            var specificQuestionRadioInputId = $"Options-{index}-destination-specific";
-
-            ModelState.AddModelError(destinationKey, string.Empty);
-            ModelState.AddModelError(specificQuestionRadioInputId, errorMessage);
-        }
-
-        var optionsWithResultsPageNoSelection = Options.Where(o =>
-            o.AnswerDestination == AnswerDestination.InternalResultsPage &&
-            string.IsNullOrEmpty(o.SelectedResultsPage));
-
-        foreach (var resultsPage in optionsWithResultsPageNoSelection)
-        {
-            var index = resultsPage.OptionNumber - 1;
-            var errorMessage = $"Please select a results page for option {resultsPage.OptionNumber}";
-
-            var selectKey = $"Options[{index}].SelectedResultsPage";
-            var resultsPageRadioInputId = $"Options-{index}-destination-internal";
-
-            ModelState.AddModelError(selectKey, string.Empty);
-            ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
         }
     }
     
@@ -200,14 +99,4 @@ public class AddAnswerOptions(ILogger<AddAnswerOptions> logger, IApiClient apiCl
             ModelState.Remove(key);
         }
     }
-
-    private static DestinationType? MapDestination(AnswerDestination? answerDestination) =>
-        answerDestination switch
-        {
-            AnswerDestination.NextQuestion => null,
-            AnswerDestination.SpecificQuestion => DestinationType.Question,
-            AnswerDestination.InternalResultsPage => DestinationType.CustomContent,
-            AnswerDestination.ExternalResultsPage => DestinationType.ExternalLink,
-            _ => throw new ArgumentOutOfRangeException(nameof(answerDestination), answerDestination, null)
-        };
 }
