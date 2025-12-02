@@ -186,6 +186,7 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
             Id = entity.Id,
             Title = entity.Title,
             Content = entity.Content,
+            ReferenceName = entity.ReferenceName,
             QuestionnaireId = entity.QuestionnaireId,
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,
