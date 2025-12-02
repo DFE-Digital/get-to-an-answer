@@ -40,9 +40,37 @@
       </dd>
     </dl>
     <div class="app-task-list">
-      <h2 class="govuk-heading-m">
-        Edit your questionnaire
-      </h2>
+      <h2 class="govuk-heading-m">Manage questionnaire</h2>
+      <ul class="govuk-task-list">
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            <a class="govuk-link govuk-task-list__link" aria-describedby="optional-task-1-status" href="/admin/questionnaires/@questionnaire?.Id/contributors">
+              View and change who has access
+            </a>
+          </div>
+        </li>
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/clone">Clone this questionnaire</a>
+          </div>
+        </li>
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            @if (questionnaire?.Version > 1)
+            {
+              <a class="govuk-link gi" href="/admin/questionnaires/@questionnaire?.Id/version-history">View questionnaire versions</a>
+            }
+            else
+            {
+              <span>View questionnaire versions</span>
+            }
+          </div>
+          <div class="govuk-task-list__status">
+            Cannot view until published
+          </div>
+        </li>
+      </ul>
+      <h2 class="govuk-heading-m">Edit your questionnaire</h2>
       <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" aria-describedby="edit-your-questionnaire-name-status" href="/admin/questionnaires/@questionnaire?.Id/edit-name">Edit the name of your questionnaire</a></div>
@@ -67,18 +95,15 @@
             <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" 
                href="/admin/questionnaires/@questionnaire?.Id/contents">Add and edit end results</a>
           </div>
-          <div class="govuk-task-list__status" id="create-your-questionnaire-1-status">
+          <div class="govuk-task-list__status">
             <strong class="govuk-tag govuk-tag--grey">Optional</strong>
           </div>
         </li>
-      </ul>
-      <h3 class="govuk-heading-s">Customise look and feel</h3>
-      <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status" href="/admin/questionnaires/@questionnaire?.Id/look-and-feel">Edit look and feel of your questionnaire</a>
           </div>
-          <div class="govuk-task-list__status" id="create-your-questionnaire-1-status"><strong class="govuk-tag govuk-tag--grey">Optional</strong></div>
+          <div class="govuk-task-list__status"><strong class="govuk-tag govuk-tag--grey">Optional</strong></div>
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
@@ -86,61 +111,23 @@
           </div>
           <div class="govuk-task-list__status" id="create-your-questionnaire-1-status"><strong class="govuk-tag govuk-tag--grey">Optional</strong></div>
         </li>
-      </ul>
-      <h3 class="govuk-heading-s">Add contact details</h3>
-      <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="provide-privacy-and-contact-details-2-status" href="/forms/262709/contact-details">Provide contact details for support</a>
+            <a class="govuk-link govuk-task-list__link" aria-describedby="provide-privacy-and-contact-details-2-status" href="/admin/questionnaires/@questionnaire?.Id/contact-details/edit">Provide contact details for support</a>
           </div>
           <div class="govuk-task-list__status" id="provide-privacy-and-contact-details-2-status">
             <strong class="govuk-tag govuk-tag--grey">Optional</strong>
           </div>
         </li>
       </ul>
-      <h2 class="govuk-heading-m">
-        Check and review
-      </h2>
+      <h2 class="govuk-heading-m">Prepare to publish questionnaire</h2>
       <ul class="govuk-task-list">
-        <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" href="/admin/questionnaires/@questionnaire?.Id/start-preview" 
-               target="_blank">Preview this questionnaire (opens in new tab)</a>
-          </div>
-        </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/branching-map" target="_blank" 
                rel="noopener">View branching map (opens in new tab)</a>
           </div>
         </li>
-        <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/version-history">View questionnaire versions</a>
-          </div>
-        </li>
-      </ul>
-      <h2 class="govuk-heading-m">
-        Manage questionnaire
-      </h2>
-      <ul class="govuk-task-list">
-        <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="optional-task-1-status" href="/admin/questionnaires/@questionnaire?.Id/contributors">
-              View and change who has access
-            </a>
-          </div>
-        </li>
-        <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/clone">Clone this questionnaire</a>
-          </div>
-        </li>
-      </ul>
-      <h2 class="govuk-heading-m">
-        Set up questionnaire on your service
-      </h2>
-      <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link" aria-describedby="edit-slug-status" href="/admin/questionnaires/@questionnaire?.Id/edit-slug">Edit the slug of your questionnaire</a>
@@ -150,6 +137,12 @@
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/deployment" target="_blank">Set up questionnaire on your service</a>
+          </div>
+        </li>
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            <a class="govuk-link govuk-task-list__link" href="/admin/questionnaires/@questionnaire?.Id/start-preview" 
+               target="_blank">Preview this questionnaire (opens in new tab)</a>
           </div>
         </li>
       </ul>

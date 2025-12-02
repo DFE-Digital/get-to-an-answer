@@ -15,7 +15,6 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 {
     [BindProperty] public required GetNextStateRequest NextStateRequest { get; set; }
     [BindProperty] public required bool IsEmbedded { get; set; }
-    [BindProperty] public bool IsRedirectConfirmation { get; set; } = false;
     [BindProperty] public required QuestionnaireInfoDto Questionnaire { get; set; }
     [BindProperty] public required DestinationDto Destination { get; set; }
     
@@ -49,57 +48,12 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
     }
 
     public async Task<IActionResult> OnPost( 
-        [FromForm(Name = "Priorities")] Dictionary<Guid, float> priorities, 
-        [FromForm(Name = "ConfirmRedirect")] bool confirmRedirect)
+        [FromForm(Name = "Priorities")] Dictionary<Guid, float> priorities)
     {
         try
         {
             if (QuestionnaireSlug == null)
                 return NotFound();
-
-            if (IsRedirectConfirmation)
-            {
-                IsRedirectConfirmation = false;
-                
-                ModelState.Clear();
-
-                if (StateCacheString == null)
-                {
-                    return NotFound();
-                }
-                
-                var stateCache = JsonSerializer.Deserialize<StateCache>(Convert.FromBase64String(StateCacheString));
-                
-                if (confirmRedirect)
-                {
-                    var nextDestination = stateCache?.NextDestination;
-                    
-                    if (nextDestination is null)
-                    {
-                        return NotFound();
-                    }
-                    
-                    IsEmbedded = Embed;
-                    Destination = nextDestination;
-                    NextStateRequest = new GetNextStateRequest();
-                    Questionnaire = JsonSerializer.Deserialize<QuestionnaireInfoDto>(TempData["Questionnaire"]?.ToString() ?? "{}")!;
-
-                    if (!Embed)
-                    {
-                        if (Destination is { Type: DestinationType.ExternalLink, Content: not null })
-                        {
-                            return Redirect(Destination.Content);
-                        }
-                    }
-                }
-                else
-                {
-                    Questionnaire = stateCache?.Questionnaire!;
-                    Destination = stateCache?.CurrDestination!;
-                }
-
-                return Page();
-            }
             
             if (!ModelState.IsValid)
             {
@@ -117,21 +71,9 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             if (destination == null)
                 return NotFound();
 
-            if (destination is { Type: DestinationType.ExternalLink, Content: not null } ||
-                destination is { Type: DestinationType.CustomContent, Title: not null, Content: not null })
+            if (!Embed && destination is { Type: DestinationType.ExternalLink, Content: not null })
             {
-                IsRedirectConfirmation = true;
-                
-                StateCacheString = Convert.ToBase64String(JsonSerializer.SerializeToUtf8Bytes(new StateCache
-                {
-                    Questionnaire = Questionnaire,
-                    CurrDestination = Destination,
-                    NextDestination = destination
-                }));
-                
-                IsEmbedded = Embed;
-                    
-                return Page();
+                return Redirect(destination.Content);
             }
 
             IsEmbedded = Embed;

@@ -14,7 +14,7 @@
 
 @section BeforeContent
 {
-    <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back to create your questionnaire</a>
+    <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
 }
 
 @if (Model!.HasErrors())
@@ -50,13 +50,15 @@
         <div class="govuk-grid-row gtaa-add-edit-questions">
             <div class="govuk-grid-column-full">
 
-                <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-                <h1 class="govuk-heading-l">Add and edit your questions</h1>
-
-                @*TODO: add status here *@
-                <p class="govuk-body">
-                    <strong class="govuk-tag" data-status="@Model.Status">@Model.Status</strong>
-                </p>
+                <h1 class="govuk-heading-l">
+                    <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
+                    Add and edit your questions
+                </h1>
+                <dl class="govuk-!-margin-bottom-7">
+                    <dt class="govuk-visually-hidden">Status</dt>
+                    <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
+                    </dd>
+                </dl>
 
                 <div class="govuk-button-group">
                     <a class="govuk-button" data-module="govuk-button"

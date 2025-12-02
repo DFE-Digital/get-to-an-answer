@@ -15,29 +15,15 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
     : BasePageModel
 {
     [FromRoute] public Guid QuestionnaireId { get; set; }
-    
-    public string? QuestionnaireTitle { get; set; } 
 
     [BindProperty] public List<QuestionDto> Questions { get; set; } = [];
     
     [BindProperty]
     public bool FinishedEditing { get; set; }
     
-    public EntityStatus Status { get; set; } = EntityStatus.Draft;
-    
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
-
-        if (TempData.Peek("QuestionnaireStatus") is int status)
-        {
-            Status = (EntityStatus) status;
-        }
-            
-        if (TempData.Peek("QuestionnaireTitle") is string title)
-        {
-            QuestionnaireTitle = title;
-        }
 
         try
         {

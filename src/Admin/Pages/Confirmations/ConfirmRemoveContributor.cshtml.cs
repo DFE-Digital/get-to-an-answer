@@ -13,8 +13,6 @@ public class ConfirmRemoveContributor(IApiClient apiClient) : QuestionnairesPage
     [FromRoute(Name = "questionnaireId")]
     public Guid QuestionnaireId { get; set; }
     
-    public string? QuestionnaireTitle { get; set; } = string.Empty;
-    
     [FromRoute(Name = "contentId")]
     public Guid ContributorId { get; set; }
     
@@ -24,7 +22,6 @@ public class ConfirmRemoveContributor(IApiClient apiClient) : QuestionnairesPage
 
     public void OnGet()
     {
-        QuestionnaireTitle = TempData.Peek("QuestionnaireTitle") as string;
         ContributorEmail = TempData.Peek("ContributorEmail") as string;
     }
     

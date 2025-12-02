@@ -16,9 +16,6 @@ public class AddContributor(ILogger<AddContributor> logger,
     IApiClient apiClient, IMsGraphClient graphClient) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
-    
-    public string? QuestionnaireTitle { get; set; } = string.Empty;
-
     [BindProperty] 
     [Required(ErrorMessage = "Enter a contributor email")]
     public string ContributorEmail { get; set; } = "";
@@ -26,7 +23,6 @@ public class AddContributor(ILogger<AddContributor> logger,
     public IActionResult OnGet()
     {
         BackLinkSlug = string.Format(Routes.AddAndEditQuestionnaireContributors, QuestionnaireId);
-        QuestionnaireTitle = TempData.Peek("QuestionnaireTitle") as string;
         return Page();
     }
 

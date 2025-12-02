@@ -23,8 +23,15 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
-        <h1 class="govuk-heading-l">Enter all options into one text box</h1>
+        <h1 class="govuk-heading-l">
+            <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
+            Enter all options into one text box
+        </h1>
+        <dl class="govuk-!-margin-bottom-7">
+            <dt class="govuk-visually-hidden">Status</dt>
+            <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
+            </dd>
+        </dl>
         <p class="govuk-body">
             People will be able to select one option from your list.
         </p>

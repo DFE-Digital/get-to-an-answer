@@ -14,8 +14,6 @@ namespace Admin.Pages.Contents;
 public class AddContent(ILogger<AddContent> logger, IApiClient apiClient) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
-    
-    public string? QuestionnaireTitle { get; set; }
 
     [BindProperty] 
     [Required(ErrorMessage = "Enter a title")] 
@@ -32,11 +30,6 @@ public class AddContent(ILogger<AddContent> logger, IApiClient apiClient) : Base
     public IActionResult OnGet()
     {
         BackLinkSlug = string.Format(Routes.AddAndEditResultPages, QuestionnaireId);
-
-        if (TempData.Peek("QuestionnaireTitle") is string title)
-        {
-            QuestionnaireTitle = title;
-        }
         
         return Page();
     }
