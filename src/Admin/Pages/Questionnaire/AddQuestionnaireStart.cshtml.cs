@@ -15,8 +15,6 @@ namespace Admin.Pages.Questionnaire;
 public class AddQuestionnaireStart(IApiClient apiClient, ILogger<AddQuestionnaireStart> logger) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
-    
-    public string? QuestionnaireTitle { get; set; }
 
     [BindProperty] public string? DisplayTitle { get; set; }
 
@@ -35,8 +33,6 @@ public class AddQuestionnaireStart(IApiClient apiClient, ILogger<AddQuestionnair
                 logger.LogWarning("Questionnaire {QuestionnaireId} not found", QuestionnaireId);
                 throw new Exception($"Questionnaire {QuestionnaireId} not found");
             }
-            
-            QuestionnaireTitle = questionnaire.Title;
 
             PopulateFields(questionnaire);
         }

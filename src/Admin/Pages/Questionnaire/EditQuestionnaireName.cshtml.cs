@@ -24,10 +24,6 @@ public class EditQuestionnaireName(IApiClient apiClient, ILogger<EditQuestionnai
     
     public IActionResult OnGet()
     {
-        if (TempData.Peek("QuestionnaireTitle") is string title)
-        {
-            Title = title;
-        }
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
         return Page();
     }

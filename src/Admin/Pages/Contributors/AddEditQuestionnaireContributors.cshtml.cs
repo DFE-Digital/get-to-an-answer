@@ -19,22 +19,13 @@ public class AddEditQuestionnaireContributors(ILogger<AddEditQuestionnaireContri
 {
     [FromRoute] public Guid QuestionnaireId { get; set; }
 
-    [BindProperty] public string? QuestionnaireTitle { get; set; }
-
     [BindProperty] public List<GraphUser> Contributors { get; set; } = [];
     
     public QuestionnaireState? QuestionnaireState { get; set;}
     
-    public EntityStatus Status { get; set; } = EntityStatus.Draft;
-    
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
-
-        if (TempData.Peek("QuestionnaireStatus") is int status)
-        {
-            Status = (EntityStatus) status;
-        }
 
         try
         {
@@ -44,11 +35,6 @@ public class AddEditQuestionnaireContributors(ILogger<AddEditQuestionnaireContri
             var graphUsers = await graphClient.GetGraphUsersAsync(contributors.ToArray());
 
             Contributors = graphUsers.Value;
-            
-            if (TempData.Peek("QuestionnaireTitle") is string title)
-            {
-                QuestionnaireTitle = title;
-            }
             
             var stateFound = TempData.TryGetValue(nameof(QuestionnaireState), out var value);
 

@@ -24,8 +24,14 @@
     <form accept-charset="UTF-8" method="post">
       <govuk-form-group asp-for="@Model.Title">
         <h1 class="govuk-label-wrapper">
+          <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
           <label for="@inputId" class="govuk-label govuk-label--l">@title</label>
         </h1> 
+        <dl class="govuk-!-margin-bottom-7">
+          <dt class="govuk-visually-hidden">Status</dt>
+          <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
+          </dd>
+        </dl>
         <div class="govuk-hint" id="@inputId-hint">
           <p>The questionnaire will be shown at the top of each page.</p>
           <p>Use a name that describes what it helps people to do. For example 'Check your care leaver support'.</p>

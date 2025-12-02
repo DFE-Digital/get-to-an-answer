@@ -17,8 +17,6 @@ public class AddEditEndResultContents(ILogger<AddEditEndResultContents> logger, 
 {
     [FromRoute] public Guid QuestionnaireId { get; set; }
 
-    [BindProperty] public string? QuestionnaireTitle { get; set; }
-
     [BindProperty] public List<ContentDto> Contents { get; set; } = [];
     
     public QuestionnaireState? QuestionnaireState { get; set;}
@@ -26,16 +24,9 @@ public class AddEditEndResultContents(ILogger<AddEditEndResultContents> logger, 
     [BindProperty]
     public bool FinishedEditing { get; set; }
     
-    public EntityStatus Status { get; set; } = EntityStatus.Draft;
-    
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
-
-        if (TempData.Peek("QuestionnaireStatus") is int status)
-        {
-            Status = (EntityStatus) status;
-        }
 
         try
         {
@@ -43,11 +34,6 @@ public class AddEditEndResultContents(ILogger<AddEditEndResultContents> logger, 
             var contents = await apiClient.GetContentsAsync(QuestionnaireId);
 
             Contents = contents;
-            
-            if (TempData.Peek("QuestionnaireTitle") is string title)
-            {
-                QuestionnaireTitle = title;
-            }
             
             if (TempData.TryGetValue("CompletionTrackingMap", out var trackingMapObj) && 
                 trackingMapObj is string trackingMapJson)

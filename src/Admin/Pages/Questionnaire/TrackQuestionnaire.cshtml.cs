@@ -27,7 +27,6 @@ public class TrackQuestionnaires(IApiClient apiClient, ILogger<TrackQuestionnair
             
             TempData["QuestionnaireStatus"] = (int) Questionnaire?.Status!;
             TempData.Keep("QuestionnaireStatus");
-            
             TempData["QuestionnaireTitle"] = Questionnaire?.Title;
             TempData.Keep("QuestionnaireTitle");
             TempData["QuestionnaireSlug"] = Questionnaire?.Slug;
