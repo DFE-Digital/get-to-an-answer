@@ -49,6 +49,7 @@ export const ErrorMessages = {
 }
 
 export const PageHeadings = {
+    EDIT_QUESTIONNAIRE_PAGE_HEADING: 'Create and edit your questionnaire',
     VIEW_QUESTION_PAGE_HEADING: 'Add and edit your questions',
     ADD_QUESTION_PAGE_HEADING: 'Add a question',
     ADD_ANSWER_PAGE_HEADING: 'Create a list of answer options',

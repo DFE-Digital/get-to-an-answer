@@ -4,7 +4,7 @@ import {signIn, goToUpdateQuestionnairePageByUrl} from '../../helpers/admin-test
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {JwtHelper} from "../../helpers/JwtHelper";
-import {EntityStatus, ErrorMessages} from "../../constants/test-data-constants";
+import {EntityStatus, ErrorMessages, PageHeadings} from "../../constants/test-data-constants";
 import {createQuestionnaire, getQuestionnaire, listQuestionnaires} from "../../test-data-seeder/questionnaire-data";
 
 test.describe('Get to an answer update questionnaire', () => {
@@ -36,7 +36,7 @@ test.describe('Get to an answer update questionnaire', () => {
     test('Back link to questionnaire from Edit Title page', async ({page}) => {
         await addQuestionnairePage.ClickBackToQuestionnaireLink();
         editQuestionnairePage = await EditQuestionnairePage.create(page);
-        expect(editQuestionnairePage.validateHeading());
+        expect(editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
     });
 
     test('Error summary appears on submit with missing title', async ({page, browserName}) => {

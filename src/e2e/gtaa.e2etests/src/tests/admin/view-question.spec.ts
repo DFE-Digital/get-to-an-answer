@@ -10,7 +10,7 @@ import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {AddQuestionPage} from "../../pages/admin/AddQuestionPage";
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";
-import {AnswerDestinationType, ErrorMessages} from "../../constants/test-data-constants";
+import {AnswerDestinationType, ErrorMessages, PageHeadings} from "../../constants/test-data-constants";
 
 test.describe('Get to an answer view questions', () => {
     let token: string;
@@ -101,7 +101,7 @@ test.describe('Get to an answer view questions', () => {
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
         
         await viewQuestionPage.expectQuestionHeadingOnPage();
-        await viewQuestionPage.expectQuestionStatusOnPage('Draft');
+        await viewQuestionPage.expectQuestionnaireStatusOnPage('Draft');
     });
 
     // TBS, CARE-1557 bug raised
@@ -112,7 +112,7 @@ test.describe('Get to an answer view questions', () => {
     //     viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
     //    
     //     await viewQuestionPage.expectQuestionHeadingOnPage();
-    //     await viewQuestionPage.expectQuestionStatusOnPage('Published');
+    //     await viewQuestionPage.expectQuestionnaireStatusOnPage('Published');
     // });
 
     test("Add question CTA navigates to Add question", async ({page}) => {
@@ -131,7 +131,7 @@ test.describe('Get to an answer view questions', () => {
         
         await viewQuestionPage.ClickBackToEditQuestionnaireLink();
         editQuestionnairePage = await EditQuestionnairePage.create(page);
-        expect(editQuestionnairePage.validateHeading());
+        expect(editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
     });
 
     test('Save and continue with No I will come back later radio navigates to Edit questionnaire page', async ({page}) => {
@@ -144,7 +144,7 @@ test.describe('Get to an answer view questions', () => {
         await viewQuestionPage.saveAndContinue();
         
         editQuestionnairePage = await EditQuestionnairePage.create(page);
-        await editQuestionnairePage.validateHeading();
+        await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
     });
     
     test('Save and continue with Yes radio navigates to Edit questionnaire page', async ({page}) => {
@@ -157,7 +157,7 @@ test.describe('Get to an answer view questions', () => {
         await viewQuestionPage.saveAndContinue();
         
         editQuestionnairePage = await EditQuestionnairePage.create(page);
-        await editQuestionnairePage.validateHeading();
+        await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
     });
 
     test('List existing questions', async ({page}) => {

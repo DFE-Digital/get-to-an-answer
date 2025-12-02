@@ -4,6 +4,7 @@ import {ViewQuestionnairePage} from '../pages/admin/ViewQuestionnairePage';
 import {ViewQuestionPage} from '../pages/admin/ViewQuestionPage';
 import {AddQuestionnairePage} from '../pages/admin/AddQuestionnairePage';
 import {AddQuestionPage} from '../pages/admin/AddQuestionPage';
+import {AddAnswerPage} from '../pages/admin/AddAnswerPage';
 import {EditQuestionnairePage} from "../pages/admin/EditQuestionnairePage";
 import {TermsOfUsePage} from "../pages/admin/TermsOfUsePage";
 import {EnvConfig} from '../config/environment-config';
@@ -112,12 +113,29 @@ export async function goToAddQuestionPageByUrl(
     waitUntil: LoadState = 'networkidle'): Promise<AddQuestionPage> {
 
     const adminUrl = EnvConfig.ADMIN_URL;
-    const viewQuestionUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/questions/add`;
+    const addQuestionUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/questions/add`;
 
-    await page.goto(viewQuestionUrl, {waitUntil});
+    await page.goto(addQuestionUrl, {waitUntil});
 
     const addQuestionPage = new AddQuestionPage(page)
     await addQuestionPage.waitForPageLoad();
 
     return addQuestionPage;
+}
+
+export async function goToAddAnswerPageByUrl(
+    page: Page,
+    questionnaireId: string,
+    questionId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<AddAnswerPage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const addAnswerUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/questions/${questionId}/answers/add`;
+
+    await page.goto(addAnswerUrl, {waitUntil});
+
+    const addAnswerPage = new AddAnswerPage(page)
+    await addAnswerPage.waitForPageLoad();
+
+    return addAnswerPage;
 }

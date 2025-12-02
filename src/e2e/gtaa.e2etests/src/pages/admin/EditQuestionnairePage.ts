@@ -140,8 +140,15 @@ export class EditQuestionnairePage extends BasePage {
         expect(text?.trim().length).toBeGreaterThan(0);
     }
 
-    async validateHeading(): Promise<void> {
+    async validateHeading(expectedText: string): Promise<void> {
         await expect(this.editQuestionnaireHeading).toBeVisible();
+
+        if (expectedText) {
+            await expect(
+                this.editQuestionnaireHeading,
+                `❌ Edit questionnaire heading text mismatch: expected "${expectedText}"`
+            ).toContainText(expectedText);
+        }
     }
 
     async validateHeadingAndStatus(): Promise<void> {

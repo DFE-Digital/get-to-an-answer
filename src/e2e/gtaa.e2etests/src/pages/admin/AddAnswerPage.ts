@@ -1,19 +1,20 @@
-import { Page, Locator, expect } from '@playwright/test';
-import { BasePage } from "../BasePage";
+import {Page, Locator, expect} from '@playwright/test';
+import {BasePage} from "../BasePage";
 import {ErrorMessages} from "../../constants/test-data-constants";
 import {Timeouts} from "../../constants/timeouts";
 import {QuestionType} from "./AddQuestionPage";
 
 type Mode = 'create' | 'edit';
-type Destination = 'NextQuestion' |'SpecificQuestion' | 'ExternalLink' | 'InternalPage' | '0';
+type Destination = 'NextQuestion' | 'SpecificQuestion' | 'ExternalResultsPage' | 'InternalResultsPage' | '0';
 
-export class AddAnswersPage extends BasePage {
+export class AddAnswerPage extends BasePage {
     private readonly mode: string;
     private readonly form: Locator;
     private readonly addAnswersHeading: Locator;
+    private readonly statusTag: Locator;
     private readonly addAnotherOptionButton: Locator;
-    private readonly saveAndContinueButton: Locator;
-    private readonly radios: Locator;
+    private readonly continueButton: Locator;
+    private readonly removeButton: Locator;
     private readonly enterAllOptionsLink: Locator;
     private readonly errorSummary: Locator;
     private readonly errorList: Locator;
@@ -21,58 +22,70 @@ export class AddAnswersPage extends BasePage {
     private readonly errorLinkOptionContent: Locator;
     private readonly inlineOptionContentError: Locator;
     private readonly optionContentFormGroup: Locator;
-    
+
     private optionContent: (i: number) => Locator;
     private optionHint: (i: number) => Locator;
     private optionScore: (i: number) => Locator;
-    private destinationRadio: (i: number, value: Destination)  => Locator;
+    private destinationRadio: (i: number, value: Destination) => Locator;
+    private selectSpecificQuestion: (i: number) => Locator;
+    private selectInternalResultsPage: (i: number) => Locator;
     private externalLinkInput: (i: number) => Locator;
     private removeButtonFor: (i: number) => Locator;
 
     constructor(page: Page, mode: Mode = 'create') {
         super(page);
-        
+
         this.mode = mode;
-        this.form = this.page.locator('#main-content form[method="post"]');
-        this.addAnswersHeading = page.locator('main h1.govuk-heading-l');
-        this.saveAndContinueButton = page.getByRole('button', { name: 'Save and continue' });
-        this.enterAllOptionsLink = page.locator('a.govuk-link[href$="/bulk-options"]');
+        this.form = this.page.locator('form[method="post"]');
+        this.addAnswersHeading = this.page.getByRole('heading', {
+            level: 1,
+            name: /Create a list of answer options/i
+        });
+        this.statusTag = page.locator('strong.govuk-tag[data-status="Draft"]');
+        this.removeButton = page.getByRole('button', {name: /remove/i});
+        this.continueButton = page.getByRole('button', {name: /continue/i});
+        this.enterAllOptionsLink = page
+            .getByRole('button', {name: /add another option/i})
+            .locator('xpath=following-sibling::a[1]');
         
         this.optionContent = (i: number) =>
-            page.locator(`input[name="Answers[${i}].Content"]`);
-
+            page.locator(`input[name="Options[${i}].OptionContent"]`)
+        
         this.optionHint = (i: number) =>
-            page.locator(`textarea[name="Answers[${i}].Description"]`);
-
+            page.locator(`textarea[name="Options[${i}].OptionHint"]`);
+        
         this.optionScore = (i: number) =>
             page.locator(`input[name="Answers[${i}].Priority"]`);
-
+        
         this.destinationRadio = (
             i: number,
             value: Destination = 'NextQuestion'
         ) =>
-            page.locator(`input[name="Answers[${i}].DestinationType"][value="${value}"]`);
-
-        this.externalLinkInput = (i: number) =>
+            page.locator(`input[name="Options[${i}].AnswerDestination"][value="${value}"]`);
+        
+        this.selectSpecificQuestion = (i: number) =>
             page.locator(
-                `#conditional-e-answer-${i} input[type="text"], #conditional-e-answer-${i} input[type="url"]`
-            ).first();
+                `select#Options-${i}-destination-specific-select`
+            );
+
+        this.selectInternalResultsPage = (i: number) =>
+            page.locator(
+                `select#Options-${i}-destination-internal-select`
+            );
+        
+        this.externalLinkInput = (i: number) =>
+            page.locator(`input[id="Options-${i}-destination-external-link"]`);
 
         this.removeButtonFor = (i: number) =>
-            page.locator(`ul.app-select-options__list > li.app-select-options__item >> nth=${i}`)
-                .locator(`button[name="remove"]`);
+            page.locator(`button[data-remove-option="${i}"]`);
 
-        //this.radios = this.form.locator('input[type="radio"][name="QuestionType"]'); //if form available in DOM
-        this.radios = this.page.locator('input[type="radio"][name="QuestionType"]');
-        this.addAnotherOptionButton = this.page.getByRole('button', { name: /add another option/i });
-
-        this.errorSummary = this.page.locator('.govuk-error-summary[role="alert"][tabindex="-1"]');
+        this.addAnotherOptionButton = this.page.getByRole('button', {name: /add another option/i});
+        this.errorSummary = this.page.locator('div.govuk-error-summary[role="alert"]');
         this.errorList = this.errorSummary.locator('ul.govuk-error-summary__list');
         this.errorLinks = this.errorList.locator('a');
-
-        this.errorLinkOptionContent = this.page.locator('a[href="#QuestionContent"]');
-        this.optionContentFormGroup = page.locator('.govuk-form-group:has(#OptionContent)');
-        this.inlineOptionContentError = this.optionContentFormGroup.locator('#OptionContent-error');
+        this.errorLinkOptionContent = this.page.locator('a[href="#Answers0__Content"]');
+        this.optionContentFormGroup = page.locator('div.govuk-form-group:has(input[name="Answers[0].Content"])');
+        this.inlineOptionContentError = this.optionContentFormGroup.locator('span.govuk-error-message');
     }
 
     // ===== Validations =====
@@ -83,22 +96,43 @@ export class AddAnswersPage extends BasePage {
             await expect(
                 this.addAnswersHeading,
                 `❌ Add answers heading text mismatch: expected "${expectedText}"`
-            ).toHaveText(expectedText);
+            ).toContainText(expectedText);
         }
+    }
+
+    async expectQuestionnaireStatusOnPage(expectedText?: string): Promise<void> {
+        await expect(this.statusTag, '❌ Questionnaire status not visible').toBeVisible();
+
+        if (expectedText) {
+            await expect(this.statusTag, `❌ Questionnaire status text does not match: expected "${expectedText}"`).toHaveText(expectedText);
+        }
+    }
+
+    async asserPageElementsUponLanding() {
+        await this.verifyHeaderLinks();
+        await this.verifyFooterLinks();
+        await expect(this.form, '❌ Form not visible').toBeVisible();
+        await expect(this.addAnotherOptionButton, '❌ Add another option button not visible').toBeVisible();
+        await expect(this.enterAllOptionsLink, '❌ Enter all options link not visible').toBeVisible();
+        await expect(this.continueButton, '❌ Continue button not visible').toBeVisible();
+    }
+
+    async asserPageElementsUponAddAnotherOptionClick(i: number) {
+        await expect(this.optionContent(i), "Option content input not visible").toBeVisible();
+        await expect(this.optionHint(i), "Option hint textarea not visible").toBeVisible();
+        await expect(this.destinationRadio(i, 'NextQuestion'), "Next question radio not visible").toBeVisible();
+        await expect(this.destinationRadio(i, 'SpecificQuestion'), "Specific question radio not visible").toBeVisible();
+        await expect(this.destinationRadio(i, 'InternalResultsPage'), "Internal results radio radio not visible").toBeVisible();
+        await expect(this.destinationRadio(i, 'ExternalResultsPage'), "External results radio radio not visible").toBeVisible();
+        await expect(this.removeButton, '❌ Remove button not visible').toBeVisible();
+        await expect(this.addAnotherOptionButton, '❌ Add another option button not visible').toBeVisible();
+        await expect(this.enterAllOptionsLink, '❌ Enter all options link not visible').toBeVisible();
+        await expect(this.continueButton, '❌ Continue button not visible').toBeVisible();
     }
 
     async VerifyOptionContentAndHintTextarea(i: number): Promise<void> {
         await expect(this.optionContent(i), '❌ Question input not visible').toBeVisible();
         await expect(this.optionHint(i), '❌ Hint textarea not visible').toBeVisible();
-    }
-    
-    async assertPageElements(i: number) {
-        await this.verifyHeaderLinks();
-        await this.verifyFooterLinks();
-        await this.VerifyOptionContentAndHintTextarea(i);
-        await expect(this.form, '❌ Form not visible').toBeVisible();
-        expect(await this.radios.count()).toBeGreaterThan(1);
-        await expect(this.saveAndContinueButton, '❌ Save button not visible').toBeVisible();
     }
 
     async validateMissingAllFieldsErrorMessageSummary(browserName: string) {
@@ -142,8 +176,8 @@ export class AddAnswersPage extends BasePage {
         //     ? this.inlineUpdateQuestionContentError
         //     : this.inlineQuestionContentError;
 
-        const errorElement =this.inlineOptionContentError; 
-            
+        const errorElement = this.inlineOptionContentError;
+
         await errorElement.waitFor({state: 'visible', timeout: Timeouts.LONG});
 
         const ariaValue = await this.optionContent(i).getAttribute('aria-describedby');
@@ -164,7 +198,7 @@ export class AddAnswersPage extends BasePage {
         //     ? this.inlineUpdateQuestionContentError
         //     : this.inlineQuestionContentError;
 
-        const errorElement =this.inlineOptionContentError;
+        const errorElement = this.inlineOptionContentError;
 
         await errorElement.waitFor({state: 'visible', timeout: Timeouts.LONG});
 
@@ -179,7 +213,7 @@ export class AddAnswersPage extends BasePage {
                 .toContain('destinationtype-field-error');
         }
     }
-    
+
     // ===== Actions =====
     async clickErrorLinkAndValidateFocus(link: Locator, browserName: string): Promise<void> {
         await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
@@ -197,6 +231,7 @@ export class AddAnswersPage extends BasePage {
             await expect(targetInput, '❌ Target input not focused').toBeFocused();
         }
     }
+
     async clickAllLinksAndValidateFocus(browserName: string): Promise<void> {
         const linkCount = await this.errorLinks.count();
 
@@ -213,7 +248,7 @@ export class AddAnswersPage extends BasePage {
             }
         }
     }
-    
+
     async setOptionContent(i: number, text: string) {
         await this.optionContent(i).fill(text);
     }
@@ -234,23 +269,31 @@ export class AddAnswersPage extends BasePage {
         await this.destinationRadio(i, value).check();
     }
 
+    async setSpecificQuestion(i: number, optionText: string) {
+        await this.chooseDestination(i, 'SpecificQuestion');
+        await this.selectSpecificQuestion(i).selectOption(optionText);
+    }
+
+    async setInternalLink(i: number, optionText: string) {
+        await this.chooseDestination(i, 'InternalResultsPage');
+        await this.selectInternalResultsPage(i).selectOption(optionText);
+    }
+
     async setExternalLink(i: number, url: string) {
-        await this.chooseDestination(i, 'ExternalLink');
+        await this.chooseDestination(i, 'ExternalResultsPage');
         await this.externalLinkInput(i).fill(url);
     }
     
-    // TBC, we may need more methods here just like 'setExternalLink'
-
     async removeOption(i: number) {
         await this.removeButtonFor(i).click();
     }
 
-    async addAnotherOption() {
+    async clickAddAnotherOptionButton() {
         await this.addAnotherOptionButton.click();
     }
 
-    async saveAndContinue() {
-        await this.saveAndContinueButton.click();
+    async clickContinueButton() {
+        await this.continueButton.click();
     }
 
     async openBulkOptions() {

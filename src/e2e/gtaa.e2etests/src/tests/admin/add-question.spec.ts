@@ -1,7 +1,7 @@
 import {expect, test} from "@playwright/test";
 import {AddQuestionPage, QuestionType} from "../../pages/admin/AddQuestionPage";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
-import {AddAnswersPage} from "../../pages/admin/AddAnswersPage";
+import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {
     signIn, goToEditQuestionnairePageByUrl, goToAddQuestionPageByUrl, goToAddQuestionnairePage
@@ -16,7 +16,7 @@ test.describe('Get to an answer add question to questionnaire', () => {
     let questionnaire: any;
     let addQuestionPage: AddQuestionPage;
     let viewQuestionPage: ViewQuestionPage;
-    let addAnswersPage: AddAnswersPage;
+    let addAnswerPage: AddAnswerPage;
 
     test.beforeEach(async ({request, page}) => {
         token = JwtHelper.NoRecordsToken();
@@ -69,8 +69,8 @@ test.describe('Get to an answer add question to questionnaire', () => {
         await addQuestionPage.chooseQuestionType(QuestionType.SingleSelectShort);
         await addQuestionPage.clickSaveAndContinue();
 
-        addAnswersPage = await AddAnswersPage.create(page);
-        await addAnswersPage.expectAnswerHeadingOnPage();
+        addAnswerPage = await AddAnswerPage.create(page);
+        await addAnswerPage.expectAnswerHeadingOnPage();
     });
 
     test('Inline error and styling for missing question content', async ({page}) => {
@@ -99,8 +99,8 @@ test.describe('Get to an answer add question to questionnaire', () => {
         await addQuestionPage.chooseQuestionType(QuestionType.SingleSelectLong);
         await addQuestionPage.clickSaveAndContinue();
 
-        addAnswersPage = await AddAnswersPage.create(page);
-        await addAnswersPage.expectAnswerHeadingOnPage();
+        addAnswerPage = await AddAnswerPage.create(page);
+        await addAnswerPage.expectAnswerHeadingOnPage();
     });
 
     test('Create question with multi-select type', async ({page}) => {
@@ -112,8 +112,8 @@ test.describe('Get to an answer add question to questionnaire', () => {
         await addQuestionPage.chooseQuestionType(QuestionType.MultiSelect);
         await addQuestionPage.clickSaveAndContinue();
 
-        addAnswersPage = await AddAnswersPage.create(page);
-        await addAnswersPage.expectAnswerHeadingOnPage();
+        addAnswerPage = await AddAnswerPage.create(page);
+        await addAnswerPage.expectAnswerHeadingOnPage();
     });
 
     // TBC, bug raised CARE-1549

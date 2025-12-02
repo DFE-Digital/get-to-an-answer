@@ -83,11 +83,11 @@ export class ViewQuestionPage extends BasePage {
         }
     }
 
-    async expectQuestionStatusOnPage(expectedText?: string): Promise<void> {
-        await expect(this.statusTag, '❌ Question status not visible').toBeVisible();
+    async expectQuestionnaireStatusOnPage(expectedText?: string): Promise<void> {
+        await expect(this.statusTag, '❌ Questionnaire status not visible').toBeVisible();
 
         if (expectedText) {
-            await expect(this.statusTag, `❌ Question status text does not match: expected "${expectedText}"`).toHaveText(expectedText);
+            await expect(this.statusTag, `❌ Questionnaire status text does not match: expected "${expectedText}"`).toHaveText(expectedText);
         }
     }
 
