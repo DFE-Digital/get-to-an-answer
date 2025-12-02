@@ -973,3 +973,92 @@ $toc-width-tablet: 210px;
 .govuk-notification-banner--warning .govuk-notification-banner__link:visited {
   color: #d4351c;
 }
+
+/* --- Outer code example container (yellow border, white background) --- */
+.govuk-code-example {
+  position: relative;
+  margin-bottom: 20px;
+  background: #ffffff;
+  border: 2px solid #ffdd00;   /* GOV.UK yellow */
+}
+
+/* Inner pre/code with monospace, padding, blue border top & bottom */
+.govuk-code-example pre {
+  margin: 0;
+  padding: 10px 15px;
+  border-top: 4px solid #1d70b8;   /* GOV.UK blue */
+  border-bottom: 4px solid #1d70b8;
+  background: #ffffff;
+  overflow-x: auto;
+}
+
+.govuk-code-example pre code.hljs {
+  display: block;
+  padding: 0;
+  background: transparent;
+  color: #0b0c0c;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* --- Copy button in top-right --- */
+.govuk-code-example__copy {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 3px 10px;
+  border: 2px solid #00703c;       /* green */
+  background: #ffffff;
+  color: #00703c;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.govuk-code-example__copy:focus {
+  outline: 3px solid #ffdd00;
+  outline-offset: 0;
+}
+
+/* --- Highlight.js GOV.UK-style colours --- */
+
+.hljs-comment,
+.hljs-quote {
+  color: #505a5f; /* dark grey for comments */
+  font-style: italic;
+}
+
+/* Tag names like <div>, <h1> */
+.hljs-tag,
+.hljs-name {
+  color: #1d70b8; /* blue */
+}
+
+/* Attribute names: class, id, type... */
+.hljs-attr {
+  color: #d4351c; /* red */
+}
+
+/* Attribute values: "govuk-input" */
+.hljs-string {
+  color: #00703c; /* green */
+}
+
+/* Punctuation: <, >, =, / etc. */
+.hljs-punctuation {
+  color: #0b0c0c;
+}
+
+/* Text content between tags */
+.hljs-text {
+  color: #0b0c0c;
+}
+
+/* Keep bold/italic behaviour if needed */
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}

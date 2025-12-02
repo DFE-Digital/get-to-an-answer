@@ -1,5 +1,7 @@
 # GetToAnAnswer (GTAA) Integration Guide
 
+
+
 Primary path: Manual embed route your app can use immediately.  
 Secondary path: Contentful-driven embed via rich text.
 

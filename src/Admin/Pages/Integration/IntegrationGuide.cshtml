@@ -1,0 +1,169 @@
+@page "/admin/questionnaires/{questionnaireId:guid}/integration-guide"
+@using Common.Local
+@model Admin.Pages.Integration.IntegrationGuide
+
+@{
+    ViewData["Title"] = "Questionnaire version history";
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.QuestionnaireId/track">Back</a>
+}
+
+<div data-module="appstepnav"id="step-by-step-navigation" class="app-step-nav js-hidden app-step-nav--large" data-show-text="Show Changes" data-hide-text="Hide Changes" data-show-all-text="Show all versions" data-hide-all-text="Hide all versions">
+  <ol class="app-step-nav__steps">
+    <li class="app-step-nav__step js-step" id="check-you-re-allowed-to-drive">
+      <div class="app-step-nav__header js-toggle-panel" data-position="1">
+        <h2 class="app-step-nav__title">
+          <span class="app-step-nav__circle app-step-nav__circle--number">
+            <span class="app-step-nav__circle-inner">
+              <span class="app-step-nav__circle-background">
+                <span class="govuk-visually-hidden govuk-!-display-none-print">Step</span> 1<span class="govuk-visually-hidden govuk-!-display-none-print" aria-hidden="true">:</span>
+              </span>
+            </span>
+          </span>
+
+          <span class="js-step-title" data-hint-text="send or embed the link" data-created-at="">
+            Quick setup
+          </span>
+        </h2>
+      </div>
+
+      <div class="app-step-nav__panel js-panel" id="step-panel-check-you-re-allowed-to-drive-1">
+        <p class="app-step-nav__paragraph">The following are the list of changes since the last publish.</p>
+
+        <ol class="app-step-nav__list " data-length="1">
+          <li class="app-step-nav__list-item js-list-item ">
+            <pre><code class="language-html">
+&lt;div class="govuk-form-group"&gt;
+  &lt;h1 class="govuk-label-wrapper"&gt;
+    &lt;label class="govuk-label govuk-label--l" for="event-name"&gt;
+      What is the name of the event?
+    &lt;/label&gt;
+  &lt;/h1&gt;
+  &lt;input class="govuk-input" id="event-name" name="event-name" type="text"&gt;
+&lt;/div&gt;
+  </code></pre>
+          </li>
+        </ol>
+      </div>
+    </li>
+    <li class="app-step-nav__step js-step" id="check-you-re-allowed-to-drive">
+      <div class="app-step-nav__header js-toggle-panel" data-position="2">
+        <h2 class="app-step-nav__title">
+          <span class="app-step-nav__circle app-step-nav__circle--number">
+            <span class="app-step-nav__circle-inner">
+              <span class="app-step-nav__circle-background">
+                <span class="govuk-visually-hidden govuk-!-display-none-print">Step</span> 2<span class="govuk-visually-hidden govuk-!-display-none-print" aria-hidden="true">:</span>
+              </span>
+            </span>
+          </span>
+
+          <span class="js-step-title" data-hint-text="manually add the iframe to pages" data-created-at="">
+            Embed Iframe
+          </span>
+        </h2>
+      </div>
+
+      <div class="app-step-nav__panel js-panel" id="step-panel-check-you-re-allowed-to-drive-1">
+        <p class="app-step-nav__paragraph">The following are the list of changes since the last publish.</p>
+
+        <ol class="app-step-nav__list " data-length="">
+          <li class="app-step-nav__list-item js-list-item ">
+            <pre><code>
+&lt;div class="gtaa-wrapper" style="margin:0 auto; max-width:100%; width:100%;"&gt;
+  &lt;iframe id="gtaaFrame"
+          title="{Title}"
+          src="{GtaaBaseUrl}/questionnaires/{questionnaireSlug}/start?embed=true"
+          allow="autoplay"
+          referrerpolicy="strict-origin"
+          sandbox="allow-scripts allow-top-navigation allow-forms"
+          style="width:100%; height:100%; border:none;"&gt;&lt;/iframe&gt;
+&lt;/div&gt;
+&lt;script asp-add-nonce="true" src="{GtaaBaseUrl}/js/gtaa.external.js"&gt;&lt;/script&gt;
+            </code></pre>
+          </li>
+        </ol>
+      </div>
+    </li>
+    <li class="app-step-nav__step js-step" id="check-you-re-allowed-to-drive">
+        <div class="app-step-nav__header js-toggle-panel" data-position="3">
+          <h2 class="app-step-nav__title">
+            <span class="app-step-nav__circle app-step-nav__circle--number">
+              <span class="app-step-nav__circle-inner">
+                <span class="app-step-nav__circle-background">
+                  <span class="govuk-visually-hidden govuk-!-display-none-print">Step</span> 3<span class="govuk-visually-hidden govuk-!-display-none-print" aria-hidden="true">:</span>
+                </span>
+              </span>
+            </span>
+
+            <span class="js-step-title" data-hint-text="add our content model and deploy wherever you want" data-created-at="">
+              Contentful integration
+            </span>
+          </h2>
+        </div>
+
+        <div class="app-step-nav__panel js-panel" id="step-panel-check-you-re-allowed-to-drive-1">
+          <p class="app-step-nav__paragraph">The following are the list of changes since the last publish.</p>
+
+          <ol class="app-step-nav__list " data-length="1">
+            <li class="app-step-nav__list-item js-list-item ">
+              
+            </li>
+          </ol>
+        </div>
+      </li>
+  </ol>
+</div>
+
+
+@section Scripts {
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+
+  <!-- and it's easy to individually load additional languages -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/xml.min.js"></script>
+  <script type="text/javascript">
+
+    GOVUK.Modules.AppStepNav.prototype.addButtonstoSteps = function () {
+      for (let i = 0; i < this.$module.steps.length; i++) {
+        const thisel = this.$module.steps[i];
+        const title = thisel.querySelectorAll('.js-step-title')[0];
+        const hint = title.getAttribute('data-hint-text') || '';
+        const createdAt = title.getAttribute('data-created-at') || '';
+        const contentId = thisel.querySelectorAll('.js-panel')[0].getAttribute('id');
+        const titleText = title.textContent || title.innerText; // IE8 fallback
+
+        title.outerHTML =
+          '<span class="js-step-title">' +
+          '<button ' +
+          'class="app-step-nav__button app-step-nav__button--title js-step-title-button" ' +
+          'aria-expanded="false" aria-controls="' + contentId + '">' +
+          '<span class="app-step-nav____title-text-focus">' +
+          '<span style="display: flex; flex-direction: column;">' +
+          '<span>' +
+          '<span class="app-step-nav__title-text js-step-title-text">' + titleText + '</span>' +
+          (hint ? '<span class="govuk-hint">' + hint +'</span>' : '') +
+          '<span class="govuk-visually-hidden app-step-nav__section-heading-divider">, </span>' +
+          '</span>' +
+          '<span class="govuk-hint">' + createdAt + '</span>' +
+          '</span>' +
+          '</span>' +
+          '</button>' +
+          '</span>'
+      }
+    }
+    
+    const $element = document.querySelector('#step-by-step-navigation');
+    const stepByStepNavigation = new GOVUK.Modules.AppStepNav($element).init();
+
+    // Highlight.js initialisation
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.hljs && typeof hljs.highlightAll === 'function') {
+        hljs.highlightAll();
+      }
+    });
+  </script>
+}

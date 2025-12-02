@@ -322,7 +322,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             foreach (var question in questionnaire.Questions)
             {
                 if (question.Answers.Count == 0)
-                    return BadRequest(ProblemTrace($"The question {question.Order} has no answers", 400));
+                    return BadRequest(ProblemTrace($"Question {question.Order} has no answers", 400));
             }
             
             if (questionnaire.Status == EntityStatus.Published)
@@ -393,7 +393,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             else if (answer.DestinationType != DestinationType.ExternalLink && current.Order == questionMap.Count)
             {
                 return (BranchingHealthType.Broken, 
-                    $"Answer '{answer.Content}' of question '{current.Order}' has no destination."); 
+                    $"Answer '{answer.Content}' of the last question should have an external link or results page."); 
             }    
         }
 
