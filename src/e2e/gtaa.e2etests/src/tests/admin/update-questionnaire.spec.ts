@@ -1,11 +1,22 @@
 import {test, expect} from "@playwright/test";
 import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
-import {signIn, goToUpdateQuestionnairePageByUrl} from '../../helpers/admin-test-helper';
+import {
+    signIn,
+    goToUpdateQuestionnairePageByUrl,
+    goToEditQuestionnairePageByUrl
+} from '../../helpers/admin-test-helper';
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
+import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaireSlugPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {EntityStatus, ErrorMessages, PageHeadings} from "../../constants/test-data-constants";
-import {createQuestionnaire, getQuestionnaire, listQuestionnaires} from "../../test-data-seeder/questionnaire-data";
+import {
+    createQuestionnaire,
+    getQuestionnaire,
+    listQuestionnaires,
+    updateQuestionnaire
+} from "../../test-data-seeder/questionnaire-data";
+import {expect200HttpStatusCode} from "../../helpers/api-assertions-helper";
 
 test.describe('Get to an answer update questionnaire', () => {
     let token: string;
@@ -14,6 +25,7 @@ test.describe('Get to an answer update questionnaire', () => {
     let viewQuestionnairePage: ViewQuestionnairePage;
     let addQuestionnairePage: AddQuestionnairePage;
     let editQuestionnairePage: EditQuestionnairePage;
+    let updateQuestionnaireSlugPage: UpdateQuestionnaireSlugPage;
 
     test.beforeEach(async ({request, page}) => {
         token = JwtHelper.NoRecordsToken();
@@ -24,22 +36,26 @@ test.describe('Get to an answer update questionnaire', () => {
             questionnaire.id,
             token
         );
-
-        viewQuestionnairePage = await signIn(page, token);
-        addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaire.id);
     });
 
     test('Edit Title page displays all required elements', async ({page}) => {
+        viewQuestionnairePage = await signIn(page, token);
+        addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
         await addQuestionnairePage.assertPageElements();
     });
 
     test('Back link to questionnaire from Edit Title page', async ({page}) => {
+        viewQuestionnairePage = await signIn(page, token);
+        addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
         await addQuestionnairePage.ClickBackToQuestionnaireLink();
         editQuestionnairePage = await EditQuestionnairePage.create(page);
         expect(editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
     });
 
     test('Error summary appears on submit with missing title', async ({page, browserName}) => {
+        viewQuestionnairePage = await signIn(page, token);
+        addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
+        
         await addQuestionnairePage.enterTitle('');
         await addQuestionnairePage.clickSaveAndContinue();
         await addQuestionnairePage.validateMissingTitleMessageSummary(browserName);  
@@ -48,6 +64,9 @@ test.describe('Get to an answer update questionnaire', () => {
     });
 
     test('Inline error message and styling when title field has error', async ({page, browserName}) => {
+        viewQuestionnairePage = await signIn(page, token);
+        addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
+        
         await addQuestionnairePage.enterTitle('');
         await addQuestionnairePage.clickSaveAndContinue();
         await addQuestionnairePage.validateMissingTitleMessageSummary(browserName);
@@ -57,12 +76,18 @@ test.describe('Get to an answer update questionnaire', () => {
 
     // TBC, aria-described by id's need correction (CARE-1546)
     test('Accessible aria-describedby includes hint id and error message id', async ({page}) => {
+        viewQuestionnairePage = await signIn(page, token);
+        addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
+        
         await addQuestionnairePage.enterTitle('');
         await addQuestionnairePage.clickSaveAndContinue();
         await addQuestionnairePage.validateTitleFieldAriaDescribedBy();
     });
 
     test('Successful submit updates title and validation', async ({request, page}) => {
+        viewQuestionnairePage = await signIn(page, token);
+        addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
+        
         const newTitle = `Updated questionnaire title - ${Date.now()}`;
         await addQuestionnairePage.enterTitle(newTitle);
         await addQuestionnairePage.clickSaveAndContinue();
@@ -94,4 +119,37 @@ test.describe('Get to an answer update questionnaire', () => {
         ];
         await viewQuestionnairePage.table.verifyTableData(expectedRows);
     });
+
+    test('Duplicate slug from another questionnaire is not allowed ', async ({request, page}) => {
+        const initialSlug = `questionnaire-slug-${Math.floor(Math.random() * 1000000000)}`;
+        
+        const {
+            updatedQuestionnairePostResponse
+        } = await updateQuestionnaire(
+            request,
+            questionnaireGetResponse.questionnaireGetBody.id,
+            {
+                slug: initialSlug
+            }, token
+        );
+        
+        expect200HttpStatusCode(updatedQuestionnairePostResponse, 204);
+        
+        const {questionnaire} = await createQuestionnaire(request, token); // second questionnaire
+        
+        viewQuestionnairePage = await signIn(page, token);
+
+        editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaire.id);
+        await editQuestionnairePage.openEditSlug();
+
+        updateQuestionnaireSlugPage = await UpdateQuestionnaireSlugPage.create(page);
+
+        await updateQuestionnaireSlugPage.expectHeadingOnEditSlugPage(PageHeadings.EDIT_QUESTIONNAIRE_SLUG_PAGE_HEADING)
+        await updateQuestionnaireSlugPage.enterSlug(initialSlug);
+
+        await updateQuestionnaireSlugPage.submit()
+        
+        await updateQuestionnaireSlugPage.validateDuplicateSlugMessageSummary('webkit')
+        await updateQuestionnaireSlugPage.validateInlineSlugError();
+    });        
 });

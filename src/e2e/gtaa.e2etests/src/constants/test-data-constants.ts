@@ -34,6 +34,7 @@ export const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9
 // ===== Admin related test data =====
 export const ErrorMessages = {
     ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE: 'Enter a questionnaire title',
+    ERROR_MESSAGE_DUPLICATE_QUESTIONNAIRE_SLUG: 'A questionnaire with this slug already exists',
     ERROR_MESSAGE_INVALID_TITLE: 'Enter a valid title',
     
     ERROR_MESSAGE_TERMS_OF_USE: 'You need to accept the agreement to continue',
@@ -50,6 +51,7 @@ export const ErrorMessages = {
 
 export const PageHeadings = {
     EDIT_QUESTIONNAIRE_PAGE_HEADING: 'Create and edit your questionnaire',
+    EDIT_QUESTIONNAIRE_SLUG_PAGE_HEADING: 'What\'s the slug of your questionnaire?',
     VIEW_QUESTION_PAGE_HEADING: 'Add and edit your questions',
     ADD_QUESTION_PAGE_HEADING: 'Add a question',
     ADD_ANSWER_PAGE_HEADING: 'Create a list of answer options',

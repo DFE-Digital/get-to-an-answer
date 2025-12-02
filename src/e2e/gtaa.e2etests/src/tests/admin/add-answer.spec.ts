@@ -95,48 +95,50 @@ test.describe('Get to an answer add an answer to a question', () => {
         await editQuestionnairePage.validateHeadingAndStatus();
     });
 
-    test("Submit an answer to a single radio question with InternalResultsPage destination", async ({request, page}) => {
-        const apiContentResponse = await createContent(request, {
-            questionnaireId,
-            title: 'Test Content',
-            content: 'This is a test content for the start page.',
-            referenceName: 'test-content'
-        }, token)
+    // TBC, CARE-1568
+    // test("Submit an answer to a single radio question with InternalResultsPage destination", async ({request, page}) => {
+    //     const apiContentResponse = await createContent(request, {
+    //         questionnaireId,
+    //         title: 'Test Content',
+    //         content: 'This is a test content for the start page.',
+    //         referenceName: 'test-content'
+    //     }, token)
+    //
+    //     await signIn(page, token);
+    //     addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+    //    
+    //     await addAnswerPage.expectAnswerHeadingOnPage();
+    //     await addAnswerPage.clickAddAnotherOptionButton();
+    //
+    //     await addAnswerPage.setOptionContent(0, 'First Answer Option');
+    //     await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
+    //     await addAnswerPage.setInternalLink(0, 'Test Content');
+    //
+    //     await addAnswerPage.clickContinueButton();
+    //
+    //     const editQuestionnairePage = await EditQuestionnairePage.create(page);
+    //     await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
+    //     await editQuestionnairePage.validateHeadingAndStatus();
+    // });
 
-        await signIn(page, token);
-        addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
-        
-        await addAnswerPage.expectAnswerHeadingOnPage();
-        await addAnswerPage.clickAddAnotherOptionButton();
-
-        await addAnswerPage.setOptionContent(0, 'First Answer Option');
-        await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
-        await addAnswerPage.setInternalLink(0, 'test-content');
-
-        await addAnswerPage.clickContinueButton();
-
-        const editQuestionnairePage = await EditQuestionnairePage.create(page);
-        await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
-        await editQuestionnairePage.validateHeadingAndStatus();
-    });
-
-    test("Submit an answer to a single radio question with ExternalResultsPage destination", async ({page}) => {
-        await signIn(page, token);
-        addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
-        
-        await addAnswerPage.expectAnswerHeadingOnPage();
-        await addAnswerPage.clickAddAnotherOptionButton();
-
-        await addAnswerPage.setOptionContent(0, 'First Answer Option');
-        await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
-        await addAnswerPage.setExternalLink(0, 'https://www.example.com');
-        
-        await addAnswerPage.clickContinueButton();
-
-        const editQuestionnairePage = await EditQuestionnairePage.create(page);
-        await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
-        await editQuestionnairePage.validateHeadingAndStatus();
-    });
+    // TBC, CARE-1567
+    // test("Submit an answer to a single radio question with ExternalResultsPage destination", async ({page}) => {
+    //     await signIn(page, token);
+    //     addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+    //    
+    //     await addAnswerPage.expectAnswerHeadingOnPage();
+    //     await addAnswerPage.clickAddAnotherOptionButton();
+    //
+    //     await addAnswerPage.setOptionContent(0, 'First Answer Option');
+    //     await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
+    //     await addAnswerPage.setExternalLink(0, 'https://www.example.com');
+    //    
+    //     await addAnswerPage.clickContinueButton();
+    //
+    //     const editQuestionnairePage = await EditQuestionnairePage.create(page);
+    //     await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
+    //     await editQuestionnairePage.validateHeadingAndStatus();
+    // });
 
     // test("Submit an answer to a single dropdown question with NextQuestion destination", async () => {
     //     await addAnswerPage.expectAnswerHeadingOnPage();

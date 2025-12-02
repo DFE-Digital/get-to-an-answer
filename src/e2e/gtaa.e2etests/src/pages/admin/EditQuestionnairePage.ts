@@ -39,9 +39,7 @@ export class EditQuestionnairePage extends BasePage {
         this.backToQuestionnaireLink = this.page.locator(
             'a.govuk-back-link[href$="/admin/questionnaires/manage"]'
         );
-        this.linkEditSlug = this.page.locator(
-            'a.govuk-task-list__link[aria-describedby="edit-slug-status"]'
-        );
+        this.linkEditSlug = page.getByRole('link', { name: /edit the slug of your questionnaire/i });
         this.linkAddEditQuestions = this.page.locator(
             'a.govuk-task-list__link[href*="/questionnaires/"][href$="/questions"]'
         );

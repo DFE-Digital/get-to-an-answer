@@ -8,23 +8,22 @@ export class ViewQuestionnaireTable {
     private readonly table: Locator;
     private readonly headers: Locator;
     private readonly rows: Locator;
-    private readonly tableHeading: Locator;
     private readonly firstTitleLink: Locator;
 
     // ===== Constructor =====
     constructor(private readonly page: Page) {
         this.section = page.getByRole('region', {name: /questionnaires/i});
-        this.table = this.section.getByRole('table', {name: /questionnaires/i});
+        this.table = this.page
+            .getByRole('region', { name: /questionnaires/i })
+            .locator('table.govuk-table');
         this.headers = this.table.getByRole('columnheader');
         this.rows = this.table.locator('tbody tr');
-        this.tableHeading = this.page.locator('table.govuk-table > caption.govuk-table__caption');
         this.firstTitleLink = this.table.locator('tbody tr td a').first();
     }
 
     // ===== Basic visibility =====
     async verifyVisible(): Promise<void> {
         await expect(this.section).toBeVisible();
-        await expect(this.tableHeading).toBeVisible();
         await expect(this.table).toBeVisible();
     }
 

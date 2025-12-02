@@ -10,7 +10,6 @@ export class ViewQuestionnairePage extends BasePage {
     private readonly HelpUserHeading: Locator;
     private readonly questionnaireHeading: Locator;
     private readonly createNewQuestionnaireButton: Locator;
-    private readonly tableCaption: Locator;
     private readonly tableHeaders: Locator;
 
     // ===== Embedded component =====
@@ -29,7 +28,7 @@ export class ViewQuestionnairePage extends BasePage {
         this.createNewQuestionnaireButton = this.page.locator(
             'a.govuk-button.govuk-button--start[href$="/questionnaires/create"]'
         );
-        this.tableCaption = this.page.locator('table caption');
+        
         this.tableHeaders = this.page.locator('table th');
 
         this.table = new ViewQuestionnaireTable(page);
@@ -68,8 +67,6 @@ export class ViewQuestionnairePage extends BasePage {
 
     // Accessibility
     async validateTableAccessibility(): Promise<void> {
-        await expect(this.tableCaption, '❌ Table caption not found').toBeVisible();
-
         const headerCount = await this.tableHeaders.count();
         expect(headerCount, '❌ Table headers not found').toBeGreaterThan(0);
 

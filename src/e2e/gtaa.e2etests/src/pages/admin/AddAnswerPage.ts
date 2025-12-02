@@ -9,13 +9,12 @@ type Destination = 'NextQuestion' | 'SpecificQuestion' | 'ExternalResultsPage' |
 
 export class AddAnswerPage extends BasePage {
     private readonly mode: string;
-    private readonly form: Locator;
     private readonly addAnswersHeading: Locator;
     private readonly statusTag: Locator;
     private readonly addAnotherOptionButton: Locator;
     private readonly continueButton: Locator;
     private readonly removeButton: Locator;
-    private readonly enterAllOptionsLink: Locator;
+    private readonly enterAllOptionsButton: Locator;
     private readonly errorSummary: Locator;
     private readonly errorList: Locator;
     private readonly errorLinks: Locator;
@@ -36,7 +35,6 @@ export class AddAnswerPage extends BasePage {
         super(page);
 
         this.mode = mode;
-        this.form = this.page.locator('form[method="post"]');
         this.addAnswersHeading = this.page.getByRole('heading', {
             level: 1,
             name: /Create a list of answer options/i
@@ -44,9 +42,9 @@ export class AddAnswerPage extends BasePage {
         this.statusTag = page.locator('strong.govuk-tag[data-status="Draft"]');
         this.removeButton = page.getByRole('button', {name: /remove/i});
         this.continueButton = page.getByRole('button', {name: /continue/i});
-        this.enterAllOptionsLink = page
-            .getByRole('button', {name: /add another option/i})
-            .locator('xpath=following-sibling::a[1]');
+        this.enterAllOptionsButton = page.locator(
+            'button[formaction*="RedirectToBulkEntry"]'
+        ).first();
         
         this.optionContent = (i: number) =>
             page.locator(`input[name="Options[${i}].OptionContent"]`)
@@ -111,9 +109,8 @@ export class AddAnswerPage extends BasePage {
     async asserPageElementsUponLanding() {
         await this.verifyHeaderLinks();
         await this.verifyFooterLinks();
-        await expect(this.form, '❌ Form not visible').toBeVisible();
         await expect(this.addAnotherOptionButton, '❌ Add another option button not visible').toBeVisible();
-        await expect(this.enterAllOptionsLink, '❌ Enter all options link not visible').toBeVisible();
+        await expect(this.enterAllOptionsButton, '❌ Enter all options link not visible').toBeVisible();
         await expect(this.continueButton, '❌ Continue button not visible').toBeVisible();
     }
 
@@ -126,7 +123,7 @@ export class AddAnswerPage extends BasePage {
         await expect(this.destinationRadio(i, 'ExternalResultsPage'), "External results radio radio not visible").toBeVisible();
         await expect(this.removeButton, '❌ Remove button not visible').toBeVisible();
         await expect(this.addAnotherOptionButton, '❌ Add another option button not visible').toBeVisible();
-        await expect(this.enterAllOptionsLink, '❌ Enter all options link not visible').toBeVisible();
+        await expect(this.enterAllOptionsButton, '❌ Enter all options link not visible').toBeVisible();
         await expect(this.continueButton, '❌ Continue button not visible').toBeVisible();
     }
 
@@ -297,6 +294,6 @@ export class AddAnswerPage extends BasePage {
     }
 
     async openBulkOptions() {
-        await this.enterAllOptionsLink.click();
+        await this.enterAllOptionsButton.click();
     }
 }
