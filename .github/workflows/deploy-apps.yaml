@@ -32,9 +32,9 @@ jobs:
     name: "Prepare Infrastructure"
     uses: ./.github/workflows/azure-infrastructure.yml
     with:
-      is_admin_deployment: ${{ github.event.inputs.deploy_admin || false }}
-      is_api_deployment: ${{ github.event.inputs.deploy_api || false }}
-      is_frontend_deployment: ${{ github.event.inputs.deploy_frontend || false }}
+      is_admin_deployment: ${{ github.event.inputs.deploy_admin == 'true' }}
+      is_api_deployment: ${{ github.event.inputs.deploy_api == 'true' }}
+      is_frontend_deployment: ${{ github.event.inputs.deploy_frontend == 'true' }}
       environment: ${{ github.event.inputs.environment || 'Development' }}
     secrets: inherit
     
@@ -42,7 +42,7 @@ jobs:
     name: "Build & Deploy the Api"
     runs-on: ubuntu-latest
     needs: prepare-infrastructure
-    if: ${{ github.event.inputs.deploy_api }}
+    if: ${{ github.event.inputs.deploy_api == 'true' }}
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -129,7 +129,7 @@ jobs:
     name: "Build & Deploy the Admin"
     runs-on: ubuntu-latest
     needs: prepare-infrastructure
-    if: ${{ github.event.inputs.deploy_admin }}
+    if: ${{ github.event.inputs.deploy_admin == 'true' }}
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -210,17 +210,11 @@ jobs:
             --name "$ADMIN_NAME" \
             --slot staging
   
-  
-  
-  
-  
-  
-  
   build-and-deploy-frontend:
     name: "Build & Deploy the Frontend"
     runs-on: ubuntu-latest
     needs: prepare-infrastructure
-    if: ${{ github.event.inputs.deploy_frontend }}
+    if: ${{ github.event.inputs.deploy_frontend == 'true' }}
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
