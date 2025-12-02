@@ -1,0 +1,59 @@
+@page "/admin/questionnaires/{questionnaireId:guid}/clone"
+@addTagHelper *, Common
+@model Admin.Pages.Questionnaire.CloneQuestionnaire
+
+@{
+  const string title = "Make a copy of your questionnaire";
+  ViewData["Title"] = title;
+
+  const string inputId = "questionnaire-title";
+}
+
+@section BeforeContent
+{
+  <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
+}
+
+@if (Model!.HasErrors())
+{
+  @await Html.PartialAsync("_ErrorSummary")
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">
+      <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
+      <label for="@inputId" class="govuk-label govuk-label--l">Make a copy</label>
+    </h1>
+    <dl class="govuk-!-margin-bottom-7">
+      <dt class="govuk-visually-hidden">Status</dt>
+      <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
+      </dd>
+    </dl>
+    <div class="govuk-inset-text" id="some-hint">
+      <p>Once you make a copy of this questionnaire, you will be directed to 'Create a questionnaire' of the new copy.</p>
+    </div>
+    <form accept-charset="UTF-8" method="post">
+      <govuk-form-group asp-for="@Model.Title">
+        <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+            <h2 class="govuk-fieldset__heading">
+              What is the title of the copy of this questionnaire? 
+            </h2>
+          </legend>
+          
+          <govuk-field-error asp-for="@Model.Title" error-id="@inputId-field-error"></govuk-field-error>
+
+          <govuk-input id="@inputId"
+                       class="govuk-input"
+                       aria-describedby="forms-name-input-name-hint"
+                       type="text"
+                       name="@nameof(Model.Title)"
+                       asp-for="@Model.Title"
+                       govuk-error-for="@Model?.Title"/>
+        </fieldset>
+      </govuk-form-group>
+      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
+    </form>
+  </div>
+</div>

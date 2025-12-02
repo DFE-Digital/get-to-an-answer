@@ -1,0 +1,60 @@
+using System.ComponentModel.DataAnnotations;
+using Common.Client;
+using Common.Domain.Request.Create;
+using Common.Domain.Request.Update;
+using Common.Enum;
+using Common.Models;
+using Common.Models.PageModels;
+using Common.Validation;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+
+namespace Admin.Pages.Questionnaire;
+
+[Authorize]
+public class CloneQuestionnaire(IApiClient apiClient, ILogger<CloneQuestionnaire> logger) : QuestionnairesPageModel
+{
+    [FromRoute(Name = "questionnaireId")]
+    public Guid QuestionnaireId { get; set; }
+    
+    [BindProperty(Name = "Title")]
+    [Required(ErrorMessage = "Enter a questionnaire title")]
+    [GdsTitle]
+    public required string Title { get; set; }
+    
+    public IActionResult OnGet()
+    {
+        BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
+        Title = $"Copy of {QuestionnaireTitle}";
+        return Page();
+    }
+    
+    public async Task<IActionResult> OnPost()
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+            
+            var cloneQuestionnaireRequestDto = new CloneQuestionnaireRequestDto() { Title = Title };
+            
+            var cloneQuestionnaire = await apiClient.CloneQuestionnaireAsync(QuestionnaireId, cloneQuestionnaireRequestDto);
+            
+            if (cloneQuestionnaire == null)
+                return RedirectToErrorPage();
+            
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustCloned = true });
+            
+            return Redirect(string.Format(Routes.QuestionnaireTrackById, cloneQuestionnaire.Id));
+
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error copying the questionnaire. Error: {EMessage}", e.Message);
+            return RedirectToErrorPage();
+        }
+    }
+}

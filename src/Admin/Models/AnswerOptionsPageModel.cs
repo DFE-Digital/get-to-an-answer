@@ -122,7 +122,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         if (!ModelState.IsValid)
         {
-            await EnsureSelectListsForOptions();
+            await PopulateOptionSelectionLists();
             return Page();
         }
 
@@ -137,8 +137,8 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         return Redirect(targetUrl ?? string.Empty);
     }
-
-    protected async Task EnsureSelectListsForOptions()
+    
+    protected async Task PopulateOptionSelectionLists()
     {
         var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
         var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
