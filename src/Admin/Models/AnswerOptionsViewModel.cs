@@ -17,9 +17,9 @@ public class AnswerOptionsViewModel
     public string? OptionContent { get; set; } = string.Empty;
     
     public string? OptionHint { get; set; } = string.Empty;
-    
-    [AnswerOptionRequired(fieldType : "destination")]
-    public AnswerDestination AnswerDestination { get; set; }
+
+    [AnswerOptionRequired(fieldType: "destination")]
+    public AnswerDestination AnswerDestination { get; set; } = AnswerDestination.NextQuestion;
     
     public IEnumerable<SelectListItem> QuestionSelectList { get; set; } = [];
     public List<SelectListItem> ResultsPageSelectList { get; set; } = [];

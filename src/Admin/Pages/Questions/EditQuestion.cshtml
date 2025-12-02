@@ -41,9 +41,10 @@
                     }
                     else
                     {
-                        <form>
-                            <button class="govuk-button govuk-button--start" type="button"
-                                    asp-page-handler="AddAQuestion">Add a
+                        <form method="post">
+                            <input type="hidden" name="QuestionnaireId" value="@Model.QuestionnaireId"/>
+                            <button class="govuk-button govuk-button--start" type="submit"
+                                    asp-page-handler="AddQuestion">Add a
                                 question
                             </button>
                         </form>

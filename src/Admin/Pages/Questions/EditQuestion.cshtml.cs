@@ -35,7 +35,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
 
     public async Task<IActionResult> OnGetAsync()
     {
-        BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
+        BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId);
 
         try
         {
@@ -132,7 +132,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         return Redirect(string.Format(Routes.ConfirmDeleteQuestion, QuestionnaireId, QuestionId));
     }
     
-    public IActionResult OnPostAddAQuestion() => Redirect(string.Format(Routes.AddQuestion, QuestionnaireId));
+    public IActionResult OnPostAddQuestion() => Redirect(string.Format(Routes.AddQuestion, QuestionnaireId));
 
     public string QuestionTypeFriendly(QuestionType type) =>
         type switch
