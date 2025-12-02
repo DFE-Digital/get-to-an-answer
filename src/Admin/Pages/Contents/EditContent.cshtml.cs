@@ -66,6 +66,7 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
             {
                 Title = ContentTitle,
                 Content = ContentValue,
+                ReferenceName = ContentRefName
             });
             
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });

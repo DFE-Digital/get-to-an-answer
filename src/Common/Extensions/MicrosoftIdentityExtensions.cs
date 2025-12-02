@@ -61,6 +61,11 @@ public static class MicrosoftIdentityExtensions
                     return Task.CompletedTask;
                 };
             }
+        },
+        cookieOptions =>
+        {
+            // Disable sliding expiration for the auth cookie
+            cookieOptions.SlidingExpiration = false;
         });
             
         authBuilder.Services
@@ -73,9 +78,9 @@ public static class MicrosoftIdentityExtensions
                 if (ctx.Properties != null)
                 {
                     ctx.Properties.IsPersistent = true; // make auth cookie persistent
+                    ctx.Properties.AllowRefresh = false; // no sliding
                 }
 
-                // ctx.Properties.AllowRefresh = false; // optional: no sliding
                 return Task.CompletedTask;
             };
         });

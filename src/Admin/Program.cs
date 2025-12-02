@@ -88,7 +88,8 @@ builder.Services.AddHttpContextAccessor();
 #region GTAA Api Client
 
 builder.Services.AddTransient(sp =>
-    new BearerTokenHandler(sp.GetRequiredService<IHttpContextAccessor>()));
+    new BearerTokenHandler(sp.GetRequiredService<IHttpContextAccessor>(),
+        sp.GetRequiredService<ILogger<BearerTokenHandler>>()));
 
 // Register an HttpClient with a pre-configured base address
 builder.Services.AddHttpClient<IApiClient, ApiClient>(client => client.BaseAddress = new Uri(apiBaseUrl))

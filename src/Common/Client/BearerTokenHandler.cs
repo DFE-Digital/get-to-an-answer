@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Common.Client;
 
@@ -14,7 +15,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 public class BearerTokenHandler(
-    IHttpContextAccessor httpContextAccessor)
+    IHttpContextAccessor httpContextAccessor,
+    ILogger<BearerTokenHandler> logger)
     : DelegatingHandler
 {
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
@@ -28,6 +30,9 @@ public class BearerTokenHandler(
         }
 
         var auth = await httpContext.AuthenticateAsync(OpenIdConnectDefaults.AuthenticationScheme);
+
+        logger.LogInformation($"Auth Cookie expiring at {auth?.Properties?.ExpiresUtc}");
+        
         var idToken = auth?.Properties?.GetTokenValue("id_token");
 
         var shouldChallenge = string.IsNullOrEmpty(idToken);
@@ -44,6 +49,8 @@ public class BearerTokenHandler(
                 if (long.TryParse(expClaim, out var expSeconds))
                 {
                     var expiry = DateTimeOffset.FromUnixTimeSeconds(expSeconds);
+                    
+                    logger.LogInformation($"Token expires at {expiry}");
 
                     if (expiry <= DateTimeOffset.UtcNow)
                     {
@@ -59,6 +66,8 @@ public class BearerTokenHandler(
 
         if (shouldChallenge)
         {
+            logger.LogWarning("Token expired or invalid, forcing re-authentication");
+            
             await httpContext.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme);
             return new HttpResponseMessage(HttpStatusCode.Unauthorized);
         }

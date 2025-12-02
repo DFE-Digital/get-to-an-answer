@@ -43,7 +43,7 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
         {
             logger.LogInformation("Getting questions for questionnaire {QuestionnaireId}", QuestionnaireId);
             var response = await apiClient.GetQuestionsAsync(QuestionnaireId);
-
+            
             Questions = response.OrderBy(q => q.Order).ToList();
             
             TempData["QuestionCount"] = Questions.Count;
@@ -64,12 +64,17 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
                         .Deserialize<Dictionary<CompletableTask, CompletionStatus>>(trackingMapJson);
                     FinishedEditing = trackingMap?[CompletableTask.AddQuestionsAndAnswers] ==
                                       CompletionStatus.Completed;
-                } 
+                }
                 catch (Exception e)
                 {
                     logger.LogError(e, "Error deserializing completion tracking map");
                 }
             }
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            logger.LogWarning("No questions found for Questionniare {QuestionniareId}", QuestionnaireId);
+            return Page();
         }
         catch (Exception e)
         {

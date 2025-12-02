@@ -54,10 +54,10 @@
                     <span class="diff-modified">@changeData.Path was modified from '@changeData.ThisValue' to '@changeData.ThatValue'</span>
                     break;
                   case ChangeKind.Added:
-                    <span class="diff-added">'@changeData.ThisValue' was added to @changeData.Path</span>
+                    <span class="diff-added">'@changeData.ThatValue' was added to @changeData.Path</span>
                     break;
                   case ChangeKind.Removed:
-                    <span class="diff-removed">'@changeData.ThisValue' was from @changeData.Path</span>
+                    <span class="diff-removed">'@changeData.ThatValue' was from @changeData.Path</span>
                     break;
                 }
               </li>

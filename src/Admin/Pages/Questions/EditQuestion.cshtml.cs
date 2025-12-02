@@ -24,7 +24,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
 
     public List<AnswerSummaryViewModel> Answers { get; } = [];
 
-    public string QuestionNumber => "1";
+    [BindProperty] public string QuestionNumber { get; set; } = 1.ToString();
 
     [TempData(Key = "QuestionSaved")] public bool QuestionSaved { get; set; }
 
@@ -35,7 +35,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
 
     public async Task<IActionResult> OnGetAsync()
     {
-        BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId);
+        BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
 
         try
         {
@@ -77,7 +77,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
             await apiClient.UpdateQuestionAsync(QuestionId, new UpdateQuestionRequestDto
             {
                 Content = QuestionContent,
-                Description = QuestionHintText,
+                Description = QuestionHintText ?? string.Empty,
                 Type = QuestionType
             });
 
@@ -110,10 +110,11 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         return Page();
     }
 
-    public async Task<IActionResult> OnPostDeleteQuestion()
+    public IActionResult OnPostDeleteQuestion()
     {
-        await apiClient.DeleteQuestionAsync(QuestionId);
-        return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
+        TempData["TitleOfQuestionToBeDeleted"] = QuestionContent;
+        TempData["NumberOfQuestionToBeDeleted"] = QuestionNumber;
+        return Redirect(string.Format(Routes.ConfirmDeleteQuestion, QuestionnaireId, QuestionId));
     }
     
     public IActionResult OnPostAddAQuestion() => Redirect(string.Format(Routes.AddQuestion, QuestionnaireId));
@@ -144,6 +145,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         QuestionContent = question.Content;
         QuestionHintText = question.Description;
         QuestionType = question.Type;
+        QuestionNumber = question.Order.ToString();
     }
 }
 

@@ -46,7 +46,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                     ["questionId"] = ["The question must belong to the specified questionnaire."]
                 }));
 
-            if (request.DestinationType != null)
+            if (request.DestinationType != null && request.DestinationType != DestinationType.Auto)
             {
                 switch (request.DestinationType)
                 {
@@ -108,7 +108,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                 DestinationUrl = request.DestinationUrl,
                 DestinationQuestionId = request.DestinationQuestionId,
                 DestinationContentId = request.DestinationContentId,
-                DestinationType = request.DestinationType,
+                DestinationType = request.DestinationType == DestinationType.Auto ? null : request.DestinationType,
                 CreatedBy = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
@@ -241,7 +241,16 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
             answer.Content = request.Content;
             answer.Description = request.Description ?? answer.Description ?? string.Empty;
             answer.DestinationUrl = request.DestinationUrl ?? answer.DestinationUrl;
-            answer.DestinationType = request.DestinationType ?? answer.DestinationType;
+
+            if (request.DestinationType == DestinationType.Auto)
+            {
+                answer.DestinationType = null;
+            }
+            else
+            {
+                answer.DestinationType = request.DestinationType ?? answer.DestinationType;
+            }
+            
             answer.DestinationQuestionId = request.DestinationQuestionId ?? answer.DestinationQuestionId;
             answer.DestinationContentId = request.DestinationContentId ?? answer.DestinationContentId;
             answer.Priority = request.Priority ?? answer.Priority;

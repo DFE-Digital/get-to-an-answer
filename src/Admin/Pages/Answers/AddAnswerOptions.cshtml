@@ -19,8 +19,6 @@
   @await Html.PartialAsync("_ErrorSummary")
 }
 
-
-
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
@@ -51,7 +49,7 @@
         };
 
         @await Html.PartialAsync("AnswerOptionsPartial", Model.Options[i], viewData)
-
+        
         <button class="govuk-button govuk-button--secondary govuk-!-margin-top-3"
                 type="submit"
                 asp-page-handler="RemoveOption">

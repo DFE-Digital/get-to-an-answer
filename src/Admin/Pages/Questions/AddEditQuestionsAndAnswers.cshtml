@@ -1,23 +1,48 @@
 @page "/admin/questionnaires/{questionnaireId:guid}/questions"
 @using Admin.Models
 @using Common.Models
+@using Newtonsoft.Json
 @model Admin.Pages.Questions.AddEditQuestionsAndAnswers
 
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Add and edit your questions";
-}
 
+    var questionDeletedTempData = TempData.Peek("DeletedQuestion");
+    var deletedQuestion = JsonConvert.DeserializeObject<QuestionNotificationSummary>(questionDeletedTempData?.ToString() ?? string.Empty);
+}
 
 @section BeforeContent
 {
-    <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
+    <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back to create your questionnaire</a>
 }
 
 @if (Model!.HasErrors())
 {
   @await Html.PartialAsync("_ErrorSummary")
 }
+
+@if (deletedQuestion is { IsDeleted: true }) { 
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                        Success
+                    </h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <h3 class="govuk-notification-banner__heading">
+                        The question, '@deletedQuestion.QuestionTitle', has been deleted.
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    TempData.Remove("DeletedQuestion");
+}
+
 
 <div class="gtaa-add-edit-questions-page govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -28,6 +53,7 @@
                 <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
                 <h1 class="govuk-heading-l">Add and edit your questions</h1>
 
+                @*TODO: add status here *@
                 <p class="govuk-body">
                     <strong class="govuk-tag" data-status="@Model.Status">@Model.Status</strong>
                 </p>
@@ -36,6 +62,7 @@
                     <a class="govuk-button" data-module="govuk-button"
                        href="@string.Format(Routes.AddQuestion, Model.QuestionnaireId)">
                         Add a question
+                        
                     </a>
                 </div>
 
