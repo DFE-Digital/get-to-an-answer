@@ -16,23 +16,26 @@
                     <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
                     Are you sure you want to delete this result page?
                 </h1>
-                <dl class="govuk-!-margin-bottom-7">
+                <dl class="govuk-!-margin-0">
                     <dt class="govuk-visually-hidden">Status</dt>
                     <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
                     </dd>
                 </dl>
             </legend>
-            <strong class="govuk-warning-text__text">
-                <span class="govuk-visually-hidden">Warning</span>
-                By deleting this result page, existing answers using this result page will be broken.
-            </strong>
+            <div class="govuk-warning-text govuk-!-margin-bottom-4 govuk-!-margin-top-4">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                    <span class="govuk-visually-hidden">Warning</span>
+                    By deleting this result page, existing answers using this result page will be broken.
+                </strong>
+            </div>
 
             <div class="govuk-radios" data-module="govuk-radios">
                 <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="finished-yes" name="DeleteContent" type="radio" asp-for="@Model.DeleteContent"
                            value="true">
                     <label class="govuk-label govuk-radios__label" for="finished-yes">
-                        Yes
+                        Yes, delete it
                     </label>
                 </div>
 
@@ -40,7 +43,7 @@
                     <input class="govuk-radios__input" id="finished-no" name="DeleteContent" type="radio" asp-for="@Model.DeleteContent"
                            value="false">
                     <label class="govuk-label govuk-radios__label" for="finished-no">
-                        No, I’ll come back later
+                        No, keep it
                     </label>
                 </div>
             </div>

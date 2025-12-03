@@ -137,9 +137,9 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     public string QuestionTypeFriendly(QuestionType type) =>
         type switch
         {
-            QuestionType.SingleSelect => "One option only (radio button)",
-            QuestionType.DropdownSelect => "One option only (drop-down)",
-            QuestionType.MultiSelect => "One or more options (multi-select)",
+            QuestionType.SingleSelect => "One option only (using radio button)",
+            QuestionType.DropdownSelect => "One option only (using a drop-down)",
+            QuestionType.MultiSelect => "One or more options (using multi-select)",
             _ => type.ToString()
         };
 

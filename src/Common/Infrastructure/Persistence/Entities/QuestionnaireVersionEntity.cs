@@ -30,8 +30,4 @@ public class QuestionnaireVersionEntity
     public string? ChangeDescription { get; set; }
     
     public string? ChangeLog { get; set; }
-    
-    [MaxLength(100)]
-    [NotMapped]
-    public string? SyncId { get; set; }
 }
