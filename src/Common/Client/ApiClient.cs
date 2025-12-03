@@ -237,24 +237,14 @@ public class ApiClient : IApiClient
     {
         var response = await _httpClient.PatchAsync(
             $"{Questionnaires}/{questionnaireId}/questions/{questionId}?action={QuestionAction.MoveDown}", null);
-        response.EnsureSuccessStatusCode();
-
-        if (response.IsSuccessStatusCode)
-            return await response.Content.ReadAsStringAsync();
-
-        return string.Empty;
+        return await GetResponse<string>(response);
     }
 
     public async Task<string?> MoveQuestionUpOneAsync(Guid questionnaireId, Guid questionId)
     {
         var response = await _httpClient.PatchAsync(
             $"{Questionnaires}/{questionnaireId}/questions/{questionId}?action={QuestionAction.MoveUp}", null);
-        response.EnsureSuccessStatusCode();
-
-        if (response.IsSuccessStatusCode)
-            return await response.Content.ReadAsStringAsync();
-
-        return string.Empty;
+        return await GetResponse<string>(response);
     }
 
     // Answer
