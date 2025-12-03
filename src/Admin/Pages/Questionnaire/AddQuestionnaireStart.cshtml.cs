@@ -69,28 +69,9 @@ public class AddQuestionnaireStart(IApiClient apiClient, ILogger<AddQuestionnair
         }
     }
     
-    public async Task<IActionResult> OnPostClearStartPageAsync()
+    public IActionResult OnPostClearStartPageAsync()
     {
-        try
-        {
-            if (!ModelState.IsValid)
-                return Page();
-
-            await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, new UpdateQuestionnaireRequestDto
-            {
-                DisplayTitle = string.Empty, // when empty the questionnaire run starts at the first question
-                Description = string.Empty,
-            });
-            
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustRemovedStartPage = true });
-            
-            return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, e.Message);
-            return RedirectToErrorPage();
-        }
+        return Redirect(string.Format(Routes.ConfirmRemoveStartPage, QuestionnaireId));
     }
     
     private async Task<QuestionnaireDto?> GetQuestionnaire() => await apiClient.GetQuestionnaireAsync(QuestionnaireId);

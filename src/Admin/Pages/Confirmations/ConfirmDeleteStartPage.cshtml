@@ -29,18 +29,18 @@
 
             <div class="govuk-radios" data-module="govuk-radios">
                 <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="finished-yes" name="DeleteContent" type="radio" asp-for="@Model.DeleteContent"
+                    <input class="govuk-radios__input" id="finished-yes" name="DeleteContent" type="radio" asp-for="@Model.RemoveStartPage"
                            value="true">
                     <label class="govuk-label govuk-radios__label" for="finished-yes">
-                        Yes
+                        Yes, delelete it
                     </label>
                 </div>
 
                 <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="finished-no" name="DeleteContent" type="radio" asp-for="@Model.DeleteContent"
+                    <input class="govuk-radios__input" id="finished-no" name="DeleteContent" type="radio" asp-for="@Model.RemoveStartPage"
                            value="false">
                     <label class="govuk-label govuk-radios__label" for="finished-no">
-                        No, I’ll come back later
+                        No, keep it
                     </label>
                 </div>
             </div>

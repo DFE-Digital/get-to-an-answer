@@ -7,7 +7,8 @@ public static class Routes
     public static readonly string QuestionnairesList = AdminRoot + "/questionnaires";
     public const string QuestionnairesManage = AdminRoot + "/questionnaires/manage";
     public static readonly string QuestionnairesCreate = AdminRoot + "/questionnaires/create";
-    
+    public const string ConfirmRemoveStartPage = AdminRoot + "/questionnaires/{0}/start-page/delete-confirmation";
+
     // Contents
     public const string AddAndEditResultPages = AdminRoot + "/questionnaires/{0}/contents";
     public const string AddContent = AdminRoot + "/questionnaires/{0}/contents/add";

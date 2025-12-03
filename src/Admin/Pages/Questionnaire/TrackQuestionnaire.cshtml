@@ -111,14 +111,6 @@
           </div>
           <div class="govuk-task-list__status" id="create-your-questionnaire-1-status"><strong class="govuk-tag govuk-tag--grey">Optional</strong></div>
         </li>
-        <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="provide-privacy-and-contact-details-2-status" href="/admin/questionnaires/@questionnaire?.Id/contact-details/edit">Provide contact details for support</a>
-          </div>
-          <div class="govuk-task-list__status" id="provide-privacy-and-contact-details-2-status">
-            <strong class="govuk-tag govuk-tag--grey">Optional</strong>
-          </div>
-        </li>
       </ul>
       <h2 class="govuk-heading-m">Prepare to publish questionnaire</h2>
       <ul class="govuk-task-list">
@@ -134,28 +126,35 @@
           </div>
           <div class="govuk-task-list__status" id="edit-slug-status">@TaskStatusTag(CompletableTask.EditQuestionnaireSlug)</div>
         </li>
-        <li class="govuk-task-list__item govuk-task-list__item--with-link">
-          <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/integration-guide" target="_blank">Add questionnaire to your service</a>
-          </div>
-        </li>
+        
+        
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link" href="/admin/questionnaires/@questionnaire?.Id/start-preview" 
                target="_blank">Preview this questionnaire (opens in new tab)</a>
           </div>
         </li>
+        
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            @if (questionnaire?.Status is EntityStatus.Draft or EntityStatus.Private)
+            {
+              <a class="govuk-link" data-module="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/publish-confirmation" data-govuk-button-init="">Publish the questionnaire</a>
+            } 
+            else if (questionnaire?.Status == EntityStatus.Published)
+            {
+              <a class="govuk-link" data-module="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/unpublish-confirmation" data-govuk-button-init="">Unpublish the questionnaire</a>
+            }
+          </div>
+        </li>
+        <li class="govuk-task-list__item govuk-task-list__item--with-link">
+          <div class="govuk-task-list__name-and-hint">
+            <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/integration-guide" target="_blank">Add questionnaire to your service</a>
+          </div>
+        </li>
       </ul>
     </div>
     <div class="govuk-button-group">
-      @if (questionnaire?.Status is EntityStatus.Draft or EntityStatus.Private)
-      {
-        <a class="govuk-button govuk-button--primary" data-module="govuk-button" href="/admin/questionnaires/@questionnaire?.Id/publish-confirmation" data-govuk-button-init="">Publish questionnaire</a>
-      } 
-      else if (questionnaire?.Status == EntityStatus.Published)
-      {
-        <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="/admin/questionnaires/@questionnaire?.Id/unpublish-confirmation" data-govuk-button-init="">Unpublish questionnaire</a>
-      }
       <a class="govuk-button govuk-button--warning" data-module="govuk-button" href="/admin/questionnaires/@questionnaire?.Id/delete-confirmation" data-govuk-button-init="">Delete questionnaire</a>
     </div>
   </div>
