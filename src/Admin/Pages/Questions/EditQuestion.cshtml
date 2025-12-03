@@ -8,7 +8,7 @@
     Layout = "_Layout";
     ViewData["Title"] = "Edit question";
 
-    var displayAnswerPriorities = Model.Answers.Any(x => !string.IsNullOrEmpty(x.Priority));
+    var displayAnswerPriorities = Model.QuestionType == QuestionType.MultiSelect;
 }
 
 @section BeforeContent
@@ -144,7 +144,7 @@
                             {
                                 <th scope="col" class="govuk-table__header">Priority</th>
                             }
-                            <th scope="col" class="govuk-table__header">Target Type</th>
+                            <th scope="col" class="govuk-table__header">Destination</th>
                         </tr>
                         </thead>
                         <tbody class="govuk-table__body">

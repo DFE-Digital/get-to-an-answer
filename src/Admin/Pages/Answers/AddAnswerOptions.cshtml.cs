@@ -58,7 +58,7 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
                     DestinationQuestionId = !string.IsNullOrEmpty(option.SelectedDestinationQuestion)
                         ? Guid.Parse(option.SelectedDestinationQuestion)
                         : null,
-                    DestinationUrl = option.ResultPageUrl,
+                    DestinationUrl = option.ExternalLink,
                     Priority = Convert.ToSingle(option.RankPriority)
                 });
             }

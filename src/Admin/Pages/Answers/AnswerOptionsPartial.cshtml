@@ -59,9 +59,6 @@
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
       Destination
     </legend>
-    <div id="@Id($"{destinationIdSuffix}-hint")" class="govuk-hint">
-      Where people go next if they select this option. 
-    </div>
 
     <govuk-field-error asp-for="AnswerDestination" error-id="@Id($"{destinationIdSuffix}-error")">
     </govuk-field-error>
@@ -91,9 +88,6 @@
         <label class="govuk-label govuk-radios__label" for="@Id("destination-specific")">
           Specific question
         </label>
-        <div class="govuk-hint govuk-radios__hint">
-          Use this to direct people to a specific question.
-        </div>
 
         <div id="@Id("destination-specific-reveal")" class="govuk-radios__conditional">
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-specific-select")">
@@ -130,9 +124,6 @@
         <label class="govuk-label govuk-radios__label" for="@Id("destination-internal")">
           Results page
         </label>
-        <div class="govuk-hint govuk-radios__hint">
-          Use this to direct people to a results page created on the ‘Add and edit results’ page.
-        </div>
 
         <div id="@Id("destination-internal-reveal")" class="govuk-radios__conditional">
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-internal-select")">
@@ -157,9 +148,6 @@
         <label class="govuk-label govuk-radios__label" for="@Id("destination-external")">
           Link (to a page outside of the questionnaire)
         </label>
-        <div class="govuk-hint govuk-radios__hint">
-          Use this to add a link and direct people to a results page.
-        </div>
 
         <div id="@Id("destination-external-reveal")" class="govuk-radios__conditional">
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-external-link")">

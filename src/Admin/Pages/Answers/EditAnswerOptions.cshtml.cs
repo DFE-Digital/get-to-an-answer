@@ -1,3 +1,4 @@
+using System.Globalization;
 using Admin.Models;
 using Common.Client;
 using Common.Domain.Request.Create;
@@ -118,12 +119,11 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
                     MapAnswerDestination(existingAnswer.DestinationType),
                 OptionContent = existingAnswer.Content,
                 OptionHint = existingAnswer.Description,
-                ExternalLink = existingAnswer.DestinationUrl,
                 SelectedDestinationQuestion = existingAnswer.DestinationQuestionId?.ToString(),
                 OptionNumber = existingAnswers.Count - 1,
                 QuestionType = currentQuestion?.Type,
-                RankPriority = existingAnswer.Priority.ToString(),
-                ResultPageUrl = existingAnswer.DestinationUrl,
+                RankPriority = existingAnswer.Priority.ToString(CultureInfo.InvariantCulture),
+                ExternalLink = existingAnswer.DestinationUrl,
                 ResultsPageSelectList = resultsPagesForSelection,
                 SelectedResultsPage = existingAnswer.DestinationContentId.ToString()
             });
