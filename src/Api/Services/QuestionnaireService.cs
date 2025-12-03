@@ -393,7 +393,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             else if (answer.DestinationType != DestinationType.ExternalLink && current.Order == questionMap.Count)
             {
                 return (BranchingHealthType.Broken, 
-                    $"Answer '{answer.Content}' of the last question should have an external link or results page."); 
+                    $"Answer '{answer.Content}' of the last question should have an external link or results page as it's destination."); 
             }    
         }
 

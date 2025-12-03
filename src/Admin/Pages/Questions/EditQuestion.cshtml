@@ -63,7 +63,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-        <h1 class="govuk-heading-l">
+        <h1 class="govuk-heading-l govuk-!-margin-0">
             <span class="govuk-caption-l">Question @Model.QuestionNumber</span>
             Edit question
         </h1>
@@ -74,23 +74,30 @@
         </dl>
         <form method="post">
             <govuk-form-group asp-for="QuestionContent">
-                <label class="govuk-label govuk-label--s" for="QuestionContent">What's your question?</label>
+                <label class="govuk-label govuk-label--m" for="QuestionContent">
+                    Your question
+                </label>
+                <div class="govuk-hint" id="QuestionContent-hint">
+                    Ask the question the way you would in person. For example, ‘Which of these countries have you lived in?’
+                </div>
+                
                 <govuk-field-error asp-for="QuestionContent" error-id="QuestionContent-error"/>
                 <govuk-input id="QuestionContent"
                              asp-for="QuestionContent"
                              class="govuk-input"
                              govuk-error-for="QuestionContent-error"/>
-                <span class="govuk-hint">
-                Ask the question the way you would in person. For example, “Which of these countries have you lived in?”
-            </span>
+                
             </govuk-form-group>
 
             <govuk-form-group asp-for="QuestionHintText">
-                <label class="govuk-label govuk-label--s" for="QuestionHintText">Hint text (optional)</label>
-                <govuk-hint>
-                    You can add a short hint to help people understand the question. For multi-select questions, explain
-                    that they can select more than one answer.
-                </govuk-hint>
+                <label class="govuk-label govuk-label--m" for="QuestionHintText">
+                    Hint text (optional)
+                </label>
+                <div class="govuk-hint" id="QuestionHintText-hint">
+                    You can add a short sentence to help people answer the question. 
+                    For example, if someone can select one or more options, use 'Select all that apply'. 
+                </div>
+                
                 <textarea class="govuk-textarea"
                           id="QuestionHintText"
                           asp-for="QuestionHintText"
@@ -111,12 +118,33 @@
                                          type="radio"
                                          value="@(option)"
                                          id="@($"{option}-radio")"/>
-                            <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
-                                @Model.QuestionTypeFriendly(option)
-                            </label>
-                            <div class="govuk-hint govuk-radios__hint">
-                                @Model.QuestionTypeHint(option)
-                            </div>
+                            @if (option == QuestionType.SingleSelect)
+                            {
+                                <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
+                                    One option only (using <a href="https://design-system.service.gov.uk/components/radios/">radio buttons</a>)
+                                </label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                    Use this when you have a small list of options.
+                                </div>
+                            }
+                            else if (option == QuestionType.DropdownSelect)
+                            {
+                                <label class="govuk-label govuk-radios__label" for="QuestionType-Dropdown">
+                                    One option only (using a <a href="https://design-system.service.gov.uk/components/select/">drop-down</a>)
+                                </label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                    Use this when you have a long list of options.
+                                </div>
+                            }
+                            else if (option == QuestionType.MultiSelect)
+                            {
+                                <label class="govuk-label govuk-radios__label" for="QuestionType-MultiSelect">
+                                    One or more options (using <a href="https://design-system.service.gov.uk/components/checkboxes/">checkboxes</a>)
+                                </label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                    Use this when people can select more than one option.
+                                </div>
+                            }
                         </div>
                     }
                 }
@@ -165,12 +193,11 @@
             </div>
 
             <div class="govuk-!-margin-top-6 govuk-!-display-flex govuk-!-gap-3" style="justify-content: start;">
-                <button class="govuk-button govuk-button--primary" type="submit" asp-page-handler="SaveQuestion">Save
-                    question
+                <button class="govuk-button govuk-button--primary" type="submit" asp-page-handler="SaveQuestion">
+                    Save question
                 </button>
                 <button class="govuk-button govuk-button--warning" type="submit" asp-page-handler="DeleteQuestion">
-                    Delete
-                    question
+                    Delete question
                 </button>
             </div>
         </form>

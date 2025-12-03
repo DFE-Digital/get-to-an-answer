@@ -1,4 +1,5 @@
 using Common.Client;
+using Common.Domain.Request.Update;
 using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
@@ -8,27 +9,40 @@ using Newtonsoft.Json;
 namespace Admin.Pages.Confirmations;
 
 [Authorize]
-public class ConfirmDeleteStartPage(IApiClient apiClient) : QuestionnairesPageModel
+public class ConfirmDeleteStartPage(IApiClient apiClient, 
+    ILogger<ConfirmDeleteStartPage> logger) : QuestionnairesPageModel
 {
     [FromRoute(Name = "questionnaireId")]
     public Guid QuestionnaireId { get; set; }
     
-    [FromRoute(Name = "contentId")]
-    public Guid ContentId { get; set; }
-    
-    [BindProperty] public bool DeleteContent { get; set; }
+    [BindProperty] public bool RemoveStartPage { get; set; }
 
     public async Task<IActionResult> OnPostContinueAsync()
     {
-        if (DeleteContent)
+        if (RemoveStartPage)
         {
-            await apiClient.DeleteContentAsync(ContentId);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return Page();
+
+                await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, new UpdateQuestionnaireRequestDto
+                {
+                    DisplayTitle = string.Empty, // when empty the questionnaire run starts at the first question
+                    Description = string.Empty,
+                });
             
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustDeleted = true });
-        
-            return Redirect(string.Format(Routes.AddAndEditResultPages, QuestionnaireId));
+                TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustRemovedStartPage = true });
+            
+                return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, e.Message);
+                return RedirectToErrorPage();
+            }
         }
 
-        return Redirect(string.Format(Routes.EditResultPage, QuestionnaireId, ContentId));
+        return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
     }
 }

@@ -24,6 +24,9 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
         {
             RetrievedQuestionType = (QuestionType)intVal;
         }
+        
+        Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
+        Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
 
         await HydrateOptionListsAsync();
         ReassignOptionNumbers();
@@ -63,7 +66,7 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
                 });
             }
 
-            return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
+            return Redirect(string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId));
         }
         catch (Exception ex)
         {
