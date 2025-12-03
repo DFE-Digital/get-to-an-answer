@@ -37,7 +37,8 @@ public class MsGraphClient : IMsGraphClient
     public async Task<GraphUsers> GetGraphUsersAsync(params string?[] contributorUserIds)
     {
         var contributorQuery = contributorUserIds
-            .Select(id => $"id eq '{id}'").Aggregate(AggregateConditions);
+            .Select(id => id?.Contains('@') == true ? $"mail eq '{id}'" : $"id eq '{id}'")
+            .Aggregate(AggregateConditions);
         
         if (string.IsNullOrWhiteSpace(contributorQuery)) 
             return new GraphUsers();
@@ -48,6 +49,8 @@ public class MsGraphClient : IMsGraphClient
             
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<GraphUsers>() ?? new GraphUsers();
+            
+            _logger.LogError($"Error getting users from Graph, status code '{response.StatusCode}': {await response.Content.ReadAsStringAsync()}");
             
             throw new MsGraphException("Error getting users from Graph", response.StatusCode);
         }

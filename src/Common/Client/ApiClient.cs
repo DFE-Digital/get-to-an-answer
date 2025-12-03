@@ -191,7 +191,7 @@ public class ApiClient : IApiClient
 
     public async Task<string?> AddQuestionnaireContributor(Guid questionnaireId, AddContributorRequestDto request)
     {
-        var response = await _httpClient.PutAsync($"{Questionnaires}/{questionnaireId}/contributors", null);
+        var response = await _httpClient.PutAsJsonAsync($"{Questionnaires}/{questionnaireId}/contributors", request);
         return await GetResponse<string>(response);
     }
 
@@ -366,13 +366,15 @@ public class ApiClient : IApiClient
         {
             // Deserialize a ProblemDetails response for specific error handling.
             var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(errorBody);
+            
+            var statusCode = problemDetails?.Status ?? (int) response.StatusCode;
 
             _logger.LogError(problemDetails?.Detail);
 
             // Throw a custom exception or return an alternative response.
             throw new GetToAnAnswerApiException(
                 $"API request failed with status code {response.StatusCode} and message: {problemDetails?.Detail}", 
-                problemDetails, response.StatusCode);
+                problemDetails, (HttpStatusCode) statusCode);
         }
         catch (Exception)
         {

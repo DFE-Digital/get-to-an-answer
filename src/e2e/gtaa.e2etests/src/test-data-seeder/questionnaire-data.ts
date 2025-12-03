@@ -251,11 +251,11 @@ export async function getLastInfo(
 export async function addContributor(
     request: APIRequestContext, 
     questionnaireId: string, 
-    email: string,
+    id: string,
     bearerToken?: string,
 ) {
     return await request.put(`${BASE_URL}/api/questionnaires/${questionnaireId}/contributors`, {
-        data: {email},
+        data: {id},
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${bearerToken ?? JwtHelper.ValidToken}`

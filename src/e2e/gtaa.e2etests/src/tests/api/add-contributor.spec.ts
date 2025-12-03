@@ -26,7 +26,7 @@ test.describe('PUT /api/questionnaires/{id}/contributors', () => {
 
         await addContributor(request, questionnaire.id, 'bob@example.com');
         const second = await addContributor(request, questionnaire.id, 'bob@example.com');
-        expect(second.status()).toBe(204);
+        expect(second.status()).toBe(400);
 
         const { contributors } = await getContributors(request, String(questionnaire.id));
         const count = contributors.filter((c:any) => c === 'bob@example.com').length;
@@ -59,7 +59,9 @@ test.describe('PUT /api/questionnaires/{id}/contributors', () => {
 
     test('can remove a contributor via DELETE (200)', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
-        await addContributor(request, questionnaire.id, 'grace@example.com');
+        const addResponse = await addContributor(request, questionnaire.id, 'grace@example.com');
+        expect(addResponse.status()).toBe(204);
+        
         await addContributor(request, questionnaire.id, 'john@example.com');
         await addContributor(request, questionnaire.id, 'jamie@example.com');
 
