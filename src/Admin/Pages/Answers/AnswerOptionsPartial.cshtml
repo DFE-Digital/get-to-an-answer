@@ -88,15 +88,17 @@
         <label class="govuk-label govuk-radios__label" for="@Id("destination-specific")">
           Specific question
         </label>
+      </div>
 
-        <div id="@Id("destination-specific-reveal")" class="govuk-radios__conditional">
+      <div id="@Id("destination-specific-reveal")" class="govuk-radios__conditional">
+        <div class="govuk-form-group">
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-specific-select")">
             Select a question
           </label>
 
           @* <govuk-field-error asp-for="SelectedQuestion" error-id="@Id(destinationSpecificSelectErrorId)"> *@
           @* </govuk-field-error> *@
-          
+
           @if (ViewData.ModelState.TryGetValue($"{prefix}-destination-specific", out var specificEntry) && specificEntry?.Errors.Count > 0)
           {
             <p id="@Id($"{destinationIdSuffix}-specific-error")" class="govuk-error-message">
@@ -124,8 +126,9 @@
         <label class="govuk-label govuk-radios__label" for="@Id("destination-internal")">
           Results page
         </label>
-
-        <div id="@Id("destination-internal-reveal")" class="govuk-radios__conditional">
+      </div>
+      <div id="@Id("destination-internal-reveal")" class="govuk-radios__conditional">
+        <div class="govuk-form-group">
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-internal-select")">
             Select a results page
           </label>
@@ -148,14 +151,16 @@
         <label class="govuk-label govuk-radios__label" for="@Id("destination-external")">
           Link (to a page outside of the questionnaire)
         </label>
+      </div>
 
-        <div id="@Id("destination-external-reveal")" class="govuk-radios__conditional">
+      <div id="@Id("destination-external-reveal")" class="govuk-radios__conditional">
+        <div class="govuk-form-group">
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-external-link")">
             Enter a link
           </label>
           <input class="govuk-input equal-input-width"
                  id="@Id("destination-external-link")"
-                 asp-for="ExternalLink" />
+                 asp-for="ExternalLink"/>
         </div>
       </div>
     </div>
