@@ -75,6 +75,23 @@ export async function goToUpdateQuestionnairePageByUrl(
     return addQuestionnairePage;
 }
 
+export async function goToUpdateQuestionPageByUrl(
+    page: Page,
+    questionnaireId: string,
+    questionId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<AddQuestionPage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const editTitleUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/questions/${questionId}/edit`;
+
+    await page.goto(editTitleUrl, {waitUntil});
+
+    const addQuestionPage = new AddQuestionPage(page, 'update')
+    await addQuestionPage.waitForPageLoad();
+
+    return addQuestionPage;
+}
+
 export async function goToEditQuestionnairePageByUrl(
     page: Page,
     questionnaireId: string,

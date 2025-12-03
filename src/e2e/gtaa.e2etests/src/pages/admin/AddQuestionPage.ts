@@ -2,6 +2,8 @@ import {expect, Locator, Page} from '@playwright/test';
 import {BasePage} from '../BasePage';
 import {ErrorMessages} from "../../constants/test-data-constants";
 import {Timeouts} from "../../constants/timeouts";
+import {ViewQuestionTable} from "./components/ViewQuestionTable";
+import {EditAnswerTable} from "./components/EditAnswerTable";
 
 type Mode = 'create' | 'update';
 
@@ -41,6 +43,10 @@ export class AddQuestionPage extends BasePage {
     private readonly inlineQuestionTypeError: Locator;
     private readonly inlineUpdateQuestionTypeError: Locator;
     private readonly fieldset: Locator;
+    private readonly saveQuestionButton: Locator;
+    private readonly deleteQuestionButton: Locator;
+    
+    readonly table: EditAnswerTable;
 
     // ===== Constructor =====
     constructor(page: Page, mode: Mode = 'create') {
@@ -106,6 +112,11 @@ export class AddQuestionPage extends BasePage {
         this.inlineQuestionTypeError = this.radiosFormGroup.locator('#QuestionType-error');
         this.inlineUpdateQuestionTypeError = this.radiosFormGroup.locator('#QuestionType-error-xxx');
         this.fieldset = this.form.locator('fieldset[aria-describedby*="QuestionType-hint"]');
+
+        this.saveQuestionButton = page.getByRole('button', { name: /save question/i });
+        this.deleteQuestionButton = page.getByRole('button', { name: /delete question/i });
+
+        this.table = new EditAnswerTable(page);
     }
 
     // ===== Validations =====
@@ -176,7 +187,14 @@ export class AddQuestionPage extends BasePage {
         await this.VerifyQuestionInputAndHintTextarea();
         await expect(this.form, '❌ Form not visible').toBeVisible();
         expect(await this.radios.count()).toBeGreaterThan(1);
-        await expect(this.saveAndContinueButton, '❌ Save button not visible').toBeVisible();
+        if (this.mode === 'update') {
+            await this.table.verifyVisible();
+            await expect(this.saveQuestionButton,'❌ Save question not visible').toBeVisible();
+            await expect(this.deleteQuestionButton,'❌ Delete question not visible').toBeVisible();
+        }else{
+            await expect(this.saveAndContinueButton, '❌ Save button not visible').toBeVisible();    
+        }
+        
     }
 
     // Accessibility
@@ -303,15 +321,11 @@ export class AddQuestionPage extends BasePage {
         await this.saveAndContinueButton.click();
     }
 
-    // Convenience helper for typical flow
-    async createQuestion(
-        question: string,
-        type: QuestionType,
-        hint?: string
-    ): Promise<void> {
-        await this.enterQuestionContent(question);
-        if (hint !== undefined) await this.enterQuestionHintText(hint);
-        await this.chooseQuestionType(type);
-        await this.clickSaveAndContinue();
+    async clickSaveQuestion(): Promise<void> {
+        await this.saveQuestionButton.click();
+    }
+
+    async clickDeleteQuestion(): Promise<void> {
+        await this.deleteQuestionButton.click();
     }
 }
