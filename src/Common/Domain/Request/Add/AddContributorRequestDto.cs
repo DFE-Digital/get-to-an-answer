@@ -8,6 +8,5 @@ public class AddContributorRequestDto
 {
     [Required(ErrorMessage = "Enter a DfE email")]
     [MaxLength(250, ErrorMessage = "email title must be 250 characters or fewer")]
-    [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Enter a valid email address")]
-    public required string Email { get; set; }
+    public required string Id { get; set; }
 } 

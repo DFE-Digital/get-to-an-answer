@@ -64,7 +64,7 @@ graph LR
 - Edit Start Page / Slug: configure entry content and public URL path.
 - Manage Questions: view ordering and structure of questions.
 - Add Question / Edit Question: define prompts, types, and help text.
-- Add Answers: add options, routing destinations, scores.
+- Add Answers: add options, routing destinations, priorities.
 - Manage Content: list reusable content blocks for the journey.
 - Create Content / Edit Content: author and update content blocks.
 - Support & Privacy: configure support contact details and privacy info.

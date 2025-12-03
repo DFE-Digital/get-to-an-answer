@@ -992,16 +992,6 @@ $toc-width-tablet: 210px;
   overflow-x: auto;
 }
 
-.govuk-code-example pre code.hljs {
-  display: block;
-  padding: 0;
-  background: transparent;
-  color: #0b0c0c;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  font-size: 16px;
-  line-height: 1.5;
-}
-
 /* --- Copy button in top-right --- */
 .govuk-code-example__copy {
   position: absolute;
@@ -1061,4 +1051,18 @@ $toc-width-tablet: 210px;
 
 .hljs-emphasis {
   font-style: italic;
+}
+
+pre code {
+  display: block;
+  max-width: 38em;
+  margin: 0;
+  padding: 20px;
+  overflow-x: auto;
+  border: 3px solid rgba(0, 0, 0, 0);
+  outline: 1px solid #b1b4b6;
+  background-color: #f8f8f8;
+  font-size: 1.1875rem;
+  line-height: 1.3157894737;
+  margin-bottom: 15px;
 }

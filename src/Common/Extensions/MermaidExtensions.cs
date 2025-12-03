@@ -22,7 +22,7 @@ public static class MermaidExtensions
         var sb = new StringBuilder();
         sb.AppendLine("flowchart TD");
         sb.AppendLine("  %% Generated from Questionnaire -> Questions -> Answers");
-        sb.AppendLine("  %% Destinations: Question, External Link, Custom Info Page");
+        sb.AppendLine("  %% Destinations: Question, External Link, Results Page");
         sb.AppendLine("  %% Priorities are used for routing for multiselect questions");
         sb.AppendLine();
 
@@ -43,16 +43,6 @@ public static class MermaidExtensions
             questionIds[questions[i].Id] = id;
             var label = EscapeLabel(string.IsNullOrWhiteSpace(questions[i].Content) ? $"Question {i + 1}" : Truncate(questions[i].Content!, 60));
             sb.AppendLine($"  {id}{{\"{label}\"}}");
-        }
-
-        if (questions.Count > 0)
-        {
-            // Composition (dashed 'contains') and initial arrow to first question by order
-            foreach (var q in questions)
-            {
-                sb.AppendLine($"  {qnId} -. contains .-> {questionIds[q.Id]}");
-            }
-            sb.AppendLine($"  {qnId} --> {questionIds[questions[0].Id]}");
         }
 
         // Containers for special destinations (info pages and external links) to avoid duplicate nodes
@@ -87,7 +77,7 @@ public static class MermaidExtensions
                                     var contentTitle = contentMap[key];
                                 
                                     var infoLabel = EscapeLabel(string.IsNullOrWhiteSpace(a.DestinationUrl)
-                                        ? $"Custom Info '{contentTitle}'"
+                                        ? $"Results page '{contentTitle}'"
                                         : Truncate(a.DestinationUrl!, 60));
                                     sb.AppendLine($"  {infoNodeId}[[{infoLabel}]]:::info");
                                 }
@@ -134,9 +124,8 @@ public static class MermaidExtensions
         sb.AppendLine("  %% Legend");
         sb.AppendLine("  subgraph Legend");
         sb.AppendLine("    L1[Solid arrows = branching via destination fields]");
-        sb.AppendLine("    L2[Dashed 'contains' = Questionnaire has Questions]");
         sb.AppendLine("    L3[\"Answer '(priority: n)' = prioritisation only\"]");
-        sb.AppendLine("    L4[[Custom Info Page]]:::info");
+        sb.AppendLine("    L4[[Results Page]]:::info");
         sb.AppendLine("    L5{{External Link}}:::link");
         sb.AppendLine("  end");
         sb.AppendLine();

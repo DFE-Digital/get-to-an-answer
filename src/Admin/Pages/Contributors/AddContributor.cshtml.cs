@@ -33,11 +33,14 @@ public class AddContributor(ILogger<AddContributor> logger,
 
         try
         {
-            await graphClient.GetGraphUserAsync(ContributorEmail);
+            var graphUser = await graphClient.GetGraphUserAsync(ContributorEmail);
+            
+            if (graphUser == null)
+                return NotFound();
 
             await apiClient.AddQuestionnaireContributor(QuestionnaireId, new AddContributorRequestDto()
             {
-                Email = ContributorEmail
+                Id = graphUser.Id
             });
 
             TempData[nameof(QuestionnaireState)] =
@@ -45,7 +48,12 @@ public class AddContributor(ILogger<AddContributor> logger,
 
             return Redirect(string.Format(Routes.AddAndEditQuestionnaireContributors, QuestionnaireId));
         }
-        catch (MsGraphException)
+        catch (GetToAnAnswerApiException e) when (e.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            ModelState.AddModelError(nameof(ContributorEmail), e.ProblemDetails?.Detail!);
+            return Page();
+        }
+        catch (MsGraphException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
             ModelState.AddModelError(nameof(ContributorEmail), "Contributor not found");
             return Page();

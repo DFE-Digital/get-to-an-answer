@@ -4,6 +4,11 @@
 
 @{
     ViewData["Title"] = "Questionnaire version history";
+
+    var questionnaireSlug = Model.Questionnaire?.Slug;
+    var requestScheme = Request.Scheme;
+    var requestHost = Request.Host;
+    var gtaaBaseUrl = $"{requestScheme}://{requestHost}";
 }
 
 @section BeforeContent
@@ -11,6 +16,18 @@
   <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.QuestionnaireId/track">Back</a>
 }
 
+<h1 class="govuk-heading-l">
+  <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
+  Add questionnaire to your service
+</h1>
+<dl class="govuk-!-margin-bottom-7">
+  <dt class="govuk-visually-hidden">Status</dt>
+  <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
+  </dd>
+</dl>
+<div class="govuk-inset-text" id="some-hint">
+  <p>Once you make a copy of this questionnaire, you will be directed to 'Create a questionnaire' of the new copy.</p>
+</div>
 <div data-module="appstepnav"id="step-by-step-navigation" class="app-step-nav js-hidden app-step-nav--large" data-show-text="Show Changes" data-hide-text="Hide Changes" data-show-all-text="Show all versions" data-hide-all-text="Hide all versions">
   <ol class="app-step-nav__steps">
     <li class="app-step-nav__step js-step" id="check-you-re-allowed-to-drive">
@@ -24,27 +41,25 @@
             </span>
           </span>
 
-          <span class="js-step-title" data-hint-text="send or embed the link" data-created-at="">
+          <span class="js-step-title" data-hint-text="send or embed the link" data-complexity="Easy">
             Quick setup
           </span>
         </h2>
       </div>
 
       <div class="app-step-nav__panel js-panel" id="step-panel-check-you-re-allowed-to-drive-1">
-        <p class="app-step-nav__paragraph">The following are the list of changes since the last publish.</p>
+        <p class="app-step-nav__paragraph"></p>
 
         <ol class="app-step-nav__list " data-length="1">
           <li class="app-step-nav__list-item js-list-item ">
-            <pre><code class="language-html">
-&lt;div class="govuk-form-group"&gt;
-  &lt;h1 class="govuk-label-wrapper"&gt;
-    &lt;label class="govuk-label govuk-label--l" for="event-name"&gt;
-      What is the name of the event?
-    &lt;/label&gt;
-  &lt;/h1&gt;
-  &lt;input class="govuk-input" id="event-name" name="event-name" type="text"&gt;
-&lt;/div&gt;
-  </code></pre>
+            <p>Send the following questionnaire link to service users, where they just need to click on the link to start the questionnaire.</p>
+            <p>OR</p>
+            <p>Add the link to your service website where some can click it and be sent to the questionnaire on the Get-To-An-Answer website.</p>
+          </li>
+          <li class="app-step-nav__list-item js-list-item ">
+            <pre><code class="language-bash">
+@gtaaBaseUrl/questionnaires/@questionnaireSlug/start?embed=false
+            </code></pre>
           </li>
         </ol>
       </div>
@@ -60,28 +75,31 @@
             </span>
           </span>
 
-          <span class="js-step-title" data-hint-text="manually add the iframe to pages" data-created-at="">
+          <span class="js-step-title" data-hint-text="manually add the iframe to pages" data-complexity="Simple if you're technical">
             Embed Iframe
           </span>
         </h2>
       </div>
 
       <div class="app-step-nav__panel js-panel" id="step-panel-check-you-re-allowed-to-drive-1">
-        <p class="app-step-nav__paragraph">The following are the list of changes since the last publish.</p>
+        <p class="app-step-nav__paragraph"></p>
 
         <ol class="app-step-nav__list " data-length="">
+          <li class="app-step-nav__list-item js-list-item ">
+            Add the following iframe to your page
+          </li>
           <li class="app-step-nav__list-item js-list-item ">
             <pre><code>
 &lt;div class="gtaa-wrapper" style="margin:0 auto; max-width:100%; width:100%;"&gt;
   &lt;iframe id="gtaaFrame"
-          title="{Title}"
-          src="{GtaaBaseUrl}/questionnaires/{questionnaireSlug}/start?embed=true"
+          title="@Model.Questionnaire?.Title"
+          src="@gtaaBaseUrl/questionnaires/@questionnaireSlug/start?embed=true"
           allow="autoplay"
           referrerpolicy="strict-origin"
           sandbox="allow-scripts allow-top-navigation allow-forms"
           style="width:100%; height:100%; border:none;"&gt;&lt;/iframe&gt;
 &lt;/div&gt;
-&lt;script asp-add-nonce="true" src="{GtaaBaseUrl}/js/gtaa.external.js"&gt;&lt;/script&gt;
+&lt;script asp-add-nonce="true" src="@gtaaBaseUrl/js/gtaa.external.js"&gt;&lt;/script&gt;
             </code></pre>
           </li>
         </ol>
@@ -98,18 +116,47 @@
               </span>
             </span>
 
-            <span class="js-step-title" data-hint-text="add our content model and deploy wherever you want" data-created-at="">
+            <span class="js-step-title" data-hint-text="add our content model and deploy wherever you want" data-complexity="Advanced">
               Contentful integration
             </span>
           </h2>
         </div>
 
         <div class="app-step-nav__panel js-panel" id="step-panel-check-you-re-allowed-to-drive-1">
-          <p class="app-step-nav__paragraph">The following are the list of changes since the last publish.</p>
+          <p class="app-step-nav__paragraph"></p>
 
           <ol class="app-step-nav__list " data-length="1">
             <li class="app-step-nav__list-item js-list-item ">
-              
+              1. Add the migration script below to your Contentful migrations project, and map the content model to the iframe shown above.
+            </li>
+            <li class="app-step-nav__list-item js-list-item ">
+              <div class="govuk-code-example">
+                <button type="button" class="govuk-code-example__copy">
+                  Copy code
+                </button>
+                <pre><code class="language-typescript">
+module.exports = function (migration) {
+  const gtaa = migration.createContentType('getToAnAnswer')
+    .name('GetToAnAnswer')
+    .displayField('title')
+    .description('Embeddable iframe that renders a questionnaire runner');
+
+  gtaa.createField('title').name('Title').type('Symbol').required(true);
+  gtaa.createField('questionnaireSlug')
+    .name('Questionnaire Slug')
+    .type('Symbol')
+    .validations([{ regexp: { pattern: '^([a-zA-Z0-9|-]).+' }, message: 'Must be a questionnaire slug' }]);
+  gtaa.changeEditorInterface('questionnaireSlug', 'singleLine');
+
+  const page = migration.editContentType('page');
+  page.editField('mainContent').validations([
+    { enabledMarks: ['bold', 'italic'] },
+    { enabledNodeTypes: ['heading-2','heading-3','heading-4','ordered-list','unordered-list','embedded-entry-block','embedded-asset-block','entry-hyperlink','hyperlink','embedded-entry-inline','hr','table'] },
+    { nodes: { 'embedded-entry-block': [{ linkContentType: ['definitionContent','callToAction','grid','richContentBlock','banner','statusChecker','riddle','getToAnAnswer','spacer','button'] }] } }
+  ]);
+};
+              </code></pre>
+              </div>
             </li>
           </ol>
         </div>
@@ -123,6 +170,7 @@
 
   <!-- and it's easy to individually load additional languages -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/typescript.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/json.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/xml.min.js"></script>
   <script type="text/javascript">
@@ -132,7 +180,7 @@
         const thisel = this.$module.steps[i];
         const title = thisel.querySelectorAll('.js-step-title')[0];
         const hint = title.getAttribute('data-hint-text') || '';
-        const createdAt = title.getAttribute('data-created-at') || '';
+        const complexity = title.getAttribute('data-complexity') || '';
         const contentId = thisel.querySelectorAll('.js-panel')[0].getAttribute('id');
         const titleText = title.textContent || title.innerText; // IE8 fallback
 
@@ -148,7 +196,7 @@
           (hint ? '<span class="govuk-hint">' + hint +'</span>' : '') +
           '<span class="govuk-visually-hidden app-step-nav__section-heading-divider">, </span>' +
           '</span>' +
-          '<span class="govuk-hint">' + createdAt + '</span>' +
+          '<span class="govuk-hint">Complexity: ' + complexity + '</span>' +
           '</span>' +
           '</span>' +
           '</button>' +
@@ -164,6 +212,30 @@
       if (window.hljs && typeof hljs.highlightAll === 'function') {
         hljs.highlightAll();
       }
+    });
+
+    document.addEventListener('click', function (e) {
+      const button = e.target.closest('.govuk-code-example__copy');
+      if (!button) return;
+
+      const container = button.closest('.govuk-code-example');
+      const code = container.querySelector('pre code');
+      if (!code) return;
+
+      const text = code.textContent;
+
+      navigator.clipboard.writeText(text).then(function () {
+        const original = button.textContent;
+        button.textContent = 'Copied';
+        setTimeout(() => (button.textContent = original), 2000);
+      }).catch(function () {
+        // Fallback: just select the text
+        const range = document.createRange();
+        range.selectNodeContents(code);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      });
     });
   </script>
 }

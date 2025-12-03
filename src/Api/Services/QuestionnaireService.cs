@@ -574,7 +574,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
     {
         try
         {
-            logger.LogInformation("AddContributor started QuestionnaireId={QuestionnaireId} Contributor={Contributor}", id, request.Email);
+            logger.LogInformation("AddContributor started QuestionnaireId={QuestionnaireId} Contributor={Contributor}", id, request.Id);
 
             var access = db.HasAccessToEntity<QuestionnaireEntity>(userId, id);
             if (access == EntityAccess.NotFound)
@@ -588,10 +588,14 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (questionnaire == null)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
 
-            if (!questionnaire.Contributors.Contains(request.Email))
+            if (!questionnaire.Contributors.Contains(request.Id))
             {
-                questionnaire.Contributors.Add(request.Email);
+                questionnaire.Contributors.Add(request.Id);
                 await db.SaveChangesAsync();
+            }
+            else
+            {
+                return BadRequest(ProblemTrace("The contributor already exists", 409));
             }
 
             return Ok();
@@ -809,7 +813,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             var contentMap = await db.Contents
                 .AsNoTracking()
                 .Where(x => x.QuestionnaireId == questionnaireId)
-                .ToDictionaryAsync(c => c.Id, c => c.Title);
+                .ToDictionaryAsync(c => c.Id, c => c.ReferenceName ?? c.Title);
             
             return Ok(new QuestionnaireBranchingMapDto
             {
