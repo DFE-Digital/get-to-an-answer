@@ -92,24 +92,6 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
         }
     }
 
-    private async Task PopulateOptionSelectionLists()
-    {
-        var questionForSelection = await _apiClient.GetQuestionsAsync(QuestionnaireId);
-        var resultsPages = await _apiClient.GetContentsAsync(QuestionnaireId);
-
-        var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
-            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
-
-        var resultsPagesForSelection = resultsPages
-            .Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
-
-        foreach (var option in Options)
-        {
-            option.QuestionSelectList = questionSelectionList;
-            option.ResultsPageSelectList = resultsPagesForSelection;
-        }
-    }
-
     private async Task PopulateFieldWithExistingValues()
     {
         Options?.Clear();
