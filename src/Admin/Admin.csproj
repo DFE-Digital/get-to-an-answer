@@ -38,8 +38,4 @@
       <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="Pages\Misc\QuestionnaireContactDetails.cshtml" />
-    </ItemGroup>
-
 </Project>
