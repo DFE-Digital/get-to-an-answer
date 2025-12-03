@@ -1,0 +1,5 @@
+env      = "Production"
+asp_env  = "Production"
+product  = "Get-To-An-Answer"
+prefix   = "s263p01"
+location = "uksouth"
