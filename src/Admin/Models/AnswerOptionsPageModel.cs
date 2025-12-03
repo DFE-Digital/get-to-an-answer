@@ -155,8 +155,6 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             option.ResultsPageSelectList = resultsPagesForSelection;
         }
     }
-    
-    
 
     protected async Task CreateAnswer(AnswerOptionsViewModel option)
     {
@@ -170,7 +168,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             DestinationQuestionId = option.SelectedDestinationQuestion != null
                 ? Guid.Parse(option.SelectedDestinationQuestion)
                 : null,
-            DestinationUrl = option.ResultPageUrl,
+            DestinationUrl = option.ExternalLink,
             Priority = Convert.ToSingle(option.RankPriority),
         });
     }
@@ -184,7 +182,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             DestinationQuestionId = option.SelectedDestinationQuestion != null
                 ? Guid.Parse(option.SelectedDestinationQuestion)
                 : null,
-            DestinationUrl = option.ResultPageUrl,
+            DestinationUrl = option.ExternalLink,
             Priority = Convert.ToSingle(option.RankPriority),
             DestinationContentId = option.SelectedResultsPage != null
                 ? Guid.Parse(option.SelectedResultsPage)
