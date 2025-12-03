@@ -118,7 +118,7 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
         catch (GetToAnAnswerApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
         {
             // Set an error message in TempData and redirect back (PRG)
-            TempData["MoveError"] = "You cannot move this question further down.";
+            TempData["MoveError"] = "You cannot move this question further down";
             return RedirectToPage(new { questionnaireId });
         }
         catch (Exception e)
