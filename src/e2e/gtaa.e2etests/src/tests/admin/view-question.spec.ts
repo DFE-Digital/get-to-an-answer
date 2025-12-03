@@ -105,15 +105,15 @@ test.describe('Get to an answer view questions', () => {
     });
 
     // TBS, CARE-1557 bug raised
-    // test("Validate questionnaire status as published on view questions page", async ({request, page}) => {
-    //     await publishQuestionnaire(request, questionnaireId, token);
-    //    
-    //     viewQuestionnairePage = await signIn(page, token);
-    //     viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-    //    
-    //     await viewQuestionPage.expectQuestionHeadingOnPage();
-    //     await viewQuestionPage.expectQuestionnaireStatusOnPage('Published');
-    // });
+    test("Validate questionnaire status as published on view questions page", async ({request, page}) => {
+        await publishQuestionnaire(request, questionnaireId, token);
+
+        viewQuestionnairePage = await signIn(page, token);
+        viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
+
+        await viewQuestionPage.expectQuestionHeadingOnPage();
+        await viewQuestionPage.expectQuestionnaireStatusOnPage('Published');
+    });
 
     test("Add question CTA navigates to Add question", async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
@@ -267,84 +267,84 @@ test.describe('Get to an answer view questions', () => {
     });
     
     // TBC, bug raised CARE-1569
-    // test('Performing concurrent move up question ordering should throw an error', async ({browser, request}) => {
-    //     // Create first browser context
-    //     const context1 = await browser.newContext();
-    //     const page1 = await context1.newPage();
-    //
-    //     // Create second browser context
-    //     const context2 = await browser.newContext();
-    //     const page2 = await context2.newPage();
-    //
-    //     try {
-    //         await signIn(page1, token);
-    //         await signIn(page2, token);
-    //
-    //         // Navigate to view questions page on both pages
-    //         const viewQuestionPage1 = await goToViewQuestionsPageByUrl(page1, questionnaireId);
-    //         const viewQuestionPage2 = await goToViewQuestionsPageByUrl(page2, questionnaireId);
-    //
-    //         // Tab 1: Move question 2 up
-    //         await viewQuestionPage1.table.moveUpByIndex(2);
-    //         await viewQuestionPage1.waitForPageLoad();
-    //
-    //         // Tab 2: Try to move question 2 up again (concurrent/stale update)
-    //         await viewQuestionPage2.table.moveUpByIndex(2);
-    //         await viewQuestionPage2.waitForPageLoad();
-    //
-    //         // Validate error message is displayed on viewQuestionPage2
-    //         await viewQuestionPage2.expectErrorSummaryVisible();
-    //        
-    //         // Verify the error message indicates a conflict or stale update
-    //         await viewQuestionPage2.validateMoveUpErrorMessageContains();
-    //         const expectedMessage = await viewQuestionPage2.getMatchingErrorMessages(ErrorMessages.ERROR_MESSAGE_TOP_QUESTION_UP)
-    //         expect(expectedMessage).toHaveLength(1);
-    //        
-    //     } finally {
-    //         await context1.close();
-    //         await context2.close();
-    //     }
-    // });
+    test('Performing concurrent move up question ordering should throw an error', async ({browser, request}) => {
+        // Create first browser context
+        const context1 = await browser.newContext();
+        const page1 = await context1.newPage();
+
+        // Create second browser context
+        const context2 = await browser.newContext();
+        const page2 = await context2.newPage();
+
+        try {
+            await signIn(page1, token);
+            await signIn(page2, token);
+
+            // Navigate to view questions page on both pages
+            const viewQuestionPage1 = await goToViewQuestionsPageByUrl(page1, questionnaireId);
+            const viewQuestionPage2 = await goToViewQuestionsPageByUrl(page2, questionnaireId);
+
+            // Tab 1: Move question 2 up
+            await viewQuestionPage1.table.moveUpByIndex(2);
+            await viewQuestionPage1.waitForPageLoad();
+
+            // Tab 2: Try to move question 2 up again (concurrent/stale update)
+            await viewQuestionPage2.table.moveUpByIndex(2);
+            await viewQuestionPage2.waitForPageLoad();
+
+            // Validate error message is displayed on viewQuestionPage2
+            await viewQuestionPage2.expectErrorSummaryVisible();
+
+            // Verify the error message indicates a conflict or stale update
+            await viewQuestionPage2.validateMoveUpErrorMessageContains();
+            const expectedMessage = await viewQuestionPage2.getMatchingErrorMessages(ErrorMessages.ERROR_MESSAGE_TOP_QUESTION_UP)
+            expect(expectedMessage).toHaveLength(1);
+
+        } finally {
+            await context1.close();
+            await context2.close();
+        }
+    });
 
     // TBC, bug raised CARE-1565
-    // test('Performing concurrent move down question ordering should throw an error', async ({browser, request}) => {
-    //     // Create first browser context
-    //     const context1 = await browser.newContext();
-    //     const page1 = await context1.newPage();
-    //
-    //     // Create second browser context
-    //     const context2 = await browser.newContext();
-    //     const page2 = await context2.newPage();
-    //
-    //     try {
-    //         await signIn(page1, token);
-    //         await signIn(page2, token);
-    //
-    //         // Navigate to view questions page on both pages
-    //         const viewQuestionPage1 = await goToViewQuestionsPageByUrl(page1, questionnaireId);
-    //         const viewQuestionPage2 = await goToViewQuestionsPageByUrl(page2, questionnaireId);
-    //
-    //         // Tab 1: Move question 2 down
-    //         await viewQuestionPage1.table.moveDownByIndex(3);
-    //         await viewQuestionPage1.waitForPageLoad();
-    //
-    //         // Tab 2: Try to move question 2 down again (concurrent/stale update)
-    //         await viewQuestionPage2.table.moveDownByIndex(3);
-    //         await viewQuestionPage2.waitForPageLoad();
-    //
-    //         // Validate error message is displayed on viewQuestionPage2
-    //         await viewQuestionPage2.expectErrorSummaryVisible();
-    //
-    //         // Verify the error message indicates a conflict or stale update
-    //         await viewQuestionPage2.validateMoveDownErrorMessageContains();
-    //         const expectedMessage = await viewQuestionPage2.getMatchingErrorMessages(ErrorMessages.ERROR_MESSAGE_BOTTOM_QUESTION_DOWN)
-    //         expect(expectedMessage).toHaveLength(1);
-    //
-    //     } finally {
-    //         await context1.close();
-    //         await context2.close();
-    //     }
-    // });
+    test('Performing concurrent move down question ordering should throw an error', async ({browser, request}) => {
+        // Create first browser context
+        const context1 = await browser.newContext();
+        const page1 = await context1.newPage();
+
+        // Create second browser context
+        const context2 = await browser.newContext();
+        const page2 = await context2.newPage();
+
+        try {
+            await signIn(page1, token);
+            await signIn(page2, token);
+
+            // Navigate to view questions page on both pages
+            const viewQuestionPage1 = await goToViewQuestionsPageByUrl(page1, questionnaireId);
+            const viewQuestionPage2 = await goToViewQuestionsPageByUrl(page2, questionnaireId);
+
+            // Tab 1: Move question 2 down
+            await viewQuestionPage1.table.moveDownByIndex(3);
+            await viewQuestionPage1.waitForPageLoad();
+
+            // Tab 2: Try to move question 2 down again (concurrent/stale update)
+            await viewQuestionPage2.table.moveDownByIndex(3);
+            await viewQuestionPage2.waitForPageLoad();
+
+            // Validate error message is displayed on viewQuestionPage2
+            await viewQuestionPage2.expectErrorSummaryVisible();
+
+            // Verify the error message indicates a conflict or stale update
+            await viewQuestionPage2.validateMoveDownErrorMessageContains();
+            const expectedMessage = await viewQuestionPage2.getMatchingErrorMessages(ErrorMessages.ERROR_MESSAGE_BOTTOM_QUESTION_DOWN)
+            expect(expectedMessage).toHaveLength(1);
+
+        } finally {
+            await context1.close();
+            await context2.close();
+        }
+    });
 
     test('Reorder behavior', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
