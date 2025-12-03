@@ -30,7 +30,7 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
 
     public async Task<IActionResult> OnGet()
     {
-        BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
+        BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId);
 
         try
         {

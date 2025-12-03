@@ -669,7 +669,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             QuestionnaireJson = json,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = questionnaire.PublishedBy ?? string.Empty,
-            ChangeDescription = "Questionnaire Published"
+            ChangeDescription = "Questionnaire published"
         };
 
         db.QuestionnaireVersions.Add(snapshot);
