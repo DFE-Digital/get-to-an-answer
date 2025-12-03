@@ -63,7 +63,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-        <h1 class="govuk-heading-l">
+        <h1 class="govuk-heading-l govuk-!-margin-0">
             <span class="govuk-caption-l">Question @Model.QuestionNumber</span>
             Edit question
         </h1>
@@ -118,12 +118,33 @@
                                          type="radio"
                                          value="@(option)"
                                          id="@($"{option}-radio")"/>
-                            <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
-                                @Model.QuestionTypeFriendly(option)
-                            </label>
-                            <div class="govuk-hint govuk-radios__hint">
-                                @Model.QuestionTypeHint(option)
-                            </div>
+                            @if (option == QuestionType.SingleSelect)
+                            {
+                                <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
+                                    One option only (using <a href="https://design-system.service.gov.uk/components/radios/">radio buttons</a>)
+                                </label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                    Use this when you have a small list of options.
+                                </div>
+                            }
+                            else if (option == QuestionType.DropdownSelect)
+                            {
+                                <label class="govuk-label govuk-radios__label" for="QuestionType-Dropdown">
+                                    One option only (using a <a href="https://design-system.service.gov.uk/components/select/">drop-down</a>)
+                                </label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                    Use this when you have a long list of options.
+                                </div>
+                            }
+                            else if (option == QuestionType.MultiSelect)
+                            {
+                                <label class="govuk-label govuk-radios__label" for="QuestionType-MultiSelect">
+                                    One or more options (using <a href="https://design-system.service.gov.uk/components/checkboxes/">checkboxes</a>)
+                                </label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                    Use this when people can select more than one option.
+                                </div>
+                            }
                         </div>
                     }
                 }
