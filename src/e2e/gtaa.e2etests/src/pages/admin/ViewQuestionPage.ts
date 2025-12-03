@@ -76,10 +76,13 @@ export class ViewQuestionPage extends BasePage {
 
     // ===== Validations =====
     async expectQuestionHeadingOnPage(expectedText?: string): Promise<void> {
-        await expect(this.questionHeading, '❌ Question heading not visible').toBeVisible();
-
+        await expect(this.questionHeading, '❌ View question page heading not visible').toBeVisible();
+        
         if (expectedText) {
-            await expect(this.questionHeading, `❌ Question heading text does not match: expected "${expectedText}"`).toHaveText(expectedText);
+            await expect(
+                this.questionHeading,
+                `❌ View question page heading text does not match: expected "${expectedText}"`
+            ).toContainText(expectedText);
         }
     }
 

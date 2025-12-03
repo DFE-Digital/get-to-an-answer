@@ -2,7 +2,7 @@ import {Page, Locator, expect} from '@playwright/test';
 import {BasePage} from "../BasePage";
 import {ErrorMessages} from "../../constants/test-data-constants";
 import {Timeouts} from "../../constants/timeouts";
-import {QuestionType} from "./AddQuestionPage";
+import {QuestionRadioLabel} from "./AddQuestionPage";
 
 type Mode = 'create' | 'edit';
 type Destination = 'NextQuestion' | 'SpecificQuestion' | 'ExternalResultsPage' | 'InternalResultsPage' | '0';

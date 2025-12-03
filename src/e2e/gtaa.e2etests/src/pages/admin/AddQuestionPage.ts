@@ -7,7 +7,7 @@ import {EditAnswerTable} from "./components/EditAnswerTable";
 
 type Mode = 'create' | 'update';
 
-export enum QuestionType {
+export enum QuestionRadioLabel {
     SingleSelectShort = 'SingleSelect',
     SingleSelectLong = 'DropdownSelect',
     MultiSelect = 'Multiselect'
@@ -41,11 +41,14 @@ export class AddQuestionPage extends BasePage {
     private readonly inlineQuestionContentError: Locator;
     private readonly inlineUpdateQuestionContentError: Locator;
     private readonly inlineQuestionTypeError: Locator;
-    private readonly inlineUpdateQuestionTypeError: Locator;
     private readonly fieldset: Locator;
     private readonly saveQuestionButton: Locator;
     private readonly deleteQuestionButton: Locator;
-    
+    private readonly addQuestionButton: Locator;
+    private readonly backToQuestionsLink: Locator;
+    private readonly successBanner: Locator;
+    private readonly successBannerHeading: Locator;
+
     readonly table: EditAnswerTable;
 
     // ===== Constructor =====
@@ -53,29 +56,25 @@ export class AddQuestionPage extends BasePage {
         super(page);
         this.mode = mode;
 
-        // The only form under #main-content – method="post", accept-charset="UTF-8"
         this.form = this.page.locator('#main-content form[method="post"]');
         this.addQuestionHeading = this.page.locator('main h1.govuk-heading-l');
         this.questionContentFormGroup = page.locator('.govuk-form-group:has(#QuestionContent)');
         this.backLink = this.page.locator('a.govuk-back-link');
 
-        // Question text input
         this.questionInput = this.form.locator('input[name="QuestionContent"][type="text"]');
-
-        // Hint textarea
         this.hintTextarea = this.form.locator('textarea[name="QuestionHintText"]');
 
         // Radio buttons
         this.typeSingleShort = this.form
-            .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionType.SingleSelectShort}"]`)
+            .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionRadioLabel.SingleSelectShort}"]`)
             .or(this.form.locator(`input[type="radio"][name="${this.radioName}"]`).nth(0));
 
         this.typeSingleLong = this.form
-            .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionType.SingleSelectLong}"]`)
+            .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionRadioLabel.SingleSelectLong}"]`)
             .or(this.form.locator(`input[type="radio"][name="${this.radioName}"]`).nth(1));
 
         this.typeMulti = this.form
-            .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionType.MultiSelect}"]`)
+            .locator(`input[type="radio"][name="${this.radioName}"][value="${QuestionRadioLabel.MultiSelect}"]`)
             .or(this.form.locator(`input[type="radio"][name="${this.radioName}"]`).last());
 
         // Save button
@@ -106,15 +105,20 @@ export class AddQuestionPage extends BasePage {
             '#QuestionContent-error'
         );
         this.inlineUpdateQuestionContentError = this.questionContentFormGroup.locator(
-            '#QuestionContent-error-xxx'
+            '#QuestionContent-error'
         );
 
         this.inlineQuestionTypeError = this.radiosFormGroup.locator('#QuestionType-error');
-        this.inlineUpdateQuestionTypeError = this.radiosFormGroup.locator('#QuestionType-error-xxx');
         this.fieldset = this.form.locator('fieldset[aria-describedby*="QuestionType-hint"]');
 
-        this.saveQuestionButton = page.getByRole('button', { name: /save question/i });
-        this.deleteQuestionButton = page.getByRole('button', { name: /delete question/i });
+        this.saveQuestionButton = page.getByRole('button', {name: /save question/i});
+        this.deleteQuestionButton = page.getByRole('button', {name: /delete question/i});
+
+        // success banner
+        this.successBanner = page.locator('.govuk-notification-banner--success');
+        this.successBannerHeading = this.successBanner.getByRole('heading', {name: /your changes have been saved/i});
+        this.addQuestionButton = page.getByRole('button', {name: /add a question/i});
+        this.backToQuestionsLink = page.getByRole('link', {name: /back to your questions/i});
 
         this.table = new EditAnswerTable(page);
     }
@@ -122,6 +126,13 @@ export class AddQuestionPage extends BasePage {
     // ===== Validations =====
     async expectAddQuestionHeadingOnPage(expectedText?: string): Promise<void> {
         await expect(this.addQuestionHeading, '❌ Add question heading not visible').toBeVisible();
+
+        if (expectedText) {
+            await expect(
+                this.addQuestionHeading,
+                `❌ Add question heading text mismatch: expected "${expectedText}"`
+            ).toContainText(expectedText);
+        }
     }
 
     async VerifyQuestionInputAndHintTextarea(): Promise<void> {
@@ -156,20 +167,12 @@ export class AddQuestionPage extends BasePage {
     }
 
     async validateInlineQuestionContentError(): Promise<void> {
-        if (this.mode === 'update') {
-            await expect(this.inlineUpdateQuestionContentError, '❌ Inline question content error not visible').toBeVisible();
-        } else {
-            await expect(this.inlineQuestionContentError, '❌ Inline question content error not visible').toBeVisible();
-        }
+        await expect(this.inlineQuestionContentError, '❌ Inline question content error not visible').toBeVisible();
     }
 
     async validateInlineQuestionTypeError(): Promise<void> {
-        if (this.mode === 'update') {
-            //await expect(this.inlineUpdateQuestionTypeError, '❌ Inline question type error not visible').toBeVisible();
-        } else {
-            await expect(this.errorSummary).toBeVisible();
-            await expect(this.inlineQuestionTypeError, '❌ Inline question type error not visible').toBeVisible();
-        }
+        await expect(this.errorSummary).toBeVisible();
+        await expect(this.inlineQuestionTypeError, '❌ Inline question type error not visible').toBeVisible();
     }
 
     async validateQuestionTextFormGroup() {
@@ -189,12 +192,18 @@ export class AddQuestionPage extends BasePage {
         expect(await this.radios.count()).toBeGreaterThan(1);
         if (this.mode === 'update') {
             await this.table.verifyVisible();
-            await expect(this.saveQuestionButton,'❌ Save question not visible').toBeVisible();
-            await expect(this.deleteQuestionButton,'❌ Delete question not visible').toBeVisible();
-        }else{
-            await expect(this.saveAndContinueButton, '❌ Save button not visible').toBeVisible();    
+            await expect(this.saveQuestionButton, '❌ Save question not visible').toBeVisible();
+            await expect(this.deleteQuestionButton, '❌ Delete question not visible').toBeVisible();
+        } else {
+            await expect(this.saveAndContinueButton, '❌ Save button not visible').toBeVisible();
         }
-        
+    }
+
+    async validateSuccessBanner(): Promise<void> {
+        await expect(this.successBanner, '❌ Success banner not visible').toBeVisible();
+        await expect(this.successBanner, '❌ Banner role attribute missing').toHaveAttribute('role', 'alert');
+        await expect(this.successBannerHeading, '❌ Banner heading incorrect').toBeVisible();
+        await expect(this.successBannerHeading).toHaveText(/your changes have been saved/i);
     }
 
     // Accessibility
@@ -208,34 +217,21 @@ export class AddQuestionPage extends BasePage {
         const ariaValue = await this.questionInput.getAttribute('aria-describedby');
         expect(ariaValue, '❌ aria-describedby is missing').not.toBeNull();
 
-        if (this.mode === 'update') {
-            expect(ariaValue, '❌ aria-describedby missing error id')
-                .toContain('questioncontent-field-error');
-        } else {
-            expect(ariaValue, '❌ aria-describedby missing error id')
-                .toContain('questioncontent-field-error');
-        }
+        expect(ariaValue, '❌ aria-describedby missing error id')
+            .toContain('questioncontent-field-error');
     }
 
     async validateQuestionTypeErrorAriaDescribedBy(): Promise<void> {
-        const errorElement = this.mode === 'update'
-            ? this.inlineQuestionTypeError
-            : this.inlineUpdateQuestionTypeError;
-
+        const errorElement = this.inlineQuestionTypeError;
         await errorElement.waitFor({state: 'visible', timeout: Timeouts.LONG});
 
         await expect(this.fieldset).toHaveAttribute('aria-describedby');
 
         const ariaValue = await this.fieldset.getAttribute('aria-describedby');
         expect(ariaValue, '❌ aria-describedby missing').not.toBeNull();
-
-        if (this.mode === 'update') {
-            expect(ariaValue, '❌ aria-describedby missing error id')
-                .toContain('QuestionType-error');
-        } else {
-            expect(ariaValue, '❌ aria-describedby missing error id')
-                .toContain('QuestionType-error');
-        }
+        
+        expect(ariaValue, '❌ aria-describedby missing error id')
+            .toContain('QuestionType-error');
     }
 
     // ===== Actions =====
@@ -297,21 +293,21 @@ export class AddQuestionPage extends BasePage {
     async clearQuestionHintText(): Promise<void> {
         await this.hintTextarea.clear();
     }
-    
+
     async enterInvalidContent(): Promise<void> {
         await this.questionInput.clear();
         await this.questionInput.fill(`${' '.repeat(10)}`);
     }
-    
-    async chooseQuestionType(type: QuestionType): Promise<void> {
+
+    async chooseQuestionType(type: QuestionRadioLabel): Promise<void> {
         switch (type) {
-            case QuestionType.SingleSelectShort:
+            case QuestionRadioLabel.SingleSelectShort:
                 await this.typeSingleShort.check();
                 break;
-            case QuestionType.SingleSelectLong:
+            case QuestionRadioLabel.SingleSelectLong:
                 await this.typeSingleLong.check();
                 break;
-            case QuestionType.MultiSelect:
+            case QuestionRadioLabel.MultiSelect:
                 await this.typeMulti.check();
                 break;
         }
@@ -327,5 +323,15 @@ export class AddQuestionPage extends BasePage {
 
     async clickDeleteQuestion(): Promise<void> {
         await this.deleteQuestionButton.click();
+    }
+
+    async clickAddQuestionInSuccessBanner(): Promise<void> {
+        await expect(this.addQuestionButton).toBeVisible();
+        await this.addQuestionButton.click();
+    }
+
+    async clickBackToYourQuestionsInSuccessBanner(): Promise<void> {
+        await expect(this.backToQuestionsLink).toBeVisible();
+        await this.backToQuestionsLink.click();
     }
 }
