@@ -266,7 +266,6 @@ test.describe('Get to an answer view questions', () => {
         expect(finalOrder).toHaveLength(3);
     });
     
-    // TBC, bug raised CARE-1569
     test('Performing concurrent move up question ordering should throw an error', async ({browser, request}) => {
         // Create first browser context
         const context1 = await browser.newContext();
