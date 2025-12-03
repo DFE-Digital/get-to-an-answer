@@ -77,5 +77,5 @@ public class QuestionnaireEntity
     [MaxLength(50)] public string? ContinueButtonText { get; set; } = "Continue";
     public bool IsAccessibilityAgreementAccepted { get; set; }
     
-    
+    [MaxLength(250)] public string? ContactEmailId { get; set; }
 }

@@ -24,8 +24,6 @@ public class AnswerOptionsViewModel
     public IEnumerable<SelectListItem> QuestionSelectList { get; set; } = [];
     public List<SelectListItem> ResultsPageSelectList { get; set; } = [];
     
-    public string? ResultPageUrl { get; set; }
-    
     public string? SelectedResultsPage { get; set; }
     
     public string? SelectedDestinationQuestion { get; set; }
