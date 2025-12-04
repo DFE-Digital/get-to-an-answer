@@ -16,6 +16,11 @@
     <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
 }
 
+@if (Model!.HasErrors())
+{
+    @await Html.PartialAsync("_ErrorSummary")
+}
+
 @if (Model.QuestionSaved)
 {
     <div class="govuk-grid-row">

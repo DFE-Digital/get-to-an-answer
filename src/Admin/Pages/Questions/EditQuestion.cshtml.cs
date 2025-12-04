@@ -80,7 +80,10 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         try
         {
             if (!ModelState.IsValid)
+            {
+                QuestionSaved = false;
                 return Page();
+            }
 
             await apiClient.UpdateQuestionAsync(QuestionId, new UpdateQuestionRequestDto
             {
