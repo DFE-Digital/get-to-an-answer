@@ -1066,3 +1066,13 @@ pre code {
   line-height: 1.3157894737;
   margin-bottom: 15px;
 }
+
+.govuk-\!-margin-bottom-11 {
+  margin-bottom: 100px !important;
+}
+
+.govuk-\!-v-align {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
