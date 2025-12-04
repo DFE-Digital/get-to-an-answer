@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
 import {BasePage} from "../BasePage";
+import {Timeouts} from "../../constants/timeouts";
 
 export class DeleteQuestionConfirmationPage extends BasePage{
     private readonly heading: Locator;
@@ -40,23 +41,24 @@ export class DeleteQuestionConfirmationPage extends BasePage{
 
     // ====== ACTIONS ======
     async clickBackLink(): Promise<void> {
-        await expect(this.backLink).toBeVisible();
+        await this.backLink.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await this.backLink.click();
+        await this.page.waitForLoadState('networkidle');
     }
 
     async clickContinue(): Promise<void> {
-        await expect(this.continueButton).toBeVisible();
+        await this.continueButton.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await this.continueButton.click();
     }
 
     // ====== RADIO SELECTORS ======
     async selectYes(): Promise<void> {
-        await expect(this.yesRadio).toBeVisible();
+        await this.yesRadio.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await this.yesRadio.check();
     }
 
     async selectNo(): Promise<void> {
-        await expect(this.noRadio).toBeVisible();
+        await this.noRadio.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await this.noRadio.check();
     }
 }

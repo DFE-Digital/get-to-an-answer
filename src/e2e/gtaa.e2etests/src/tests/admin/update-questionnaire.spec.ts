@@ -84,8 +84,7 @@ test.describe('Get to an answer update questionnaire', () => {
     //     await addQuestionnairePage.clickSaveAndContinue();
     //     await addQuestionnairePage.validateTitleFieldAriaDescribedBy();
     // });
-
-    //TBC, CARE-1572 bug raised
+    
     test('Successful submit updates title and validation', async ({request, page}) => {
         viewQuestionnairePage = await signIn(page, token);
         addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);

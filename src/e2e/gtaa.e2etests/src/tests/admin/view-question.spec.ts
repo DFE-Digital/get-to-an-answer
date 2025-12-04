@@ -1,6 +1,11 @@
 import {expect, test} from "@playwright/test";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
-import {goToUpdateQuestionnairePageByUrl, goToViewQuestionsPageByUrl, signIn} from "../../helpers/admin-test-helper";
+import {
+    goToEditQuestionnairePageByUrl,
+    goToUpdateQuestionnairePageByUrl,
+    goToViewQuestionsPageByUrl,
+    signIn
+} from "../../helpers/admin-test-helper";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire, publishQuestionnaire} from "../../test-data-seeder/questionnaire-data";
@@ -16,7 +21,7 @@ test.describe('Get to an answer view questions', () => {
     let token: string;
     let questionnaireId: string;
     let qResp3: any;
-    
+
     let viewQuestionnairePage: ViewQuestionnairePage;
     let editQuestionnairePage: EditQuestionnairePage;
     let viewQuestionPage: ViewQuestionPage;
@@ -34,7 +39,7 @@ test.describe('Get to an answer view questions', () => {
 
         const externalUrl = 'https://www.gov.uk/government/organisations/department-for-education';
 
-        const {answerPostResponse:a1Res} = await createSingleAnswer(
+        const {answerPostResponse: a1Res} = await createSingleAnswer(
             request,
             {
                 questionId: qResp1.question.id,
@@ -45,7 +50,7 @@ test.describe('Get to an answer view questions', () => {
             }, token
         );
 
-        const {answerPostResponse:a2Res} = await createSingleAnswer(
+        const {answerPostResponse: a2Res} = await createSingleAnswer(
             request,
             {
                 questionId: qResp2.question.id,
@@ -56,7 +61,7 @@ test.describe('Get to an answer view questions', () => {
             }, token
         );
 
-        const {answerPostResponse:a3Res} = await createSingleAnswer(
+        const {answerPostResponse: a3Res} = await createSingleAnswer(
             request,
             {
                 questionId: qResp3.question.id,
@@ -67,7 +72,7 @@ test.describe('Get to an answer view questions', () => {
             }, token
         );
 
-        const {answerPostResponse:a4Res} = await createSingleAnswer(
+        const {answerPostResponse: a4Res} = await createSingleAnswer(
             request,
             {
                 questionId: qResp4.question.id,
@@ -92,25 +97,27 @@ test.describe('Get to an answer view questions', () => {
     test('Validate presence of elements on view question page', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.assertPageElements();
     });
 
     test("Header section - H1 and question status", async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.expectQuestionHeadingOnPage();
         await viewQuestionPage.expectQuestionnaireStatusOnPage('Draft');
     });
-
-    // TBS, CARE-1557 bug raised
+    
     test("Validate questionnaire status as published on view questions page", async ({request, page}) => {
         await publishQuestionnaire(request, questionnaireId, token);
 
         viewQuestionnairePage = await signIn(page, token);
-        viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
 
+        editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireId);
+        await editQuestionnairePage.openAddEditQuestionsAnswers();
+
+        viewQuestionPage = await ViewQuestionPage.create(page);
         await viewQuestionPage.expectQuestionHeadingOnPage();
         await viewQuestionPage.expectQuestionnaireStatusOnPage('Published');
     });
@@ -118,7 +125,7 @@ test.describe('Get to an answer view questions', () => {
     test("Add question CTA navigates to Add question", async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.clickAddQuestion();
 
         addQuestionPage = await AddQuestionPage.create(page);
@@ -128,7 +135,7 @@ test.describe('Get to an answer view questions', () => {
     test('Back to edit questionnaire link navigation from view questions page', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.ClickBackToEditQuestionnaireLink();
         editQuestionnairePage = await EditQuestionnairePage.create(page);
         expect(editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
@@ -137,25 +144,25 @@ test.describe('Get to an answer view questions', () => {
     test('Save and continue with No I will come back later radio navigates to Edit questionnaire page', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.markFinishedEditing(false);
         await viewQuestionPage.expectComeBackLaterRadioIsSelected();
-        
+
         await viewQuestionPage.saveAndContinue();
-        
+
         editQuestionnairePage = await EditQuestionnairePage.create(page);
         await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
     });
-    
+
     test('Save and continue with Yes radio navigates to Edit questionnaire page', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.expectYesRadioIsNotSelected();
         await viewQuestionPage.markFinishedEditing(true);
-        
+
         await viewQuestionPage.saveAndContinue();
-        
+
         editQuestionnairePage = await EditQuestionnairePage.create(page);
         await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
     });
@@ -165,7 +172,7 @@ test.describe('Get to an answer view questions', () => {
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
 
         await viewQuestionPage.expectQuestionHeadingOnPage();
-        
+
         await viewQuestionPage.table.verifyListExistsWithOrderNumbersContentAndActions();
     });
 
@@ -192,20 +199,20 @@ test.describe('Get to an answer view questions', () => {
     test('Show re-order controls for middle rows', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.table.expectReorderControlsOnRowByIndex(2);
     });
 
     test('Move middle question up', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         const allTextsBefore = await viewQuestionPage.table.allQuestionContent();
         const secondQuestionBefore = allTextsBefore[1]; // Index 1 = second question
-        
+
         await viewQuestionPage.table.moveUpByIndex(2);
         await viewQuestionPage.waitForPageLoad();
-        
+
         const allTextsAfter = await viewQuestionPage.table.allQuestionContent();
         const firstQuestionAfter = allTextsAfter[0]; // Index 0 = first question
 
@@ -219,17 +226,17 @@ test.describe('Get to an answer view questions', () => {
     test('Move middle question down', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         const allTextsBefore = await viewQuestionPage.table.allQuestionContent();
         const secondQuestionBefore = allTextsBefore[1]; // Index 1 = second question
-        
+
         await viewQuestionPage.table.moveDownByIndex(2);
 
         await viewQuestionPage.waitForPageLoad();
-        
+
         const allTextsAfter = await viewQuestionPage.table.allQuestionContent();
         const thirdQuestionAfter = allTextsAfter[2]; // Index 2 = third question
-        
+
         // Extract just the question content without the numbering prefix for comparison
         const secondQuestionContent = secondQuestionBefore.replace(/^\d+\.\s/, '');
         const thirdQuestionContent = thirdQuestionAfter.replace(/^\d+\.\s/, '');
@@ -251,9 +258,9 @@ test.describe('Get to an answer view questions', () => {
             qResp3.question.id,
             token
         );
-        
+
         expect([200, 204]).toContain(deleteQuestionResponse.status());
-        
+
         await page.reload();
         await viewQuestionPage.waitForPageLoad();
 

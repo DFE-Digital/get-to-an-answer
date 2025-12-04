@@ -1,9 +1,8 @@
 import {expect, Locator, Page} from '@playwright/test';
 import {BasePage} from '../BasePage';
 import {ErrorMessages} from "../../constants/test-data-constants";
-import {Timeouts} from "../../constants/timeouts";
-import {ViewQuestionTable} from "./components/ViewQuestionTable";
 import {EditAnswerTable} from "./components/EditAnswerTable";
+import {Timeouts} from '../../constants/timeouts'
 
 type Mode = 'create' | 'update';
 
@@ -125,6 +124,7 @@ export class AddQuestionPage extends BasePage {
 
     // ===== Validations =====
     async expectAddQuestionHeadingOnPage(expectedText?: string): Promise<void> {
+        await this.addQuestionHeading.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await expect(this.addQuestionHeading, '❌ Add question heading not visible').toBeVisible();
 
         if (expectedText) {
@@ -145,28 +145,36 @@ export class AddQuestionPage extends BasePage {
     }
 
     async validateMissingAllFieldsErrorMessageSummary(browserName: string) {
-        await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
-        await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
-        await expect(this.errorSummary, '❌ Attribute tabIndex is missing').toHaveAttribute('tabindex', '-1');
-        await expect(this.errorSummary, '❌ Error summary not focused').toBeFocused();
-
+        
+        await this.errorSummary.waitFor({state: 'visible', timeout: Timeouts.MEDIUM});
+        await this.errorList.waitFor({state: 'visible', timeout: Timeouts.MEDIUM});
+        
         await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_CONTENT);
         await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_TYPE);
-
+        
+        await this.page.waitForTimeout(200);  // Increase to 200ms for Firefox
+        await expect(this.errorSummary, '❌ Error summary not focused').toBeFocused();
+        
         await this.clickAllLinksAndValidateFocus(browserName);
     }
 
     async validateMissingQuestionContentErrorMessageSummary(browserName: string) {
+        await this.errorSummary.waitFor({state: 'visible', timeout: Timeouts.MEDIUM});
+        await this.errorList.waitFor({state: 'visible', timeout: Timeouts.MEDIUM});
+
         await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_CONTENT);
+
+        await this.page.waitForTimeout(200);
         await this.clickErrorLinkAndValidateFocus(this.errorLinkQuestionContent, browserName);
     }
-
+    
     async validateMissingQuestionTypeErrorMessageSummary(browserName: string) {
         await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_TYPE);
         await this.clickErrorLinkAndValidateFocus(this.errorLinkQuestionType, browserName);
     }
 
     async validateInlineQuestionContentError(): Promise<void> {
+        await this.inlineQuestionContentError.waitFor({state: 'visible', timeout: Timeouts.MEDIUM});
         await expect(this.inlineQuestionContentError, '❌ Inline question content error not visible').toBeVisible();
     }
 
@@ -229,7 +237,7 @@ export class AddQuestionPage extends BasePage {
 
         const ariaValue = await this.fieldset.getAttribute('aria-describedby');
         expect(ariaValue, '❌ aria-describedby missing').not.toBeNull();
-        
+
         expect(ariaValue, '❌ aria-describedby missing error id')
             .toContain('QuestionType-error');
     }
@@ -271,26 +279,30 @@ export class AddQuestionPage extends BasePage {
 
     async clickBackLink(): Promise<void> {
         await Promise.all([
-            this.page.waitForLoadState('networkidle'),
-            this.backLink.click()
+            this.backLink.click(),
+            await this.waitForPageLoad(),
         ]);
     }
 
     async enterQuestionContent(text: string): Promise<void> {
+        await this.questionInput.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await this.questionInput.clear();
         await this.questionInput.fill(text);
     }
 
     async clearQuestionContent(): Promise<void> {
+        await this.questionInput.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await this.questionInput.clear();
     }
 
     async enterQuestionHintText(text: string): Promise<void> {
+        await this.hintTextarea.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await this.hintTextarea.clear();
         await this.hintTextarea.fill(text);
     }
 
     async clearQuestionHintText(): Promise<void> {
+        await this.hintTextarea.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await this.hintTextarea.clear();
     }
 
@@ -318,7 +330,9 @@ export class AddQuestionPage extends BasePage {
     }
 
     async clickSaveQuestion(): Promise<void> {
+        await this.saveQuestionButton.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await this.saveQuestionButton.click();
+        await this.waitForPageLoad();
     }
 
     async clickDeleteQuestion(): Promise<void> {

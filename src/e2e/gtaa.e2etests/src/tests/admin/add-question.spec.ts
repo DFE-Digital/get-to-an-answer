@@ -36,7 +36,7 @@ test.describe('Get to an answer add question to questionnaire', () => {
         await addQuestionPage.verifyBackLinkPresent();
         await addQuestionPage.clickBackLink();
 
-        viewQuestionPage = new ViewQuestionPage(page);
+        viewQuestionPage = await ViewQuestionPage.create(page);
         await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
     });
 

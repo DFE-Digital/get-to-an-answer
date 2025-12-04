@@ -15,8 +15,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
         token = JwtHelper.NoRecordsToken();
         viewQuestionnairePage = await signIn(page, token);
     });
-
-    //TBC, CARE-1572 bug raised
+    
     test('Add a new questionnaire successfully and lands on Edit Questionnaire Page', async ({ page }) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
 
@@ -67,7 +66,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await addQuestionnairePage.validateTitleFormGroup();
     });
     
-    // TBC, aria-described by id's need correction (CARE-1546)
+    // TBC, aria-described by id's need correction (CARE-1546) during accessibility testing
     test('Submit a new questionnaire with invalid title to validate aria-describedby', async ({page}) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
 

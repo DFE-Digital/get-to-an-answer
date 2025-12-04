@@ -18,7 +18,7 @@ test.describe('Get to an answer sign in page', () => {
         await signInPage.assertPageElements();
     });
 
-    test('Clicking sign in button navigates to terms od service agreement', async ({page}) => {
+    test('Clicking sign in button navigates to terms of service agreement', async ({page}) => {
         await signInPage.clickSignIn();
         
         termsOfUsePage = await TermsOfUsePage.create(page);

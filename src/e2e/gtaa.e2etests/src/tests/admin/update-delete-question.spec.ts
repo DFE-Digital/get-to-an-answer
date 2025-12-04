@@ -1,26 +1,14 @@
 import {expect, test} from "@playwright/test";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
-import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaireSlugPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
-import {
-    createQuestionnaire,
-    getQuestionnaire,
-    listQuestionnaires,
-    updateQuestionnaire
-} from "../../test-data-seeder/questionnaire-data";
-import {
-    goToEditQuestionnairePageByUrl,
-    goToUpdateQuestionnairePageByUrl, goToUpdateQuestionPageByUrl,
-    signIn
-} from "../../helpers/admin-test-helper";
+import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
+import {goToUpdateQuestionPageByUrl, signIn} from "../../helpers/admin-test-helper";
 import {EntityStatus, PageHeadings, QuestionType} from "../../constants/test-data-constants";
-import {expect200HttpStatusCode} from "../../helpers/api-assertions-helper";
 import {createQuestion, getQuestion} from "../../test-data-seeder/question-data";
 import {AddQuestionPage, QuestionRadioLabel} from "../../pages/admin/AddQuestionPage";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
-import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
 import {DeleteQuestionConfirmationPage} from "../../pages/admin/DeleteQuestionConfirmationPage";
 
 test.describe('Get to an answer update question', () => {
