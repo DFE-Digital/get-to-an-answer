@@ -61,7 +61,7 @@
         var canDeleteContributors = contributorCount > 2;
         
         <table class="govuk-table">
-          <caption class="govuk-table__caption govuk-table__caption--m">Your questionnaire contributors</caption>
+          <caption class="govuk-table__caption govuk-table__caption--m">Your questionnaire people</caption>
           <thead class="govuk-table__head">
           <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">Name</th>
@@ -88,7 +88,7 @@
                   else
                   {
                     <button disabled class="govuk-button govuk-button--warning" data-module="govuk-button" type="button">
-                      Delete contributor
+                      Remove
                     </button>
                   }
                 </form>
@@ -101,7 +101,7 @@
     </div>
     <div class="govuk-button-group">
       <a class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" 
-         href="@string.Format(Routes.AddContributor, Model.QuestionnaireId)">Add contributor</a>
+         href="@string.Format(Routes.AddContributor, Model.QuestionnaireId)">Add person</a>
     </div>
   </div>
 </div>
