@@ -10,8 +10,6 @@ on:
         options:
           - Local
           - Development
-          - Test
-          - Production
   push:
     branches: [ "main" ]
   pull_request:

@@ -5,6 +5,8 @@ public class ConfigViewModel
     public string ContentType => "configuration";
 
     public string ServiceName => "GetToAnAnswer";
+    
+    public string ServiceDisplayName => "Get to an answer";
 
     public BannerPhase Phase { get; init; } = BannerPhase.Beta;
 

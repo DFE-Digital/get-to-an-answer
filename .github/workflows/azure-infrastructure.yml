@@ -32,6 +32,9 @@ on:
         options:
           - Development
           - Test
+          - Production
+  
+run-name: Deploy Infrastructure to ${{ github.event.inputs.environment || inputs.environment || 'Development' }}
 
 jobs:
   terraform:
@@ -115,7 +118,7 @@ jobs:
             echo "env=Dev" >> $GITHUB_OUTPUT
             echo "sa=gtaatfstatesa" >> $GITHUB_OUTPUT
           elif [ "${{ env.ENVIRONMENT }}" = "Production" ]; then
-            echo "env=Prod" >> $GITHUB_OUTPUT
+            echo "env=Production" >> $GITHUB_OUTPUT
             echo "sa=gtaatfstateprod" >> $GITHUB_OUTPUT
           else
             echo "env=Test" >> $GITHUB_OUTPUT
@@ -147,7 +150,7 @@ jobs:
             az group create \
               -n ${{ vars.GTAA_PREFIX }}rg-uks-terraform-state \
               -l uksouth \
-              --tags Environment="${{ steps.tfenv.outputs.env }}" Product="Get-To-An-Answer"
+              --tags Environment="${{ steps.tfenv.outputs.env }}" Product="Get-To-An-Answer" "Service Offering"="Get-To-An-Answer"
           fi
           az storage account create \
             -g ${{ vars.GTAA_PREFIX }}rg-uks-terraform-state \
@@ -158,10 +161,18 @@ jobs:
             --https-only true \
             --min-tls-version TLS1_2 \
             --allow-blob-public-access false \
-            --tags Environment="${{ steps.tfenv.outputs.env }}" Product="Get-To-An-Answer" Owner="Platform"
+            --tags Environment="${{ steps.tfenv.outputs.env }}" Product="Get-To-An-Answer" "Service Offering"="Get-To-An-Answer"
+          az role assignment create \
+            --assignee ${{ env.ARM_CLIENT_ID }} \
+            --role "Storage Blob Data Owner" \
+            --scope "/subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.GTAA_PREFIX }}rg-uks-terraform-state/providers/Microsoft.Storage/storageAccounts/${{ steps.tfenv.outputs.sa }}"
           az storage container create --name tfstate \
             --account-name ${{ steps.tfenv.outputs.sa }} --auth-mode login
           echo "exists=false" >> $GITHUB_OUTPUT
+          
+      - name: Add Alert Mgmt Provider
+        run: |
+          az provider register --namespace Microsoft.AlertsManagement
 
       - name: Terraform Init (migrate or reconfigure)
         run: |

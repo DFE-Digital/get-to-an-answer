@@ -1,9 +1,11 @@
 using Common.Client;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Admin.Controllers;
 
 [Controller]
+[Authorize]
 public class DecorativeImageController(
     ILogger<DecorativeImageController> logger, 
     IApiClient apiClient,

@@ -9,6 +9,7 @@ using Common.Local;
 using Common.Logging;
 using Common.Telemetry;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Identity.Web.UI;
 using OpenTelemetry.Metrics;
@@ -16,6 +17,12 @@ using OpenTelemetry.Trace;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+#region Configuration
+
+builder.Services.AddOptions<ScriptOptions>().BindConfiguration(ScriptOptions.Name);
+
+#endregion
 
 const string localEnvironmentName = "Local";
 var builderIsLocalEnvironment = builder.Environment.IsEnvironment(localEnvironmentName);
@@ -27,7 +34,19 @@ if (builderIsLocalEnvironment)
     builder.Services.AddMockAzureAdForMvc();
 }
 
-var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.CheckConsentNeeded = _ => true;
+    
+    // Use Lax or None – Strict breaks external login flows (like Azure AD)
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    
+    options.Secure = CookieSecurePolicy.Always;
+    options.ConsentCookie.IsEssential = true;
+    
+    // HttpOnly should normally be Always for security
+    options.HttpOnly = HttpOnlyPolicy.Always;
+});
 
 if (!builderIsLocalEnvironment)
 {
@@ -87,6 +106,8 @@ builder.Services.AddHttpContextAccessor();
 
 #region GTAA Api Client
 
+var apiBaseUrl = builder.Configuration.GetSection("ApiSettings:BaseUrl").Value!;
+
 builder.Services.AddTransient(sp =>
     new BearerTokenHandler(sp.GetRequiredService<IHttpContextAccessor>(),
         sp.GetRequiredService<ILogger<BearerTokenHandler>>()));
@@ -139,6 +160,9 @@ builder.Services.AddRazorPages(options =>
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+    
+// Cookie Security
+app.UseCookiePolicy();
 
 #region Rebrand
 
