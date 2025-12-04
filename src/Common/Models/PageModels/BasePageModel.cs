@@ -7,6 +7,9 @@ namespace Common.Models.PageModels;
 
 public class BasePageModel : PageModel
 {
+    public bool AcceptCookies { get; set; }
+    
+    public bool ShowSuccessBanner { get; set; }
     [BindProperty(SupportsGet = true)] public string? BackLinkSlug { get; protected set; }
     
     private const string BackLinkTempDataKey = "BackLinkSlugTempData";
