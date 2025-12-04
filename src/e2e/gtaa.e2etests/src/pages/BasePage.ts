@@ -28,9 +28,11 @@ export class BasePage {
         this.page = page;
 
         // Locators for cookie banner and buttons - TBC
-        this.cookieBanner = page.locator('');
-        this.acceptButton = page.locator('');
-        this.rejectButton = page.locator('');
+        this.cookieBanner = page.getByRole('region', {
+            name: /cookies on gettoananswer/i,
+        });
+        this.acceptButton = this.cookieBanner.locator('#accept-cookie');
+        this.rejectButton = this.cookieBanner.locator('#reject-cookie');
 
         // ===== Locators for web page header =====
         this.logoLink = page.locator('a.govuk-header__link--homepage');
@@ -49,38 +51,28 @@ export class BasePage {
     async navigateTo(url: string, waitUntil: LoadState = 'networkidle'): Promise<void> {
         await this.page.goto(url, {waitUntil});
     }
-
-    protected escapeRegexExpression(s: string): string {
-        return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-
-    async validateUrlMatches(patternOrFragment: string | RegExp): Promise<void> {
-        const pattern = typeof patternOrFragment === 'string'
-            ? new RegExp(this.escapeRegexExpression(patternOrFragment))
-            : patternOrFragment;
-        await expect(this.page).toHaveURL(pattern);
-    }
-
+    
     // ===== Actions =====
-
     // Wait for the page to load
     async waitForPageLoad() {
         await this.page.waitForLoadState('networkidle');
     }
 
     // Cookie banner functionality
-    async acceptCookies() {
-        await this.acceptButton.click();
-        await expect(this.cookieBanner).not.toBeVisible();
+    async acceptCookiesIfVisible(): Promise<void> {
+        if (await this.cookieBanner.isVisible()) {
+            await this.acceptButton.click();
+            await expect(this.cookieBanner).toBeHidden();
+        }
     }
 
-    async rejectCookies() {
-        await expect(this.rejectButton).toBeVisible();
-        await this.rejectButton.click();
-        // Ensure the banner disappears
-        await expect(this.cookieBanner).not.toBeVisible();
+    async rejectCookiesIfVisible(): Promise<void> {
+        if (await this.cookieBanner.isVisible()) {
+            await this.rejectButton.click();
+            await expect(this.cookieBanner).toBeHidden();
+        }
     }
-
+    
     // ===== Verify header Links are visible =====
     async verifyHeaderLinks() {
         //await expect(this.WebsiteNameLink).toHaveText(/Support for/i); //TBC

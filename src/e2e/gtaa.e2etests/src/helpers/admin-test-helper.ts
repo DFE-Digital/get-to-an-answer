@@ -25,6 +25,7 @@ export async function signIn(page: Page, bearerToken?: string): Promise<ViewQues
     await signInPage.clickSignIn();
 
     const termsOfUsePage = new TermsOfUsePage(page);
+    await termsOfUsePage.acceptCookiesIfVisible();
     await termsOfUsePage.agreeToTermsOfUse();
 
     const viewQuestionnairePage = new ViewQuestionnairePage(page);

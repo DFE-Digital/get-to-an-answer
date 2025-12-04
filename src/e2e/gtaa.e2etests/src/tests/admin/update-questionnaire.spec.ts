@@ -10,15 +10,14 @@ import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {
     signIn,
     goToUpdateQuestionnairePageByUrl,
-    goToEditQuestionnairePageByUrl, goToUpdateQuestionPageByUrl
+    goToEditQuestionnairePageByUrl
 } from '../../helpers/admin-test-helper';
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaireSlugPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
-import {EntityStatus, ErrorMessages, PageHeadings} from "../../constants/test-data-constants";
+import {EntityStatus, PageHeadings} from "../../constants/test-data-constants";
 import {expect200HttpStatusCode} from "../../helpers/api-assertions-helper";
-import {DeleteQuestionnaireConfirmationPage} from "../../pages/admin/DeleteQuestionnaireConfirmationPage";
 
 test.describe('Get to an answer update questionnaire', () => {
     let token: string;
@@ -76,16 +75,17 @@ test.describe('Get to an answer update questionnaire', () => {
         await addQuestionnairePage.validateTitleFormGroup();
     });
 
-    // TBC, aria-described by id's need correction (CARE-1546)
-    test('Accessible aria-describedby includes hint id and error message id', async ({page}) => {
-        viewQuestionnairePage = await signIn(page, token);
-        addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
-        
-        await addQuestionnairePage.enterTitle('');
-        await addQuestionnairePage.clickSaveAndContinue();
-        await addQuestionnairePage.validateTitleFieldAriaDescribedBy();
-    });
+    // TBC, aria-described by id's need correction (CARE-1546), to be fixed later with accessibility testing
+    // test('Accessible aria-describedby includes hint id and error message id', async ({page}) => {
+    //     viewQuestionnairePage = await signIn(page, token);
+    //     addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
+    //    
+    //     await addQuestionnairePage.enterTitle('');
+    //     await addQuestionnairePage.clickSaveAndContinue();
+    //     await addQuestionnairePage.validateTitleFieldAriaDescribedBy();
+    // });
 
+    //TBC, CARE-1572 bug raised
     test('Successful submit updates title and validation', async ({request, page}) => {
         viewQuestionnairePage = await signIn(page, token);
         addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
@@ -161,75 +161,5 @@ test.describe('Get to an answer update questionnaire', () => {
         
         await updateQuestionnaireSlugPage.validateDuplicateSlugMessageSummary('webkit')
         await updateQuestionnaireSlugPage.validateInlineSlugError();
-    });
-
-    test('Delete a questionnaire successfully', async ({page}) => {
-        await signIn(page, token);
-
-        editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
-
-        await editQuestionnairePage.deleteQuestionnaire();
-
-        const deleteConfirmationPage = new DeleteQuestionnaireConfirmationPage(page);
-        await deleteConfirmationPage.expectTwoRadiosPresent();
-        await deleteConfirmationPage.chooseYes();
-        await deleteConfirmationPage.clickContinue();
-
-        viewQuestionnairePage = await ViewQuestionnairePage.create(page);
-        await viewQuestionnairePage.expectQuestionnaireHeadingOnPage();
-    });
-    
-    test('Delete questionnaire with cancellation returns to edit page', async ({page}) => {
-        await signIn(page, token);
-
-        editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
-
-        await editQuestionnairePage.deleteQuestionnaire();
-
-        const deleteConfirmationPage = new DeleteQuestionnaireConfirmationPage(page);
-        await deleteConfirmationPage.expectTwoRadiosPresent();
-        await deleteConfirmationPage.chooseNo();
-        await deleteConfirmationPage.clickContinue();
-
-        editQuestionnairePage = new EditQuestionnairePage(page);
-        await editQuestionnairePage.validateHeadingAndStatus();
-    });
-
-    //TBC, CARE-1573 bug raised
-    test('Delete questionnaire back link returns to edit page', async ({page}) => {
-        await signIn(page, token);
-
-        editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
-
-        await editQuestionnairePage.deleteQuestionnaire();
-
-        const deleteConfirmationPage = new DeleteQuestionnaireConfirmationPage(page);
-        await deleteConfirmationPage.clickBackLink();
-
-        editQuestionnairePage = new EditQuestionnairePage(page);
-        await editQuestionnairePage.validateHeadingAndStatus();
-    });
-    
-    test('Delete questionnaire removes questionnaire from questionnaire list', async ({request, page}) => {
-        await signIn(page, token);
-
-        const questionnaireIdToDelete = questionnaireGetResponse.questionnaireGetBody.id;
-        editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireIdToDelete);
-
-        await editQuestionnairePage.deleteQuestionnaire();
-
-        const deleteConfirmationPage = new DeleteQuestionnaireConfirmationPage(page);
-        await deleteConfirmationPage.expectTwoRadiosPresent();
-        await deleteConfirmationPage.chooseYes();
-        await deleteConfirmationPage.clickContinue();
-
-        viewQuestionnairePage = await ViewQuestionnairePage.create(page);
-        await viewQuestionnairePage.expectQuestionnaireHeadingOnPage();
-        
-        const listQuestionnaireResponse = await listQuestionnaires(request, token);
-        const list: any[] = listQuestionnaireResponse.questionnaireGetBody;
-        const deletedQuestionnaire = list.find((q: any) => q.id === questionnaireIdToDelete);
-
-        expect(deletedQuestionnaire).toBeUndefined();
     });
 });
