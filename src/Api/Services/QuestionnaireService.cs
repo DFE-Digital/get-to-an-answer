@@ -464,6 +464,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 .Where(q => q.Id == id && q.Status != EntityStatus.Deleted)
                 .Include(q => q.Questions.Where(a => !a.IsDeleted))
                 .ThenInclude(qq => qq.Answers.Where(a => !a.IsDeleted))
+                .Include(questionnaireEntity => questionnaireEntity.Contents)
                 .FirstOrDefaultAsync();
 
             if (questionnaire == null)
@@ -485,6 +486,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             var cloneQuestionnaireId = cloneQuestionnaire.Id;
             
             var cloneQuestions = new Dictionary<int, QuestionEntity>();
+            var questionOldToNewIds = new Dictionary<Guid, Guid>();
             var orderAnswers = new Dictionary<int, ICollection<AnswerEntity>>();
             
             foreach (var question in questionnaire.Questions)
@@ -501,11 +503,35 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                     UpdatedAt = DateTime.UtcNow,
                 };
                     
+                questionOldToNewIds.Add(question.Id, cloneQuestion.Id);
                 cloneQuestions.Add(question.Order, cloneQuestion);
                 orderAnswers.Add(question.Order, question.Answers);
             }
             
             await db.Questions.AddRangeAsync(cloneQuestions.Values);
+            await db.SaveChangesAsync();
+            
+            var cloneContents = new Dictionary<string, ContentEntity>();
+            var contentOldToNewIds = new Dictionary<Guid, Guid>();
+            
+            foreach (var content in questionnaire.Contents)
+            {
+                var cloneContent = new ContentEntity
+                {
+                    QuestionnaireId = cloneQuestionnaireId,
+                    Title = content.Title,
+                    Content = content.Content,
+                    ReferenceName = content.ReferenceName,
+                    CreatedBy = userId,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                };
+                    
+                contentOldToNewIds.Add(content.Id, cloneContent.Id);
+                cloneContents.Add(content.ReferenceName!, cloneContent);
+            }
+            
+            await db.Contents.AddRangeAsync(cloneContents.Values);
             await db.SaveChangesAsync();
 
             var cloneAnswers = new List<AnswerEntity>();
@@ -513,9 +539,34 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             foreach (var (questionOrder, answers) in orderAnswers)
             {
                 var cloneQuestionId = cloneQuestions[questionOrder].Id;
-                
+
                 foreach (var answer in answers)
                 {
+                    Guid? newDestinationQuestionId = null;
+                    Guid? newDestinationContentId = null;
+                
+                    if (answer.DestinationQuestionId is { } destQuestionId)
+                    {
+                        if (!questionOldToNewIds.TryGetValue(destQuestionId, out var mappedDestinationQuestionId))
+                        {
+                            return Problem(ProblemTrace($"The destination question {destQuestionId} does not exist",
+                                500));
+                        }
+
+                        newDestinationQuestionId = mappedDestinationQuestionId;
+                    }
+
+                    if (answer.DestinationContentId is { } destContentId)
+                    {
+                        if (!contentOldToNewIds.TryGetValue(destContentId, out var mappedDestinationContentId))
+                        {
+                            return Problem(ProblemTrace($"The destination results page {destContentId} does not exist",
+                                500));
+                        }
+
+                        newDestinationContentId = mappedDestinationContentId;
+                    }
+                    
                     var cloneAnswer = new AnswerEntity
                     {
                         QuestionId = cloneQuestionId,
@@ -523,7 +574,8 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                         Content = answer.Content,
                         Description = answer.Description,
                         DestinationUrl = answer.DestinationUrl,
-                        DestinationQuestionId = answer.DestinationQuestionId,
+                        DestinationQuestionId = newDestinationQuestionId,
+                        DestinationContentId = newDestinationContentId,
                         DestinationType = answer.DestinationType,
                         Priority = answer.Priority,
                         CreatedBy = userId,
