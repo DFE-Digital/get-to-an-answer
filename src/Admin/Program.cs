@@ -38,14 +38,9 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.CheckConsentNeeded = _ => true;
     
-    // Use Lax or None – Strict breaks external login flows (like Azure AD)
+    // disabled everything else because the Entra ID was failing to store cookies,
+    // but when reconfigured the the consent cookie was still not being stored
     options.MinimumSameSitePolicy = SameSiteMode.None;
-    
-    options.Secure = CookieSecurePolicy.Always;
-    options.ConsentCookie.IsEssential = true;
-    
-    // HttpOnly should normally be Always for security
-    options.HttpOnly = HttpOnlyPolicy.Always;
 });
 
 if (!builderIsLocalEnvironment)
