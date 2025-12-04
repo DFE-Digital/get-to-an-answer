@@ -1,15 +1,10 @@
 @page "/admin/questionnaires/{questionnaireId:guid}/questions/{questionId:guid}/confirm-delete"
-@model Admin.Pages.Questions.ConfirmDeleteQuestion
+@model Admin.Pages.Confirmations.ConfirmDeleteQuestion
 @addTagHelper *, Common
 
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Delete question";
-}
-
-@section BeforeContent
-{
-    <a class="govuk-back-link govuk-!-display-none-print" href="@Model?.BackLinkSlug">Back</a>
 }
 
 @if (Model!.HasErrors())
@@ -35,6 +30,7 @@
                         <div class="govuk-radios__item">
                             <govuk-input class="govuk-radios__input"
                                          id="ConfirmDelete-true"
+                                         name="ConfirmDelete" 
                                          asp-for="@Model.ConfirmDelete"
                                          type="radio"
                                          value="true"/>
@@ -45,6 +41,7 @@
                         <div class="govuk-radios__item">
                             <govuk-input class="govuk-radios__input"
                                          id="ConfirmDelete-false"
+                                         name="ConfirmDelete" 
                                          asp-for="@Model.ConfirmDelete"
                                          type="radio"
                                          value="false"/>

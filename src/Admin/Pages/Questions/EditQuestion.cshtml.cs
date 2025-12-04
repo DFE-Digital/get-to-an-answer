@@ -71,7 +71,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     {
         DestinationType.Question => "Specific question",
         DestinationType.CustomContent => "Results page",
-        DestinationType.ExternalLink => "External link",
+        DestinationType.ExternalLink => "Link",
         _ => "Next question",
     };
 
@@ -80,7 +80,10 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         try
         {
             if (!ModelState.IsValid)
+            {
+                QuestionSaved = false;
                 return Page();
+            }
 
             await apiClient.UpdateQuestionAsync(QuestionId, new UpdateQuestionRequestDto
             {
@@ -133,25 +136,6 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     }
     
     public IActionResult OnPostAddQuestion() => Redirect(string.Format(Routes.AddQuestion, QuestionnaireId));
-
-    public string QuestionTypeFriendly(QuestionType type) =>
-        type switch
-        {
-            QuestionType.SingleSelect => "One option only (using radio button)",
-            QuestionType.DropdownSelect => "One option only (using a drop-down)",
-            QuestionType.MultiSelect => "One or more options (using multi-select)",
-            _ => type.ToString()
-        };
-
-    public string QuestionTypeHint(QuestionType type) =>
-        type switch
-        {
-            QuestionType.SingleSelect => "Use this when you have a small list of options.",
-            QuestionType.DropdownSelect => "Use this when you have a long list of options.",
-            QuestionType.MultiSelect => "Use this when people can select more than one option.",
-            _ => string.Empty
-        };
-
 
     private async Task<QuestionDto?> GetQuestion() => await apiClient.GetQuestionAsync(QuestionId);
 
