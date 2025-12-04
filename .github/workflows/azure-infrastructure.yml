@@ -33,6 +33,8 @@ on:
           - Development
           - Test
           - Production
+  
+run-name: Deploy Infrastructure to ${{ github.event.inputs.environment || inputs.environment || 'Development' }}
 
 jobs:
   terraform:
