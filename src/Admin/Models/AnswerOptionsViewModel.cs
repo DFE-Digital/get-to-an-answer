@@ -30,7 +30,5 @@ public class AnswerOptionsViewModel
 
     public string? ExternalLink { get; set; }
     
-    public string? RankPriority { get; set; } 
-    
-    public static readonly string AnswersSnapshotTempDataKey = "AnswersSnapshot";
+    public string? RankPriority { get; set; }
 }

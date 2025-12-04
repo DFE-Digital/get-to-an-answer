@@ -45,6 +45,14 @@ public class AnswerController(IAnswerService answerService) : Controller
         
         return (await answerService.UpdateAnswer(userId, id, request)).ToActionResult();
     }
+    
+    [HttpPost("answers/bulk")]
+    public async Task<IActionResult> BulkUpsertAnswersAsync(BulkUpsertAnswersRequestDto bulkRequest)
+    {
+        var userId = User.GetIdClaim()!;
+        
+        return (await answerService.BulkUpsertAnswersAsync(userId, bulkRequest)).ToActionResult();
+    }
 
     [HttpDelete("answers/{id:guid}")]
     public async Task<IActionResult> DeleteAnswer(Guid id)

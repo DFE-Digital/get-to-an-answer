@@ -3,10 +3,8 @@ using Common.Client;
 using Common.Domain.Request.Create;
 using Common.Enum;
 using Common.Models;
-using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Admin.Pages.Answers;
 
@@ -41,7 +39,6 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
 
         if (!ModelState.IsValid)
         {
-            // RemoveGenericOptionErrors();
             await HydrateOptionListsAsync();
             ReassignOptionNumbers();
             return Page();

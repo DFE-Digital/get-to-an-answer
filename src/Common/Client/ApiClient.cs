@@ -52,6 +52,7 @@ public interface IApiClient
     Task<List<AnswerDto>> GetAnswersAsync(Guid questionId);
     Task<AnswerDto?> CreateAnswerAsync(CreateAnswerRequestDto request);
     Task<string?> UpdateAnswerAsync(Guid answerId, UpdateAnswerRequestDto request);
+    Task<string?> BulkUpsertAnswersAsync(BulkUpsertAnswersRequestDto bulkRequest);
     Task<string?> DeleteAnswerAsync(Guid answerId);
 
     // === For Questionnaire Versions ===
@@ -270,6 +271,12 @@ public class ApiClient : IApiClient
     public async Task<string?> UpdateAnswerAsync(Guid answerId, UpdateAnswerRequestDto request)
     {
         var response = await _httpClient.PutAsJsonAsync($"{Answers}/{answerId}", request);
+        return await GetResponse<string>(response);
+    }
+
+    public async Task<string?> BulkUpsertAnswersAsync(BulkUpsertAnswersRequestDto bulkRequest)
+    {
+        var response = await _httpClient.PostAsJsonAsync($"{Answers}/bulk", bulkRequest);
         return await GetResponse<string>(response);
     }
 

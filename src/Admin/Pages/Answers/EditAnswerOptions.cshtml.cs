@@ -23,20 +23,6 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
     {
         BackLinkSlug = string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId);
 
-        var existingOptionsFromTempData = TempData.Peek("AnswersSnapshot");
-
-        if (existingOptionsFromTempData is string optionsJson)
-        {
-            Options = JsonConvert.DeserializeObject<List<AnswerOptionsViewModel>>(optionsJson) ?? [];
-
-            if (Options.Count != 0)
-            {
-                ReassignOptionNumbers();
-                await PopulateOptionSelectionLists();
-                return Page();
-            }
-        }
-
         await PopulateFieldWithExistingValues();
 
         if (Options.Count == 0)
