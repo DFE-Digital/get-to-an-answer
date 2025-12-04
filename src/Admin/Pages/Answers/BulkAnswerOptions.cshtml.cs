@@ -1,12 +1,13 @@
 using System.Text.RegularExpressions;
 using Admin.Models;
+using Common.Client;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace Admin.Pages.Answers;
 
-public partial class BulkAnswerOptions(ILogger<BulkAnswerOptions> logger) : BasePageModel
+public partial class BulkAnswerOptions(IApiClient apiClient, ILogger<BulkAnswerOptions> logger) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
 
@@ -15,6 +16,16 @@ public partial class BulkAnswerOptions(ILogger<BulkAnswerOptions> logger) : Base
     [BindProperty] public string? QuestionNumber { get; set; } = "1";
 
     [BindProperty] public string? BulkAnswerOptionsRawText { get; set; }
+
+    public async Task<IActionResult> OnGet()
+    {
+        var answers = await apiClient.GetAnswersAsync(QuestionId);
+
+        BulkAnswerOptionsRawText = answers.Select(a => a.Content)
+            .Aggregate((a, b) => a + "\n" + b).Trim();
+        
+        return Page();
+    }
 
     public IActionResult OnPost(string? returnUrl)
     {
