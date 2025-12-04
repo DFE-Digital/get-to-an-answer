@@ -19,6 +19,8 @@
     CompletionStatus.Completed => "Completed",
     _ => "<strong class=\"govuk-tag govuk-tag--blue\">Not started</strong>"
   });
+
+  var displayVersionHistory = questionnaire?.Status == EntityStatus.Published || questionnaire?.Version > 1;
 }
 
 @section BeforeContent
@@ -56,7 +58,7 @@
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            @if (questionnaire?.Version > 1)
+            @if (displayVersionHistory)
             {
               <a class="govuk-link gi" href="/admin/questionnaires/@questionnaire?.Id/version-history">View questionnaire versions</a>
             }
@@ -66,7 +68,10 @@
             }
           </div>
           <div class="govuk-task-list__status">
-            Cannot view until published
+            @if (!displayVersionHistory)
+            {
+              <div>Cannot view until published</div>
+            }
           </div>
         </li>
       </ul>

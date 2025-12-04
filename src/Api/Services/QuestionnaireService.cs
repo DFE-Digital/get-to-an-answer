@@ -379,7 +379,12 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         {
             if (answer is { DestinationType: DestinationType.Question, DestinationQuestionId: { } id })
             {
-                var (type, message) = IsBranchingHealthy(questionMap[id], 
+                if (!questionMap.TryGetValue(id, out var value))
+                {
+                    return (BranchingHealthType.Broken, $"Answer '{answer.Content}' of question {current.Order}, has an invalid question destination.");
+                }
+                
+                var (type, message) = IsBranchingHealthy(value, 
                     new Dictionary<Guid, bool>(visitedList), questionMap, contentMap);
                 
                 if (type != BranchingHealthType.Ok)
