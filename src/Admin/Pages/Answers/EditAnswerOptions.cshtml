@@ -27,7 +27,7 @@
 
     <h1 class="govuk-heading-l govuk-!-margin-0">
       <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
-      Create a list of answer options
+      Add or edit answers
     </h1>
     <dl class="govuk-!-margin-bottom-7">
       <dt class="govuk-visually-hidden">Status</dt>
@@ -50,7 +50,7 @@
       </form>
     </div>
 
-    <h2 class="govuk-heading-m govuk-!-margin-top-6">Add answer options to your list</h2>
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">Answer options</h2>
 
     <form method="post" accept-charset="UTF-8">
       @for (var i = 0; i < Model.Options.Count; i++)

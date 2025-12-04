@@ -19,15 +19,19 @@
                       <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
                       Are you sure you want to remove edit access for '@Model.ContributorEmail'?
                   </h2>
-                  <dl class="govuk-!-margin-bottom-7">
+                  <dl class="govuk-!-margin-0">
                       <dt class="govuk-visually-hidden">Status</dt>
                       <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
                       </dd>
                   </dl>
               </legend>
 
-              <div id="finished-hint" class="govuk-hint">
-                  By deleting this contributor, existing answers with this result page will be broken.
+              <div class="govuk-warning-text govuk-!-margin-bottom-4 govuk-!-margin-top-4">
+                  <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                  <strong class="govuk-warning-text__text">
+                      <span class="govuk-visually-hidden">Warning</span>
+                      By deleting this contributor, existing answers with this result page will be broken.
+                  </strong>
               </div>
 
               <div class="govuk-radios" data-module="govuk-radios">
