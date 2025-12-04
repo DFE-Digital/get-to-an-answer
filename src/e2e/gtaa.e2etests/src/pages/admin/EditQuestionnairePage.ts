@@ -21,7 +21,7 @@ export class EditQuestionnairePage extends BasePage {
     private readonly linkAnswerContent: Locator;
     private readonly linkPrivacyPolicy: Locator;
     private readonly btnPublish: Locator;
-    private readonly btnDelete: Locator;
+    private readonly deleteQuestionnaireButton: Locator;
     private readonly linkViewVersions: Locator;
     private readonly linkClone: Locator;
 
@@ -61,9 +61,9 @@ export class EditQuestionnairePage extends BasePage {
         this.btnPublish = this.page.locator(
             'a.govuk-button.govuk-button--primary[href$="/publish/confirm"]'
         );
-        this.btnDelete = this.page.locator(
-            'a.govuk-button.govuk-button--warning[href$="/delete/confirm"]'
-        );
+        this.deleteQuestionnaireButton = page.getByRole('link', {
+            name: /delete questionnaire/i,
+        });
         this.linkViewVersions = this.page.locator(
             'a.govuk-link[href$="/versions"]'
         );
@@ -116,8 +116,8 @@ export class EditQuestionnairePage extends BasePage {
         await this.btnPublish.click();
     }
 
-    async delete(): Promise<void> {
-        await this.btnDelete.click();
+    async deleteQuestionnaire(): Promise<void> {
+        await this.deleteQuestionnaireButton.click();
     }
 
     async viewVersions(): Promise<void> {
@@ -185,7 +185,7 @@ export class EditQuestionnairePage extends BasePage {
 
     async validateActionsSection(): Promise<void> {
         await expect(this.btnPublish).toBeVisible();
-        await expect(this.btnDelete).toBeVisible();
+        await expect(this.deleteQuestionnaireButton).toBeVisible();
         await expect(this.linkViewVersions).toBeVisible();
         await expect(this.linkClone).toBeVisible();
     }

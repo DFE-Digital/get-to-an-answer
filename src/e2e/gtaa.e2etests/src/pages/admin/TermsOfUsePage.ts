@@ -28,7 +28,7 @@ export class TermsOfUsePage extends BasePage {
     constructor(page: Page) {
         super(page);
 
-        this.heading = page.locator('h1.govuk-heading-l');
+        this.heading = page.locator('h1.govuk-heading-l').first();
 
         this.agreeCheckbox = page.locator('input#Agreed');
         this.checkboxContainer = page.locator('div.govuk-checkboxes__item');
@@ -58,7 +58,9 @@ export class TermsOfUsePage extends BasePage {
 
         // Inline error message to be inside DOM > Fieldset
         this.inlineError = this.fieldset.locator('p.govuk-error-message');
-        this.saveAndContinueButton = page.locator('button.govuk-button');
+        this.saveAndContinueButton = page.getByRole('button', {
+            name: /save and continue/i,
+        });
         this.formGroup = this.page.locator('.govuk-form-group');
     }
 
@@ -119,7 +121,7 @@ export class TermsOfUsePage extends BasePage {
         await this.verifyTermsSections();
         await expect(this.heading, '❌ Main heading not visible').toBeVisible();
         await expect(this.agreeCheckbox, '❌ Agree checkbox not visible').toBeVisible();
-        await expect(this.saveAndContinueButton, '❌ Continue button not visible').toBeVisible();
+        await expect(this.saveAndContinueButton, '❌ Save and continue button not visible').toBeVisible();
     }
 
     // ===== Actions =====

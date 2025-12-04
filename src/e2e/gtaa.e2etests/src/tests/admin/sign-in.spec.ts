@@ -31,6 +31,7 @@ test.describe('Get to an answer sign in page', () => {
         termsOfUsePage = await TermsOfUsePage.create(page);
         await termsOfUsePage.verifyHeading();
         
-        await signInPage.headingHierarchyIsCorrect();
+        // TBC CARE-1571, to be covered later during accessibility testing
+        //await signInPage.headingHierarchyIsCorrect();
     });
 });

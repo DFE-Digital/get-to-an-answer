@@ -16,6 +16,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
         viewQuestionnairePage = await signIn(page, token);
     });
 
+    //TBC, CARE-1572 bug raised
     test('Add a new questionnaire successfully and lands on Edit Questionnaire Page', async ({ page }) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
 

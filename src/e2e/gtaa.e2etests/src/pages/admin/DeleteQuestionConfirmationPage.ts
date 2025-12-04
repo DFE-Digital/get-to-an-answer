@@ -1,6 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
+import {BasePage} from "../BasePage";
 
-export class DeleteQuestionConfirmationPage {
+export class DeleteQuestionConfirmationPage extends BasePage{
     private readonly heading: Locator;
     private readonly backLink: Locator;
 
@@ -9,7 +10,8 @@ export class DeleteQuestionConfirmationPage {
 
     private readonly continueButton: Locator;
 
-    constructor(private readonly page: Page) {
+    constructor(readonly page: Page) {
+        super(page);
         // Main heading
         this.heading = page.getByRole('heading', { level: 1, name: /delete this question/i });
 
