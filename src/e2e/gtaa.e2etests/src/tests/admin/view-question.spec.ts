@@ -265,7 +265,8 @@ test.describe('Get to an answer view questions', () => {
         expect(finalOrder).toEqual([initialOrder[0], initialOrder[1], initialOrder[3]]);
         expect(finalOrder).toHaveLength(3);
     });
-    
+
+    // TBC, bug raised CARE-1565, CARE-1575
     test('Performing concurrent move up question ordering should throw an error', async ({browser, request}) => {
         // Create first browser context
         const context1 = await browser.newContext();
@@ -305,7 +306,7 @@ test.describe('Get to an answer view questions', () => {
         }
     });
 
-    // TBC, bug raised CARE-1565
+    // TBC, bug raised CARE-1565, CARE-1575
     test('Performing concurrent move down question ordering should throw an error', async ({browser, request}) => {
         // Create first browser context
         const context1 = await browser.newContext();
