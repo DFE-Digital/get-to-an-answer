@@ -25,10 +25,10 @@ namespace Api.Controllers;
 [AllowAnonymous]
 public class QuestionnaireRunnerController(IQuestionnaireRunnerService questionnaireRunnerService) : Controller
 {
-    [HttpGet("questionnaires/{questionnaireSlug}/publishes/last/info")]
-    public async Task<IActionResult> GetLastPublishedQuestionnaireInfo(string questionnaireSlug)
+    [HttpGet("questionnaires/{questionnaireIdOrSlug}/publishes/last/info")]
+    public async Task<IActionResult> GetLastPublishedQuestionnaireInfo(string questionnaireIdOrSlug, [FromQuery] bool preview = false)
     {
-        return (await questionnaireRunnerService.GetLastPublishedQuestionnaireInfo(questionnaireSlug)).ToActionResult();
+        return (await questionnaireRunnerService.GetLastPublishedQuestionnaireInfo(questionnaireIdOrSlug, preview)).ToActionResult();
     }
     
     [HttpGet("questionnaires/{questionnaireId:guid}/initial-state")]
