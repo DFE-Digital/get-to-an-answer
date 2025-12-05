@@ -40,12 +40,6 @@ export class DeleteQuestionConfirmationPage extends BasePage{
     }
 
     // ====== ACTIONS ======
-    async clickBackLink(): Promise<void> {
-        await this.backLink.waitFor({state: 'visible', timeout: Timeouts.LONG});
-        await this.backLink.click();
-        await this.page.waitForLoadState('networkidle');
-    }
-
     async clickContinue(): Promise<void> {
         await this.continueButton.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await this.continueButton.click();

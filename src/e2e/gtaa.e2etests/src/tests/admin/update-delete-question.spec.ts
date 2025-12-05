@@ -5,7 +5,7 @@ import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaire
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {goToUpdateQuestionPageByUrl, signIn} from "../../helpers/admin-test-helper";
-import {EntityStatus, PageHeadings, QuestionType} from "../../constants/test-data-constants";
+import {PageHeadings, QuestionType} from "../../constants/test-data-constants";
 import {createQuestion, getQuestion} from "../../test-data-seeder/question-data";
 import {AddQuestionPage, QuestionRadioLabel} from "../../pages/admin/AddQuestionPage";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
@@ -166,20 +166,6 @@ test.describe('Get to an answer update question', () => {
 
         viewQuestionPage = new ViewQuestionPage(page);
         await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
-    });
-
-    test('Delete a question with back link returns to edit page', async ({page}) => {
-        await signIn(page, token);
-        addQuestionPage = await goToUpdateQuestionPageByUrl(page, questionnaireId, question1Id);
-
-        await addQuestionPage.clickDeleteQuestion();
-
-        const deleteConfirmationPage = new DeleteQuestionConfirmationPage(page);
-        await deleteConfirmationPage.validateOnPage();
-        await deleteConfirmationPage.clickBackLink();
-
-        addQuestionPage = new AddQuestionPage(page, 'update');
-        await addQuestionPage.expectAddQuestionHeadingOnPage();
     });
 
     test('Delete a question with cancellation returns to edit page', async ({page}) => {

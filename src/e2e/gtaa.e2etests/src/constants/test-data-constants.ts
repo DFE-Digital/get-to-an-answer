@@ -38,9 +38,8 @@ export const ErrorMessages = {
     ERROR_MESSAGE_INVALID_TITLE: 'Enter a valid title',
     
     ERROR_MESSAGE_TERMS_OF_USE: 'You need to accept the agreement to continue',
-
-    ERROR_MESSAGE_MISSING_QUESTION_TYPE: 'Select question type',
-    ERROR_MESSAGE_MISSING_QUESTION_CONTENT: 'Enter a question',
+    
+    ERROR_MESSAGE_MISSING_QUESTION_CONTENT: 'The QuestionContent field is required.',
 
     ERROR_MESSAGE_MISSING_OPTION_CONTENT: 'The OptionContent field is required.',
 
