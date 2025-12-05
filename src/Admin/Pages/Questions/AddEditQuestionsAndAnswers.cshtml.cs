@@ -48,8 +48,11 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
                 {
                     var trackingMap = JsonSerializer
                         .Deserialize<Dictionary<CompletableTask, CompletionStatus>>(trackingMapJson);
-                    FinishedEditing = trackingMap?[CompletableTask.AddQuestionsAndAnswers] ==
-                                      CompletionStatus.Completed;
+
+                    if (trackingMap != null && trackingMap.TryGetValue(CompletableTask.AddQuestionsAndAnswers, out var status))
+                    {
+                        FinishedEditing = status == CompletionStatus.Completed;
+                    }
                 }
                 catch (Exception e)
                 {
