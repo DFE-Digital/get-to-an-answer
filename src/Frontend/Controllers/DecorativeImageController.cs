@@ -9,16 +9,19 @@ public class DecorativeImageController(
     IApiClient apiClient,
     IImageStorageClient imageStorageClient) : Controller
 {
-    [HttpGet("/questionnaires/{questionnaireId:guid}/decorative-image")]
-    public async Task<IActionResult> GetImageFile(Guid questionnaireId)
+    [HttpGet("/questionnaires/{questionnaireSlug}/decorative-image")]
+    public async Task<IActionResult> GetImageFile(string questionnaireSlug)
     {
         try
         {
-            var questionnaire = await apiClient.GetQuestionnaireAsync(questionnaireId); 
+            var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(questionnaireSlug); 
+            
+            if (questionnaire == null) 
+                return NotFound();
             
             // Download the image from blob storage
             var imageStream = await imageStorageClient.DownloadImageAsync(
-                $"{questionnaireId}/{questionnaire?.DecorativeImage}");
+                $"{questionnaire.Id}/published");
 
             // Get the file extension
             var extension = Path.GetExtension(questionnaire?.DecorativeImage);

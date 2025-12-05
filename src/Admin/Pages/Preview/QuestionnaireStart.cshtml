@@ -9,8 +9,6 @@
   ViewData["Title"] = Model.Questionnaire.DisplayTitle;
   
   var hasErrors = Model != null && !ViewData.ModelState.IsValid;
-  
-  //ViewBag.PreviewClasses = "gtaa-start-page-preview";
 }
 
 @if (hasErrors)
@@ -20,26 +18,55 @@
 
 @section BeforeContainer
 {
-  <section class="dfe-page-grey" id="main-content-header">
-    <div class="govuk-width-container" id="main-header-container">
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-          @*<a href="@string.Format(Routes.QuestionnaireTrackById, Model.QuestionnaireId)" class="govuk-breadcrumbs__link">Home</a>*@
-          <h1 class="govuk-heading-xl">@Model?.Questionnaire?.DisplayTitle</h1>
+  @if (Model?.Questionnaire.DecorativeImage is null && !Model.IsEmbedded)
+  {
+    <section class="dfe-page-grey" id="main-content-header">
+      <div class="govuk-width-container" id="main-header-container">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            @*<a href="@string.Format(Routes.QuestionnaireTrackById, Model.QuestionnaireId)" class="govuk-breadcrumbs__link">Home</a>*@
+            <h1 class="govuk-heading-xl">@Model?.Questionnaire?.DisplayTitle</h1>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  }
+  else
+  {
+    <section id="main-content-header">
+      <div class="govuk-width-container" id="main-header-container">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            <img class="gtaa-preview-image" src="/admin/questionnaires/@Model?.Questionnaire?.Id/decorative-image" alt="@Model?.Questionnaire?.DisplayTitle" />
+          </div>
+        </div>
+      </div>
+    </section>
+  }
 }
 
 <div class="govuk-grid-row" data-last-fetched="2025-09-25T15:45:38">
   <div class="govuk-grid-column-full" id="primary-content">
-    @(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model?.Questionnaire?.Description)))
-    <a href="/admin/questionnaires/@Model?.QuestionnaireId/next-preview?embed=@Model?.IsEmbedded" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button" data-govuk-button-init=""> 
-      Start now 
+    @if (Model?.Questionnaire?.DecorativeImage is not null || Model.IsEmbedded)
+    {
+      <fieldset class="govuk-fieldset" aria-describedby="@Model?.Questionnaire?.DisplayTitle">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+          <h1 class="govuk-fieldset__heading">
+            @Model?.Questionnaire?.DisplayTitle
+          </h1>
+        </legend>
+        <p>@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model?.Questionnaire?.Description)))</p>
+      </fieldset>
+    }
+    else
+    {
+      <p>@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model?.Questionnaire?.Description)))</p>
+    }
+    <a href="/admin/questionnaires/@Model?.QuestionnaireId/next-preview?embed=@Model?.IsEmbedded" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button" data-govuk-button-init="">
+      Start now
       <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
         <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z"></path>
-      </svg> 
+      </svg>
     </a>
   </div>
 </div>

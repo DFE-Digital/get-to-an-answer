@@ -3,10 +3,16 @@
 @inject IWebHostEnvironment WebHostEnvironment
 @inject IOptions<ScriptOptions> ScriptOptions
 
-@if (!WebHostEnvironment.IsProduction())
+@if (!WebHostEnvironment.IsProduction() && ViewBag.IsPreview != true)
 {
     <div class="environment-banner">
         <div class="govuk-body-s"><strong>ATTENTION!</strong> This is the <strong>@WebHostEnvironment.EnvironmentName</strong> version of @Model.ServiceName website.</div>
+    </div>
+} 
+else if (ViewBag.IsPreview == true)
+{
+    <div class="environment-banner">
+        <div class="govuk-body-s"><strong>ATTENTION! </strong> This a preview of your questionnaire.</div>
     </div>
 }
 
