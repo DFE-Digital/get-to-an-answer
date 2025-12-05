@@ -20,6 +20,9 @@
             <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
             Are you sure you want to delete this question?
         </h1>
+        <span class="govuk-hint govuk-!-margin-bottom-8">
+            By deleting this question, ....
+        </span>
         <form method="post" accept-charset="UTF-8">
             <govuk-form-group asp-for="@Model.ConfirmDelete" specific-id-for-form-group-error="ConfirmDelete-error">
                 <fieldset class="govuk-fieldset">

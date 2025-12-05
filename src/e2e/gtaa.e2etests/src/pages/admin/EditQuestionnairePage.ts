@@ -40,7 +40,7 @@ export class EditQuestionnairePage extends BasePage {
         this.backToQuestionnaireLink = this.page.locator(
             'a.govuk-back-link[href$="/admin/questionnaires/manage"]'
         );
-        this.questionnaireId = page.getByRole('link', { name: /create questionnaire ID/i });
+        this.questionnaireId = page.getByRole('link', { name: /add or edit questionnaire ID/i });
         this.linkAddEditQuestion = this.page.locator(
             'a.govuk-task-list__link[href*="/questionnaires/"][href$="/questions"]'
         );

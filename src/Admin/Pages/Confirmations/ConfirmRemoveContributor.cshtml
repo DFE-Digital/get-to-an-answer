@@ -17,29 +17,20 @@
               <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                   <h2 class="govuk-fieldset__heading">
                       <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-                      Are you sure you want to remove edit access for '@Model.ContributorEmail'?
+                      Are you sure you want to remove access for '@Model.ContributorEmail'?
                   </h2>
-                  <dl class="govuk-!-margin-0">
-                      <dt class="govuk-visually-hidden">Status</dt>
-                      <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
-                      </dd>
-                  </dl>
               </legend>
 
-              <div class="govuk-warning-text govuk-!-margin-bottom-4 govuk-!-margin-top-4">
-                  <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                  <strong class="govuk-warning-text__text">
-                      <span class="govuk-visually-hidden">Warning</span>
-                      By deleting this contributor, existing answers with this result page will be broken.
-                  </strong>
-              </div>
+              <span class="govuk-hint govuk-!-margin-bottom-8">
+                  This person will no longer be able to view or edit the questionnaire.
+              </span>
 
               <div class="govuk-radios" data-module="govuk-radios">
                   <div class="govuk-radios__item">
                       <input class="govuk-radios__input" id="finished-yes" name="DeleteContributor" type="radio" asp-for="@Model.RemoveContributor"
                              value="true">
                       <label class="govuk-label govuk-radios__label" for="finished-yes">
-                          Yes, remove them
+                          Yes, remove person
                       </label>
                   </div>
 
@@ -47,7 +38,7 @@
                       <input class="govuk-radios__input" id="finished-no" name="DeleteContributor" type="radio" asp-for="@Model.RemoveContributor"
                              value="false">
                       <label class="govuk-label govuk-radios__label" for="finished-no">
-                          No, keep them
+                          No, keep person
                       </label>
                   </div>
               </div>

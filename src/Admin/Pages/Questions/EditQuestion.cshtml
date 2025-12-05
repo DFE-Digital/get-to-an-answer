@@ -21,7 +21,7 @@
     @await Html.PartialAsync("_ErrorSummary")
 }
 
-@if (Model.QuestionSaved)
+@if (Model.QuestionSaved || Model.QuestionnaireState is { JustUpdated: true })
 {
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -68,15 +68,10 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-        <h1 class="govuk-heading-l govuk-!-margin-0">
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-8">
             <span class="govuk-caption-l">Question @Model.QuestionNumber</span>
             Edit question
         </h1>
-        <dl class="govuk-!-margin-bottom-7">
-            <dt class="govuk-visually-hidden">Status</dt>
-            <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
-            </dd>
-        </dl>
         <form method="post">
             <govuk-form-group asp-for="QuestionContent">
                 <label class="govuk-label govuk-label--m" for="QuestionContent">

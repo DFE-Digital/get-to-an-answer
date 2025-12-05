@@ -35,6 +35,8 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     public bool CurrentQuestionHasNextOne { get; set; }
     
     [TempData(Key = "NextQuestionId")] public Guid? NextQuestionId { get; set; }
+    
+    public QuestionnaireState? QuestionnaireState { get; set;}
 
     public async Task<IActionResult> OnGetAsync()
     {

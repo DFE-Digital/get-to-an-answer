@@ -19,26 +19,6 @@
     <partial name="_CookieConsentPartial" model="@Model"/>
 }
 
-<div class="govuk-width-container">
-    <div class="govuk-phase-banner">
-        <div class="govuk-phase-banner__content">
-            <strong class="govuk-phase-banner__content__tag govuk-tag">
-                @Model.Phase.ToString()
-            </strong>
-            <span class="govuk-phase-banner__text">
-                This is a new service.
-                @if (!string.IsNullOrEmpty(Model.FeedbackText) && Model.ShowNavigation)
-                {
-                    <text>
-                        Help us improve it and <a class="govuk-link" href="@Model.FeedbackUrl" target="_blank" rel="nofollow">
-                            @Model.FeedbackText (opens in new tab)</a>. 
-                    </text>
-                }
-            </span>
-        </div>
-    </div>
-</div>
-
 @if (SiteConfiguration.Rebrand)
 {
     <header class="govuk-header" data-module="govuk-header">
