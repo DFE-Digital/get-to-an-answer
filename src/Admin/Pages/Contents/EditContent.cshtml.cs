@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Common.Client;
 using Common.Domain;
@@ -17,11 +18,13 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
     [FromRoute(Name = "contentId")] public Guid ContentId { get; set; }
 
+    [Required(ErrorMessage = "Add a title")] 
     [BindProperty] public string ContentTitle { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "Enter some details")] 
     [BindProperty] public string ContentValue { get; set; }
 
-    [BindProperty] public string ContentRefName { get; set; }
+    [BindProperty] public string? ContentRefName { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {

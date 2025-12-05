@@ -1,4 +1,5 @@
 @page "/admin/questionnaires/{questionnaireId:guid}/version-history"
+@using Common.Custom
 @using Common.Local
 @model Admin.Pages.Version.QuestionnaireVersionHistory
 
@@ -20,6 +21,18 @@
   <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model.QuestionnaireId/track">Back</a>
 }
 
+<h1 class="govuk-heading-l govuk-!-margin-0">
+  <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
+  View version history
+</h1>
+<dl class="govuk-!-margin-bottom-7">
+  <dt class="govuk-visually-hidden">Status</dt>
+  <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
+  </dd>
+</dl>
+<div class="govuk-hint">
+  <p>Once you make a copy of this questionnaire, you will be directed to 'Create a questionnaire' of the new copy.</p>
+</div>
 <div data-module="appstepnav"id="step-by-step-navigation" class="app-step-nav js-hidden app-step-nav--large" data-show-text="Show Changes" data-hide-text="Hide Changes" data-show-all-text="Show all versions" data-hide-all-text="Hide all versions">
   <ol class="app-step-nav__steps">
     @foreach (var version in Model.QuestionnaireVersions)
@@ -51,13 +64,13 @@
                 @switch (changeData.Kind)
                 {
                   case ChangeKind.Modified:
-                    <span class="diff-modified">@changeData.Path was modified from '@changeData.ThisValue' to '@changeData.ThatValue'</span>
+                    <span class="diff-modified">@JsonPathDescriber.Describe(changeData.Path) was changed from '@changeData.ThisValue' to '@changeData.ThatValue'</span>
                     break;
                   case ChangeKind.Added:
-                    <span class="diff-added">'@changeData.ThatValue' was added to @changeData.Path</span>
+                    <span class="diff-added">'@changeData.ThatValue' was added to @JsonPathDescriber.Describe(changeData.Path)</span>
                     break;
                   case ChangeKind.Removed:
-                    <span class="diff-removed">'@changeData.ThatValue' was from @changeData.Path</span>
+                    <span class="diff-removed">'@changeData.ThatValue' was deleted from @changeData.Path</span>
                     break;
                 }
               </li>

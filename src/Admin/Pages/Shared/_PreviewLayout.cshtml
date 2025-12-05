@@ -152,21 +152,6 @@
 
 @await RenderSectionAsync("BeforeContainer", required: false)
 <div class="govuk-width-container @ViewBag.ContainerClasses" id="main-content-container">
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            <div class="govuk-phase-banner" style="border-bottom: 1px solid #b1b4b6;">
-                <p class="govuk-phase-banner__content">
-                    <strong class="govuk-tag govuk-tag--yellow govuk-phase-banner__content__tag">
-                        Draft Preview
-                    </strong>
-                    <span class="govuk-phase-banner__text">
-                        This is a draft preview of your questionnaire.
-                    </span>
-                </p>
-            </div>
-        </div>
-    </div>
-    
     @await RenderSectionAsync("BeforeContent", required: false)
     
     <main class="govuk-main-wrapper @ViewBag.MainClasses" id="main-content" role="main" lang="@ViewBag.MainLang">

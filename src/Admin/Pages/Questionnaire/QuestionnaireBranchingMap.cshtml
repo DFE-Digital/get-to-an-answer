@@ -14,7 +14,7 @@
     <div class="govuk-grid-column-full">
         <h1 class="govuk-heading-l govuk-!-margin-0">
             <span class="govuk-caption-l">@Model.QuestionnaireBranchingMapDto?.QuestionnaireTitle</span>
-            Branching map
+            View branching map
         </h1>
         <dl class="govuk-!-margin-bottom-7">
             <dt class="govuk-visually-hidden">Status</dt>
@@ -22,7 +22,11 @@
             </dd>
         </dl>
 
-        <div class="govuk-hint">This visualises question-to-answer branching. Answer priorities indicate prioritisation on multi-select questions.</div>
+        <div class="govuk-hint">
+            <p>This map can help you review how branching works between questions and answers. You can also do this by reviewing answer destinations.</p>
+
+            <p>You may need to use your browser zoom settings to view detail.</p>
+        </div>
 
         <div id="diagram-wrapper" class="govuk-!-margin-top-4">
             <div id="diagram" class="mermaid">

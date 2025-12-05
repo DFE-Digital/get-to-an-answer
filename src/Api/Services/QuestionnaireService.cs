@@ -27,7 +27,7 @@ public interface IQuestionnaireService
     Task<ServiceResult> GetQuestionnaires(string userId);
 
     Task<ServiceResult> UpdateQuestionnaire(string userId, Guid id, UpdateQuestionnaireRequestDto request);
-    Task<ServiceResult> UpdateQuestionnaireLookAndFeel(string userId, Guid id, UpdateLookAndFeelRequestDto request);
+    Task<ServiceResult> UpdateQuestionnaireCustomStyling(string userId, Guid id, UpdateCustomStylingRequestDto request);
     Task<ServiceResult> UpdateQuestionnaireContinueButton(string userId, Guid id,
         UpdateContinueButtonRequestDto request);
     Task<ServiceResult> DeleteQuestionnaireDecorativeImage(string userId, Guid id);
@@ -181,11 +181,11 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
-    public async Task<ServiceResult> UpdateQuestionnaireLookAndFeel(string userId, Guid id, UpdateLookAndFeelRequestDto request)
+    public async Task<ServiceResult> UpdateQuestionnaireCustomStyling(string userId, Guid id, UpdateCustomStylingRequestDto request)
     {
         try
         {
-            logger.LogInformation("UpdateQuestionnaireLookAndFeel started QuestionnaireId={QuestionnaireId}", id);
+            logger.LogInformation("UpdateQuestionnaireCustomStyling started QuestionnaireId={QuestionnaireId}", id);
 
             if (request.TextColor == null && request.BackgroundColor == null && request.PrimaryButtonColor == null && 
                 request.SecondaryButtonColor == null && request.StateColor == null && request.ErrorMessageColor == null)
@@ -221,12 +221,12 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             
             await db.SaveChangesAsync();
             
-            logger.LogInformation("UpdateQuestionnaireLookAndFeel succeeded QuestionnaireId={QuestionnaireId}", id);
+            logger.LogInformation("UpdateQuestionnaireCustomStyling succeeded QuestionnaireId={QuestionnaireId}", id);
             return NoContent();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "UpdateQuestionnaireLookAndFeel failed QuestionnaireId={QuestionnaireId}", id);
+            logger.LogError(ex, "UpdateQuestionnaireCustomStyling failed QuestionnaireId={QuestionnaireId}", id);
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
     }

@@ -20,11 +20,10 @@ public class AddContent(ILogger<AddContent> logger, IApiClient apiClient) : Base
     public string ContentTitle { get; set; } = "";
 
     [BindProperty] 
-    [Required(ErrorMessage = "Enter some content")] 
+    [Required(ErrorMessage = "Enter some details")] 
     public string ContentValue { get; set; } = "";
 
     [BindProperty] 
-    [Required(ErrorMessage = "Enter a reference name")] 
     public string ContentRefName { get; set; } = "";
 
     public IActionResult OnGet()

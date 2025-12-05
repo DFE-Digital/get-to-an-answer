@@ -1,12 +1,13 @@
 using System.Text.RegularExpressions;
-using Admin.Models;
+using Common.Client;
+using Common.Domain.Request.Create;
+using Common.Enum;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Admin.Pages.Answers;
 
-public partial class BulkAnswerOptions(ILogger<BulkAnswerOptions> logger) : BasePageModel
+public partial class BulkAnswerOptions(IApiClient apiClient, ILogger<BulkAnswerOptions> logger) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
 
@@ -16,7 +17,20 @@ public partial class BulkAnswerOptions(ILogger<BulkAnswerOptions> logger) : Base
 
     [BindProperty] public string? BulkAnswerOptionsRawText { get; set; }
 
-    public IActionResult OnPost(string? returnUrl)
+    public async Task<IActionResult> OnGet()
+    {
+        if (!ModelState.IsValid) 
+            return Page();
+        
+        var answers = await apiClient.GetAnswersAsync(QuestionId);
+
+        BulkAnswerOptionsRawText = answers.Select(a => a.Content)
+            .Aggregate((a, b) => a + "\n" + b).Trim();
+        
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPost(string? returnUrl)
     {
         try
         {
@@ -26,24 +40,63 @@ public partial class BulkAnswerOptions(ILogger<BulkAnswerOptions> logger) : Base
                 .Where(line => !string.IsNullOrWhiteSpace(line))
                 .Select(line => line.TrimEnd())
                 .ToList();
-
-            var existingOptionsSnapshot = TempData.Peek(AnswerOptionsViewModel.AnswersSnapshotTempDataKey);
-            var existingAnswerOptions =
-                JsonConvert.DeserializeObject<List<AnswerOptionsViewModel>>(existingOptionsSnapshot?.ToString() ?? "[]");
-
-            if (existingAnswerOptions != null)
+            
+            // entries should be unique, if not, throw an error
+            if (bulkOptions.Count != bulkOptions.Distinct().Count())
             {
-                var bulkOptionsAsAnswers = bulkOptions.Select(optionStringValue => new AnswerOptionsViewModel
-                {
-                    OptionContent = optionStringValue,
-                    AnswerDestination = AnswerDestination.NextQuestion
-                });
-
-                existingAnswerOptions.AddRange(bulkOptionsAsAnswers);
+                ModelState.AddModelError("BulkAnswerOptionsRawText", "Duplicate entries found");
+                return Page();
             }
 
-            TempData[AnswerOptionsViewModel.AnswersSnapshotTempDataKey] =
-                JsonConvert.SerializeObject(existingAnswerOptions);
+            var answers = await apiClient.GetAnswersAsync(QuestionId);
+            var answerMap = answers.ToDictionary(a => a.Content, a => a);
+            
+            var bulkUpserts = new BulkUpsertAnswersRequestDto
+            {
+                QuestionnaireId = QuestionnaireId,
+                QuestionId = QuestionId,
+            };
+
+            // upsert any new answers 
+            foreach (var option in bulkOptions)
+            {
+                if (answerMap.TryGetValue(option, out var existingAnswer))
+                {
+                    bulkUpserts.Upserts.Add(new UpsertAnswerRequestDto
+                    {
+                        Id = existingAnswer.Id,
+                        Content = existingAnswer.Content,
+                        Description = existingAnswer.Description,
+                        DestinationType = existingAnswer.DestinationType,
+                        DestinationQuestionId = existingAnswer.DestinationQuestionId,
+                        DestinationContentId = existingAnswer.DestinationContentId,
+                        DestinationUrl = existingAnswer.DestinationUrl,
+                        Priority = existingAnswer.Priority,
+                    });
+                }
+                else
+                {
+                    bulkUpserts.Upserts.Add(new UpsertAnswerRequestDto
+                    {
+                        Content = option,
+                        DestinationType = DestinationType.Auto
+                    });
+                }
+            }
+            
+            await apiClient.BulkUpsertAnswersAsync(bulkUpserts);
+
+            var answerContentList = answers.Select(a => a.Content).ToList();
+            var removedAnswers = answerContentList.Except(bulkOptions).ToList();
+
+            // remove any answers that are no longer in the bulk options
+            foreach (var option in removedAnswers)
+            {
+                if (answerMap.TryGetValue(option, out var existingAnswer))
+                {
+                    await apiClient.DeleteAnswerAsync(existingAnswer.Id);
+                }
+            }
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             {

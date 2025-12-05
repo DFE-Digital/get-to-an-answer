@@ -1,4 +1,5 @@
 @page "/admin/questionnaires/{questionnaireId}/questions/{questionId}/answers/add/bulk"
+@addTagHelper *, Common
 @model Admin.Pages.Answers.BulkAnswerOptions
 
 @{
@@ -42,12 +43,17 @@
         </p>
 
         <form method="post" accept-charset="UTF-8">
-            <textarea class="govuk-textarea"
-                      id="BulkAnswerOptions"
-                      rows="8"
-                      asp-for="@Model.BulkAnswerOptionsRawText"
-                      aria-describedby="BulksAnswerOptions-hint"></textarea>
-
+            <govuk-form-group asp-for="@Model.BulkAnswerOptionsRawText">
+                
+                <govuk-field-error asp-for="@Model.BulkAnswerOptionsRawText" error-id="bulk-options-error">
+                </govuk-field-error>
+                
+                <textarea class="govuk-textarea"
+                          id="BulkAnswerOptions"
+                          rows="8"
+                          asp-for="@Model.BulkAnswerOptionsRawText"
+                          aria-describedby="BulksAnswerOptions-hint"></textarea>
+            </govuk-form-group>
             <button class="govuk-button govuk-button--primary">Continue</button>
         </form>
 
