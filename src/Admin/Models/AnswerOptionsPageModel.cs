@@ -1,4 +1,5 @@
 using Common.Client;
+using Common.Domain;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Common.Enum;
@@ -149,8 +150,12 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         return Redirect(targetUrl ?? string.Empty);
     }
-    
-    protected async Task PopulateOptionSelectionLists()
+
+    protected async Task<(
+        List<QuestionDto> Questions,
+        List<ContentDto> ResultsPages,
+        List<SelectListItem> questionSelectionList,
+        List<SelectListItem> resultsPagesForSelection)> GetPopulatePrerequisites()
     {
         var questionForSelection = await apiClient.GetQuestionsAsync(QuestionnaireId);
         var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
@@ -161,6 +166,18 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         var resultsPagesForSelection = resultsPages
             .Select(r => new SelectListItem(r.ReferenceName ?? r.Title, r.Id.ToString())).ToList();
 
+        return (questionForSelection, resultsPages, questionSelectionList, resultsPagesForSelection);
+    }
+    
+    protected async Task PopulateOptionSelectionLists()
+    {
+        var (
+            _,
+            _,
+            questionSelectionList,
+            resultsPagesForSelection
+        ) = await GetPopulatePrerequisites();
+        
         foreach (var option in Options)
         {
             option.QuestionSelectList = questionSelectionList;
@@ -179,6 +196,9 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             DestinationType = MapDestination(option.AnswerDestination),
             DestinationQuestionId = option.SelectedDestinationQuestion != null
                 ? Guid.Parse(option.SelectedDestinationQuestion)
+                : null,
+            DestinationContentId = !string.IsNullOrEmpty(option.SelectedResultsPage)
+                ? Guid.Parse(option.SelectedResultsPage)
                 : null,
             DestinationUrl = option.ExternalLink,
             Priority = Convert.ToSingle(option.RankPriority),
