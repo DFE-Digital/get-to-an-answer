@@ -1,10 +1,12 @@
 using Common.Models.PageModels;
 using Common.Client;
 using Common.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Admin.Pages.Preview;
 
+[Authorize]
 [IgnoreAntiforgeryToken]
 public class QuestionnaireStart(IApiClient apiClient, ILogger<QuestionnaireStart> logger) : QuestionnairesPageModel
 {

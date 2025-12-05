@@ -5,10 +5,12 @@ using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
 using Common.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Admin.Pages.Preview;
 
+[Authorize]
 [IgnoreAntiforgeryToken]
 public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> logger) : QuestionnairesPageModel
 {
