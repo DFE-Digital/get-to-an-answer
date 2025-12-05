@@ -91,15 +91,14 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
         Options?.Clear();
 
         var existingAnswers = await _apiClient.GetAnswersAsync(QuestionId);
-        var questionForSelection = await _apiClient.GetQuestionsAsync(QuestionnaireId);
-        var resultsPages = await _apiClient.GetContentsAsync(QuestionnaireId);
-
-        var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
-            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
-
-        var resultsPagesForSelection = resultsPages
-            .Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
-
+        
+        var (
+            questionForSelection,
+            _,
+            questionSelectionList,
+            resultsPagesForSelection
+        ) = await GetPopulatePrerequisites();
+        
         var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
 
         foreach (var existingAnswer in existingAnswers)
