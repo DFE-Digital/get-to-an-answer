@@ -21,7 +21,8 @@ public class Error(ILogger<Error> logger) : BasePageModel
             ErrorMessage = ErrorCode switch
             {
                 (int) HttpStatusCode.NotFound => "Page not found.",
-                (int) HttpStatusCode.Forbidden => "Access denied.",
+                (int) HttpStatusCode.Unauthorized => "Access denied.",
+                (int) HttpStatusCode.Forbidden => "Forbidden.",
                 (int) HttpStatusCode.BadRequest => "Bad request.",
                 (int) HttpStatusCode.InternalServerError => "Internal server error.",
                 (int) HttpStatusCode.ServiceUnavailable => "Service unavailable.",
