@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Common.Local;
+using Common.Versioning;
 
 namespace Common.Extensions;
 
