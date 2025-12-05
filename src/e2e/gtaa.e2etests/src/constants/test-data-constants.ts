@@ -43,7 +43,8 @@ export const ErrorMessages = {
     ERROR_MESSAGE_MISSING_QUESTION_CONTENT_OnUpdate: 'The question is required',
     ERROR_MESSAGE_MISSING_QUESTION_TYPE: 'Select question type',
 
-    ERROR_MESSAGE_MISSING_OPTION_CONTENT: 'The OptionContent field is required.',
+    ERROR_MESSAGE_MISSING_ANSWER_OPTION1_CONTENT: 'Option 1 content is required',
+    ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT: 'Option 2 content is required',
 
     ERROR_MESSAGE_TOP_QUESTION_UP: 'You cannot move this question further up',
     ERROR_MESSAGE_BOTTOM_QUESTION_DOWN: 'You cannot move this question further down'
