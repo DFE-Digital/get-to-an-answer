@@ -29,8 +29,8 @@
         </h2>
       </div>
       <div class="govuk-notification-banner__content">
-        <h3 class="govuk-notification-banner__heading">
-          Your result page has been created.
+        <h3 id="just-created-banner-text" class="govuk-notification-banner__heading">
+          Your results page has been created.
         </h3>
       </div>
     </div>
@@ -48,7 +48,7 @@ else if (Model.QuestionnaireState is { JustUpdated: true })
         </h2>
       </div>
       <div class="govuk-notification-banner__content">
-        <h3 class="govuk-notification-banner__heading">
+        <h3 id="just-updated-banner-text" class="govuk-notification-banner__heading">
           Your changes have been saved.
         </h3>
       </div>
@@ -56,10 +56,29 @@ else if (Model.QuestionnaireState is { JustUpdated: true })
   </div>
 </div>
 }
+else if (Model.QuestionnaireState is { JustDeleted: true })
+{
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+            Success
+          </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <h3 id="just-deleted-banner-text" class="govuk-notification-banner__heading">
+            Your results page has been deleted.
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+}
 
-<div class="govuk-grid-row">
+<div class="govuk-grid-row gtaa-add-edit-results-pages">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-l govuk-!-margin-0">
+    <h1 id="view-results-pages-heading" class="govuk-heading-l govuk-!-margin-0">
       <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
       Add or edit results pages
     </h1>
@@ -71,7 +90,7 @@ else if (Model.QuestionnaireState is { JustUpdated: true })
       </p>
     </div>
     <div class="govuk-button-group">
-      <a class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" 
+      <a id="add-results-page-btn" class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" 
          href="@string.Format(Routes.AddContent, Model.QuestionnaireId)">Add a result page</a>
     </div>
     <h2 class="govuk-heading-m govuk-!-margin-top-7 govuk-!-margin-bottom-0">Your result pages</h2>

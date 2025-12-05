@@ -1,27 +1,29 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from '../BasePage';
 
-export class PublishQuestionnairePage extends BasePage {
+export class RemoveStartPageConfirmationPage extends BasePage {
     // ===== Locators =====
     private readonly section: Locator = this.page.locator('main[role="main"]');
     private readonly backLink: Locator = this.section.locator('a.govuk-back-link');
     private readonly h1: Locator = this.section.locator('h1');
-    private readonly form: Locator = this.section.locator('form[method="post"][action$="/publish"]');
-    
+
+    // Form and radio buttons
+    private readonly form: Locator = this.section.locator('form[method="post"]');
+
     private readonly yesRadio: Locator =
-        this.form.locator('#publish-questionnaire-yes-input')
-            .or(this.form.locator('input[type="radio"][value="true"]'))
+        this.form.locator('#finished-yes')
+            .or(this.form.locator('input[type="radio"][name="RemoveStartPage"][value="true"]'))
             .first();
 
     private readonly noRadio: Locator =
-        this.form.locator('#publish-questionnaire-no-input')
-            .or(this.form.locator('input[type="radio"][value="false"]'))
+        this.form.locator('#finished-no')
+            .or(this.form.locator('input[type="radio"][name="RemoveStartPage"][value="false"]'))
             .first();
 
-    private readonly radios: Locator = this.form.locator('input[type="radio"]');
-    
+    private readonly radios: Locator = this.form.locator('input[type="radio"][name="RemoveStartPage"]');
+
     private readonly continueBtn: Locator =
-        this.form.locator('button.govuk-button.govuk-button--primary[type="submit"]');
+        this.form.locator('button[type="submit"]');
 
     // ===== Constructor =====
     constructor(page: Page) {
@@ -46,14 +48,13 @@ export class PublishQuestionnairePage extends BasePage {
     }
 
     // ===== Assertions (structure-only) =====
-    async expectBasicStructure(): Promise<void> {
+    async expectTwoRadiosPresent(): Promise<void> {
         await expect(this.section).toBeVisible();
-        await expect(this.backLink).toBeVisible();
         await expect(this.h1).toBeVisible();
         await expect(this.form).toBeVisible();
 
         const radioCount = await this.radios.count();
-        expect(radioCount).toBeGreaterThan(1);
+        expect(radioCount).toBeGreaterThanOrEqual(2);
 
         await expect(this.yesRadio).toBeVisible();
         await expect(this.noRadio).toBeVisible();

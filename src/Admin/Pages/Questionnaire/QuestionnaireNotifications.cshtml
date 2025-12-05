@@ -8,7 +8,7 @@
   var questionnaireViewModel = Model.ViewModel;
 }
 
-@if (questionnaireViewModel.QuestionnaireState is { InviteAccepted: true })
+@if (questionnaireViewModel.QuestionnaireState is { JustCreated: true })
 {
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -19,27 +19,7 @@
           </h2>
         </div>
         <div class="govuk-notification-banner__content">
-          <h3 class="govuk-notification-banner__heading">
-            You've been added as a contributor.
-          </h3>
-          <p class="govuk-body">We are glad to have you on the team.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-} 
-else if (questionnaireViewModel.QuestionnaireState is { JustCreated: true })
-{
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
-        <div class="govuk-notification-banner__header">
-          <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
-            Success
-          </h2>
-        </div>
-        <div class="govuk-notification-banner__content">
-          <h3 class="govuk-notification-banner__heading">
+          <h3 id="just-created-banner-text" class="govuk-notification-banner__heading">
             Your questionnaire has been created.
           </h3>
         </div>
@@ -58,7 +38,7 @@ else if (questionnaireViewModel.QuestionnaireState is { JustUpdated: true })
           </h2>
         </div>
         <div class="govuk-notification-banner__content">
-          <h3 class="govuk-notification-banner__heading">
+          <h3 id="just-updated-banner-text" class="govuk-notification-banner__heading">
             Your changes have been saved.
           </h3>
         </div>
@@ -77,7 +57,7 @@ else if (questionnaireViewModel.QuestionnaireState is { JustCloned: true })
         </h2>
       </div>
       <div class="govuk-notification-banner__content">
-        <h3 class="govuk-notification-banner__heading">
+        <h3 id="just-cloned-banner-text"  class="govuk-notification-banner__heading">
           Your copy questionnaire has been created.
         </h3>
       </div>
@@ -96,7 +76,7 @@ else if (questionnaireViewModel.QuestionnaireState is { JustPublished: true })
           </h2>
         </div>
         <div class="govuk-notification-banner__content">
-          <h3 class="govuk-notification-banner__heading">
+          <h3 id="just-published-banner-text" class="govuk-notification-banner__heading">
             Your questionnaire has been published.
           </h3>
         </div>
@@ -115,7 +95,7 @@ else if (questionnaireViewModel.QuestionnaireState is { JustUnpublished: true })
           </h2>
         </div>
         <div class="govuk-notification-banner__content">
-          <h3 class="govuk-notification-banner__heading">
+          <h3 id="just-unpublished-banner-text" class="govuk-notification-banner__heading">
             Your questionnaire has been unpublished.
           </h3>
         </div>
@@ -134,7 +114,7 @@ else if (questionnaireViewModel.QuestionnaireState is { JustAddedStartPage: true
           </h2>
         </div>
         <div class="govuk-notification-banner__content">
-          <h3 class="govuk-notification-banner__heading">
+          <h3 id="just-added-start-page-banner-text" class="govuk-notification-banner__heading">
             Your start page has been saved
           </h3>
         </div>
@@ -153,7 +133,7 @@ else if (questionnaireViewModel.QuestionnaireState is { JustRemovedStartPage: tr
           </h2>
         </div>
         <div class="govuk-notification-banner__content">
-          <h3 class="govuk-notification-banner__heading">
+          <h3 id="just-removed-start-page-banner-text" class="govuk-notification-banner__heading">
             Your start page has been removed
           </h3>
         </div>
@@ -172,7 +152,7 @@ else if (questionnaireViewModel.QuestionnaireState is { JustResetStyling: true }
           </h2>
         </div>
         <div class="govuk-notification-banner__content">
-          <h3 class="govuk-notification-banner__heading">
+          <h3 id="just-reset-styling-banner-text" class="govuk-notification-banner__heading">
             Your customised styling has been reset
           </h3>
         </div>
@@ -191,7 +171,7 @@ else if (questionnaireViewModel.QuestionnaireState is { JustCustomisedStyling: t
           </h2>
         </div>
         <div class="govuk-notification-banner__content">
-          <h3 class="govuk-notification-banner__heading">
+          <h3 id="just-updated-styling-banner-text" class="govuk-notification-banner__heading">
             Your customised styling has been saved
           </h3>
         </div>
@@ -210,7 +190,7 @@ else if (questionnaireViewModel.QuestionnaireState is { JustAddedCustomButtonTex
           </h2>
         </div>
         <div class="govuk-notification-banner__content">
-          <h3 class="govuk-notification-banner__heading">
+          <h3 id="just-modified-button-text-banner-text" class="govuk-notification-banner__heading">
             Your button text has been saved
           </h3>
         </div>
@@ -229,7 +209,7 @@ else if (questionnaireViewModel.QuestionnaireState is { JustRemovedStartPageImag
           </h2>
         </div>
         <div class="govuk-notification-banner__content">
-          <h3 class="govuk-notification-banner__heading">
+          <h3 id="just-removed-start-page-image-banner-text" class="govuk-notification-banner__heading">
             Your start page image has been removed
           </h3>
         </div>
