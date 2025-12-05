@@ -89,7 +89,6 @@ test.describe('Get to an answer update question', () => {
         await addQuestionPage.validateSuccessBanner();
     });
     
-    // TBC, CARE-1570 bug raised
     test('Error summary on invalid submit with missing required fields when updating question', async ({page, browserName}) => {
         await signIn(page, token);
         addQuestionPage = await goToUpdateQuestionPageByUrl(page, questionnaireId, question1Id);

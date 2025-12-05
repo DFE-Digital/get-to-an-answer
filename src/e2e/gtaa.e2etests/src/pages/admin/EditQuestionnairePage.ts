@@ -13,7 +13,7 @@ export class EditQuestionnairePage extends BasePage {
     private readonly editQuestionnaireHeading: Locator;
     private readonly questionnaireStatus: Locator;
     private readonly linkEditTitle: Locator;
-    private readonly linkEditSlug: Locator;
+    private readonly questionnaireId: Locator;
     private readonly linkAddEditQuestion: Locator;
     private readonly linkAddEditQuestionsAnswers: Locator;
     private readonly linkStartPage: Locator;
@@ -40,14 +40,14 @@ export class EditQuestionnairePage extends BasePage {
         this.backToQuestionnaireLink = this.page.locator(
             'a.govuk-back-link[href$="/admin/questionnaires/manage"]'
         );
-        this.linkEditSlug = page.getByRole('link', { name: /edit the slug of your questionnaire/i });
+        this.questionnaireId = page.getByRole('link', { name: /create questionnaire ID/i });
         this.linkAddEditQuestion = this.page.locator(
             'a.govuk-task-list__link[href*="/questionnaires/"][href$="/questions"]'
         );
         this.linkStartPage = this.page.locator(
             'a.govuk-task-list__link[href$="/start-page/edit"]'
         );
-        this.linkAddEditQuestionsAnswers = page.getByRole('link', { name: /add and edit questions and answers/i });
+        this.linkAddEditQuestionsAnswers = page.getByRole('link', { name: /add or edit questions and answers/i });
         this.linkBrandingTheme = this.page.locator(
             'a.govuk-task-list__link[href$="/branding"]'
         );
@@ -86,8 +86,8 @@ export class EditQuestionnairePage extends BasePage {
         await this.linkEditTitle.click();
     }
 
-    async openEditSlug(): Promise<void> {
-        await this.linkEditSlug.click();
+    async createQuestionnaireId(): Promise<void> {
+        await this.questionnaireId.click();
     }
 
     async openQuestions(): Promise<void> {
@@ -165,7 +165,7 @@ export class EditQuestionnairePage extends BasePage {
 
     async validateCoreLinks(): Promise<void> {
         await expect(this.linkEditTitle).toBeVisible();
-        await expect(this.linkEditSlug).toBeVisible();
+        await expect(this.questionnaireId).toBeVisible();
         await expect(this.linkAddEditQuestion).toBeVisible();
     }
 

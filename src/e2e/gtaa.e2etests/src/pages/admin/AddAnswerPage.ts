@@ -37,7 +37,7 @@ export class AddAnswerPage extends BasePage {
         this.mode = mode;
         this.addAnswersHeading = this.page.getByRole('heading', {
             level: 1,
-            name: /Create a list of answer options/i
+            name: /Add or edit answers/i
         });
         this.statusTag = page.locator('strong.govuk-tag[data-status="Draft"]');
         this.removeButton = page.getByRole('button', {name: /remove/i});

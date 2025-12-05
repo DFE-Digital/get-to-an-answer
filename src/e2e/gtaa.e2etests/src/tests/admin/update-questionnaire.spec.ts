@@ -149,7 +149,7 @@ test.describe('Get to an answer update questionnaire', () => {
         viewQuestionnairePage = await signIn(page, token);
 
         editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaire.id);
-        await editQuestionnairePage.openEditSlug();
+        await editQuestionnairePage.createQuestionnaireId();
 
         updateQuestionnaireSlugPage = await UpdateQuestionnaireSlugPage.create(page);
 

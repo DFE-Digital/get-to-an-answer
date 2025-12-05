@@ -148,9 +148,12 @@ export class AddQuestionPage extends BasePage {
         
         await this.errorSummary.waitFor({state: 'visible', timeout: Timeouts.MEDIUM});
         await this.errorList.waitFor({state: 'visible', timeout: Timeouts.MEDIUM});
-        
-        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_CONTENT);
-        
+
+        if (this.mode === 'update') {
+            await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_CONTENT_OnUpdate);
+        }else{
+            await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_TYPE);    
+        }
         await this.page.waitForTimeout(200);  // Increase to 200ms for Firefox
         await expect(this.errorSummary, '❌ Error summary not focused').toBeFocused();
         
@@ -165,6 +168,16 @@ export class AddQuestionPage extends BasePage {
 
         await this.page.waitForTimeout(200);
         await this.clickErrorLinkAndValidateFocus(this.errorLinkQuestionContent, browserName);
+    }
+
+    async validateMissingQuestionTypeErrorMessageSummary(browserName: string) {
+        await this.errorSummary.waitFor({state: 'visible', timeout: Timeouts.MEDIUM});
+        await this.errorList.waitFor({state: 'visible', timeout: Timeouts.MEDIUM});
+
+        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTION_TYPE);
+
+        await this.page.waitForTimeout(200);
+        await this.clickErrorLinkAndValidateFocus(this.errorLinkQuestionType, browserName);
     }
 
     async validateInlineQuestionContentError(): Promise<void> {
