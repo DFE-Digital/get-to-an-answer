@@ -19,7 +19,7 @@ public interface IApiClient
 {
     // === For Questionnaires ===
     Task<QuestionnaireDto?> GetQuestionnaireAsync(Guid questionnaireId);
-    Task<QuestionnaireInfoDto?> GetLastPublishedQuestionnaireInfoAsync(string questionnaireSlug);
+    Task<QuestionnaireInfoDto?> GetLastPublishedQuestionnaireInfoAsync(string questionnaireIdOrSlug, bool preview = false);
     Task<List<QuestionnaireDto>> GetQuestionnairesAsync();
     Task<QuestionnaireDto?> CreateQuestionnaireAsync(CreateQuestionnaireRequestDto request);
     Task<string?> UpdateQuestionnaireAsync(Guid questionnaireId, UpdateQuestionnaireRequestDto request);
@@ -102,9 +102,9 @@ public class ApiClient : IApiClient
         return await GetResponse<QuestionnaireDto>(response);
     }
 
-    public async Task<QuestionnaireInfoDto?> GetLastPublishedQuestionnaireInfoAsync(string questionnaireSlug)
+    public async Task<QuestionnaireInfoDto?> GetLastPublishedQuestionnaireInfoAsync(string questionnaireIdOrSlug, bool preview = false)
     {
-        var response = await _httpClient.GetAsync($"{Questionnaires}/{questionnaireSlug}/publishes/last/info");
+        var response = await _httpClient.GetAsync($"{Questionnaires}/{questionnaireIdOrSlug}/publishes/last/info?preview={preview}");
         return await GetResponse<QuestionnaireInfoDto>(response);
     }
 

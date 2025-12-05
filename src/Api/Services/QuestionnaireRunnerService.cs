@@ -17,38 +17,49 @@ namespace Api.Services;
 
 public interface IQuestionnaireRunnerService
 {
-    Task<ServiceResult> GetLastPublishedQuestionnaireInfo(string questionnaireSlug);
+    Task<ServiceResult> GetLastPublishedQuestionnaireInfo(string questionnaireIdOrSlug, bool isPreview = false);
     Task<ServiceResult> GetInitialQuestion(Guid questionnaireId, bool isPreview = false);
     Task<ServiceResult> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool isPreview = false);
 }
 
 public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<QuestionnaireRunnerService> logger) : AbstractService, IQuestionnaireRunnerService
 {
-    [HttpGet("questionnaires/{questionnaireSlug}/publishes/last/info")]
-    public async Task<ServiceResult> GetLastPublishedQuestionnaireInfo(string questionnaireSlug)
+    public async Task<ServiceResult> GetLastPublishedQuestionnaireInfo(string questionnaireIdOrSlug, bool isPreview = false)
     {
         try
         {
-            logger.LogInformation("GetLastPublishedQuestionnaireInfo started Slug={Slug}", questionnaireSlug);
+            logger.LogInformation("GetLastPublishedQuestionnaireInfo started SlugOrId={Slug}", questionnaireIdOrSlug);
 
-            var questionnaireVersionJson =  await GetDraftOrLatestPublishedVersion(questionnaireSlug: questionnaireSlug);
+            QuestionnaireEntity? questionnaire; 
 
-            if (questionnaireVersionJson == null)
-                return NotFound(ProblemTrace("No published version found for this questionnaire.", 404));
+            if (isPreview && Guid.TryParse(questionnaireIdOrSlug, out var questionnaireId))
+            {
+                questionnaire = await db.Questionnaires.FirstOrDefaultAsync(q => q.Id == questionnaireId);
+                
+                if (questionnaire == null)
+                    return NotFound(ProblemTrace("Failed to read questionnaire meta.", 404));
+            }
+            else
+            {
+                var questionnaireVersionJson =  await GetDraftOrLatestPublishedVersion(questionnaireSlug: questionnaireIdOrSlug);
 
-            var questionnaire = ToQuestionnaire(questionnaireVersionJson);
+                if (questionnaireVersionJson == null)
+                    return NotFound(ProblemTrace("No published version found for this questionnaire.", 404));
+
+                questionnaire = ToQuestionnaire(questionnaireVersionJson);
             
-            if (questionnaire == null)
-                return NotFound(ProblemTrace("Failed to read questionnaire meta.", 404));
+                if (questionnaire == null)
+                    return NotFound(ProblemTrace("Failed to read questionnaire meta.", 404));
 
-            logger.LogInformation("GetLastPublishedQuestionnaireInfo succeeded Slug={Slug} QuestionnaireId={QuestionnaireId}", questionnaireSlug, questionnaire.Id);
+                logger.LogInformation("GetLastPublishedQuestionnaireInfo succeeded Slug={Slug} QuestionnaireId={QuestionnaireId}", questionnaireIdOrSlug, questionnaire.Id);
+            }
             
             return Ok(new QuestionnaireInfoDto
             {
                 Id = questionnaire.Id,
-                DisplayTitle = questionnaire.DisplayTitle ?? questionnaire.Title,
+                DisplayTitle = questionnaire.DisplayTitle,
                 Description = questionnaire.Description,
-                Slug = questionnaireSlug,
+                Slug = questionnaire.Slug,
                 HasStartPage = !string.IsNullOrWhiteSpace(questionnaire.DisplayTitle),
                 
                 TextColor = questionnaire.TextColor,
@@ -63,7 +74,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "GetLastPublishedQuestionnaireInfo failed Slug={Slug}", questionnaireSlug);
+            logger.LogError(ex, "GetLastPublishedQuestionnaireInfo failed SlugOrId={Slug}", questionnaireIdOrSlug);
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
     }

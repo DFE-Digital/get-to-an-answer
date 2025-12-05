@@ -1,10 +1,13 @@
 import { JwtHelper, ClaimTypes, SimpleDate } from "./JwtHelper";
 
-export function generateToken(): string {
+export function generateToken(
+    email: string = 'test.user@example.com',
+    name: string = 'Test User'
+): string {
     const claims: Record<string, unknown> = {
         [ClaimTypes.Subject]: 'test-subject',
-        [ClaimTypes.Name]: 'Test User',
-        [ClaimTypes.Email]: 'test.user@example.com',
+        [ClaimTypes.Name]: name,
+        [ClaimTypes.Email]: email,
         [ClaimTypes.Role]: ['Admin'],
         [ClaimTypes.Expiration]: new SimpleDate().addDate({years: 3}).ToSeconds()
     };
@@ -15,9 +18,10 @@ export function generateToken(): string {
 (async () => {
     try {
         const baseUrl = 'http://localhost:5042';
-        const token = generateToken();
-
-        console.log(token);
+        const token1 = generateToken("test.user1@example.com", "Test User 1");
+        console.log(token1);
+        const token2 = generateToken("test.user@example.com", "Test User 2");
+        console.log(token2);
 
         /*const res = await fetch(`${baseUrl}/api/questionnaires`, {
             method: 'POST',
