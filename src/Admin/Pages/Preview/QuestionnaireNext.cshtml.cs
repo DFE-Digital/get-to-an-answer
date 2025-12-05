@@ -5,10 +5,12 @@ using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
 using Common.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Admin.Pages.Preview;
 
+[Authorize]
 [IgnoreAntiforgeryToken]
 public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> logger) : QuestionnairesPageModel
 {
@@ -25,28 +27,12 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 
     public async Task<IActionResult> OnGet()
     {
-        var questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId);
-        
+        var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireId.ToString(), true);
+            
         if (questionnaire == null)
             return NotFound();
 
-        Questionnaire = new QuestionnaireInfoDto()
-        {
-            Id = questionnaire.Id,
-            DisplayTitle = questionnaire.DisplayTitle ?? questionnaire.Title,
-            Slug = questionnaire.Slug,
-            
-            DecorativeImage = questionnaire.DecorativeImage,
-            
-            TextColor = questionnaire.TextColor,
-            BackgroundColor = questionnaire.BackgroundColor,
-            PrimaryButtonColor = questionnaire.PrimaryButtonColor,
-            SecondaryButtonColor = questionnaire.SecondaryButtonColor,
-            StateColor = questionnaire.StateColor,
-            ErrorMessageColor = questionnaire.ErrorMessageColor,
-            
-            ContinueButtonText = questionnaire.ContinueButtonText
-        };
+        Questionnaire = questionnaire;
         IsEmbedded = Embed;
         Destination = new DestinationDto
         {

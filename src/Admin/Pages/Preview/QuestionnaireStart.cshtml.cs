@@ -1,10 +1,12 @@
 using Common.Models.PageModels;
 using Common.Client;
 using Common.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Admin.Pages.Preview;
 
+[Authorize]
 [IgnoreAntiforgeryToken]
 public class QuestionnaireStart(IApiClient apiClient, ILogger<QuestionnaireStart> logger) : QuestionnairesPageModel
 {
@@ -26,7 +28,7 @@ public class QuestionnaireStart(IApiClient apiClient, ILogger<QuestionnaireStart
                 return Page();
             }
             
-            var questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId);
+            var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireId.ToString(), true);
             
             if (questionnaire == null)
                 return NotFound();
@@ -34,30 +36,12 @@ public class QuestionnaireStart(IApiClient apiClient, ILogger<QuestionnaireStart
             IsEmbedded = Embed;
 
             // if the display title is not defined, redirect to the first question
-            if (string.IsNullOrWhiteSpace(questionnaire.DisplayTitle))
+            if (!questionnaire.HasStartPage)
             {
                 return Redirect($"/admin/questionnaires/{QuestionnaireId}/next-preview?embed={Embed}");
             }
             
-            Questionnaire = new QuestionnaireInfoDto()
-            {
-                Id = questionnaire.Id,
-                DisplayTitle = questionnaire.DisplayTitle ?? questionnaire.Title,
-                Slug = questionnaire.Slug,
-                
-                Description = questionnaire.Description,
-            
-                DecorativeImage = questionnaire.DecorativeImage,
-            
-                TextColor = questionnaire.TextColor,
-                BackgroundColor = questionnaire.BackgroundColor,
-                PrimaryButtonColor = questionnaire.PrimaryButtonColor,
-                SecondaryButtonColor = questionnaire.SecondaryButtonColor,
-                StateColor = questionnaire.StateColor,
-                ErrorMessageColor = questionnaire.ErrorMessageColor,
-            
-                ContinueButtonText = questionnaire.ContinueButtonText
-            };
+            Questionnaire = questionnaire;
         }
         catch (Exception e)
         {
