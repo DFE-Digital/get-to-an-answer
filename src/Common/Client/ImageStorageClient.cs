@@ -103,8 +103,11 @@ public class ImageStorageClient : IImageStorageClient
 
     public async Task DuplicateToAsync(string existingBlobFileName, string duplicateBlobFileName)
     {
-        await _containerClient.GetBlobClient(duplicateBlobFileName)
-            .StartCopyFromUriAsync(new Uri(_containerClient.Uri, existingBlobFileName));
+        await CheckContainerExists();
+        
+        BlobClient blobClient = _containerClient.GetBlobClient(duplicateBlobFileName);
+        var blobUri = new Uri($"{_containerClient.Uri}/{existingBlobFileName}");
+        await blobClient.StartCopyFromUriAsync(blobUri);
     }
 
     private async Task CheckContainerExists()

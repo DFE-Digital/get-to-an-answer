@@ -1082,6 +1082,8 @@ pre code {
   width: 100%;
 }
 
-.gtaa-preview-header {
-  background-color: #EAF5FF;
+.gtaa-preview-image {
+  max-height: 240px;
+  width: 100%;
+  object-fit: cover;
 }

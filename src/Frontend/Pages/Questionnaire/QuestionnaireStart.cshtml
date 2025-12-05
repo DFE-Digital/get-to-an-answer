@@ -23,7 +23,7 @@
 
 @section BeforeContainer
 {
-  @if (Model is { IsEmbedded: false })
+  @if (Model?.Questionnaire.DecorativeImage is null && Model is { IsEmbedded: false })
   {
     <section class="dfe-page-grey" id="main-content-header">
       <div class="govuk-width-container" id="main-header-container">
@@ -35,11 +35,23 @@
       </div>
     </section>
   }
+  else
+  {
+    <section id="main-content-header">
+      <div class="govuk-width-container" id="main-header-container">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            <img class="gtaa-preview-image" src="/questionnaires/@Model?.Questionnaire?.Slug/decorative-image" alt="@Model?.Questionnaire?.DisplayTitle" />
+          </div>
+        </div>
+      </div>
+    </section>
+  }
 }
 
 <div class="govuk-grid-row" data-last-fetched="2025-09-25T15:45:38">
   <div class="govuk-grid-column-full" id="primary-content">
-    @if (Model.IsEmbedded)
+    @if (Model?.Questionnaire?.DecorativeImage is not null || Model.IsEmbedded)
     {
       <fieldset class="govuk-fieldset" aria-describedby="@Model?.Questionnaire.DisplayTitle">
         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">

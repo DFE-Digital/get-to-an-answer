@@ -20,7 +20,7 @@ public class DecorativeImageController(
             
             // Download the image from blob storage
             var imageStream = await imageStorageClient.DownloadImageAsync(
-                $"{questionnaireId}/{questionnaire?.DecorativeImage}");
+                $"{questionnaireId}/latest");
 
             // Get the file extension
             var extension = Path.GetExtension(questionnaire?.DecorativeImage);
