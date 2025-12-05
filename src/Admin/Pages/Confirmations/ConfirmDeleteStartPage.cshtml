@@ -16,19 +16,10 @@
                     <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
                     Are you sure you want to delete your questionnaire's start page?
                 </h1>
-                <dl class="govuk-!-margin-0">
-                    <dt class="govuk-visually-hidden">Status</dt>
-                    <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
-                    </dd>
-                </dl>
             </legend>
-            <div class="govuk-warning-text govuk-!-margin-bottom-4 govuk-!-margin-top-4">
-                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                <strong class="govuk-warning-text__text">
-                    <span class="govuk-visually-hidden">Warning</span>
-                    By deleting this result page, existing answers using this result page will be broken.
-                </strong>
-            </div>
+            <span class="govuk-hint govuk-!-margin-bottom-8">
+                By deleting this result page, existing answers using this result page will be broken.
+            </span>
 
             <div class="govuk-radios" data-module="govuk-radios">
                 <div class="govuk-radios__item">

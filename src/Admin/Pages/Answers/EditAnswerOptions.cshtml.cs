@@ -67,6 +67,8 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             return RedirectToErrorPage();
         }
 
+        TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+            
         return Redirect(string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId));
     }
 

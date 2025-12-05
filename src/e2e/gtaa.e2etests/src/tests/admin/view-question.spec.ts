@@ -106,20 +106,6 @@ test.describe('Get to an answer view questions', () => {
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
 
         await viewQuestionPage.expectQuestionHeadingOnPage();
-        await viewQuestionPage.expectQuestionnaireStatusOnPage('Draft');
-    });
-    
-    test("Validate questionnaire status as published on view questions page", async ({request, page}) => {
-        await publishQuestionnaire(request, questionnaireId, token);
-
-        viewQuestionnairePage = await signIn(page, token);
-
-        editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireId);
-        await editQuestionnairePage.openAddEditQuestionsAnswers();
-
-        viewQuestionPage = await ViewQuestionPage.create(page);
-        await viewQuestionPage.expectQuestionHeadingOnPage();
-        await viewQuestionPage.expectQuestionnaireStatusOnPage('Published');
     });
 
     test("Add question CTA navigates to Add question", async ({page}) => {

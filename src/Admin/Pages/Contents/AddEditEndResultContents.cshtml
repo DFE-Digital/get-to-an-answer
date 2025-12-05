@@ -63,13 +63,7 @@ else if (Model.QuestionnaireState is { JustUpdated: true })
       <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
       Add or edit results pages
     </h1>
-    <dl class="govuk-!-margin-bottom-7">
-      <dt class="govuk-visually-hidden">Status</dt>
-      <dd class="govuk-!-margin-0">
-        <strong class="govuk-tag" data-status="@Model.QuestionnaireStatus">@Model.QuestionnaireStatus</strong>
-      </dd>
-    </dl>
-    <div class="govuk-body">
+    <div class="govuk-hint govuk-!-margin-bottom-8">
       <p>After answering questions, someone can end on a result page.</p>  
       <p>
         You can take someone to a results page by selecting a certain answer

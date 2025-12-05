@@ -5,6 +5,7 @@ using Common.Enum;
 using Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Admin.Pages.Answers;
 
@@ -66,6 +67,8 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
                 });
             }
 
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+            
             return Redirect(string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId));
         }
         catch (Exception ex)

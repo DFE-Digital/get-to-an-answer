@@ -31,13 +31,8 @@
             <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
             Customise styling
         </h1>
-        <dl class="govuk-!-margin-bottom-7">
-            <dt class="govuk-visually-hidden">Status</dt>
-            <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
-            </dd>
-        </dl>
 
-        <div class="govuk-hint">
+        <div class="govuk-hint govuk-!-margin-bottom-8">
             <p>The default, all questionnaires use DfE styling.</p>
             <p>
                 You can customise styling if you need to, as long as it meets accessibility standards.
@@ -198,7 +193,7 @@
 
                     <p>Follow GOV.UK guidance on copyright standards when choosing an image.</p>
 
-                    <p>Upload or enter a URL for an image. Images can be JPEG, PNG, SVG or GIF files. </p>
+                    <p>Upload or enter a URL for an image. Images can be JPEG and PNG files. </p>
 
                     <p>You must upload an image at the size xxxx</p>
                 </div>
@@ -237,49 +232,44 @@
                         name="ResetStyling" value="true">Reset to DfE styling</button>
             </div>
             
-            @if (!(Model?.UpdateRequest?.IsAccessibilityAgreementAccepted ?? true))
-            {
-                <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
-                
-                <govuk-form-group asp-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted">
-                    <fieldset class="govuk-fieldset" aria-describedby="accessibility-accepted-hint">
-                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                            <h2 class="govuk-fieldset__heading">
-                                Accessibility standards
-                            </h2>
-                        </legend>
-                        <div id="accessibility-accepted-hint" class="govuk-hint">
-                            If you customise styling it is your responsibility to ensure colours 
-                            and images meet accessibility standards. 
-                        </div>
+            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+            
+            <!-- Accessibility agreement (should be clicked every time an update is made to styling) -->
+            
+            <govuk-form-group asp-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted">
+                <fieldset class="govuk-fieldset" aria-describedby="accessibility-accepted-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading">
+                            Accessibility standards
+                        </h2>
+                    </legend>
+                    <div id="accessibility-accepted-hint" class="govuk-hint">
+                        If you customise styling it is your responsibility to ensure colours 
+                        and images meet accessibility standards. 
+                    </div>
 
-                        <govuk-field-error asp-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted"
-                                           error-id="forms-name-input-name-field-error"/>
+                    <govuk-field-error asp-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted"
+                                       error-id="forms-name-input-name-field-error"/>
 
-                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                            <div class="govuk-checkboxes__item">
-                                <govuk-input asp-for="UpdateRequest.IsAccessibilityAgreementAccepted"
-                                             class="govuk-checkboxes__input"
-                                             id="UpdateRequest-IsAccessibilityAgreementAccepted"
-                                             type="checkbox"
-                                             name="UpdateRequest.IsAccessibilityAgreementAccepted"
-                                             value="true"
-                                             aria-describedby="agreed-checkbox-item-hint"
-                                             govuk-error-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted"/>
-                                <label class="govuk-label govuk-checkboxes__label" for="Agreed">
-                                    I agree to confirm the customised styling meets accessibility standards
-                                </label>
-                                <div id="agreed-checkbox-item-hint" class="govuk-hint govuk-checkboxes__hint">
-                                </div>
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            <govuk-input asp-for="UpdateRequest.IsAccessibilityAgreementAccepted"
+                                         class="govuk-checkboxes__input"
+                                         id="UpdateRequest-IsAccessibilityAgreementAccepted"
+                                         type="checkbox"
+                                         name="UpdateRequest.IsAccessibilityAgreementAccepted"
+                                         value="true"
+                                         aria-describedby="agreed-checkbox-item-hint"
+                                         govuk-error-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted"/>
+                            <label class="govuk-label govuk-checkboxes__label" for="Agreed">
+                                I agree to confirm the customised styling meets accessibility standards
+                            </label>
+                            <div id="agreed-checkbox-item-hint" class="govuk-hint govuk-checkboxes__hint">
                             </div>
                         </div>
-                    </fieldset>
-                </govuk-form-group>
-            }
-            else
-            {
-                <input type="hidden" name="UpdateRequest.IsAccessibilityAgreementAccepted" value="true"/>
-            }
+                    </div>
+                </fieldset>
+            </govuk-form-group>
 
             <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button"
                     data-prevent-double-click="true" data-govuk-button-init="">Save and continue
