@@ -3,7 +3,7 @@ using Common.Validation;
 
 namespace Common.Domain.Request.Update;
 
-public class UpdateLookAndFeelRequestDto
+public class UpdateCustomStylingRequestDto
 {
     [GdsColor] public string? TextColor { get; set; } = "#0b0c0c";
     [GdsColor] public string? BackgroundColor { get; set; } = "#ffffff";
@@ -14,5 +14,5 @@ public class UpdateLookAndFeelRequestDto
     
     [MaxLength(250)] public string? DecorativeImage { get; set; }
     
-    public bool IsAccessibilityAgreementAccepted { get; set; } = true;
+    public bool IsAccessibilityAgreementAccepted { get; set; }
 }

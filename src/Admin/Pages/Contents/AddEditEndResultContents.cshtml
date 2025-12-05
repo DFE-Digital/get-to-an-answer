@@ -61,7 +61,7 @@ else if (Model.QuestionnaireState is { JustUpdated: true })
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l govuk-!-margin-0">
       <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-      Add and edit your result pages
+      Add or edit results pages
     </h1>
     <dl class="govuk-!-margin-bottom-7">
       <dt class="govuk-visually-hidden">Status</dt>
@@ -69,6 +69,13 @@ else if (Model.QuestionnaireState is { JustUpdated: true })
         <strong class="govuk-tag" data-status="@Model.QuestionnaireStatus">@Model.QuestionnaireStatus</strong>
       </dd>
     </dl>
+    <div class="govuk-body">
+      <p>After answering questions, someone can end on a result page.</p>  
+      <p>
+        You can take someone to a results page by selecting a certain answer
+        to a question when you add or edit questions and answers.
+      </p>
+    </div>
     <div class="govuk-button-group">
       <a class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" 
          href="@string.Format(Routes.AddContent, Model.QuestionnaireId)">Add a result page</a>
@@ -85,11 +92,8 @@ else if (Model.QuestionnaireState is { JustUpdated: true })
           
           <div id="content-@(i+1)" class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key app-page-list__key govuk-summary-list__key-s">
-              @(i+1)
-            </dt>
-            <dd class="govuk-summary-list__value">
               @content.Title
-            </dd>
+            </dt>
             <dd class="govuk-summary-list__actions govuk-summary-list__actions-m">
               <ul class="govuk-summary-list__actions-list">
                 <li class="govuk-summary-list__actions-list-item">
@@ -106,7 +110,7 @@ else if (Model.QuestionnaireState is { JustUpdated: true })
       <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
               <h2 class="govuk-fieldset__heading">
-                  Have you finished adding your result pages?
+                  Have you finished editing result pages?
               </h2>
           </legend>
 

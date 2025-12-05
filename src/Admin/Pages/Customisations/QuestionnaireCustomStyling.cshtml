@@ -1,11 +1,11 @@
-@page "/admin/questionnaires/{questionnaireId}/look-and-feel"
+@page "/admin/questionnaires/{questionnaireId}/styling"
 @addTagHelper *, Common
-@model Admin.Pages.Customisations.QuestionnaireLookAndFeel
+@model Admin.Pages.Customisations.QuestionnaireCustomStyling
 
 @{
     Layout = "Shared/_Layout";
     
-    ViewData["Title"] = "Questionnaire look and feel";
+    ViewData["Title"] = "Customise questionnaire styling";
 
     const string textColorId = "text-color";
     const string backgroundColorId = "background-color";
@@ -17,7 +17,7 @@
 
 @section BeforeContent
 {
-    <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model?.Questionnaire?.Id/track">Back</a>
+    <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/@Model?.QuestionnaireId/track">Back</a>
 }
 
 @if (Model!.HasErrors())
@@ -28,25 +28,28 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <h1 class="govuk-heading-l govuk-!-margin-0">
-            <span class="govuk-caption-l">@Model.Questionnaire.Title</span>
-            Edit look and feel of your questionnaire
+            <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
+            Customise styling
         </h1>
-    <dl class="govuk-!-margin-0">
-        <dt class="govuk-visually-hidden">Status</dt>
-        <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
-        </dd>
-    </dl>
+        <dl class="govuk-!-margin-bottom-7">
+            <dt class="govuk-visually-hidden">Status</dt>
+            <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
+            </dd>
+        </dl>
 
         <div class="govuk-hint">
-            <p>The default look and feel for questionnaires use DfE styling.</p>
-            <p>You can customise the look and feel for specific purposes, like to match campaign branding.</p>
+            <p>The default, all questionnaires use DfE styling.</p>
+            <p>
+                You can customise styling if you need to, as long as it meets accessibility standards.
+                For example, to match campaign branding.
+            </p>
         </div>
 
         <div class="govuk-warning-text govuk-!-margin-bottom-4 govuk-!-margin-top-4">
             <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
             <strong class="govuk-warning-text__text">
                 <span class="govuk-visually-hidden">Warning</span>
-                Do not edit the look and feel unless there is a clear user or business need.
+                Do not customise styling unless there's a clear user or business need. 
             </strong>
         </div>
 
@@ -196,6 +199,8 @@
                     <p>Follow GOV.UK guidance on copyright standards when choosing an image.</p>
 
                     <p>Upload or enter a URL for an image. Images can be JPEG, PNG, SVG or GIF files. </p>
+
+                    <p>You must upload an image at the size xxxx</p>
                 </div>
                 <div class="govuk-form-group govuk-!-margin-bottom-6">
                     <label class="govuk-label" for="file-upload-1" id="file-upload-1-label">
@@ -225,7 +230,7 @@
                     Reset to DfE styling
                 </label>
                 <p class="govuk-hint">
-                    Use this to reset the look and feel to DfE styling.
+                    Use this to reset the styling to DfE styling.
                 </p>
                 <button id="file-upload" type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary" 
                         data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="" 
@@ -244,7 +249,8 @@
                             </h2>
                         </legend>
                         <div id="accessibility-accepted-hint" class="govuk-hint">
-                            If you customise the look and feel it is your responsibility to ensure the font and colours meet accessibility standards.
+                            If you customise styling it is your responsibility to ensure colours 
+                            and images meet accessibility standards. 
                         </div>
 
                         <govuk-field-error asp-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted"
@@ -254,13 +260,14 @@
                             <div class="govuk-checkboxes__item">
                                 <govuk-input asp-for="UpdateRequest.IsAccessibilityAgreementAccepted"
                                              class="govuk-checkboxes__input"
-                                             id="Agreed"
+                                             id="UpdateRequest-IsAccessibilityAgreementAccepted"
                                              type="checkbox"
+                                             name="UpdateRequest.IsAccessibilityAgreementAccepted"
                                              value="true"
                                              aria-describedby="agreed-checkbox-item-hint"
                                              govuk-error-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted"/>
                                 <label class="govuk-label govuk-checkboxes__label" for="Agreed">
-                                    I agree to confirm the customised look and feel meet accessibility standards
+                                    I agree to confirm the customised styling meets accessibility standards
                                 </label>
                                 <div id="agreed-checkbox-item-hint" class="govuk-hint govuk-checkboxes__hint">
                                 </div>

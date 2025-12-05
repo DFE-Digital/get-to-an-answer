@@ -23,7 +23,7 @@ public interface IApiClient
     Task<List<QuestionnaireDto>> GetQuestionnairesAsync();
     Task<QuestionnaireDto?> CreateQuestionnaireAsync(CreateQuestionnaireRequestDto request);
     Task<string?> UpdateQuestionnaireAsync(Guid questionnaireId, UpdateQuestionnaireRequestDto request);
-    Task<string?> UpdateQuestionnaireLookAndFeelAsync(Guid questionnaireId, UpdateLookAndFeelRequestDto request);
+    Task<string?> UpdateQuestionnaireStylingAsync(Guid questionnaireId, UpdateCustomStylingRequestDto request);
     Task<string?> UpdateContinueButtonAsync(Guid questionnaireId, UpdateContinueButtonRequestDto request);
     Task<string?> DeleteQuestionnaireDecorativeImageAsync(Guid questionnaireId);
     Task<string?> PublishQuestionnaireAsync(Guid questionnaireId);
@@ -126,9 +126,9 @@ public class ApiClient : IApiClient
         return await GetResponse<string>(response);
     }
 
-    public async Task<string?> UpdateQuestionnaireLookAndFeelAsync(Guid questionnaireId, UpdateLookAndFeelRequestDto request)
+    public async Task<string?> UpdateQuestionnaireStylingAsync(Guid questionnaireId, UpdateCustomStylingRequestDto request)
     {
-        var response = await _httpClient.PatchAsJsonAsync($"{Questionnaires}/{questionnaireId}/look-and-feel", request);
+        var response = await _httpClient.PatchAsJsonAsync($"{Questionnaires}/{questionnaireId}/styling", request);
         return await GetResponse<string>(response);
     }
 

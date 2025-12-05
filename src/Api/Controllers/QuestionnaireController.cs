@@ -51,12 +51,12 @@ public class QuestionnaireController(IQuestionnaireService questionnaireService)
         return (await questionnaireService.UpdateQuestionnaire(userId, id, request)).ToActionResult();
     }
 
-    [HttpPatch("{id:guid}/look-and-feel")]
-    public async Task<IActionResult> UpdateQuestionnaireLookAndFeel(Guid id, UpdateLookAndFeelRequestDto request)
+    [HttpPatch("{id:guid}/styling")]
+    public async Task<IActionResult> UpdateQuestionnaireCustomStyling(Guid id, UpdateCustomStylingRequestDto request)
     {
         var userId = User.GetIdClaim()!;
         
-        return (await questionnaireService.UpdateQuestionnaireLookAndFeel(userId, id, request)).ToActionResult();
+        return (await questionnaireService.UpdateQuestionnaireCustomStyling(userId, id, request)).ToActionResult();
     }
     
     [HttpPatch("{id:guid}/continue-button")]

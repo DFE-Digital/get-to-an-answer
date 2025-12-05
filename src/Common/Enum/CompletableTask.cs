@@ -5,6 +5,11 @@ public enum CompletableTask
     EditQuestionnaireName = 1,
     EditQuestionnaireSlug = 2,
     AddQuestionsAndAnswers = 3,
-    AddContents = 3,
-    IntegrationQuestionnaire = 4
+    IntegrateQuestionnaire = 4,
+    AddContents = 5,
+    AddStartPage = 6,
+    CustomiseStyling = 7,
+    AddCustomButton = 8,
+    AddQuestionnaireSlug = 9,
+    PublishQuestionnaire = 10
 }

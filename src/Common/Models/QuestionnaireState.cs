@@ -13,4 +13,8 @@ public class QuestionnaireState
     public bool JustPublished { get; set; }
     public bool JustUnpublished { get; set; }
     public bool InviteAccepted { get; set; }
+    public bool JustResetStyling { get; set; }
+    public bool JustRemovedStartPageImage { get; set; }
+    public bool JustCustomisedStyling { get; set; }
+    public bool JustAddedCustomButtonText { get; set; }
 }

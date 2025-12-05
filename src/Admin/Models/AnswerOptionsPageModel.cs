@@ -159,7 +159,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
 
         var resultsPagesForSelection = resultsPages
-            .Select(r => new SelectListItem(r.ReferenceName, r.Id.ToString())).ToList();
+            .Select(r => new SelectListItem(r.ReferenceName ?? r.Title, r.Id.ToString())).ToList();
 
         foreach (var option in Options)
         {
