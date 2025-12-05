@@ -13,15 +13,16 @@ export class EditQuestionnairePage extends BasePage {
     private readonly editQuestionnaireHeading: Locator;
     private readonly questionnaireStatus: Locator;
     private readonly linkEditTitle: Locator;
-    private readonly linkEditSlug: Locator;
-    private readonly linkAddEditQuestions: Locator;
+    private readonly questionnaireId: Locator;
+    private readonly linkAddEditQuestion: Locator;
+    private readonly linkAddEditQuestionsAnswers: Locator;
     private readonly linkStartPage: Locator;
     private readonly linkBrandingTheme: Locator;
     private readonly linkCustomisations: Locator;
     private readonly linkAnswerContent: Locator;
     private readonly linkPrivacyPolicy: Locator;
     private readonly btnPublish: Locator;
-    private readonly btnDelete: Locator;
+    private readonly deleteQuestionnaireButton: Locator;
     private readonly linkViewVersions: Locator;
     private readonly linkClone: Locator;
 
@@ -39,15 +40,14 @@ export class EditQuestionnairePage extends BasePage {
         this.backToQuestionnaireLink = this.page.locator(
             'a.govuk-back-link[href$="/admin/questionnaires/manage"]'
         );
-        this.linkEditSlug = this.page.locator(
-            'a.govuk-task-list__link[aria-describedby="edit-slug-status"]'
-        );
-        this.linkAddEditQuestions = this.page.locator(
+        this.questionnaireId = page.getByRole('link', { name: /create questionnaire ID/i });
+        this.linkAddEditQuestion = this.page.locator(
             'a.govuk-task-list__link[href*="/questionnaires/"][href$="/questions"]'
         );
         this.linkStartPage = this.page.locator(
             'a.govuk-task-list__link[href$="/start-page/edit"]'
         );
+        this.linkAddEditQuestionsAnswers = page.getByRole('link', { name: /add or edit questions and answers/i });
         this.linkBrandingTheme = this.page.locator(
             'a.govuk-task-list__link[href$="/branding"]'
         );
@@ -63,9 +63,9 @@ export class EditQuestionnairePage extends BasePage {
         this.btnPublish = this.page.locator(
             'a.govuk-button.govuk-button--primary[href$="/publish/confirm"]'
         );
-        this.btnDelete = this.page.locator(
-            'a.govuk-button.govuk-button--warning[href$="/delete/confirm"]'
-        );
+        this.deleteQuestionnaireButton = page.getByRole('link', {
+            name: /delete questionnaire/i,
+        });
         this.linkViewVersions = this.page.locator(
             'a.govuk-link[href$="/versions"]'
         );
@@ -86,16 +86,20 @@ export class EditQuestionnairePage extends BasePage {
         await this.linkEditTitle.click();
     }
 
-    async openEditSlug(): Promise<void> {
-        await this.linkEditSlug.click();
+    async createQuestionnaireId(): Promise<void> {
+        await this.questionnaireId.click();
     }
 
     async openQuestions(): Promise<void> {
-        await this.linkAddEditQuestions.click();
+        await this.linkAddEditQuestion.click();
     }
 
     async openStartPage(): Promise<void> {
         await this.linkStartPage.click();
+    }
+
+    async openAddEditQuestionsAnswers(): Promise<void> {
+        await this.linkAddEditQuestionsAnswers.click();
     }
 
     async openBrandingTheme(): Promise<void> {
@@ -118,8 +122,8 @@ export class EditQuestionnairePage extends BasePage {
         await this.btnPublish.click();
     }
 
-    async delete(): Promise<void> {
-        await this.btnDelete.click();
+    async deleteQuestionnaire(): Promise<void> {
+        await this.deleteQuestionnaireButton.click();
     }
 
     async viewVersions(): Promise<void> {
@@ -140,8 +144,15 @@ export class EditQuestionnairePage extends BasePage {
         expect(text?.trim().length).toBeGreaterThan(0);
     }
 
-    async validateHeading(): Promise<void> {
+    async validateHeading(expectedText: string): Promise<void> {
         await expect(this.editQuestionnaireHeading).toBeVisible();
+
+        if (expectedText) {
+            await expect(
+                this.editQuestionnaireHeading,
+                `❌ Edit questionnaire heading text mismatch: expected "${expectedText}"`
+            ).toContainText(expectedText);
+        }
     }
 
     async validateHeadingAndStatus(): Promise<void> {
@@ -154,8 +165,8 @@ export class EditQuestionnairePage extends BasePage {
 
     async validateCoreLinks(): Promise<void> {
         await expect(this.linkEditTitle).toBeVisible();
-        await expect(this.linkEditSlug).toBeVisible();
-        await expect(this.linkAddEditQuestions).toBeVisible();
+        await expect(this.questionnaireId).toBeVisible();
+        await expect(this.linkAddEditQuestion).toBeVisible();
     }
 
     async validateOptionalTasks(shouldExist = true): Promise<void> {
@@ -180,7 +191,7 @@ export class EditQuestionnairePage extends BasePage {
 
     async validateActionsSection(): Promise<void> {
         await expect(this.btnPublish).toBeVisible();
-        await expect(this.btnDelete).toBeVisible();
+        await expect(this.deleteQuestionnaireButton).toBeVisible();
         await expect(this.linkViewVersions).toBeVisible();
         await expect(this.linkClone).toBeVisible();
     }

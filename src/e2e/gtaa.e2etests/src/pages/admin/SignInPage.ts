@@ -13,8 +13,8 @@ export class SignInPage extends BasePage {
     constructor(page: Page) {
         super(page);
 
-        this.mainHeading = page.locator('h1.govuk-heading-xl');
-        this.subHeading = page.locator('h2.govuk-heading-l');
+        this.mainHeading = page.locator('h1.govuk-heading-l');
+        this.subHeading = page.locator('h2.govuk-heading-m').first();
         this.signInButton = page.locator('a.govuk-button.govuk-button--start');
     }
 

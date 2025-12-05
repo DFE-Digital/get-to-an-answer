@@ -1,6 +1,11 @@
 import {expect, test} from "@playwright/test";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
-import {goToUpdateQuestionnairePageByUrl, goToViewQuestionsPageByUrl, signIn} from "../../helpers/admin-test-helper";
+import {
+    goToEditQuestionnairePageByUrl,
+    goToUpdateQuestionnairePageByUrl,
+    goToViewQuestionsPageByUrl,
+    signIn
+} from "../../helpers/admin-test-helper";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire, publishQuestionnaire} from "../../test-data-seeder/questionnaire-data";
@@ -10,13 +15,13 @@ import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {AddQuestionPage} from "../../pages/admin/AddQuestionPage";
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";
-import {AnswerDestinationType, ErrorMessages} from "../../constants/test-data-constants";
+import {AnswerDestinationType, ErrorMessages, PageHeadings} from "../../constants/test-data-constants";
 
 test.describe('Get to an answer view questions', () => {
     let token: string;
     let questionnaireId: string;
     let qResp3: any;
-    
+
     let viewQuestionnairePage: ViewQuestionnairePage;
     let editQuestionnairePage: EditQuestionnairePage;
     let viewQuestionPage: ViewQuestionPage;
@@ -34,7 +39,7 @@ test.describe('Get to an answer view questions', () => {
 
         const externalUrl = 'https://www.gov.uk/government/organisations/department-for-education';
 
-        const {answerPostResponse:a1Res} = await createSingleAnswer(
+        const {answerPostResponse: a1Res} = await createSingleAnswer(
             request,
             {
                 questionId: qResp1.question.id,
@@ -45,7 +50,7 @@ test.describe('Get to an answer view questions', () => {
             }, token
         );
 
-        const {answerPostResponse:a2Res} = await createSingleAnswer(
+        const {answerPostResponse: a2Res} = await createSingleAnswer(
             request,
             {
                 questionId: qResp2.question.id,
@@ -56,7 +61,7 @@ test.describe('Get to an answer view questions', () => {
             }, token
         );
 
-        const {answerPostResponse:a3Res} = await createSingleAnswer(
+        const {answerPostResponse: a3Res} = await createSingleAnswer(
             request,
             {
                 questionId: qResp3.question.id,
@@ -67,7 +72,7 @@ test.describe('Get to an answer view questions', () => {
             }, token
         );
 
-        const {answerPostResponse:a4Res} = await createSingleAnswer(
+        const {answerPostResponse: a4Res} = await createSingleAnswer(
             request,
             {
                 questionId: qResp4.question.id,
@@ -92,33 +97,35 @@ test.describe('Get to an answer view questions', () => {
     test('Validate presence of elements on view question page', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.assertPageElements();
     });
 
     test("Header section - H1 and question status", async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
-        await viewQuestionPage.expectQuestionHeadingOnPage();
-        await viewQuestionPage.expectQuestionStatusOnPage('Draft');
-    });
 
-    // TBS, CARE-1557 bug raised
-    // test("Validate questionnaire status as published on view questions page", async ({request, page}) => {
-    //     await publishQuestionnaire(request, questionnaireId, token);
-    //    
-    //     viewQuestionnairePage = await signIn(page, token);
-    //     viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-    //    
-    //     await viewQuestionPage.expectQuestionHeadingOnPage();
-    //     await viewQuestionPage.expectQuestionStatusOnPage('Published');
-    // });
+        await viewQuestionPage.expectQuestionHeadingOnPage();
+        await viewQuestionPage.expectQuestionnaireStatusOnPage('Draft');
+    });
+    
+    test("Validate questionnaire status as published on view questions page", async ({request, page}) => {
+        await publishQuestionnaire(request, questionnaireId, token);
+
+        viewQuestionnairePage = await signIn(page, token);
+
+        editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireId);
+        await editQuestionnairePage.openAddEditQuestionsAnswers();
+
+        viewQuestionPage = await ViewQuestionPage.create(page);
+        await viewQuestionPage.expectQuestionHeadingOnPage();
+        await viewQuestionPage.expectQuestionnaireStatusOnPage('Published');
+    });
 
     test("Add question CTA navigates to Add question", async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.clickAddQuestion();
 
         addQuestionPage = await AddQuestionPage.create(page);
@@ -128,36 +135,36 @@ test.describe('Get to an answer view questions', () => {
     test('Back to edit questionnaire link navigation from view questions page', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.ClickBackToEditQuestionnaireLink();
         editQuestionnairePage = await EditQuestionnairePage.create(page);
-        expect(editQuestionnairePage.validateHeading());
+        expect(editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
     });
 
     test('Save and continue with No I will come back later radio navigates to Edit questionnaire page', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.markFinishedEditing(false);
         await viewQuestionPage.expectComeBackLaterRadioIsSelected();
-        
+
         await viewQuestionPage.saveAndContinue();
-        
+
         editQuestionnairePage = await EditQuestionnairePage.create(page);
-        await editQuestionnairePage.validateHeading();
+        await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
     });
-    
+
     test('Save and continue with Yes radio navigates to Edit questionnaire page', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.expectYesRadioIsNotSelected();
         await viewQuestionPage.markFinishedEditing(true);
-        
+
         await viewQuestionPage.saveAndContinue();
-        
+
         editQuestionnairePage = await EditQuestionnairePage.create(page);
-        await editQuestionnairePage.validateHeading();
+        await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
     });
 
     test('List existing questions', async ({page}) => {
@@ -165,7 +172,7 @@ test.describe('Get to an answer view questions', () => {
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
 
         await viewQuestionPage.expectQuestionHeadingOnPage();
-        
+
         await viewQuestionPage.table.verifyListExistsWithOrderNumbersContentAndActions();
     });
 
@@ -192,20 +199,20 @@ test.describe('Get to an answer view questions', () => {
     test('Show re-order controls for middle rows', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         await viewQuestionPage.table.expectReorderControlsOnRowByIndex(2);
     });
 
     test('Move middle question up', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         const allTextsBefore = await viewQuestionPage.table.allQuestionContent();
         const secondQuestionBefore = allTextsBefore[1]; // Index 1 = second question
-        
+
         await viewQuestionPage.table.moveUpByIndex(2);
         await viewQuestionPage.waitForPageLoad();
-        
+
         const allTextsAfter = await viewQuestionPage.table.allQuestionContent();
         const firstQuestionAfter = allTextsAfter[0]; // Index 0 = first question
 
@@ -219,17 +226,17 @@ test.describe('Get to an answer view questions', () => {
     test('Move middle question down', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
-        
+
         const allTextsBefore = await viewQuestionPage.table.allQuestionContent();
         const secondQuestionBefore = allTextsBefore[1]; // Index 1 = second question
-        
+
         await viewQuestionPage.table.moveDownByIndex(2);
 
         await viewQuestionPage.waitForPageLoad();
-        
+
         const allTextsAfter = await viewQuestionPage.table.allQuestionContent();
         const thirdQuestionAfter = allTextsAfter[2]; // Index 2 = third question
-        
+
         // Extract just the question content without the numbering prefix for comparison
         const secondQuestionContent = secondQuestionBefore.replace(/^\d+\.\s/, '');
         const thirdQuestionContent = thirdQuestionAfter.replace(/^\d+\.\s/, '');
@@ -251,9 +258,9 @@ test.describe('Get to an answer view questions', () => {
             qResp3.question.id,
             token
         );
-        
+
         expect([200, 204]).toContain(deleteQuestionResponse.status());
-        
+
         await page.reload();
         await viewQuestionPage.waitForPageLoad();
 
@@ -265,7 +272,8 @@ test.describe('Get to an answer view questions', () => {
         expect(finalOrder).toEqual([initialOrder[0], initialOrder[1], initialOrder[3]]);
         expect(finalOrder).toHaveLength(3);
     });
-    
+
+    // TBC, bug raised CARE-1565, CARE-1575
     test('Performing concurrent move up question ordering should throw an error', async ({browser, request}) => {
         // Create first browser context
         const context1 = await browser.newContext();
@@ -293,57 +301,57 @@ test.describe('Get to an answer view questions', () => {
 
             // Validate error message is displayed on viewQuestionPage2
             await viewQuestionPage2.expectErrorSummaryVisible();
-            
+
             // Verify the error message indicates a conflict or stale update
             await viewQuestionPage2.validateMoveUpErrorMessageContains();
             const expectedMessage = await viewQuestionPage2.getMatchingErrorMessages(ErrorMessages.ERROR_MESSAGE_TOP_QUESTION_UP)
             expect(expectedMessage).toHaveLength(1);
-            
+
         } finally {
             await context1.close();
             await context2.close();
         }
     });
 
-    // TBC, bug raised CARE-1565
-    // test('Performing concurrent move down question ordering should throw an error', async ({browser, request}) => {
-    //     // Create first browser context
-    //     const context1 = await browser.newContext();
-    //     const page1 = await context1.newPage();
-    //
-    //     // Create second browser context
-    //     const context2 = await browser.newContext();
-    //     const page2 = await context2.newPage();
-    //
-    //     try {
-    //         await signIn(page1, token);
-    //         await signIn(page2, token);
-    //
-    //         // Navigate to view questions page on both pages
-    //         const viewQuestionPage1 = await goToViewQuestionsPageByUrl(page1, questionnaireId);
-    //         const viewQuestionPage2 = await goToViewQuestionsPageByUrl(page2, questionnaireId);
-    //
-    //         // Tab 1: Move question 2 down
-    //         await viewQuestionPage1.table.moveDownByIndex(3);
-    //         await viewQuestionPage1.waitForPageLoad();
-    //
-    //         // Tab 2: Try to move question 2 down again (concurrent/stale update)
-    //         await viewQuestionPage2.table.moveDownByIndex(3);
-    //         await viewQuestionPage2.waitForPageLoad();
-    //
-    //         // Validate error message is displayed on viewQuestionPage2
-    //         await viewQuestionPage2.expectErrorSummaryVisible();
-    //
-    //         // Verify the error message indicates a conflict or stale update
-    //         await viewQuestionPage2.validateMoveDownErrorMessageContains();
-    //         const expectedMessage = await viewQuestionPage2.getMatchingErrorMessages(ErrorMessages.ERROR_MESSAGE_BOTTOM_QUESTION_DOWN)
-    //         expect(expectedMessage).toHaveLength(1);
-    //
-    //     } finally {
-    //         await context1.close();
-    //         await context2.close();
-    //     }
-    // });
+    // TBC, bug raised CARE-1565, CARE-1575
+    test('Performing concurrent move down question ordering should throw an error', async ({browser, request}) => {
+        // Create first browser context
+        const context1 = await browser.newContext();
+        const page1 = await context1.newPage();
+
+        // Create second browser context
+        const context2 = await browser.newContext();
+        const page2 = await context2.newPage();
+
+        try {
+            await signIn(page1, token);
+            await signIn(page2, token);
+
+            // Navigate to view questions page on both pages
+            const viewQuestionPage1 = await goToViewQuestionsPageByUrl(page1, questionnaireId);
+            const viewQuestionPage2 = await goToViewQuestionsPageByUrl(page2, questionnaireId);
+
+            // Tab 1: Move question 2 down
+            await viewQuestionPage1.table.moveDownByIndex(3);
+            await viewQuestionPage1.waitForPageLoad();
+
+            // Tab 2: Try to move question 2 down again (concurrent/stale update)
+            await viewQuestionPage2.table.moveDownByIndex(3);
+            await viewQuestionPage2.waitForPageLoad();
+
+            // Validate error message is displayed on viewQuestionPage2
+            await viewQuestionPage2.expectErrorSummaryVisible();
+
+            // Verify the error message indicates a conflict or stale update
+            await viewQuestionPage2.validateMoveDownErrorMessageContains();
+            const expectedMessage = await viewQuestionPage2.getMatchingErrorMessages(ErrorMessages.ERROR_MESSAGE_BOTTOM_QUESTION_DOWN)
+            expect(expectedMessage).toHaveLength(1);
+
+        } finally {
+            await context1.close();
+            await context2.close();
+        }
+    });
 
     test('Reorder behavior', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);

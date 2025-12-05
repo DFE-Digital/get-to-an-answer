@@ -1,7 +1,7 @@
 import {expect, test} from "@playwright/test";
-import {AddQuestionPage, QuestionType} from "../../pages/admin/AddQuestionPage";
+import {AddQuestionPage, QuestionRadioLabel} from "../../pages/admin/AddQuestionPage";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
-import {AddAnswersPage} from "../../pages/admin/AddAnswersPage";
+import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
 import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {
     signIn, goToEditQuestionnairePageByUrl, goToAddQuestionPageByUrl, goToAddQuestionnairePage
@@ -16,7 +16,7 @@ test.describe('Get to an answer add question to questionnaire', () => {
     let questionnaire: any;
     let addQuestionPage: AddQuestionPage;
     let viewQuestionPage: ViewQuestionPage;
-    let addAnswersPage: AddAnswersPage;
+    let addAnswerPage: AddAnswerPage;
 
     test.beforeEach(async ({request, page}) => {
         token = JwtHelper.NoRecordsToken();
@@ -31,15 +31,14 @@ test.describe('Get to an answer add question to questionnaire', () => {
     test('Validate presence of elements on add new question page', async ({page}) => {
         await addQuestionPage.assertPageElements();
     });
+    
+    test('Back link takes to view question list from Add question page', async ({page}) => {
+        await addQuestionPage.verifyBackLinkPresent();
+        await addQuestionPage.clickBackLink();
 
-    // TBC, expected page should be view questions (1548 bug raised)
-    // test('Back link takes to view question list from Add question page', async ({page}) => {
-    //     await addQuestionPage.verifyBackLinkPresent();
-    //     await addQuestionPage.clickBackLink();
-    //
-    //     viewQuestionPage = new ViewQuestionPage(page);
-    //     await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
-    // });
+        viewQuestionPage = await ViewQuestionPage.create(page);
+        await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
+    });
 
     test('Error summary appears on invalid submit with all missing required fields', async ({browserName}) => {
         await addQuestionPage.clickSaveAndContinue();
@@ -49,7 +48,7 @@ test.describe('Get to an answer add question to questionnaire', () => {
     test('Error summary appears on submit with missing question content', async ({browserName}) => {
         const questionHintText = `Test hint text - ${Date.now()}`;
         await addQuestionPage.enterQuestionHintText(questionHintText);
-        await addQuestionPage.chooseQuestionType(QuestionType.SingleSelectShort);
+        await addQuestionPage.chooseQuestionType(QuestionRadioLabel.SingleSelectShort);
         await addQuestionPage.clickSaveAndContinue();
         await addQuestionPage.validateMissingQuestionContentErrorMessageSummary(browserName);
     });
@@ -66,16 +65,16 @@ test.describe('Get to an answer add question to questionnaire', () => {
     test('Successful submit with missing optional question hint text', async ({page}) => {
         const questionContent = `Test Question - ${Date.now()}`;
         await addQuestionPage.enterQuestionContent(questionContent);
-        await addQuestionPage.chooseQuestionType(QuestionType.SingleSelectShort);
+        await addQuestionPage.chooseQuestionType(QuestionRadioLabel.SingleSelectShort);
         await addQuestionPage.clickSaveAndContinue();
 
-        addAnswersPage = await AddAnswersPage.create(page);
-        await addAnswersPage.expectAnswerHeadingOnPage();
+        addAnswerPage = await AddAnswerPage.create(page);
+        await addAnswerPage.expectAnswerHeadingOnPage();
     });
 
     test('Inline error and styling for missing question content', async ({page}) => {
         await addQuestionPage.clearQuestionContent();
-        await addQuestionPage.chooseQuestionType(QuestionType.SingleSelectShort);
+        await addQuestionPage.chooseQuestionType(QuestionRadioLabel.SingleSelectShort);
         await addQuestionPage.clickSaveAndContinue();
 
         await addQuestionPage.validateInlineQuestionContentError();
@@ -96,11 +95,11 @@ test.describe('Get to an answer add question to questionnaire', () => {
 
         await addQuestionPage.enterQuestionContent(questionContent);
         await addQuestionPage.enterQuestionHintText(hintText);
-        await addQuestionPage.chooseQuestionType(QuestionType.SingleSelectLong);
+        await addQuestionPage.chooseQuestionType(QuestionRadioLabel.SingleSelectLong);
         await addQuestionPage.clickSaveAndContinue();
 
-        addAnswersPage = await AddAnswersPage.create(page);
-        await addAnswersPage.expectAnswerHeadingOnPage();
+        addAnswerPage = await AddAnswerPage.create(page);
+        await addAnswerPage.expectAnswerHeadingOnPage();
     });
 
     test('Create question with multi-select type', async ({page}) => {
@@ -109,28 +108,26 @@ test.describe('Get to an answer add question to questionnaire', () => {
 
         await addQuestionPage.enterQuestionContent(questionContent);
         await addQuestionPage.enterQuestionHintText(hintText);
-        await addQuestionPage.chooseQuestionType(QuestionType.MultiSelect);
+        await addQuestionPage.chooseQuestionType(QuestionRadioLabel.MultiSelect);
         await addQuestionPage.clickSaveAndContinue();
 
-        addAnswersPage = await AddAnswersPage.create(page);
-        await addAnswersPage.expectAnswerHeadingOnPage();
+        addAnswerPage = await AddAnswerPage.create(page);
+        await addAnswerPage.expectAnswerHeadingOnPage();
     });
+    
+    test('Create a new question with invalid content to validate aria-describedby', async ({page}) => {
+        await addQuestionPage.enterInvalidContent();
+        await addQuestionPage.chooseQuestionType(QuestionRadioLabel.SingleSelectShort);
 
-    // TBC, bug raised CARE-1549
-    // test('Create a new question with invalid content to validate aria-describedby', async ({page}) => {
-    //     await addQuestionPage.enterInvalidContent();
-    //     await addQuestionPage.chooseQuestionType(QuestionType.SingleSelectShort);
-    //
-    //     await addQuestionPage.clickSaveAndContinue();
-    //     await addQuestionPage.validateQuestionContentFieldAriaDescribedBy();
-    // });
+        await addQuestionPage.clickSaveAndContinue();
+        await addQuestionPage.validateQuestionContentFieldAriaDescribedBy();
+    });
+    
+    test('Create a new question with missing question type to validate aria-describedby', async ({page}) => {
+        const questionContent = `Test Question - ${Date.now()}`;
+        await addQuestionPage.enterQuestionContent(questionContent);
 
-    // TBC, CARE-1549 bug raised
-    // test('Create a new question with missing question type to validate aria-describedby', async ({page}) => {
-    //     const questionContent = `Test Question - ${Date.now()}`;
-    //     await addQuestionPage.enterQuestionContent(questionContent);
-    //
-    //     await addQuestionPage.clickSaveAndContinue();
-    //     await addQuestionPage.validateQuestionTypeErrorAriaDescribedBy();
-    // });
+        await addQuestionPage.clickSaveAndContinue();
+        await addQuestionPage.validateQuestionTypeErrorAriaDescribedBy();
+    });
 });

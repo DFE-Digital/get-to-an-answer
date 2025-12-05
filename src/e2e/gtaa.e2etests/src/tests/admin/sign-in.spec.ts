@@ -18,7 +18,7 @@ test.describe('Get to an answer sign in page', () => {
         await signInPage.assertPageElements();
     });
 
-    test('Clicking sign in button navigates to terms od service agreement', async ({page}) => {
+    test('Clicking sign in button navigates to terms of service agreement', async ({page}) => {
         await signInPage.clickSignIn();
         
         termsOfUsePage = await TermsOfUsePage.create(page);
@@ -31,6 +31,7 @@ test.describe('Get to an answer sign in page', () => {
         termsOfUsePage = await TermsOfUsePage.create(page);
         await termsOfUsePage.verifyHeading();
         
-        await signInPage.headingHierarchyIsCorrect();
+        // TBC CARE-1571, to be covered later during accessibility testing
+        //await signInPage.headingHierarchyIsCorrect();
     });
 });

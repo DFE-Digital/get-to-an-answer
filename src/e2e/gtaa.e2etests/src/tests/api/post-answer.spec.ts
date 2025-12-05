@@ -729,7 +729,6 @@ test.describe('POST answers', () => {
         expect(answerPostResponse.status()).toBe(400);
     });
     
-    //bug another 500 when exceeding the characters limit
     test('Validate POST create answer with destinationUrl exceeding maximum length (250 characters)', async ({ request }) => {
         const {
             questionnairePostResponse,
