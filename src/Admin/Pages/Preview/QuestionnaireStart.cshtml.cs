@@ -44,6 +44,8 @@ public class QuestionnaireStart(IApiClient apiClient, ILogger<QuestionnaireStart
                 Id = questionnaire.Id,
                 DisplayTitle = questionnaire.DisplayTitle ?? questionnaire.Title,
                 Slug = questionnaire.Slug,
+                
+                Description = questionnaire.Description,
             
                 DecorativeImage = questionnaire.DecorativeImage,
             

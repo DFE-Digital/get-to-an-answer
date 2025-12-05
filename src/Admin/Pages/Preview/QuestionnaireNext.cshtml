@@ -26,19 +26,28 @@
 {
   @if (Model?.Destination?.Type == DestinationType.CustomContent)
   {
-    <section class="dfe-page-grey" id="main-content-header">
-      <div class="govuk-width-container" id="main-header-container">
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-xl">
-              @Model?.Destination.Title
-            </h1>
+    <section class="gtaa-preview-header">
+      @await Html.PartialAsync("_DraftPreviewBanner")
+      <section class="dfe-page-grey" id="main-content-header">
+        <div class="govuk-width-container" id="main-header-container">
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+              <h1 class="govuk-heading-xl">
+                @Model?.Destination.Title
+              </h1>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
     </section>
   }
+  else
+  {
+    @await Html.PartialAsync("_DraftPreviewBanner")
+  }
+  
 }
+
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
