@@ -486,7 +486,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             var cloneQuestionnaireId = cloneQuestionnaire.Id;
             
             var cloneQuestions = new Dictionary<int, QuestionEntity>();
-            var questionOldToNewIds = new Dictionary<Guid, Guid>();
+            var oldIdCloneQuestions = new Dictionary<Guid, QuestionEntity>();
             var orderAnswers = new Dictionary<int, ICollection<AnswerEntity>>();
             
             foreach (var question in questionnaire.Questions)
@@ -503,7 +503,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                     UpdatedAt = DateTime.UtcNow,
                 };
                     
-                questionOldToNewIds.Add(question.Id, cloneQuestion.Id);
+                oldIdCloneQuestions.Add(question.Id, cloneQuestion);
                 cloneQuestions.Add(question.Order, cloneQuestion);
                 orderAnswers.Add(question.Order, question.Answers);
             }
@@ -511,8 +511,12 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             await db.Questions.AddRangeAsync(cloneQuestions.Values);
             await db.SaveChangesAsync();
             
+            var questionOldToNewIds = new Dictionary<Guid, Guid>();
+            foreach (var (originalId, cloneQuestion) in oldIdCloneQuestions)
+                questionOldToNewIds.Add(originalId, cloneQuestion.Id);
+            
             var cloneContents = new Dictionary<string, ContentEntity>();
-            var contentOldToNewIds = new Dictionary<Guid, Guid>();
+            var oldIdCloneContents = new Dictionary<Guid, ContentEntity>();
             
             foreach (var content in questionnaire.Contents)
             {
@@ -526,13 +530,16 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                 };
-                    
-                contentOldToNewIds.Add(content.Id, cloneContent.Id);
+                oldIdCloneContents.Add(content.Id, cloneContent);
                 cloneContents.Add(content.ReferenceName!, cloneContent);
             }
             
             await db.Contents.AddRangeAsync(cloneContents.Values);
             await db.SaveChangesAsync();
+            
+            var contentOldToNewIds = new Dictionary<Guid, Guid>();
+            foreach (var (originalId, cloneContent) in oldIdCloneContents)
+                contentOldToNewIds.Add(originalId, cloneContent.Id);
 
             var cloneAnswers = new List<AnswerEntity>();
                 
