@@ -1,5 +1,4 @@
 import {expect, test} from "@playwright/test";
-import {AddQuestionPage} from "../../pages/admin/AddQuestionPage";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
 import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
@@ -136,8 +135,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         const viewQuestionPage = await ViewQuestionPage.create(page);
         await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
     });
-
-    // TBC, CARE-1568
+    
     test("Submit an answer to a single radio question with InternalResultsPage destination", async ({request, page}) => {
         const title = 'Test Content';
         const apiContentResponse = await createContent(request, {
@@ -206,8 +204,49 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.validateInlineQuestionContentError(1);
     })
 
+    //TBC, CARE-1579 bug raised to be covered later during accessibility testing
+    // test('Accessible ids and aria-describedby for multiple options with hint', async ({page}) => {
+    //     await signIn(page, token);
+    //     addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+    //
+    //     await addAnswerPage.expectAnswerHeadingOnPage();
+    //     await addAnswerPage.validateUniqueIdsForMultipleOptions(2);
+    //
+    //     await addAnswerPage.setOptionContent(0, 'First Answer Option');
+    //     await addAnswerPage.setOptionContent(1, 'Second Answer Option');
+    //    
+    //     await addAnswerPage.clickAddAnotherOptionButton();
+    //     await addAnswerPage.validateUniqueIdsForMultipleOptions(3);
+    //
+    //     await addAnswerPage.setOptionContent(2, 'Third Answer Option');
+    //     await addAnswerPage.setOptionHint(0, 'First answer hint');
+    //     await addAnswerPage.setOptionHint(1, 'Second answer hint');
+    //     await addAnswerPage.setOptionHint(2, 'Third answer hint');
+    //    
+    //     // Verify aria-describedby includes hint ids (no errors present)
+    //     await addAnswerPage.validateAriaDescribedByWithHintOnly(0);
+    //     await addAnswerPage.validateAriaDescribedByWithHintOnly(1);
+    //     await addAnswerPage.validateAriaDescribedByWithHintOnly(2);
+    // })
 
-
+    //TBC, CARE-1579 bug raised to be covered later during accessibility testing
+    // test('Accessible ids and aria-describedby for multiple options with error', async ({page}) => {
+    //     await signIn(page, token);
+    //     addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+    //
+    //     await addAnswerPage.expectAnswerHeadingOnPage();
+    //    
+    //     await addAnswerPage.setOptionHint(0, 'First answer hint');
+    //     await addAnswerPage.setOptionHint(1, 'Second answer hint');
+    //    
+    //     await addAnswerPage.clickSaveAndContinueButton();
+    //     await addAnswerPage.validateUniqueIdsForMultipleOptions(2);
+    //
+    //     // Verify aria-describedby includes both hint id and error id when error is present
+    //     await addAnswerPage.validateAriaDescribedByWithHintAndError(0);
+    //     await addAnswerPage.validateAriaDescribedByWithHintAndError(1);
+    // })
+    
     // test("Submit an answer to a single dropdown question with NextQuestion destination", async () => {
     //     await addAnswerPage.expectAnswerHeadingOnPage();
     //     await addAnswerPage.clickAddAnotherOptionButton();

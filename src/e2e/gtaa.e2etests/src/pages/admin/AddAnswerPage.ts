@@ -43,31 +43,31 @@ export class AddAnswerPage extends BasePage {
         });
         this.backLink = page.locator('a.govuk-back-link');
         this.statusTag = page.locator('strong.govuk-tag[data-status="Draft"]');
-        this.answerOptionsHeader = page.getByRole('heading', { name: 'Answer options' });
-        this.removeButton = page.getByRole('button', { name: 'Remove' });
+        this.answerOptionsHeader = page.getByRole('heading', {name: 'Answer options'});
+        this.removeButton = page.getByRole('button', {name: 'Remove'});
         this.saveAndContinueButton = page.getByRole('button', {name: /Save and continue/i});
         this.enterAllOptionsButton = page.locator(
             'button[formaction*="RedirectToBulkEntry"]'
         ).first();
-        
+
         this.optionContent = (i: number) =>
             page.locator(`input[name="Options[${i}].OptionContent"]`)
-        
+
         this.inlineError = (i: number) =>
             page.locator(`#Options-${i}-OptionContent-error`)
-        
+
         this.optionHint = (i: number) =>
             page.locator(`textarea[name="Options[${i}].OptionHint"]`);
-        
+
         this.optionScore = (i: number) =>
             page.locator(`input[name="Answers[${i}].Priority"]`);
-        
+
         this.destinationRadio = (
             i: number,
             value: Destination = 'NextQuestion'
         ) =>
             page.locator(`input[name="Options[${i}].AnswerDestination"][value="${value}"]`);
-        
+
         this.selectSpecificQuestion = (i: number) =>
             page.locator(
                 `select#Options-${i}-destination-specific-select`
@@ -77,7 +77,7 @@ export class AddAnswerPage extends BasePage {
             page.locator(
                 `select#Options-${i}-destination-internal-select`
             );
-        
+
         this.externalLinkInput = (i: number) =>
             page.locator(`input[id="Options-${i}-destination-external-link"]`);
 
@@ -117,7 +117,7 @@ export class AddAnswerPage extends BasePage {
         await this.verifyAnswerOptionElements(i);
         await expect(this.removeButton).toHaveCount(removeButtonCount);
         for (let i = 0; i < removeButtonCount; i++) {
-            await expect(this.removeButton.nth(i)).toBeVisible();    
+            await expect(this.removeButton.nth(i)).toBeVisible();
         }
         await expect(this.addAnotherOptionButton, '❌ Add another option button not visible').toBeVisible();
         await expect(this.enterAllOptionsButton, '❌ Enter all options link not visible').toBeVisible();
@@ -149,61 +149,73 @@ export class AddAnswerPage extends BasePage {
 
         await this.clickAllLinksAndValidateFocus(browserName);
     }
-    
-    async validateInlineQuestionContentError(i:number): Promise<void> {
+
+    async validateInlineQuestionContentError(i: number): Promise<void> {
         await expect(this.inlineError(i), '❌ Inline option content error not visible').toBeVisible();
-        if(i==0)
-        {
-            await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_ANSWER_OPTION1_CONTENT);    
-        }else{
-            await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT);   
+        if (i == 0) {
+            await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_ANSWER_OPTION1_CONTENT);
+        } else {
+            await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT);
         }
     }
-    
+
     // Accessibility
-    async validateOptionContentFieldAriaDescribedBy(i: number) {
-        // TBC, when update is available then check below lines are applicable or not
-        // const errorElement = this.mode === 'update'
-        //     ? this.inlineUpdateQuestionContentError
-        //     : this.inlineQuestionContentError;
-
-        const errorElement = this.inlineOptionContentError;
-
-        await errorElement.waitFor({state: 'visible', timeout: Timeouts.LONG});
-
-        const ariaValue = await this.optionContent(i).getAttribute('aria-describedby');
-        expect(ariaValue, '❌ aria-describedby is missing').not.toBeNull();
-
-        if (this.mode === 'update') {
-            expect(ariaValue, '❌ aria-describedby missing error id')
-                .toContain('optioncontent-field-error');
-        } else {
-            expect(ariaValue, '❌ aria-describedby missing error id')
-                .toContain('optioncontent-field-error');
+    async validateUniqueIdsForMultipleOptions(optionCount: number): Promise<void> {
+        for (let i = 0; i < optionCount; i++) {
+            const optionContentId = await this.optionContent(i).getAttribute('id');
+            expect(optionContentId, `❌ Option ${i} content input missing unique id`).not.toBeNull();
+            expect(optionContentId, `❌ Option ${i} content id should incorporate index ${i}`).toContain(`Options-${i}`);
+            
+            const optionHintId = await this.optionHint(i).getAttribute('id');
+            expect(optionHintId, `❌ Option ${i} hint textarea missing unique id`).not.toBeNull();
+            expect(optionHintId, `❌ Option ${i} hint id should incorporate index ${i}`).toContain(`Options-${i}`);
         }
     }
 
-    async validateDestinationTypeFieldAriaDescribedBy(i: number) {
-        // TBC, when update is available then check below lines are applicable or not
-        // const errorElement = this.mode === 'update'
-        //     ? this.inlineUpdateQuestionContentError
-        //     : this.inlineQuestionContentError;
+    async validateAriaDescribedByWithHintAndError(optionIndex: number): Promise<void> {
+        const ariaDescribedBy = await this.optionContent(optionIndex).getAttribute('aria-describedby');
+        expect(ariaDescribedBy, `❌ aria-describedby is missing for option ${optionIndex}`).not.toBeNull();
+        
+        const hintId = await this.optionHint(optionIndex).getAttribute('id');
+        expect(hintId, `❌ Option ${optionIndex} hint missing id attribute`).not.toBeNull();
+        expect(ariaDescribedBy, `❌ aria-describedby should include hint id for option ${optionIndex}`)
+            .toContain(hintId);
+        
+        const errorElement = this.inlineError(optionIndex);
+        const errorIsVisible = await errorElement.isVisible().catch(() => false);
 
-        const errorElement = this.inlineOptionContentError;
-
-        await errorElement.waitFor({state: 'visible', timeout: Timeouts.LONG});
-
-        const ariaValue = await this.optionContent(i).getAttribute('aria-describedby');
-        expect(ariaValue, '❌ aria-describedby is missing').not.toBeNull();
-
-        if (this.mode === 'update') {
-            expect(ariaValue, '❌ aria-describedby missing error id')
-                .toContain('destinationtype-field-error');
+        if (errorIsVisible) {
+            const errorId = await errorElement.getAttribute('id');
+            expect(errorId, `❌ Option ${optionIndex} error missing id attribute`).not.toBeNull();
+            expect(ariaDescribedBy, `❌ aria-describedby should include error id for option ${optionIndex}`)
+                .toContain(errorId);
         } else {
-            expect(ariaValue, '❌ aria-describedby missing error id')
-                .toContain('destinationtype-field-error');
+            expect(false, `❌ Error should be visible for option ${optionIndex}`).toBe(true);
         }
     }
+
+    async validateAriaDescribedByWithHintOnly(optionIndex: number): Promise<void> {
+        const ariaDescribedBy = await this.optionContent(optionIndex).getAttribute('aria-describedby');
+        expect(ariaDescribedBy, `❌ aria-describedby is missing for option ${optionIndex}`).not.toBeNull();
+        
+        const hintId = await this.optionHint(optionIndex).getAttribute('id');
+        expect(hintId, `❌ Option ${optionIndex} hint missing id attribute`).not.toBeNull();
+        expect(ariaDescribedBy, `❌ aria-describedby should include hint id for option ${optionIndex}`)
+            .toContain(hintId);
+
+        // Verify error is NOT visible when no validation errors are present
+        const errorElement = this.inlineError(optionIndex);
+        const errorIsVisible = await errorElement.isVisible().catch(() => false);
+        expect(errorIsVisible, `❌ Error should not be visible for option ${optionIndex}`).toBe(false);
+
+        // Verify error id is NOT included in aria-describedby
+        const errorId = await errorElement.getAttribute('id').catch(() => null);
+        if (errorId) {
+            expect(ariaDescribedBy, `❌ aria-describedby should not include error id for option ${optionIndex}`)
+                .not.toContain(errorId);
+        }
+    }
+
 
     // ===== Actions =====
     async clickErrorLinkAndValidateFocus(link: Locator, browserName: string): Promise<void> {
@@ -278,7 +290,7 @@ export class AddAnswerPage extends BasePage {
     async clickBackLInk() {
         await this.backLink.click();
     }
-    
+
     async removeOption(i: number) {
         await this.removeButton.nth(i).click();
     }
