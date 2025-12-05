@@ -13,7 +13,7 @@ namespace Admin.Pages.Customisations;
 [Authorize]
 public class QuestionnaireCustomButton(
     ILogger<QuestionnaireCustomButton> logger, 
-    IApiClient apiClient) : QuestionnairesPageModel
+    IApiClient apiClient) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] 
     public required Guid QuestionnaireId { get; set; }

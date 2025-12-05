@@ -18,5 +18,5 @@ public class CreateContentRequestDto
     [Required(ErrorMessage = "Enter some content")]
     [MaxLength(10000, ErrorMessage = "Content must be 10000 characters or fewer")]
     public required string Content { get; set; }
-    public required string ReferenceName { get; set; }
+    public string? ReferenceName { get; set; }
 } 

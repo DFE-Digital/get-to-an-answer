@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Common.Client;
 using Common.Domain;
@@ -16,10 +17,12 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
     [FromRoute(Name = "questionId")] public Guid QuestionId { get; set; }
 
+    [Required(ErrorMessage = "The question is required")]
     [BindProperty] public string QuestionContent { get; set; } = string.Empty;
 
     [BindProperty] public string? QuestionHintText { get; set; }
 
+    [Required(ErrorMessage = "Select question type")]
     [BindProperty] public QuestionType QuestionType { get; set; }
 
     public List<AnswerSummaryViewModel> Answers { get; } = [];

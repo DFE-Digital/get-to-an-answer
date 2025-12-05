@@ -11,16 +11,17 @@ namespace Api.Services;
 
 public interface IAnswerService
 {
-    Task<ServiceResult> CreateAnswer(string userId, CreateAnswerRequestDto request);
+    Task<ServiceResult> CreateAnswer(string userId, CreateAnswerRequestDto request, Action<AnswerEntity>? preSaveAction = null);
     ServiceResult GetAnswer(string userId, Guid id);
     ServiceResult GetAnswers(string userId, Guid questionId);
-    Task<ServiceResult> UpdateAnswer(string userId, Guid id, UpdateAnswerRequestDto request);
+    Task<ServiceResult> UpdateAnswer(string userId, Guid id, UpdateAnswerRequestDto request, Action<AnswerEntity>? preSaveAction = null);
+    Task<ServiceResult> BulkUpsertAnswersAsync(string userId, BulkUpsertAnswersRequestDto requests);
     Task<ServiceResult> DeleteAnswer(string userId, Guid id);
 }
 
 public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> logger) : AbstractService, IAnswerService
 {
-    public async Task<ServiceResult> CreateAnswer(string userId, CreateAnswerRequestDto request)
+    public async Task<ServiceResult> CreateAnswer(string userId, CreateAnswerRequestDto request, Action<AnswerEntity>? preSaveAction = null)
     {
         try
         {
@@ -113,6 +114,8 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             };
+            
+            preSaveAction?.Invoke(entity);
 
             db.Answers.Add(entity);
             await db.SaveChangesAsync();
@@ -167,7 +170,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                 return Forbid(ProblemTrace("You do not have permission to do this", 403));
 
             var answers = db.Answers.Where(q => q.QuestionId == questionId && !q.IsDeleted);
-            var list = answers.AsEnumerable().Select(EntityToDto).ToList();
+            var list = answers.AsEnumerable().Select(EntityToDto).OrderBy(a => a.CreatedAt).ToList();
 
             logger.LogInformation("GetAnswers succeeded QuestionId={QuestionId} Count={Count}", questionId, list.Count);
             return Ok(list);
@@ -179,7 +182,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
         }
     }
 
-    public async Task<ServiceResult> UpdateAnswer(string userId, Guid id, UpdateAnswerRequestDto request)
+    public async Task<ServiceResult> UpdateAnswer(string userId, Guid id, UpdateAnswerRequestDto request, Action<AnswerEntity>? preSaveAction = null)
     {
         try
         {
@@ -255,6 +258,8 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
             answer.DestinationContentId = request.DestinationContentId ?? answer.DestinationContentId;
             answer.Priority = request.Priority ?? answer.Priority;
             answer.UpdatedAt = DateTime.UtcNow;
+            
+            preSaveAction?.Invoke(answer);
 
             await db.SaveChangesAsync();
             await db.ResetQuestionnaireToDraft(answer.QuestionnaireId);
@@ -267,6 +272,53 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
             logger.LogError(ex, "UpdateAnswer failed AnswerId={AnswerId}", id);
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
+    }
+
+    public async Task<ServiceResult> BulkUpsertAnswersAsync(string userId, BulkUpsertAnswersRequestDto requests)
+    {
+        foreach (var request in requests.Upserts)
+        {
+            if (request.Id is { } id)
+            {
+                var result = await UpdateAnswer(userId, id, new UpdateAnswerRequestDto
+                {
+                    Content = request.Content,
+                    Description = request.Description,
+                    DestinationType = request.DestinationType,
+                    DestinationQuestionId = request.DestinationQuestionId,
+                    DestinationContentId = request.DestinationContentId,
+                    DestinationUrl = request.DestinationUrl,
+                    Priority = request.Priority,
+                }, entity => entity.CreatedAt = DateTime.UtcNow);
+
+                if (!result.IsSuccessStatusCode)
+                {
+                    return result;
+                }
+            }
+            else
+            {
+                var result = await CreateAnswer(userId, new CreateAnswerRequestDto
+                {
+                    QuestionnaireId = requests.QuestionnaireId,
+                    QuestionId = requests.QuestionId,
+                    Content = request.Content,
+                    Description = request.Description,
+                    DestinationType = request.DestinationType,
+                    DestinationQuestionId = request.DestinationQuestionId,
+                    DestinationContentId = request.DestinationContentId,
+                    DestinationUrl = request.DestinationUrl,
+                    Priority = request.Priority,
+                });
+
+                if (!result.IsSuccessStatusCode)
+                {
+                    return result;
+                }
+            }
+        }
+        
+        return Ok();
     }
 
     public async Task<ServiceResult> DeleteAnswer(string userId, Guid id)
@@ -311,6 +363,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
             DestinationUrl = entity.DestinationUrl,
             DestinationType = entity.DestinationType,
             DestinationQuestionId = entity.DestinationQuestionId,
+            DestinationContentId = entity.DestinationContentId,
             QuestionId = entity.QuestionId,
             QuestionnaireId = entity.QuestionnaireId,
             Priority = entity.Priority,

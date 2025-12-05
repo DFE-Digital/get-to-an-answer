@@ -44,7 +44,7 @@
       <form method="post" accept-charset="UTF-8">
         <input name="returnUrl" type="hidden" value="@($"{Request.Path}{Request.QueryString}")"/>
         <button type="submit" asp-page-handler="RedirectToBulkEntry"
-                class="govuk-button govuk-button--link govuk-!-margin-left-4">
+                class="govuk-button govuk-button--link govuk-!-margin-0">
           enter all the options into one text box
         </button>
       </form>
@@ -65,14 +65,17 @@
 
         @await Html.PartialAsync("AnswerOptionsPartial", Model.Options[i], viewData)
 
-        <button class="govuk-button govuk-button--secondary govuk-!-margin-top-3"
+        var isLast = i == Model.Options.Count-1;
+        var marginBottom = isLast ? "margin-0" : "margin-bottom-11";
+
+        <button class="govuk-button govuk-button--secondary govuk-!-@marginBottom"
                 type="submit"
                 asp-page-handler="RemoveOption">
           Remove
         </button>
       }
 
-      <div class="govuk-!-margin-top-3 govuk-!-display-flex govuk-!-gap-3 govuk-!-flex-wrap gtaa-add-edit-questions-page">
+      <div class="govuk-!-margin-top-3 govuk-!-display-flex govuk-!-gap-3 govuk-!-flex-wrap gtaa-add-edit-questions-page govuk-!-v-align">
         <button class="govuk-button govuk-button--secondary"
                 type="submit"
                 asp-page-handler="AddOption">
@@ -81,7 +84,7 @@
         
           <input name="returnUrl" type="hidden" value="@($"{Request.Path}{Request.QueryString}")"/>
           <button type="submit" asp-page-handler="RedirectToBulkEntry"
-                  class="govuk-button govuk-button--link govuk-!-margin-left-4">
+                  class="govuk-button govuk-button--link govuk-!-margin-0">
             Enter all the options into one text box
         </button>
         

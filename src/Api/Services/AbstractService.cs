@@ -61,4 +61,7 @@ public sealed class ServiceResult(ServiceResultType resultType, object? value)
 {
     public ServiceResultType Type { get; } = resultType;
     public object? Value { get; } = value;
+    
+    public bool IsSuccessStatusCode => 
+        Type is ServiceResultType.Ok or ServiceResultType.NoContent or ServiceResultType.Created;
 }

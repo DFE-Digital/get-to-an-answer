@@ -1,15 +1,13 @@
-using Admin.Models;
 using Common.Client;
 using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Common.Enum;
-using Common.Models.ViewModels;
+using Common.Models.PageModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
-namespace Common.Models.PageModels;
+namespace Admin.Models;
 
 public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 {
@@ -95,6 +93,22 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             ModelState.AddModelError(selectKey, string.Empty);
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
         }
+        
+        var optionsWithExternalLinkNoSelection = Options.Where(o =>
+            o.AnswerDestination == AnswerDestination.ExternalResultsPage &&
+            string.IsNullOrEmpty(o.ExternalLink));
+        
+        foreach (var externalLink in optionsWithExternalLinkNoSelection)
+        {
+            var index = externalLink.OptionNumber - 1;
+            var errorMessage = $"Please enter an external link for option {externalLink.OptionNumber}";
+
+            var selectKey = $"Options[{index}].ExternalLink";
+            var resultsPageRadioInputId = $"Options-{index}-destination-external";
+
+            ModelState.AddModelError(selectKey, string.Empty);
+            ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
+        }
     }
     
     protected async Task HydrateOptionListsAsync()
@@ -126,8 +140,6 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             return Page();
         }
 
-        TempData["AnswersSnapshot"] = JsonConvert.SerializeObject(Options);
-
         var targetUrl = Url.Page("/Answers/BulkAnswerOptions", null, new
         {
             questionnaireId = QuestionnaireId,
@@ -147,7 +159,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
 
         var resultsPagesForSelection = resultsPages
-            .Select(r => new SelectListItem(r.ReferenceName, r.Id.ToString())).ToList();
+            .Select(r => new SelectListItem(r.ReferenceName ?? r.Title, r.Id.ToString())).ToList();
 
         foreach (var option in Options)
         {
