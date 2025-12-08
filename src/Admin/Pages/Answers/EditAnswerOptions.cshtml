@@ -48,25 +48,25 @@
     <h2 class="govuk-heading-m govuk-!-margin-top-6">Answer options</h2>
 
     <form method="post" accept-charset="UTF-8">
-      @for (var i = 0; i < Model.Options.Count; i++)
+      @for (var index = 0; index < Model.Options.Count; index++)
       {
         var viewData = new ViewDataDictionary(ViewData)
         {
           TemplateInfo =
           {
-            HtmlFieldPrefix = $"Options[{i}]"
+            HtmlFieldPrefix = $"Options[{index}]"
           }
         };
 
-        @await Html.PartialAsync("AnswerOptionsPartial", Model.Options[i], viewData)
+        @await Html.PartialAsync("AnswerOptionsPartial", Model.Options[index], viewData)
 
-        var isLast = i == Model.Options.Count-1;
+        var isLast = index == Model.Options.Count-1;
         var marginBottom = isLast ? "margin-0" : "margin-bottom-11";
 
         <button class="govuk-button govuk-button--secondary govuk-!-@marginBottom"
                 type="submit"
                 name="index"
-                value="@i"
+                value="@index"
                 formnovalidate="formnovalidate"
                 asp-page-handler="RemoveOption">
           Remove
