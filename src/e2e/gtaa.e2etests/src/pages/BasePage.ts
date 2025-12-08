@@ -123,4 +123,12 @@ export class BasePage {
         await instance.waitForPageLoad();
         return instance;
     }
+    
+    errorSummaryLink(href: string): Locator {
+        return this.page.locator(`[href="${href}"].govuk-link.govuk-error-summary__link`)
+    }
+
+    inlineErrorLink(fieldId: string): Locator {
+        return this.page.locator(`#${fieldId}.govuk-error-message`)
+    }
 }

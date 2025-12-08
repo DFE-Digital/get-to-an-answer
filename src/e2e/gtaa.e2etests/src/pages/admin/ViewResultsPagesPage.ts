@@ -1,35 +1,46 @@
 import {Page, Locator, expect} from '@playwright/test';
 import {BasePage} from '../BasePage';
 import {ViewQuestionTable} from './components/ViewQuestionTable';
-import {ErrorMessages} from "../../constants/test-data-constants";
+import {ErrorMessages, SuccessBannerMessages} from "../../constants/test-data-constants";
+import {ViewResultPageTable} from "./components/ViewResultPageTable";
 
-export class ViewQuestionPage extends BasePage {
+export class ViewResultsPagesPage extends BasePage {
     // ===== Locators  ===== 
+    private readonly banner: Locator;
+    private readonly heading: Locator;
     private readonly section: Locator;
     private readonly backToEditQuestionnaireLink: Locator;
-    private readonly questionHeading: Locator;
+    private readonly resultsPagesHeading: Locator;
     private readonly statusTag: Locator;
-    private readonly addQuestionLink: Locator;
+    private readonly addResultsPageBtn: Locator;
     private readonly finishedYesRadio: Locator;
     private readonly finishedNoRadio: Locator;
     private readonly saveAndContinueButton: Locator;
     private readonly errorSummary: Locator;
     private readonly errorList: Locator;
+    private readonly justCreatedBannerText: Locator;
+    private readonly justUpdatedBannerText: Locator;
+    private readonly justDeletedBannerText: Locator;
 
     // ===== Embedded component =====
-    readonly table: ViewQuestionTable;
+    readonly table: ViewResultPageTable;
 
     // ===== Constructor =====
     constructor(page: Page) {
         super(page);
-
-        this.questionHeading = this.page.locator('main h1.govuk-heading-l');
-        this.section = this.page.locator('div.govuk-grid-row.gtaa-add-edit-questions');
+        
+        this.banner = this.page.locator('div.govuk-notification-banner--success[role="alert"]');
+        this.heading = this.banner.locator('.govuk-notification-banner__title');
+        
+        this.justCreatedBannerText = this.page.locator('#just-created-banner-text');
+        this.justUpdatedBannerText = this.page.locator('#just-updated-banner-text');
+        this.justDeletedBannerText = this.page.locator('#just-deleted-banner-text');
+        
+        this.resultsPagesHeading = this.page.locator('main h1.govuk-heading-l');
+        this.section = this.page.locator('div.govuk-grid-row.gtaa-add-edit-results-pages');
         this.backToEditQuestionnaireLink = page.locator('a.govuk-back-link');
         this.statusTag = this.section.locator('strong.govuk-tag');
-        this.addQuestionLink = this.page.locator(
-            'div.govuk-button-group a.govuk-button[href*="/questions/"][href$="/add"]'
-        );
+        this.addResultsPageBtn = this.page.locator('#add-results-page-btn');
         this.finishedYesRadio = this.page.locator(
             'input.govuk-radios__input[name="FinishedEditing"][value="true"]'
         );
@@ -43,7 +54,7 @@ export class ViewQuestionPage extends BasePage {
         this.errorList = this.errorSummary.locator(
             'ul.govuk-error-summary__list'
         );
-        this.table = new ViewQuestionTable(page);
+        this.table = new ViewResultPageTable(page);
     }
 
     // ===== Actions =====
@@ -54,8 +65,8 @@ export class ViewQuestionPage extends BasePage {
         ]);
     }
     
-    async clickAddQuestion(): Promise<void> {
-        await this.addQuestionLink.click();
+    async clickAddResultsPage(): Promise<void> {
+        await this.addResultsPageBtn.click();
     }
 
     async markFinishedEditing(done: boolean): Promise<void> {
@@ -67,12 +78,12 @@ export class ViewQuestionPage extends BasePage {
     }
 
     // ===== Validations =====
-    async expectQuestionHeadingOnPage(expectedText?: string): Promise<void> {
-        await expect(this.questionHeading, '❌ View question page heading not visible').toBeVisible();
+    async expectResultsPagesHeadingOnPage(expectedText?: string): Promise<void> {
+        await expect(this.resultsPagesHeading, '❌ View question page heading not visible').toBeVisible();
         
         if (expectedText) {
             await expect(
-                this.questionHeading,
+                this.resultsPagesHeading,
                 `❌ View question page heading text does not match: expected "${expectedText}"`
             ).toContainText(expectedText);
         }
@@ -92,14 +103,6 @@ export class ViewQuestionPage extends BasePage {
 
     async expectErrorSummaryVisible(): Promise<void> {
         await expect(this.errorSummary, '❌ Error summary not visible').toBeVisible();
-    }
-    
-    async validateMoveUpErrorMessageContains(): Promise<void> {
-        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_TOP_QUESTION_UP);
-    }
-
-    async validateMoveDownErrorMessageContains(): Promise<void> {
-        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_BOTTOM_QUESTION_DOWN);
     }
 
     async getMatchingErrorMessages(expectedMessage: string): Promise<string[]> {
@@ -128,11 +131,34 @@ export class ViewQuestionPage extends BasePage {
         await this.verifyHeaderLinks()
         await this.verifyFooterLinks();
         await expect(this.section, '❌ Section not visible').toBeVisible();
-        await expect(this.addQuestionLink, '❌ Add question link not visible').toBeVisible();
+        await expect(this.addResultsPageBtn, '❌ Add results page button not visible').toBeVisible();
         await expect(this.finishedYesRadio, '❌ Finished Yes radio not visible').toBeVisible();
         await expect(this.finishedNoRadio, '❌ Finished No radio not visible').toBeVisible();
         await expect(this.saveAndContinueButton, '❌ Save and continue button not visible').toBeVisible();
         await this.expectComeBackLaterRadioIsSelected();
         await this.table.verifyVisible();
+    }
+
+    async expectSuccessBannerVisible(): Promise<void> {
+        await expect(this.banner).toBeVisible();
+        await expect(this.heading).toBeVisible();
+
+        const text = await this.heading.textContent();
+        expect(text?.trim().length).toBeGreaterThan(0);
+    }
+
+    async assertCreatedResultsPageSuccessBanner() {
+        await expect(this.justCreatedBannerText).toBeVisible();
+        await expect(this.justCreatedBannerText).toHaveText(SuccessBannerMessages.CREATED_RESULTS_PAGE_SUCCESS_MESSAGE);
+    }
+
+    async assertUpdatedResultsPageSuccessBanner() {
+        await expect(this.justUpdatedBannerText).toBeVisible();
+        await expect(this.justUpdatedBannerText).toHaveText(SuccessBannerMessages.UPDATED_RESULTS_PAGE_SUCCESS_MESSAGE);
+    }
+
+    async assertDeletedResultsPageSuccessBanner() {
+        await expect(this.justDeletedBannerText).toBeVisible();
+        await expect(this.justDeletedBannerText).toHaveText(SuccessBannerMessages.DELETED_RESULTS_PAGE_SUCCESS_MESSAGE);
     }
 }

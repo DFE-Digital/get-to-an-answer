@@ -34,21 +34,21 @@
 
 @section BeforeContent
 {
-  <a class="govuk-back-link govuk-!-display-none-print" href="/admin/questionnaires/manage">Back</a>
+  <a class="govuk-back-link govuk-!-display-none-print" id="back-to-manage" href="/admin/questionnaires/manage">Back</a>
 }
 
 @await Html.PartialAsync("QuestionnaireNotifications", Model)
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-l govuk-!-margin-0">
-      <span class="govuk-caption-l">@Model.Questionnaire?.Title</span><span class="govuk-visually-hidden"> - </span>
+    <h1 id="track-questionnaire-page-heading" class="govuk-heading-l govuk-!-margin-0">
+      <span id="current-questionnaire-title" class="govuk-caption-l">@Model.Questionnaire?.Title</span><span class="govuk-visually-hidden"> - </span>
       Design a questionnaire
     </h1>
     <dl class="govuk-!-margin-bottom-7">
       <dt class="govuk-visually-hidden">Status</dt>
       <dd class="govuk-!-margin-0">
-        <strong class="govuk-tag" data-status="@questionnaire?.Status">
+        <strong id="questionnaire-status" class="govuk-tag" data-status="@questionnaire?.Status">
           @questionnaire?.Status
         </strong>
       </dd>
@@ -59,6 +59,7 @@
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link"
+               id="edit-questionnaire-name"
                aria-describedby="edit-your-questionnaire-name-status"
                href="/admin/questionnaires/@questionnaire?.Id/edit-name">
               Edit the name of your questionnaire
@@ -71,6 +72,7 @@
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link" aria-describedby="optional-task-1-status"
+               id="manage-access"
                href="/admin/questionnaires/@questionnaire?.Id/contributors">
               Manage access
             </a>
@@ -78,15 +80,16 @@
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/clone">Make a copy</a>
+            <a class="govuk-link" id="make-copy" href="/admin/questionnaires/@questionnaire?.Id/clone">Make a copy</a>
           </div>
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             @if (displayVersionHistory)
             {
-              <a class="govuk-link gi" href="/admin/questionnaires/@questionnaire?.Id/version-history">
-                View version history
+              <a class="govuk-link gi" id="view-version-history"
+                 href="/admin/questionnaires/@questionnaire?.Id/version-history">
+              View version history
               </a>
             }
             else
@@ -107,6 +110,7 @@
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link" aria-describedby="optional-task-1-status"
+               id="edit-start-page"
                href="/admin/questionnaires/@questionnaire?.Id/start-page/edit">
               Add and edit start page
             </a>
@@ -119,6 +123,7 @@
           <div class="govuk-task-list__name-and-hint">
             
             <a class="govuk-link govuk-task-list__link"
+               id="edit-questions"
                aria-describedby="create-your-questionnaire-2-status"
                href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">
               Add or edit questions and answers
@@ -131,6 +136,7 @@
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status"
+               id="edit-results-pages"
                href="/admin/questionnaires/@questionnaire?.Id/contents">Add and edit results pages</a>
           </div>
           <div class="govuk-task-list__status">
@@ -143,6 +149,7 @@
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status"
+               id="customise-styling"
                href="/admin/questionnaires/@questionnaire?.Id/styling">
               Customise styling
             </a>
@@ -154,6 +161,7 @@
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status"
+               id="edit-button-text"
                href="/admin/questionnaires/@questionnaire?.Id/edit-continue-button">Edit button text</a>
           </div>
           <div class="govuk-task-list__status" id="create-your-questionnaire-1-status">
@@ -165,13 +173,14 @@
       <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/branching-map"
+            <a id="view-branching-map" class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/branching-map"
                rel="noopener">View branching map</a>
           </div>
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" href="/admin/questionnaires/@questionnaire?.Id/start-preview"
+            <a class="govuk-link govuk-task-list__link" id="preview-questionnaire"
+               href="/admin/questionnaires/@questionnaire?.Id/start-preview"
                target="_blank">Preview questionnaire (opens in new tab)</a>
           </div>
         </li>
@@ -181,6 +190,7 @@
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link" aria-describedby="edit-slug-status"
+               id="edit-questionnaire-id"
                href="/admin/questionnaires/@questionnaire?.Id/edit-slug">
               Add or edit questionnaire ID
             </a>
@@ -195,6 +205,7 @@
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link" data-module="govuk-link" data-govuk-button-init=""
+               id="publish-questionnaire"
                href="/admin/questionnaires/@questionnaire?.Id/publish-confirmation">
               Publish questionnaire
             </a>
@@ -203,8 +214,9 @@
       }
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/integration-guide" target="_blank">
-              Add questionnaire to your service
+            <a class="govuk-link" id="integration-guide"
+               href="/admin/questionnaires/@questionnaire?.Id/integration-guide" target="_blank">
+            Add questionnaire to your service
             </a>
           </div>
         </li>
@@ -214,11 +226,13 @@
       @if (questionnaire?.Status == EntityStatus.Published)
       {
         <a class="govuk-button govuk-button--secondary" data-module="govuk-button"
+           id="unpublish-questionnaire"
            href="/admin/questionnaires/@questionnaire?.Id/unpublish-confirmation" data-govuk-button-init="">
           Unpublish the questionnaire
         </a>
       }
       <a class="govuk-button govuk-button--warning" data-module="govuk-button"
+         id="delete-questionnaire"
          href="/admin/questionnaires/@questionnaire?.Id/delete-confirmation" data-govuk-button-init="">
         Delete questionnaire
       </a>
