@@ -194,7 +194,7 @@ export async function goToAddAnswerPageByUrl(
     return addAnswerPage;
 }
 
-export async function goToEditAnswerPageByUrl(
+export async function goToUpdateAnswerPageByUrl(
     page: Page,
     questionnaireId: string,
     questionId: string,
@@ -205,7 +205,7 @@ export async function goToEditAnswerPageByUrl(
 
     await page.goto(addAnswerUrl, {waitUntil});
 
-    const addAnswerPage = new AddAnswerPage(page, 'edit')
+    const addAnswerPage = new AddAnswerPage(page, 'update')
     await addAnswerPage.waitForPageLoad();
 
     return addAnswerPage;

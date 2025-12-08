@@ -4,7 +4,7 @@ import {ErrorMessages} from "../../constants/test-data-constants";
 import {Timeouts} from "../../constants/timeouts";
 import {QuestionRadioLabel} from "./AddQuestionPage";
 
-type Mode = 'create' | 'edit';
+type Mode = 'create' | 'update';
 type Destination = 'NextQuestion' | 'SpecificQuestion' | 'ExternalResultsPage' | 'InternalResultsPage' | '0';
 
 export class AddAnswerPage extends BasePage {
@@ -113,7 +113,12 @@ export class AddAnswerPage extends BasePage {
         }
         await expect(this.addAnotherOptionButton, '❌ Add another option button not visible').toBeVisible();
         await expect(this.enterAllOptionsButton, '❌ Enter all options link not visible').toBeVisible();
-        await expect(this.saveAndContinueButton, '❌ Continue button not visible').toBeVisible();
+        if(this.mode=='update') {
+            await expect(this.saveAnswersButton, '❌ Save answers button not visible').toBeVisible();
+        }else{
+            await expect(this.saveAndContinueButton, '❌ Save and continue button not visible').toBeVisible();    
+        }
+        
     }
 
     async verifyAnswerOptionElements(i: number): Promise<void> {
@@ -244,12 +249,24 @@ export class AddAnswerPage extends BasePage {
         }
     }
 
+    async clearOptionContent(i: number) {
+        await this.optionContent(i).clear();
+    }
+
     async setOptionContent(i: number, text: string) {
         await this.optionContent(i).fill(text);
     }
 
+    async clearOptionHint(i: number) {
+        await this.optionHint(i).clear();
+    }
+
     async setOptionHint(i: number, text: string) {
         await this.optionHint(i).fill(text);
+    }
+
+    async clearAnswerRank(i: number) {
+        await this.answerRank(i).clear();
     }
 
     async setAnswerRank(i: number, priority: number) {
