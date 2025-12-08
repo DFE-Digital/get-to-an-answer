@@ -42,7 +42,7 @@
                type="text"
                asp-for="@Model.Title"
                value="@(Model?.Title ?? "")"
-               name="@inputId"
+               name="@nameof(Model.Title)"
                govuk-error-for="@Model?.Title"/>
       </govuk-form-group>
 
