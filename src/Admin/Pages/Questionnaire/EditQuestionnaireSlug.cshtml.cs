@@ -18,8 +18,9 @@ public class EditQuestionnaireSlug(IApiClient apiClient, ILogger<EditQuestionnai
     public Guid QuestionnaireId { get; set; }
     
     [BindProperty(Name = "Slug")]
-    [Required(ErrorMessage = "Enter a questionnaire slug")]
-    [GdsTitle]
+    [Required(ErrorMessage = "Enter a questionnaire ID")]
+    [RegularExpression(@"^[a-z0-9]+(?:-[a-z0-9]+)*$", 
+        ErrorMessage = "Questionnaire IDs must contain only lowercase letters, numbers, and hyphens, and cannot start or end with a hyphen")]
     public string? Slug { get; set; }
     
     public IActionResult OnGet()

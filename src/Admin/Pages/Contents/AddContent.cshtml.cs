@@ -24,7 +24,7 @@ public class AddContent(ILogger<AddContent> logger, IApiClient apiClient) : Base
     public string ContentValue { get; set; } = "";
 
     [BindProperty] 
-    public string ContentRefName { get; set; } = "";
+    public string? ContentRefName { get; set; } = "";
 
     public IActionResult OnGet()
     {
@@ -48,7 +48,7 @@ public class AddContent(ILogger<AddContent> logger, IApiClient apiClient) : Base
                 ReferenceName = ContentRefName
             });
             
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustCreated = true });
 
             return Redirect(string.Format(Routes.AddAndEditResultPages, QuestionnaireId));
         }

@@ -52,10 +52,23 @@ public class AddQuestionnaireStart(IApiClient apiClient, ILogger<AddQuestionnair
             if (!ModelState.IsValid)
                 return Page();
 
+            if (DisplayTitle == null)
+            {
+                ModelState.AddModelError(nameof(DisplayTitle), "Display title is required when you save");
+            }
+            
+            if (Description == null)
+            {
+                ModelState.AddModelError(nameof(Description), "Description is required when you save");
+            }
+            
+            if (!ModelState.IsValid)
+                return Page();
+
             await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, new UpdateQuestionnaireRequestDto
             {
-                DisplayTitle = DisplayTitle,
-                Description = Description,
+                DisplayTitle = DisplayTitle ?? string.Empty,
+                Description = Description ?? string.Empty,
             });
             
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustAddedStartPage = true });

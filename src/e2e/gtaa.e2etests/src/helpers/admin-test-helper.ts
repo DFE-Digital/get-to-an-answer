@@ -8,6 +8,10 @@ import {AddAnswerPage} from '../pages/admin/AddAnswerPage';
 import {EditQuestionnairePage} from "../pages/admin/EditQuestionnairePage";
 import {TermsOfUsePage} from "../pages/admin/TermsOfUsePage";
 import {EnvConfig} from '../config/environment-config';
+import {AddQuestionnaireStartPage} from "../pages/admin/AddQuestionnaireStartPage";
+import {ViewResultsPagesPage} from "../pages/admin/ViewResultsPagesPage";
+import {AddResultsPagePage} from "../pages/admin/AddResultsPagePage";
+import {EditResultsPagePage} from "../pages/admin/EditResultsPagePage";
 
 type LoadState = 'domcontentloaded' | 'load' | 'networkidle';
 
@@ -125,6 +129,22 @@ export async function goToViewQuestionsPageByUrl(
     return viewQuestionPage;
 }
 
+export async function goToViewResultsPagesPageByUrl(
+    page: Page,
+    questionnaireId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<ViewResultsPagesPage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const viewQuestionUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/contents`;
+
+    await page.goto(viewQuestionUrl, {waitUntil});
+
+    const viewResultsPagesPage = new ViewResultsPagesPage(page)
+    await viewResultsPagesPage.waitForPageLoad();
+
+    return viewResultsPagesPage;
+}
+
 export async function goToAddQuestionPageByUrl(
     page: Page,
     questionnaireId: string,
@@ -139,6 +159,22 @@ export async function goToAddQuestionPageByUrl(
     await addQuestionPage.waitForPageLoad();
 
     return addQuestionPage;
+}
+
+export async function goToAddQuestionnaireStartPageByUrl(
+    page: Page,
+    questionnaireId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<AddQuestionnaireStartPage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const addQuestionUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/start-page/edit`;
+
+    await page.goto(addQuestionUrl, {waitUntil});
+
+    const addQuestionnaireStartPage = new AddQuestionnaireStartPage(page)
+    await addQuestionnaireStartPage.waitForPageLoad();
+
+    return addQuestionnaireStartPage;
 }
 
 export async function goToAddAnswerPageByUrl(
@@ -156,4 +192,37 @@ export async function goToAddAnswerPageByUrl(
     await addAnswerPage.waitForPageLoad();
 
     return addAnswerPage;
+}
+
+export async function goToAddResultPagePageByUrl(
+    page: Page,
+    questionnaireId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<AddResultsPagePage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const addQuestionUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/contents/add`;
+
+    await page.goto(addQuestionUrl, {waitUntil});
+
+    const addResultsPagePage = new AddResultsPagePage(page)
+    await addResultsPagePage.waitForPageLoad();
+
+    return addResultsPagePage;
+}
+
+export async function goToEditResultPagePageByUrl(
+    page: Page,
+    questionnaireId: string,
+    resultPageId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<EditResultsPagePage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const addQuestionUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/contents/${resultPageId}/edit`;
+
+    await page.goto(addQuestionUrl, {waitUntil});
+
+    const addResultsPagePage = new EditResultsPagePage(page)
+    await addResultsPagePage.waitForPageLoad();
+
+    return addResultsPagePage;
 }
