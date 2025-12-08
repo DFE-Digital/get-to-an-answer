@@ -3,14 +3,16 @@
 @inject IWebHostEnvironment WebHostEnvironment
 @inject IOptions<ScriptOptions> ScriptOptions
 
-@{
-    var languageCode = Context.Request.RouteValues["languageCode"]?.ToString();
-}
-
-@if (!WebHostEnvironment.IsProduction())
+@if (!WebHostEnvironment.IsProduction() && ViewBag.IsPreview != true)
 {
     <div class="environment-banner">
         <div class="govuk-body-s"><strong>ATTENTION!</strong> This is the <strong>@WebHostEnvironment.EnvironmentName</strong> version of @Model.ServiceName website.</div>
+    </div>
+} 
+else if (ViewBag.IsPreview == true)
+{
+    <div class="environment-banner">
+        <div class="govuk-body-s"><strong>ATTENTION! </strong> This a preview of your questionnaire.</div>
     </div>
 }
 
@@ -18,26 +20,6 @@
 {
     <partial name="_CookieConsentPartial" model="@Model"/>
 }
-
-<div class="govuk-width-container">
-    <div class="govuk-phase-banner">
-        <div class="govuk-phase-banner__content">
-            <strong class="govuk-phase-banner__content__tag govuk-tag">
-                @Model.Phase.ToString()
-            </strong>
-            <span class="govuk-phase-banner__text">
-                This is a new service.
-                @if (!string.IsNullOrEmpty(Model.FeedbackText) && Model.ShowNavigation)
-                {
-                    <text>
-                        Help us improve it and <a class="govuk-link" href="@Model.FeedbackUrl" target="_blank" rel="nofollow">
-                            @Model.FeedbackText (opens in new tab)</a>. 
-                    </text>
-                }
-            </span>
-        </div>
-    </div>
-</div>
 
 @if (SiteConfiguration.Rebrand)
 {

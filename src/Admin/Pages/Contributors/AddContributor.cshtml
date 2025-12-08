@@ -29,19 +29,14 @@
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
             <h1 class="govuk-fieldset__heading">
               <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-              Add contributor
+              Add person
             </h1>
-            <dl class="govuk-!-margin-bottom-7">
-              <dt class="govuk-visually-hidden">Status</dt>
-              <dd class="govuk-!-margin-0"><strong class="govuk-tag" data-status="@Model?.QuestionnaireStatus">@Model?.QuestionnaireStatus</strong>
-              </dd>
-            </dl>
           </legend>
 
-          <div id="finished-hint" class="govuk-hint">
-            <p>Add a DfE email address that you want to give edit access.</p>
+          <div class="govuk-hint govuk-!-margin-bottom-8">
+            <p>Add the DfE email address for the person you want to give access to.</p>
 
-            <p>After you add access, they will be able to see the questionnaire when they sign in or you can send them a link.</p> 
+            <p>Once you add them, they can edit the questionnaire when they sign in.</p> 
           </div>
 
           <govuk-field-error asp-for="@Model.ContributorEmail" error-id="ContributorEmail-error">

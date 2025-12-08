@@ -182,7 +182,7 @@
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link govuk-task-list__link" aria-describedby="edit-slug-status"
                href="/admin/questionnaires/@questionnaire?.Id/edit-slug">
-              Create questionnaire ID
+              Add or edit questionnaire ID
             </a>
           </div>
           <div class="govuk-task-list__status" id="edit-slug-status">
@@ -190,17 +190,17 @@
           </div>
         </li>
 
+      @if (questionnaire?.Status is EntityStatus.Draft or EntityStatus.Private)
+      {
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            @if (questionnaire?.Status is EntityStatus.Draft or EntityStatus.Private)
-            {
-              <a class="govuk-link" data-module="govuk-link" data-govuk-button-init=""
-                 href="/admin/questionnaires/@questionnaire?.Id/publish-confirmation">
-                Publish questionnaire
-              </a>
-            }
+            <a class="govuk-link" data-module="govuk-link" data-govuk-button-init=""
+               href="/admin/questionnaires/@questionnaire?.Id/publish-confirmation">
+              Publish questionnaire
+            </a>
           </div>
         </li>
+      }
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
             <a class="govuk-link" href="/admin/questionnaires/@questionnaire?.Id/integration-guide" target="_blank">

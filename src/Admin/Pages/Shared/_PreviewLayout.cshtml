@@ -19,6 +19,8 @@
     ViewBag.FullName = User.FindFirst(ClaimTypes.Name)?.Value;
 
     var configViewModel = new ConfigViewModel();
+    
+    ViewBag.IsPreview = true;
 }
 
 <!DOCTYPE html>

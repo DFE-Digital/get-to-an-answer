@@ -5,7 +5,7 @@
 
 @{
   Layout = "_Layout";
-  ViewData["Title"] = "Add and edit contributors to your questionnaire";
+  ViewData["Title"] = "Manage access";
 }
 
 @section BeforeContent
@@ -30,7 +30,7 @@
       </div>
       <div class="govuk-notification-banner__content">
         <h3 class="govuk-notification-banner__heading">
-          Your changes have been saved.
+          Your changes to access has been saved
         </h3>
       </div>
     </div>
@@ -42,16 +42,12 @@
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
       <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-      View and change who has access
+      Manage access
     </h1>
-    <dl class="govuk-!-margin-bottom-7">
-      <dt class="govuk-visually-hidden">Status</dt>
-      <dd class="govuk-!-margin-0">
-        <strong class="govuk-tag" data-status="@Model.QuestionnaireStatus">@Model.QuestionnaireStatus</strong>
-      </dd>
-    </dl>
-    <div class="govuk-hint">
-      These people have permission to edit this questionnaire. 
+    <div class="govuk-hint govuk-!-margin-bottom-8">
+      <p>It's recommended that at least 2 people have access to a questionnaire to make sure it can be maintained.</p>
+
+      <p>The following people have access to view or edit this questionnaire. </p>
     </div>
     
     <div class="app-page-list">

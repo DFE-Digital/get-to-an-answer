@@ -887,3 +887,9 @@ $toc-width-tablet: 210px;
 .govuk-hint > .govuk-body:only-child {
   margin-bottom: 0;
 }
+
+.gtaa-preview-image {
+  max-height: 240px;
+  width: 100%;
+  object-fit: cover;
+}

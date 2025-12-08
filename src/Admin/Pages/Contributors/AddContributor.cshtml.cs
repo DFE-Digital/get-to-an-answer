@@ -17,7 +17,7 @@ public class AddContributor(ILogger<AddContributor> logger,
 {
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
     [BindProperty] 
-    [Required(ErrorMessage = "Enter a contributor email")]
+    [Required(ErrorMessage = "Enter a person's email")]
     public string ContributorEmail { get; set; } = "";
 
     public IActionResult OnGet()
