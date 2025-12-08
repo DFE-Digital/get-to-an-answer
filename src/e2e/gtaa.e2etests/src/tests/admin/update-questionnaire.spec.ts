@@ -75,15 +75,14 @@ test.describe('Get to an answer update questionnaire', () => {
         await addQuestionnairePage.validateTitleFormGroup();
     });
 
-    // TBC, aria-described by id's need correction (CARE-1546), to be fixed later with accessibility testing
-    // test('Accessible aria-describedby includes hint id and error message id', async ({page}) => {
-    //     viewQuestionnairePage = await signIn(page, token);
-    //     addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
-    //    
-    //     await addQuestionnairePage.enterTitle('');
-    //     await addQuestionnairePage.clickSaveAndContinue();
-    //     await addQuestionnairePage.validateTitleFieldAriaDescribedBy();
-    // });
+    test('Accessible aria-describedby includes hint id and error message id', async ({page}) => {
+        viewQuestionnairePage = await signIn(page, token);
+        addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
+
+        await addQuestionnairePage.enterTitle('');
+        await addQuestionnairePage.clickSaveAndContinue();
+        await addQuestionnairePage.validateTitleFieldAriaDescribedBy();
+    });
     
     test('Successful submit updates title and validation', async ({request, page}) => {
         viewQuestionnairePage = await signIn(page, token);

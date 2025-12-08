@@ -36,16 +36,16 @@ export class AddQuestionnairePage extends BasePage {
             '#main-content-container a.govuk-back-link'
         );
         this.titleInput = this.page.locator(
-            'input#questionnaire-title'
+            'input#title'
         );
         this.saveAndContinueButton = this.page.getByRole(
             'button', {name: 'Save and continue'}
         );
         this.titleLabel = this.page.locator(
-            'label[for="questionnaire-title"]'
+            'label[for="title"]'
         );
         this.supportiveHint = this.page.locator(
-            '#questionnaire-title-hint'
+            '#title-hint'
         );
         this.errorSummary = this.page.locator(
             '.govuk-error-summary[role="alert"][tabindex="-1"]'
@@ -57,14 +57,14 @@ export class AddQuestionnairePage extends BasePage {
             'a[href="#Title"]'
         );
         this.titleFormGroup = page.locator(
-            '.govuk-form-group:has(#questionnaire-title)'
+            '.govuk-form-group:has(#title)'
         );
 
         this.inlineUpdateTitleError = this.titleFormGroup.locator(
-            '#questionnaire-title-field-error'
+            '#title-field-error'
         );
         this.inlineTitleError = this.titleFormGroup.locator(
-            '#questionnaire-title-error'
+            '#title-error'
         );
         this.error = this.page.locator(
             '#Title-error'
@@ -123,12 +123,12 @@ export class AddQuestionnairePage extends BasePage {
 
         if (this.mode === 'update') {
             expect(ariaValue, '❌ aria-describedby missing hint id')
-                .toContain('forms-name-input-name-hint');
+                .toContain('title-hint');
             expect(ariaValue, '❌ aria-describedby missing error message id')
                 .toContain('title-field-error');
         } else {
             expect(ariaValue, '❌ aria-describedby missing hint id')
-                .toContain('questionnaire-title-hint');
+                .toContain('title-hint');
             expect(ariaValue, '❌ aria-describedby missing error message id')
                 .toContain('title-field-error');
         }
