@@ -37,12 +37,11 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.asserPageElementsUponLanding(1, 2);
     });
 
-    test("Header section - H1 and questionnaire status", async ({page}) => {
+    test("Header section - H1 heading", async ({page}) => {
         await signIn(page, token);
+        
         addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
-
         await addAnswerPage.expectAnswerHeadingOnPage();
-        await addAnswerPage.expectQuestionnaireStatusOnPage('Draft');
     });
 
     test('Clicking the back link takes to list questions page', async ({page}) => {

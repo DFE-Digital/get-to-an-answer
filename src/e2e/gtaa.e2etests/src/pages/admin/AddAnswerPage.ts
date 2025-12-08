@@ -11,10 +11,10 @@ export class AddAnswerPage extends BasePage {
     private readonly mode: string;
     private readonly backLink: Locator;
     private readonly addAnswersHeading: Locator;
-    private readonly statusTag: Locator;
     private readonly answerOptionsHeader: Locator;
     private readonly addAnotherOptionButton: Locator;
     private readonly saveAndContinueButton: Locator;
+    private readonly saveAnswersButton: Locator;
     private readonly removeButton: Locator;
     private readonly enterAllOptionsButton: Locator;
     private readonly errorSummary: Locator;
@@ -26,7 +26,7 @@ export class AddAnswerPage extends BasePage {
 
     private optionContent: (i: number) => Locator;
     private optionHint: (i: number) => Locator;
-    private optionScore: (i: number) => Locator;
+    private answerRank: (i: number) => Locator;
     private destinationRadio: (i: number, value: Destination) => Locator;
     private selectSpecificQuestion: (i: number) => Locator;
     private selectInternalResultsPage: (i: number) => Locator;
@@ -42,10 +42,10 @@ export class AddAnswerPage extends BasePage {
             name: /Add or edit answers/i
         });
         this.backLink = page.locator('a.govuk-back-link');
-        this.statusTag = page.locator('strong.govuk-tag[data-status="Draft"]');
         this.answerOptionsHeader = page.getByRole('heading', {name: 'Answer options'});
         this.removeButton = page.getByRole('button', {name: 'Remove'});
         this.saveAndContinueButton = page.getByRole('button', {name: /Save and continue/i});
+        this.saveAnswersButton = page.getByRole('button', {name: /Save answers/i});
         this.enterAllOptionsButton = page.locator(
             'button[formaction*="RedirectToBulkEntry"]'
         ).first();
@@ -59,8 +59,8 @@ export class AddAnswerPage extends BasePage {
         this.optionHint = (i: number) =>
             page.locator(`textarea[name="Options[${i}].OptionHint"]`);
 
-        this.optionScore = (i: number) =>
-            page.locator(`input[name="Answers[${i}].Priority"]`);
+        this.answerRank = (i: number) =>
+            page.locator(`input[id=Options-${i}-RankPriority]`);
 
         this.destinationRadio = (
             i: number,
@@ -101,15 +101,7 @@ export class AddAnswerPage extends BasePage {
             ).toContainText(expectedText);
         }
     }
-
-    async expectQuestionnaireStatusOnPage(expectedText?: string): Promise<void> {
-        await expect(this.statusTag, '❌ Questionnaire status not visible').toBeVisible();
-
-        if (expectedText) {
-            await expect(this.statusTag, `❌ Questionnaire status text does not match: expected "${expectedText}"`).toHaveText(expectedText);
-        }
-    }
-
+    
     async asserPageElementsUponLanding(i: number, removeButtonCount: number) {
         await this.verifyHeaderLinks();
         await this.verifyFooterLinks();
@@ -260,8 +252,8 @@ export class AddAnswerPage extends BasePage {
         await this.optionHint(i).fill(text);
     }
 
-    async setOptionScore(i: number, priority: number) {
-        await this.optionScore(i).fill(String(priority));
+    async setAnswerRank(i: number, priority: number) {
+        await this.answerRank(i).fill(String(priority));
     }
 
     /** Next Question - nothing is set (set to null in backend)
@@ -302,7 +294,10 @@ export class AddAnswerPage extends BasePage {
     async clickSaveAndContinueButton() {
         await this.saveAndContinueButton.click();
     }
-
+    
+    async clickSaveAnswersButton() {
+        await this.saveAnswersButton.click();
+    }
     async openBulkOptions() {
         await this.enterAllOptionsButton.click();
     }
