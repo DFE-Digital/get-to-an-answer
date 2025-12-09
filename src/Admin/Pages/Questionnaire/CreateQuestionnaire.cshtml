@@ -6,7 +6,7 @@
   Layout = "Shared/_Layout";
   ViewData["Title"] = "Create new questionnaire";
 
-  const string inputId = "questionnaire-title";
+  const string inputId = "Title";
 }
 
 @section BeforeContent
@@ -42,6 +42,7 @@
                type="text"
                asp-for="@Model.Title"
                value="@(Model?.Title ?? "")"
+               name="@nameof(Model.Title)"
                govuk-error-for="@Model?.Title"/>
       </govuk-form-group>
 

@@ -4,6 +4,7 @@ import {goToAddQuestionnairePage, signIn} from '../../helpers/admin-test-helper'
 import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {JwtHelper} from "../../helpers/JwtHelper";
+import {ErrorMessages} from "../../constants/test-data-constants";
 
 test.describe('Get to an answer create a new questionnaire', () => {
     let token: string;
@@ -50,6 +51,12 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await addQuestionnairePage.clickSaveAndContinue();
 
         await addQuestionnairePage.validateMissingTitleMessageSummary(browserName);
+        await addQuestionnairePage.validateErrorLinkBehaviour(
+            addQuestionnairePage.errorSummaryLink('#Title'),
+            ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE,
+            browserName
+        );
+        
         await addQuestionnairePage.validateInlineTitleError();
         await addQuestionnairePage.validateTitleFormGroup();
     });

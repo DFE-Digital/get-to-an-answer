@@ -172,158 +172,158 @@ resource "azurerm_cdn_frontdoor_route" "frontdoor-frontend-route" {
 }
 
 // WAF attach to all three endpoints and optional custom domains
-# resource "azurerm_cdn_frontdoor_security_policy" "frontdoor-web-security-policy" {
-#   name                     = "${var.prefix}fds-uks-security-policy"
-#   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
-# 
-#   security_policies {
-#     firewall {
-#       cdn_frontdoor_firewall_policy_id = azurerm_cdn_frontdoor_firewall_policy.web_firewall_policy.id
-# 
-#       association {
-#         domain {
-#           cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_endpoint.frontdoor-api-endpoint.id
-#         }
-#         domain {
-#           cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_endpoint.frontdoor-admin-endpoint.id
-#         }
-#         domain {
-#           cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_endpoint.frontdoor-frontend-endpoint.id
-#         }
-# 
-#         dynamic "domain" {
-#           for_each = var.api_custom_domain != "" ? ["apply"] : []
-#           content {
-#             cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_custom_domain.fd-api-custom-domain[0].id
-#           }
-#         }
-# 
-#         dynamic "domain" {
-#           for_each = var.admin_custom_domain != "" ? ["apply"] : []
-#           content {
-#             cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_custom_domain.fd-admin-custom-domain[0].id
-#           }
-#         }
-# 
-#         dynamic "domain" {
-#           for_each = var.frontend_custom_domain != "" ? ["apply"] : []
-#           content {
-#             cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_custom_domain.fd-frontend-custom-domain[0].id
-#           }
-#         }
-# 
-#         patterns_to_match = ["/*"]
-#       }
-#     }
-#   }
-# }
+resource "azurerm_cdn_frontdoor_security_policy" "frontdoor-web-security-policy" {
+  name                     = "${var.prefix}fds-uks-security-policy"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
+
+  security_policies {
+    firewall {
+      cdn_frontdoor_firewall_policy_id = azurerm_cdn_frontdoor_firewall_policy.web_firewall_policy.id
+
+      association {
+        domain {
+          cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_endpoint.frontdoor-api-endpoint.id
+        }
+        domain {
+          cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_endpoint.frontdoor-admin-endpoint.id
+        }
+        domain {
+          cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_endpoint.frontdoor-frontend-endpoint.id
+        }
+
+        dynamic "domain" {
+          for_each = var.api_custom_domain != "" ? ["apply"] : []
+          content {
+            cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_custom_domain.fd-api-custom-domain[0].id
+          }
+        }
+
+        dynamic "domain" {
+          for_each = var.admin_custom_domain != "" ? ["apply"] : []
+          content {
+            cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_custom_domain.fd-admin-custom-domain[0].id
+          }
+        }
+
+        dynamic "domain" {
+          for_each = var.frontend_custom_domain != "" ? ["apply"] : []
+          content {
+            cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_custom_domain.fd-frontend-custom-domain[0].id
+          }
+        }
+
+        patterns_to_match = ["/*"]
+      }
+    }
+  }
+}
 
 // Rule sets
-# resource "azurerm_cdn_frontdoor_rule_set" "security_headers" {
-#   name                     = "${var.prefix}SecurityHeaders"
-#   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
-# }
-# 
-# resource "azurerm_cdn_frontdoor_rule" "security_headers_rule" {
-#   depends_on = [
-#     azurerm_cdn_frontdoor_origin_group.fd-api-origin-group,
-#     azurerm_cdn_frontdoor_origin_group.fd-admin-origin-group,
-#     azurerm_cdn_frontdoor_origin_group.fd-frontend-origin-group,
-#     azurerm_cdn_frontdoor_origin.frontdoor-api-origin,
-#     azurerm_cdn_frontdoor_origin.frontdoor-admin-origin,
-#     azurerm_cdn_frontdoor_origin.frontdoor-frontend-origin
-#   ]
-# 
-#   name                      = "securityHeaders"
-#   cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.security_headers.id
-#   order                     = 0
-#   behavior_on_match         = "Continue"
-# 
-#   actions {
-#     response_header_action {
-#       header_action = "Overwrite"
-#       header_name   = "Strict-Transport-Security"
-#       value         = "max-age=31536000; includeSubDomains; preload"
-#     }
-#     response_header_action {
-#       header_action = "Overwrite"
-#       header_name   = "X-Content-Type-Options"
-#       value         = "nosniff"
-#     }
-#   }
-# }
-# 
-# 
-# resource "azurerm_cdn_frontdoor_rule_set" "security_redirects" {
-#   name                     = "${var.prefix}SecurityRedirects"
-#   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
-# }
-# 
-# resource "azurerm_cdn_frontdoor_rule" "security_txt_rule" {
-#   depends_on = [
-#     azurerm_cdn_frontdoor_origin_group.fd-api-origin-group,
-#     azurerm_cdn_frontdoor_origin_group.fd-admin-origin-group,
-#     azurerm_cdn_frontdoor_origin_group.fd-frontend-origin-group,
-#     azurerm_cdn_frontdoor_origin.frontdoor-api-origin,
-#     azurerm_cdn_frontdoor_origin.frontdoor-admin-origin,
-#     azurerm_cdn_frontdoor_origin.frontdoor-frontend-origin
-#   ]
-# 
-#   name                      = "securityTxtRedirect"
-#   cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.security_redirects.id
-#   order                     = 0
-#   behavior_on_match         = "Continue"
-# 
-#   conditions {
-#     url_path_condition {
-#       operator     = "BeginsWith"
-#       match_values = [".well-known/security.txt", "security.txt"]
-#       transforms   = ["Lowercase"]
-#     }
-#   }
-# 
-#   actions {
-#     url_redirect_action {
-#       redirect_type        = "PermanentRedirect"
-#       redirect_protocol    = "Https"
-#       destination_hostname = "vdp.security.education.gov.uk"
-#       destination_path     = "/security.txt"
-#     }
-#   }
-# }
-# 
-# resource "azurerm_cdn_frontdoor_rule" "thanks_txt_rule" {
-#   depends_on = [
-#     azurerm_cdn_frontdoor_origin_group.fd-api-origin-group,
-#     azurerm_cdn_frontdoor_origin_group.fd-admin-origin-group,
-#     azurerm_cdn_frontdoor_origin_group.fd-frontend-origin-group,
-#     azurerm_cdn_frontdoor_origin.frontdoor-api-origin,
-#     azurerm_cdn_frontdoor_origin.frontdoor-admin-origin,
-#     azurerm_cdn_frontdoor_origin.frontdoor-frontend-origin
-#   ]
-# 
-#   name                      = "thanksTxtRedirect"
-#   cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.security_redirects.id
-#   order                     = 1
-#   behavior_on_match         = "Continue"
-# 
-#   conditions {
-#     url_path_condition {
-#       operator     = "BeginsWith"
-#       match_values = [".well-known/thanks.txt", "thanks.txt"]
-#       transforms   = ["Lowercase"]
-#     }
-#   }
-# 
-#   actions {
-#     url_redirect_action {
-#       redirect_type        = "PermanentRedirect"
-#       redirect_protocol    = "Https"
-#       destination_hostname = "vdp.security.education.gov.uk"
-#       destination_path     = "/thanks.txt"
-#     }
-#   }
-# }
+resource "azurerm_cdn_frontdoor_rule_set" "security_headers" {
+  name                     = "${var.prefix}SecurityHeaders"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
+}
+
+resource "azurerm_cdn_frontdoor_rule" "security_headers_rule" {
+  depends_on = [
+    azurerm_cdn_frontdoor_origin_group.fd-api-origin-group,
+    azurerm_cdn_frontdoor_origin_group.fd-admin-origin-group,
+    azurerm_cdn_frontdoor_origin_group.fd-frontend-origin-group,
+    azurerm_cdn_frontdoor_origin.frontdoor-api-origin,
+    azurerm_cdn_frontdoor_origin.frontdoor-admin-origin,
+    azurerm_cdn_frontdoor_origin.frontdoor-frontend-origin
+  ]
+
+  name                      = "securityHeaders"
+  cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.security_headers.id
+  order                     = 0
+  behavior_on_match         = "Continue"
+
+  actions {
+    response_header_action {
+      header_action = "Overwrite"
+      header_name   = "Strict-Transport-Security"
+      value         = "max-age=31536000; includeSubDomains; preload"
+    }
+    response_header_action {
+      header_action = "Overwrite"
+      header_name   = "X-Content-Type-Options"
+      value         = "nosniff"
+    }
+  }
+}
+
+
+resource "azurerm_cdn_frontdoor_rule_set" "security_redirects" {
+  name                     = "${var.prefix}SecurityRedirects"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
+}
+
+resource "azurerm_cdn_frontdoor_rule" "security_txt_rule" {
+  depends_on = [
+    azurerm_cdn_frontdoor_origin_group.fd-api-origin-group,
+    azurerm_cdn_frontdoor_origin_group.fd-admin-origin-group,
+    azurerm_cdn_frontdoor_origin_group.fd-frontend-origin-group,
+    azurerm_cdn_frontdoor_origin.frontdoor-api-origin,
+    azurerm_cdn_frontdoor_origin.frontdoor-admin-origin,
+    azurerm_cdn_frontdoor_origin.frontdoor-frontend-origin
+  ]
+
+  name                      = "securityTxtRedirect"
+  cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.security_redirects.id
+  order                     = 0
+  behavior_on_match         = "Continue"
+
+  conditions {
+    url_path_condition {
+      operator     = "BeginsWith"
+      match_values = [".well-known/security.txt", "security.txt"]
+      transforms   = ["Lowercase"]
+    }
+  }
+
+  actions {
+    url_redirect_action {
+      redirect_type        = "PermanentRedirect"
+      redirect_protocol    = "Https"
+      destination_hostname = "vdp.security.education.gov.uk"
+      destination_path     = "/security.txt"
+    }
+  }
+}
+
+resource "azurerm_cdn_frontdoor_rule" "thanks_txt_rule" {
+  depends_on = [
+    azurerm_cdn_frontdoor_origin_group.fd-api-origin-group,
+    azurerm_cdn_frontdoor_origin_group.fd-admin-origin-group,
+    azurerm_cdn_frontdoor_origin_group.fd-frontend-origin-group,
+    azurerm_cdn_frontdoor_origin.frontdoor-api-origin,
+    azurerm_cdn_frontdoor_origin.frontdoor-admin-origin,
+    azurerm_cdn_frontdoor_origin.frontdoor-frontend-origin
+  ]
+
+  name                      = "thanksTxtRedirect"
+  cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.security_redirects.id
+  order                     = 1
+  behavior_on_match         = "Continue"
+
+  conditions {
+    url_path_condition {
+      operator     = "BeginsWith"
+      match_values = [".well-known/thanks.txt", "thanks.txt"]
+      transforms   = ["Lowercase"]
+    }
+  }
+
+  actions {
+    url_redirect_action {
+      redirect_type        = "PermanentRedirect"
+      redirect_protocol    = "Https"
+      destination_hostname = "vdp.security.education.gov.uk"
+      destination_path     = "/thanks.txt"
+    }
+  }
+}
 
 // Custom domains (optional per variable)
 resource "azurerm_cdn_frontdoor_custom_domain" "fd-api-custom-domain" {
