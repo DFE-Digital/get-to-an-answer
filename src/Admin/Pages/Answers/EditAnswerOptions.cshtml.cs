@@ -65,9 +65,10 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
             if (DeletedAnswerIds.Count > 0)
             {
-                foreach (var answerId in DeletedAnswerIds.Where(x => x != Guid.Empty).Distinct())
+                foreach (var answerId in DeletedAnswerIds.Where(x => x != Guid.Empty).Distinct().ToList())
                 {
                     await _apiClient.DeleteAnswerAsync(answerId);
+                    DeletedAnswerIds.Remove(answerId);
                 }
             }
         }
