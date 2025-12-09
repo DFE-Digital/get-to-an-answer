@@ -14,10 +14,12 @@ using Newtonsoft.Json;
 namespace Admin.Pages.Answers;
 
 [Authorize]
-public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IApiClient apiClient) : 
+public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IApiClient apiClient) :
     AnswerOptionsPageModel(apiClient)
 {
     private readonly IApiClient _apiClient = apiClient;
+
+    [BindProperty] public List<Guid> DeletedAnswerIds { get; set; } = [];
 
     public async Task<IActionResult> OnGet()
     {
@@ -60,6 +62,15 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
                     await CreateAnswer(option);
                 }
             }
+
+            if (DeletedAnswerIds.Count > 0)
+            {
+                foreach (var answerId in DeletedAnswerIds.Where(x => x != Guid.Empty).Distinct().ToList())
+                {
+                    await _apiClient.DeleteAnswerAsync(answerId);
+                    DeletedAnswerIds.Remove(answerId);
+                }
+            }
         }
         catch (Exception e)
         {
@@ -67,13 +78,18 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             return RedirectToErrorPage();
         }
 
-        TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
-            
+        TempData[nameof(QuestionnaireState)] =
+            JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+
         return Redirect(string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId));
     }
-    
+
     public async Task<IActionResult> OnPostRemoveOption(int index)
     {
+        var removedOption = Options[index];
+        if (removedOption.AnswerId != Guid.Empty)
+            DeletedAnswerIds.Add(removedOption.AnswerId);
+
         Options.RemoveAt(index);
         RemoveModelStateEntriesForOption(index);
 
@@ -81,7 +97,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
         ReassignOptionNumbers();
         return Page();
     }
-    
+
     private void RemoveModelStateEntriesForOption(int index)
     {
         var prefixBracket = $"Options[{index}]";
@@ -100,17 +116,15 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
     private async Task PopulateFieldWithExistingValues()
     {
-        Options?.Clear();
-
         var existingAnswers = await _apiClient.GetAnswersAsync(QuestionId);
-        
+
         var (
             questionForSelection,
             _,
             questionSelectionList,
             resultsPagesForSelection
-        ) = await GetPopulatePrerequisites();
-        
+            ) = await GetPopulatePrerequisites();
+
         var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
 
         foreach (var existingAnswer in existingAnswers)
@@ -133,7 +147,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             });
         }
     }
-    
+
     private static AnswerDestination MapAnswerDestination(DestinationType? destinationType) =>
         destinationType switch
         {
@@ -143,6 +157,4 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             null => AnswerDestination.NextQuestion,
             _ => throw new ArgumentOutOfRangeException(nameof(destinationType), destinationType, null)
         };
-    
-    
 }
