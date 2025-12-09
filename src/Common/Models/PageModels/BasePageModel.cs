@@ -10,7 +10,9 @@ public class BasePageModel : PageModel
     public bool AcceptCookies { get; set; }
     
     public bool ShowSuccessBanner { get; set; }
-    [BindProperty(SupportsGet = true)] public string? BackLinkSlug { get; set; }
+    
+    [BindProperty(SupportsGet = true)] 
+    public string? BackLinkSlug { get; set; }
     
     private const string BackLinkTempDataKey = "BackLinkSlugTempData";
 

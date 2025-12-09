@@ -18,9 +18,6 @@ public partial class BulkAnswerOptions(IApiClient apiClient, ILogger<BulkAnswerO
 
     [BindProperty] public string? BulkAnswerOptionsRawText { get; set; }
     
-    [BindProperty]
-    public string? ReturnUrl { get; set; }
-
     public async Task<IActionResult> OnGet(string? returnUrl)
     {
         BackLinkSlug = returnUrl ?? Routes.QuestionnairesManage;
