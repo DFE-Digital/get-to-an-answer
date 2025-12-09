@@ -71,13 +71,13 @@ export class AddAnswerPage extends BasePage {
         this.selectSpecificQuestion = (i: number) =>
             page.locator(
                 `select#Options-${i}-destination-specific-select`
-            );
-
-        this.selectInternalResultsPage = (i: number) =>
+            ); this.selectInternalResultsPage = (i: number) =>
             page.locator(
                 `select#Options-${i}-destination-internal-select`
             );
 
+
+       
         this.externalLinkInput = (i: number) =>
             page.locator(`input[id="Options-${i}-destination-external-link"]`);
 
@@ -155,6 +155,13 @@ export class AddAnswerPage extends BasePage {
             await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT);
         }
     }
+    
+    async validateInlineErrorNotVisible(i: number): Promise<void> {
+        const errorElement = this.inlineError(i);
+        const isVisible = await errorElement.isVisible().catch(() => false);
+        expect(isVisible, `❌ Inline error should not be visible for option ${i}`).toBe(false);
+    }
+
 
     // Accessibility
     async validateUniqueIdsForMultipleOptions(optionCount: number): Promise<void> {

@@ -5,7 +5,7 @@ import {createQuestion} from "../../test-data-seeder/question-data";
 import {AnswerDestinationType, QuestionType} from "../../constants/test-data-constants";
 import {
     goToAddAnswerPageByUrl,
-    goToEditAnswerPageByUrl, goToUpdateQuestionPageByUrl,
+    goToUpdateAnswerPageByUrl, goToUpdateQuestionPageByUrl,
     goToViewQuestionsPageByUrl,
     signIn
 } from "../../helpers/admin-test-helper";
@@ -59,7 +59,7 @@ test.describe('Get to an answer update questionnaire', () => {
         rowData = await addQuestionPage.table.getAnswerRowData(answer1.content);
         expect(rowData).toBeDefined();
 
-        addAnswerPage = await goToEditAnswerPageByUrl(page, questionnaireId, question1Id);
+        addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
         await addAnswerPage.expectAnswerHeadingOnPage();
         //delete answer and validate it's deleted in the table
 
@@ -77,7 +77,7 @@ test.describe('Get to an answer update questionnaire', () => {
         rowData = await addQuestionPage.table.getAnswerRowData(answer.content);
         expect(rowData).toBeDefined();
 
-        addAnswerPage = await goToEditAnswerPageByUrl(page, questionnaireId, question1Id);
+        addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
         await addAnswerPage.expectAnswerHeadingOnPage();
 
         //delete answer and validate it's deleted in the table
