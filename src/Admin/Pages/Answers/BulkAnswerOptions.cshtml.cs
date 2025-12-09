@@ -17,10 +17,13 @@ public partial class BulkAnswerOptions(IApiClient apiClient, ILogger<BulkAnswerO
     [BindProperty] public string? QuestionNumber { get; set; } = "1";
 
     [BindProperty] public string? BulkAnswerOptionsRawText { get; set; }
+    
+    [BindProperty]
+    public string? ReturnUrl { get; set; }
 
-    public async Task<IActionResult> OnGet()
+    public async Task<IActionResult> OnGet(string? returnUrl)
     {
-        // BackLinkSlug = string.Format()
+        BackLinkSlug = returnUrl ?? Routes.QuestionnairesManage;
 
         if (!ModelState.IsValid)
             return Page();
