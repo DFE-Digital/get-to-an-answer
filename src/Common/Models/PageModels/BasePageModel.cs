@@ -10,7 +10,7 @@ public class BasePageModel : PageModel
     public bool AcceptCookies { get; set; }
     
     public bool ShowSuccessBanner { get; set; }
-    [BindProperty(SupportsGet = true)] public string? BackLinkSlug { get; protected set; }
+    [BindProperty(SupportsGet = true)] public string? BackLinkSlug { get; set; }
     
     private const string BackLinkTempDataKey = "BackLinkSlugTempData";
 
@@ -52,15 +52,15 @@ public class BasePageModel : PageModel
         } 
     }
     
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context,
-        PageHandlerExecutionDelegate next)
-    {
-        TryRestoreBackLinkFromTempData();
-
-        await next();
-
-        SaveBackLinkToTempDataIfPresent();
-    }
+    // public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context,
+    //     PageHandlerExecutionDelegate next)
+    // {
+    //     TryRestoreBackLinkFromTempData();
+    //
+    //     await next();
+    //
+    //     SaveBackLinkToTempDataIfPresent();
+    // }
 
     private void TryRestoreBackLinkFromTempData()
     {

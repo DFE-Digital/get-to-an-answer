@@ -18,9 +18,7 @@
 }
 
 
-<input type="hidden" asp-for="QuestionNumber"/>
 
-<input type="hidden" name="returnUrl" value="@($"{Request.Path}{Request.QueryString}")" />
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -38,11 +36,15 @@
         </p>
 
         <form method="post" accept-charset="UTF-8">
+            <input type="hidden" name="returnUrl" value="@($"{Request.Path}{Request.QueryString}")" />
+            <input type="hidden" asp-for="QuestionNumber"/>
+            <input type="hidden" asp-for="@Model.BackLinkSlug"/>
+
             <govuk-form-group asp-for="@Model.BulkAnswerOptionsRawText">
-                
+
                 <govuk-field-error asp-for="@Model.BulkAnswerOptionsRawText" error-id="bulk-options-error">
                 </govuk-field-error>
-                
+
                 <textarea class="govuk-textarea"
                           id="BulkAnswerOptions"
                           rows="8"

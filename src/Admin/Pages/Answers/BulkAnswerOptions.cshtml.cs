@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Common.Client;
 using Common.Domain.Request.Create;
 using Common.Enum;
+using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,13 +20,18 @@ public partial class BulkAnswerOptions(IApiClient apiClient, ILogger<BulkAnswerO
 
     public async Task<IActionResult> OnGet()
     {
-        if (!ModelState.IsValid) 
+        // BackLinkSlug = string.Format()
+
+        if (!ModelState.IsValid)
             return Page();
-        
+
         var answers = await apiClient.GetAnswersAsync(QuestionId);
 
-        BulkAnswerOptionsRawText = answers.Select(a => a.Content)
-            .Aggregate((a, b) => a + "\n" + b).Trim();
+        if (answers.Count > 0)
+        {
+            BulkAnswerOptionsRawText = answers.Select(a => a.Content)
+                .Aggregate((a, b) => a + "\n" + b).Trim();
+        }
         
         return Page();
     }
@@ -40,7 +46,7 @@ public partial class BulkAnswerOptions(IApiClient apiClient, ILogger<BulkAnswerO
                 .Where(line => !string.IsNullOrWhiteSpace(line))
                 .Select(line => line.TrimEnd())
                 .ToList();
-            
+
             // entries should be unique, if not, throw an error
             if (bulkOptions.Count != bulkOptions.Distinct().Count())
             {
@@ -50,7 +56,7 @@ public partial class BulkAnswerOptions(IApiClient apiClient, ILogger<BulkAnswerO
 
             var answers = await apiClient.GetAnswersAsync(QuestionId);
             var answerMap = answers.ToDictionary(a => a.Content, a => a);
-            
+
             var bulkUpserts = new BulkUpsertAnswersRequestDto
             {
                 QuestionnaireId = QuestionnaireId,
@@ -83,7 +89,7 @@ public partial class BulkAnswerOptions(IApiClient apiClient, ILogger<BulkAnswerO
                     });
                 }
             }
-            
+
             await apiClient.BulkUpsertAnswersAsync(bulkUpserts);
 
             var answerContentList = answers.Select(a => a.Content).ToList();
