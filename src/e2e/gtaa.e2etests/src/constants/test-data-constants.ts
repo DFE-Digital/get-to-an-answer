@@ -53,6 +53,9 @@ export const ErrorMessages = {
     ERROR_MESSAGE_DISPLAY_TITLE_REQUIRED: 'Display title is required when you save',
     ERROR_MESSAGE_QUESTIONNAIRE_DESCRIPTION_REQUIRED: 'Description is required when you save',
 
+    ERROR_MESSAGE_MISSING_ANSWER_OPTION1_CONTENT: 'Option 1 content is required',
+    ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT: 'Option 2 content is required'
+
 }
 
 export const PageHeadings = {
@@ -60,6 +63,7 @@ export const PageHeadings = {
     EDIT_QUESTIONNAIRE_SLUG_PAGE_HEADING: 'Add or edit questionnaire ID',
     VIEW_QUESTION_PAGE_HEADING: 'Add and edit your questions',
     ADD_QUESTION_PAGE_HEADING: 'Add a question',
+    EDIT_QUESTION_PAGE_HEADING: 'Edit question',
     ADD_ANSWER_PAGE_HEADING: 'Create a list of answer options',
     
     VIEW_RESULTS_PAGES_PAGE_HEADING: 'Add or edit results pages',

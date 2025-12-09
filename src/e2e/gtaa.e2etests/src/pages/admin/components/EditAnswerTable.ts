@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from '@playwright/test';
+import {expect, Locator, Page} from '@playwright/test';
 
 export class EditAnswerTable {
     // ===== Locators =====
@@ -8,7 +8,7 @@ export class EditAnswerTable {
 
     // ===== Constructor =====
     constructor(private readonly page: Page) {
-        const title = page.getByRole('heading', { level: 2, name: 'Answers' });
+        const title = page.getByRole('heading', {level: 2, name: 'Answers'});
         this.card = title.locator('..').locator('..'); // wrapper div -> card container
         this.table = this.card.locator('table.govuk-table');
         this.rows = this.table.locator('tbody tr');
@@ -31,7 +31,7 @@ export class EditAnswerTable {
     // ===== Row helpers =====
     private rowByAnswer(answer: string): Locator {
         return this.rows.filter({
-            has: this.page.locator('td', { hasText: answer })
+            has: this.page.locator('td', {hasText: answer})
         }).first();
     }
 
@@ -45,16 +45,53 @@ export class EditAnswerTable {
 
     async getCellText(
         answer: string,
-        column: 'Answer' | 'Priority' | 'Target Type'
+        column: 'Answer' | 'Priority' | 'Destination'
     ): Promise<string> {
         const row = this.rowByAnswer(answer);
         const colIndex = column === 'Answer' ? 0 : column === 'Priority' ? 1 : 2;
         return (await row.locator('td').nth(colIndex).innerText()).trim();
     }
 
+    async getAnswerRowData(
+        answerContent: string,
+        includePriority: boolean = false
+    ): Promise<{
+        answer: string;
+        priority?: string;
+        destination: string;
+    }> {
+        const row = this.rowByAnswer(answerContent);
+
+        await expect(
+            row,
+            `❌ Row with answer content "${answerContent}" not found`
+        ).toBeVisible();
+
+        const answer = await row.locator('td').nth(0).innerText();
+        const destination = includePriority
+            ? await row.locator('td').nth(2).innerText()
+            : await row.locator('td').nth(1).innerText();
+
+        const result: {
+            answer: string;
+            priority?: string;
+            destination: string;
+        } = {
+            answer: answer.trim(),
+            destination: destination.trim()
+        };
+
+        if (includePriority) {
+            const priority = await row.locator('td').nth(1).innerText();
+            result.priority = priority.trim();
+        }
+
+        return result;
+    }
+
     // ===== Actions =====
     async openEdit(): Promise<void> {
-        const editButton = this.card.getByRole('button', { name: /edit/i });
+        const editButton = this.card.getByRole('button', {name: /edit/i});
         await expect(editButton).toBeVisible();
         await editButton.click();
     }

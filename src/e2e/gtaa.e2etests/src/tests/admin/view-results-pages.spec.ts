@@ -1,21 +1,12 @@
 import {expect, test} from "@playwright/test";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
-import {
-    goToEditQuestionnairePageByUrl,
-    goToUpdateQuestionnairePageByUrl,
-    goToViewResultsPagesPageByUrl,
-    signIn
-} from "../../helpers/admin-test-helper";
-import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
+import {goToViewResultsPagesPageByUrl, signIn} from "../../helpers/admin-test-helper";
 import {JwtHelper} from "../../helpers/JwtHelper";
-import {createQuestionnaire, publishQuestionnaire} from "../../test-data-seeder/questionnaire-data";
-import {createQuestion, deleteQuestion} from "../../test-data-seeder/question-data";
+import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {expect200HttpStatusCode} from "../../helpers/api-assertions-helper";
-import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {AddQuestionPage} from "../../pages/admin/AddQuestionPage";
-import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
-import {createSingleAnswer} from "../../test-data-seeder/answer-data";
-import {AnswerDestinationType, ErrorMessages, PageHeadings} from "../../constants/test-data-constants";
+import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
+import {PageHeadings} from "../../constants/test-data-constants";
 import {ViewResultsPagesPage} from "../../pages/admin/ViewResultsPagesPage";
 import {createContent} from "../../test-data-seeder/content-data";
 
@@ -25,7 +16,7 @@ test.describe('Get to an answer view questions', () => {
     let qResp3: any;
 
     let viewQuestionnairePage: ViewQuestionnairePage;
-    let editQuestionnairePage: EditQuestionnairePage;
+    let designQuestionnairePage: DesignQuestionnairePage;
     let viewResultsPagesPage: ViewResultsPagesPage;
     let addQuestionPage: AddQuestionPage;
 
@@ -91,8 +82,8 @@ test.describe('Get to an answer view questions', () => {
         viewResultsPagesPage = await goToViewResultsPagesPageByUrl(page, questionnaireId);
 
         await viewResultsPagesPage.ClickBackToEditQuestionnaireLink();
-        editQuestionnairePage = await EditQuestionnairePage.create(page);
-        expect(editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        expect(designQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
     });
 
     test('Save and continue with No I will come back later radio navigates to Edit questionnaire page', async ({page}) => {
@@ -104,8 +95,8 @@ test.describe('Get to an answer view questions', () => {
 
         await viewResultsPagesPage.saveAndContinue();
 
-        editQuestionnairePage = await EditQuestionnairePage.create(page);
-        await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        await designQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
     });
 
     test('Save and continue with Yes radio navigates to Edit questionnaire page', async ({page}) => {
@@ -117,8 +108,8 @@ test.describe('Get to an answer view questions', () => {
 
         await viewResultsPagesPage.saveAndContinue();
 
-        editQuestionnairePage = await EditQuestionnairePage.create(page);
-        await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        await designQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
     });
 
     test('List existing results pages', async ({page}) => {

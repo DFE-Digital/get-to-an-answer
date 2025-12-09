@@ -1,12 +1,10 @@
 import { test, expect } from '@playwright/test';
 import {
     createQuestionnaire,
-    getQuestionnaire,
-    publishQuestionnaire,
+    getQuestionnaire
 } from '../../test-data-seeder/questionnaire-data';
 
-import { signIn, goToEditQuestionnairePageByUrl } from '../../helpers/admin-test-helper';
-import { EditQuestionnairePage } from '../../pages/admin/EditQuestionnairePage';
+import { signIn, goToDesignQuestionnairePageByUrl } from '../../helpers/admin-test-helper';
 import { PublishQuestionnaireConfirmationPage } from '../../pages/admin/PublishQuestionnaireConfirmationPage';
 import { JwtHelper } from '../../helpers/JwtHelper';
 import {createQuestion} from "../../test-data-seeder/question-data";
@@ -34,8 +32,8 @@ test.describe('Get to an answer publish questionnaire', () => {
 
         const questionnaireId = questionnaire.id;
 
-        // Go to Edit Questionnaire page and trigger publish flow
-        const editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireId);
+        // Go to Edit a Questionnaire page and trigger publish flow
+        const editQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
 
         // This mirrors the existing pattern used for delete confirmation flows
         await editQuestionnairePage.publishQuestionnaire();
@@ -70,8 +68,8 @@ test.describe('Get to an answer publish questionnaire', () => {
 
         const questionnaireId = questionnaire.id;
 
-        // Go to Edit Questionnaire page and trigger publish flow
-        const editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireId);
+        // Go to Edit a Questionnaire page and trigger publish flow
+        const editQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
 
         // This mirrors the existing pattern used for delete confirmation flows
         await editQuestionnairePage.publishQuestionnaire();
@@ -99,7 +97,7 @@ test.describe('Get to an answer publish questionnaire', () => {
 
         const questionnaireId = questionnaire.id;
 
-        const editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireId);
+        const editQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
 
         await editQuestionnairePage.publishQuestionnaire();
 
@@ -134,7 +132,7 @@ test.describe('Get to an answer publish questionnaire', () => {
 
         const questionnaireId = questionnaire.id;
 
-        const editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireId);
+        const editQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
 
         await editQuestionnairePage.publishQuestionnaire();
 
@@ -181,7 +179,7 @@ test.describe('Get to an answer publish questionnaire', () => {
 
         const questionnaireId = questionnaire.id;
 
-        const editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireId);
+        const editQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
 
         await editQuestionnairePage.publishQuestionnaire();
 
@@ -230,7 +228,7 @@ test.describe('Get to an answer publish questionnaire', () => {
 
         const questionnaireId = questionnaire.id;
 
-        const editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireId);
+        const editQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
 
         await editQuestionnairePage.publishQuestionnaire();
 

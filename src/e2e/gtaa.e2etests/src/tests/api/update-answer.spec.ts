@@ -382,8 +382,7 @@ test.describe('PUT Update answer', () => {
         expect(updatedAnswerPostResponse.ok()).toBeFalsy();
         expect(updatedAnswerPostResponse.status()).toBe(404);
     });
-
-    //possibly a bug as api should return false and update should not happen
+    
     test('Validate update answer with soft deleted question id', async ({ request }) => {
         const token = JwtHelper.NoRecordsToken();
 

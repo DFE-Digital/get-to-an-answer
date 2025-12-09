@@ -5,7 +5,7 @@ import {ViewQuestionPage} from '../pages/admin/ViewQuestionPage';
 import {AddQuestionnairePage} from '../pages/admin/AddQuestionnairePage';
 import {AddQuestionPage} from '../pages/admin/AddQuestionPage';
 import {AddAnswerPage} from '../pages/admin/AddAnswerPage';
-import {EditQuestionnairePage} from "../pages/admin/EditQuestionnairePage";
+import {DesignQuestionnairePage} from "../pages/admin/DesignQuestionnairePage";
 import {TermsOfUsePage} from "../pages/admin/TermsOfUsePage";
 import {EnvConfig} from '../config/environment-config';
 import {AddQuestionnaireStartPage} from "../pages/admin/AddQuestionnaireStartPage";
@@ -49,7 +49,7 @@ export async function goToAddQuestionnairePage(page: Page): Promise<AddQuestionn
     return addQuestionnairePage;
 }
 
-export async function goToEditQuestionnairePage(page: Page): Promise<EditQuestionnairePage> {
+export async function goToEditQuestionnairePage(page: Page): Promise<DesignQuestionnairePage> {
     const viewQuestionnairePage = new ViewQuestionnairePage(page);
     await viewQuestionnairePage.waitForPageLoad();
     await viewQuestionnairePage.clickCreateNewQuestionnaire();
@@ -57,10 +57,10 @@ export async function goToEditQuestionnairePage(page: Page): Promise<EditQuestio
     const addQuestionnairePage = new AddQuestionnairePage(page);
     await addQuestionnairePage.waitForPageLoad();
 
-    const editQuestionnairePage = new EditQuestionnairePage(page);
-    await editQuestionnairePage.waitForPageLoad();
+    const designQuestionnairePage = new DesignQuestionnairePage(page);
+    await designQuestionnairePage.waitForPageLoad();
 
-    return editQuestionnairePage;
+    return designQuestionnairePage;
 }
 
 // =====  URL based page navigation =====
@@ -97,20 +97,20 @@ export async function goToUpdateQuestionPageByUrl(
     return addQuestionPage;
 }
 
-export async function goToEditQuestionnairePageByUrl(
+export async function goToDesignQuestionnairePageByUrl(
     page: Page,
     questionnaireId: string,
-    waitUntil: LoadState = 'networkidle'): Promise<EditQuestionnairePage> {
+    waitUntil: LoadState = 'networkidle'): Promise<DesignQuestionnairePage> {
 
     const adminUrl = EnvConfig.ADMIN_URL;
     const editUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/track`;
 
     await page.goto(editUrl, {waitUntil});
 
-    const editQuestionnairePage = new EditQuestionnairePage(page)
-    await editQuestionnairePage.waitForPageLoad();
+    const designQuestionnairePage = new DesignQuestionnairePage(page)
+    await designQuestionnairePage.waitForPageLoad();
 
-    return editQuestionnairePage;
+    return designQuestionnairePage;
 }
 
 export async function goToViewQuestionsPageByUrl(
@@ -189,6 +189,23 @@ export async function goToAddAnswerPageByUrl(
     await page.goto(addAnswerUrl, {waitUntil});
 
     const addAnswerPage = new AddAnswerPage(page)
+    await addAnswerPage.waitForPageLoad();
+
+    return addAnswerPage;
+}
+
+export async function goToUpdateAnswerPageByUrl(
+    page: Page,
+    questionnaireId: string,
+    questionId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<AddAnswerPage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const addAnswerUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/questions/${questionId}/answers/edit`;
+
+    await page.goto(addAnswerUrl, {waitUntil});
+
+    const addAnswerPage = new AddAnswerPage(page, 'update')
     await addAnswerPage.waitForPageLoad();
 
     return addAnswerPage;

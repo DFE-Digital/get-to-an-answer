@@ -1,21 +1,12 @@
 import {expect, test} from "@playwright/test";
-import {AddQuestionPage, QuestionRadioLabel} from "../../pages/admin/AddQuestionPage";
-import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
-import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
-import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {
-    signIn, goToEditQuestionnairePageByUrl, goToAddQuestionPageByUrl, goToAddQuestionnairePage,
-    goToEditResultPagePageByUrl
-} from '../../helpers/admin-test-helper';
+    signIn, goToEditResultPagePageByUrl} from '../../helpers/admin-test-helper';
 import {JwtHelper} from "../../helpers/JwtHelper";
-import {createQuestionnaire, getQuestionnaire, updateQuestionnaire} from "../../test-data-seeder/questionnaire-data";
-import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
+import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {PageHeadings} from "../../constants/test-data-constants";
-import {AddResultsPagePage} from "../../pages/admin/AddResultsPagePage";
 import {ViewResultsPagesPage} from "../../pages/admin/ViewResultsPagesPage";
 import {createContent} from "../../test-data-seeder/content-data";
 import {EditResultsPagePage} from "../../pages/admin/EditResultsPagePage";
-import {RemoveStartPageConfirmationPage} from "../../pages/admin/RemoveStartPageConfirmationPage";
 import {RemoveResultsPageConfirmationPage} from "../../pages/admin/RemoveResultsPageConfirmationPage";
 
 test.describe('Get to an answer edit results-page to questionnaire', () => {
