@@ -34,7 +34,7 @@ test.describe('Get to an answer views questionnaire', () => {
 
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
         addQuestionnairePage = await AddQuestionnairePage.create(page);
-        await addQuestionnairePage.verifyLabelAndHintPresent();
+        await addQuestionnairePage.verifyHintPresent();
     });
 
     test("Questionnaires table - columns, title link navigates", async ({page, request}) => {

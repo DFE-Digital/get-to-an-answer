@@ -53,6 +53,7 @@ test.describe('Get to an answer update questionnaire', () => {
         expect(designQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
     });
 
+    //TBC, CARE-1592 bug raised
     test('Error summary appears on submit with missing title', async ({page, browserName}) => {
         viewQuestionnairePage = await signIn(page, token);
         addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
@@ -80,6 +81,7 @@ test.describe('Get to an answer update questionnaire', () => {
         await addQuestionnairePage.validateTitleFormGroup();
     });
 
+    // TBC, CARE-1546 bug raised
     test('Accessible aria-describedby includes hint id and error message id', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
