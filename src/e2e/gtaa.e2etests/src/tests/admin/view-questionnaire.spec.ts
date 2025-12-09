@@ -1,8 +1,8 @@
 import {expect, test} from "@playwright/test";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
-import {signIn, goToAddQuestionnairePage} from "../../helpers/admin-test-helper";
+import {signIn} from "../../helpers/admin-test-helper";
 import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
-import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
+import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
 import {createQuestionnaire, getQuestionnaire, listQuestionnaires} from "../../test-data-seeder/questionnaire-data";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {EntityStatus} from "../../constants/test-data-constants";
@@ -12,7 +12,7 @@ test.describe('Get to an answer views questionnaire', () => {
 
     let viewQuestionnairePage: ViewQuestionnairePage;
     let addQuestionnairePage: AddQuestionnairePage;
-    let editQuestionnairePage: EditQuestionnairePage;
+    let designQuestionnairePage: DesignQuestionnairePage;
 
     test.beforeEach(async () => {
         token = JwtHelper.NoRecordsToken();
@@ -46,8 +46,8 @@ test.describe('Get to an answer views questionnaire', () => {
         await viewQuestionnairePage.table.verifyFirstTitleIsLink();
 
         await viewQuestionnairePage.table.clickFirstQuestionnaireTitle();
-        editQuestionnairePage = await EditQuestionnairePage.create(page);
-        await editQuestionnairePage.validateHeadingAndStatus();
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        await designQuestionnairePage.validateHeadingAndStatus();
     });
 
     test("Questionnaires table - validate data", async ({page, request}) => {

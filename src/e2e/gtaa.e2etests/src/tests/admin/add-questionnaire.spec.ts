@@ -1,7 +1,7 @@
 import {test, expect} from "@playwright/test";
 import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {goToAddQuestionnairePage, signIn} from '../../helpers/admin-test-helper';
-import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
+import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 
@@ -9,7 +9,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
     let token: string;
     let viewQuestionnairePage: ViewQuestionnairePage;
     let addQuestionnairePage: AddQuestionnairePage;
-    let editQuestionnairePage: EditQuestionnairePage;
+    let designQuestionnairePage: DesignQuestionnairePage;
 
     test.beforeEach(async ({page}) => {
         token = JwtHelper.NoRecordsToken();
@@ -22,9 +22,9 @@ test.describe('Get to an answer create a new questionnaire', () => {
         addQuestionnairePage = await AddQuestionnairePage.create(page);
         await addQuestionnairePage.addQuestionnaire();
 
-         editQuestionnairePage = await EditQuestionnairePage.create(page);
-         await editQuestionnairePage.validateHeadingAndStatus();
-         await editQuestionnairePage.expectSuccessBannerVisible();
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+         await designQuestionnairePage.validateHeadingAndStatus();
+         await designQuestionnairePage.expectSuccessBannerVisible();
     });
 
     test('Validate presence of elements on add new questionnaire page', async ({page}) => {

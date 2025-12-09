@@ -4,7 +4,6 @@ import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {createQuestion} from "../../test-data-seeder/question-data";
 import {AnswerDestinationType, QuestionType} from "../../constants/test-data-constants";
 import {
-    goToAddAnswerPageByUrl,
     goToUpdateAnswerPageByUrl, goToUpdateQuestionPageByUrl,
     goToViewQuestionsPageByUrl,
     signIn
@@ -61,7 +60,8 @@ test.describe('Get to an answer update questionnaire', () => {
 
         addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
         await addAnswerPage.expectAnswerHeadingOnPage();
-        //delete answer and validate it's deleted in the table
+        
+        //delete an answer and validate it's deleted in the table
 
     });
 
@@ -80,7 +80,7 @@ test.describe('Get to an answer update questionnaire', () => {
         addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
         await addAnswerPage.expectAnswerHeadingOnPage();
 
-        //delete answer and validate it's deleted in the table
+        //delete an answer and validate it's deleted in the table
 
     });
 });

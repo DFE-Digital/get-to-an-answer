@@ -126,12 +126,13 @@ test.describe('Get to an answer add an answer to a question', () => {
         addAnswerPage = await AddAnswerPage.create(page);
         await addAnswerPage.expectAnswerHeadingOnPage();
         
-        await addAnswerPage.clickAddAnotherOptionButton();
-
         await addAnswerPage.setOptionContent(0, 'First Answer Option');
         await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
         await addAnswerPage.setExternalLink(0, 'https://www.example.com');
         await addAnswerPage.setAnswerRank(0, 1);
+        
+        await addAnswerPage.clickAddAnotherOptionButton();
+        await  addAnswerPage.waitForPageLoad();
 
         await addAnswerPage.setOptionContent(1, 'Second Answer Option');
         await addAnswerPage.setOptionHint(1, 'This is the second answer hint');
@@ -143,7 +144,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         const viewQuestionPage = await ViewQuestionPage.create(page);
         await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
     });
-
+    
     test("Error summary appears on invalid submit with all missing required fields", async ({page, browserName}) => {
         const questionContent = `Test Question - ${Date.now()}`;
         await addQuestionPage.enterQuestionContent(questionContent);

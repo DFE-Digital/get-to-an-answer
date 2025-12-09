@@ -1,6 +1,6 @@
 import {expect, test} from "@playwright/test";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
-import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
+import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
 import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaireSlugPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
@@ -19,7 +19,7 @@ test.describe('Get to an answer update question', () => {
     let viewQuestionnairePage: ViewQuestionnairePage;
     let viewQuestionPage: ViewQuestionPage;
     let addQuestionPage: AddQuestionPage;
-    let editQuestionnairePage: EditQuestionnairePage;
+    let editQuestionnairePage: DesignQuestionnairePage;
     let updateQuestionnaireSlugPage: UpdateQuestionnaireSlugPage;
 
     test.beforeEach(async ({request, page}) => {

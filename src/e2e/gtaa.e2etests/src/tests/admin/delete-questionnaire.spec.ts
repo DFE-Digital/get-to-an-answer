@@ -6,8 +6,8 @@ import {
 } from "../../test-data-seeder/questionnaire-data";
 
 import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
-import {signIn, goToEditQuestionnairePageByUrl} from '../../helpers/admin-test-helper';
-import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
+import {signIn, goToDesignQuestionnairePageByUrl} from '../../helpers/admin-test-helper';
+import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaireSlugPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
@@ -19,7 +19,7 @@ test.describe('Get to an answer update questionnaire', () => {
 
     let viewQuestionnairePage: ViewQuestionnairePage;
     let addQuestionnairePage: AddQuestionnairePage;
-    let editQuestionnairePage: EditQuestionnairePage;
+    let designQuestionnairePage: DesignQuestionnairePage;
     let updateQuestionnaireSlugPage: UpdateQuestionnaireSlugPage;
 
     test.beforeEach(async ({request, page}) => {
@@ -35,9 +35,9 @@ test.describe('Get to an answer update questionnaire', () => {
     test('Delete a questionnaire successfully', async ({page}) => {
         await signIn(page, token);
 
-        editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
 
-        await editQuestionnairePage.deleteQuestionnaire();
+        await designQuestionnairePage.deleteQuestionnaire();
 
         const deleteConfirmationPage = new DeleteQuestionnaireConfirmationPage(page);
         await deleteConfirmationPage.expectTwoRadiosPresent();
@@ -51,26 +51,26 @@ test.describe('Get to an answer update questionnaire', () => {
     test('Delete questionnaire with cancellation returns to edit page', async ({page}) => {
         await signIn(page, token);
 
-        editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
 
-        await editQuestionnairePage.deleteQuestionnaire();
+        await designQuestionnairePage.deleteQuestionnaire();
 
         const deleteConfirmationPage = new DeleteQuestionnaireConfirmationPage(page);
         await deleteConfirmationPage.expectTwoRadiosPresent();
         await deleteConfirmationPage.chooseNo();
         await deleteConfirmationPage.clickContinue();
 
-        editQuestionnairePage = new EditQuestionnairePage(page);
-        await editQuestionnairePage.validateHeadingAndStatus();
+        designQuestionnairePage = new DesignQuestionnairePage(page);
+        await designQuestionnairePage.validateHeadingAndStatus();
     });
-    
+
     test('Delete questionnaire removes questionnaire from questionnaire list', async ({request, page}) => {
         await signIn(page, token);
 
         const questionnaireIdToDelete = questionnaireGetResponse.questionnaireGetBody.id;
-        editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaireIdToDelete);
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireIdToDelete);
 
-        await editQuestionnairePage.deleteQuestionnaire();
+        await designQuestionnairePage.deleteQuestionnaire();
 
         const deleteConfirmationPage = new DeleteQuestionnaireConfirmationPage(page);
         await deleteConfirmationPage.expectTwoRadiosPresent();

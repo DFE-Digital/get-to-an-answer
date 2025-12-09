@@ -1,15 +1,7 @@
 import {expect, test} from "@playwright/test";
-import {AddQuestionPage, QuestionRadioLabel} from "../../pages/admin/AddQuestionPage";
-import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
-import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
-import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
-import {
-    signIn, goToEditQuestionnairePageByUrl, goToAddQuestionPageByUrl, goToAddQuestionnairePage,
-    goToAddResultPagePageByUrl
-} from '../../helpers/admin-test-helper';
+import {signIn, goToAddResultPagePageByUrl} from '../../helpers/admin-test-helper';
 import {JwtHelper} from "../../helpers/JwtHelper";
-import {createQuestionnaire, getQuestionnaire} from "../../test-data-seeder/questionnaire-data";
-import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
+import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {PageHeadings} from "../../constants/test-data-constants";
 import {AddResultsPagePage} from "../../pages/admin/AddResultsPagePage";
 import {ViewResultsPagesPage} from "../../pages/admin/ViewResultsPagesPage";

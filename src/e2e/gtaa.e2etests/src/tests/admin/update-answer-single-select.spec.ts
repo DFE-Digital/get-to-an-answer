@@ -3,11 +3,7 @@ import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
 import {AddQuestionPage} from "../../pages/admin/AddQuestionPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
-import {
-    goToUpdateAnswerPageByUrl,
-    goToUpdateQuestionPageByUrl,
-    signIn
-} from "../../helpers/admin-test-helper";
+import {goToUpdateAnswerPageByUrl, signIn} from "../../helpers/admin-test-helper";
 import {AnswerDestinationType, QuestionType} from "../../constants/test-data-constants";
 import {createQuestion} from "../../test-data-seeder/question-data";
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";

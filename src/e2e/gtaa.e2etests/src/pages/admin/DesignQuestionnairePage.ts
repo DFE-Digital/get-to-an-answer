@@ -1,9 +1,7 @@
 import {expect, Page, Locator} from '@playwright/test';
 import {BasePage} from '../BasePage';
 
-type Mode = 'create' | 'edit' | 'clone';
-
-export class EditQuestionnairePage extends BasePage {
+export class DesignQuestionnairePage extends BasePage {
     // ===== Locators =====
     private readonly main: Locator;
     private readonly banner: Locator;
@@ -42,7 +40,7 @@ export class EditQuestionnairePage extends BasePage {
     private readonly gtaaApiErrorBannerLabel: Locator;
     private readonly gtaaApiErrorBannerText: Locator;
     
-    constructor(page: Page, mode: Mode = 'edit') {
+    constructor(page: Page) {
         super(page);
         this.main = this.page.locator('main.govuk-main-wrapper[role="main"]');
         this.banner = this.page.locator('div.govuk-notification-banner--success[role="alert"]');
