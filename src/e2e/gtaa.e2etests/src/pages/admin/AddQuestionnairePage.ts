@@ -61,7 +61,7 @@ export class AddQuestionnairePage extends BasePage {
         );
 
         this.inlineUpdateTitleError = this.titleFormGroup.locator(
-            '#title-field-error'
+            '#Title-field-error'
         );
         this.inlineTitleError = this.titleFormGroup.locator(
             '#Title-error'
@@ -76,7 +76,7 @@ export class AddQuestionnairePage extends BasePage {
             '#DescribedBy'
         );
     }
-
+    
     // ===== Actions =====
     async ClickBackToQuestionnaireLink(): Promise<void> {
         await Promise.all([
@@ -144,7 +144,25 @@ export class AddQuestionnairePage extends BasePage {
 
         await this.errorLink.click();
         if (browserName !== 'webkit') {
-            await expect(this.errorLink).toBeFocused();
+            await this.errorLink.waitFor({state: 'visible', timeout: Timeouts.LONG});
+            await expect(this.errorSummary, '❌ Error summary text mismatch').toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
+        }
+    }
+
+    async validateErrorLinkBehaviour(link: Locator, expectedMessage: string, browserName: string) {
+        await expect(link, '❌ Error summary link missing').toBeVisible();
+        await expect(link, '❌ Error link text mismatch').toHaveText(expectedMessage);
+
+        await link.click();
+
+        if (browserName !== 'webkit') {
+            await expect(this.titleInput, '❌ Title input not focused after error link click').toBeFocused();
+            await expect(this.errorSummary, '❌ Error summary text mismatch').toContainText(expectedMessage);
+
+            const outline = await this.titleInput.evaluate((el) => {
+                return window.getComputedStyle(el).getPropertyValue('outline');
+            });
+            expect(outline, '❌ Title input does not show focus outline').not.toBe('none');
         }
     }
 

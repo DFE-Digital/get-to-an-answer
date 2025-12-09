@@ -16,7 +16,7 @@ import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaireSlugPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
-import {EntityStatus, PageHeadings} from "../../constants/test-data-constants";
+import {EntityStatus, ErrorMessages, PageHeadings} from "../../constants/test-data-constants";
 import {expect200HttpStatusCode} from "../../helpers/api-assertions-helper";
 
 test.describe('Get to an answer update questionnaire', () => {
@@ -59,7 +59,12 @@ test.describe('Get to an answer update questionnaire', () => {
         
         await addQuestionnairePage.enterTitle('');
         await addQuestionnairePage.clickSaveAndContinue();
-        await addQuestionnairePage.validateMissingTitleMessageSummary(browserName);  
+        await addQuestionnairePage.validateMissingTitleMessageSummary(browserName);
+        await addQuestionnairePage.validateErrorLinkBehaviour(
+            addQuestionnairePage.errorSummaryLink('#Title'),
+            ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE,
+            browserName
+        );
         await addQuestionnairePage.validateInlineTitleError();
         await addQuestionnairePage.validateTitleFormGroup();
     });
