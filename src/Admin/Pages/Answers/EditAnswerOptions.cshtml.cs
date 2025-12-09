@@ -1,14 +1,10 @@
 using System.Globalization;
 using Admin.Models;
 using Common.Client;
-using Common.Domain.Request.Create;
-using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Models;
-using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 
 namespace Admin.Pages.Answers;
@@ -91,8 +87,10 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             DeletedAnswerIds.Add(removedOption.AnswerId);
 
         Options.RemoveAt(index);
+        
         RemoveModelStateEntriesForOption(index);
-
+        RemoveModelStateErrorsForFields();
+        
         await HydrateOptionListsAsync();
         ReassignOptionNumbers();
         return Page();
@@ -111,6 +109,14 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
         foreach (var key in keysToRemove)
         {
             ModelState.Remove(key);
+        }
+    }
+
+    private void RemoveModelStateErrorsForFields()
+    {
+        foreach (var key in ModelState.Keys)
+        {
+            ModelState[key]?.Errors.Clear();
         }
     }
 
