@@ -71,7 +71,17 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             
         return Redirect(string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId));
     }
+    
+    public async Task<IActionResult> OnPostRemoveOption(int index)
+    {
+        Options.RemoveAt(index);
+        RemoveModelStateEntriesForOption(index);
 
+        await HydrateOptionListsAsync();
+        ReassignOptionNumbers();
+        return Page();
+    }
+    
     private void RemoveModelStateEntriesForOption(int index)
     {
         var prefixBracket = $"Options[{index}]";
