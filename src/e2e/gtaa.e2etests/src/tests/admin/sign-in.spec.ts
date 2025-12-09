@@ -11,7 +11,8 @@ test.describe('Get to an answer sign in page', () => {
 
     test.beforeEach(async ({page}) => {
         token = JwtHelper.NoRecordsToken();
-        signInPage = await landing(page, token);
+        await page.goto('/')
+        signInPage = new SignInPage(page);
     });
 
     test('Validate presence of elements on sign in page', async ({page}) => {
@@ -19,8 +20,7 @@ test.describe('Get to an answer sign in page', () => {
     });
 
     test('Clicking sign in button navigates to terms of service agreement', async ({page}) => {
-        await signInPage.clickSignIn();
-        
+        await signInPage.openSignInPage(token);
         termsOfUsePage = await TermsOfUsePage.create(page);
         await termsOfUsePage.verifyHeading();
     });

@@ -1,5 +1,6 @@
 import { test, expect, APIResponse } from '@playwright/test';
 import {
+    addContributor,
     createQuestionnaire, deleteQuestionnaire,
     getLastInfo,
     publishQuestionnaire,
@@ -20,6 +21,9 @@ test.describe('GET /questionnaires/{slug}/publishes/last/info', () => {
             displayTitle: 'Custom display title',
             slug: questionnaireSlug
         });
+
+        await addContributor(request, questionnaire.id, 'user-1')
+        
         const { question } = await createQuestion(request, questionnaire.id, undefined, 
             'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
 
@@ -107,6 +111,8 @@ test.describe('GET /questionnaires/{slug}/publishes/last/info', () => {
             description: 'Valid JSON description',
             slug: questionnaireSlug
         })
+
+        await addContributor(request, questionnaire.id, 'user-1')
 
         const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
         

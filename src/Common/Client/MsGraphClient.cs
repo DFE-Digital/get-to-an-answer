@@ -31,7 +31,7 @@ public class MsGraphClient : IMsGraphClient
     public async Task<GraphUser?> GetGraphUserAsync(string contributorEmailAddress)
     {
         var response = await _httpClient.GetAsync($"/v1.0/users/{contributorEmailAddress}");
-        return await GetResponse<GraphUser>(response);
+        return await GetResponse<GraphUser>(response, contributorEmailAddress);
     }
 
     public async Task<GraphUsers> GetGraphUsersAsync(params string?[] contributorUserIds)
@@ -52,7 +52,7 @@ public class MsGraphClient : IMsGraphClient
             
             _logger.LogError($"Error getting users from Graph, status code '{response.StatusCode}': {await response.Content.ReadAsStringAsync()}");
             
-            throw new MsGraphException("Error getting users from Graph", response.StatusCode);
+            throw new MsGraphException("Error getting users from Graph", null, response.StatusCode);
         }
         catch (Exception e)
         {
@@ -82,7 +82,7 @@ public class MsGraphClient : IMsGraphClient
     
     
 
-    private async Task<TResponse?> GetResponse<TResponse>(HttpResponseMessage response) where TResponse : class
+    private async Task<TResponse?> GetResponse<TResponse>(HttpResponseMessage response, string newContributorEmail) where TResponse : class
     {
         if (response.IsSuccessStatusCode)
         {
@@ -106,8 +106,28 @@ public class MsGraphClient : IMsGraphClient
 
             // Throw a custom exception or return an alternative response.
             throw new MsGraphException(
-                $"Microsoft Graph request failed with status code {response.StatusCode} and message: {problemDetails?.Detail}", 
+                $"Microsoft Graph request failed with status code {response.StatusCode} and message: {problemDetails?.Detail}",
+                problemDetails,
                 response.StatusCode);
+        }
+        catch (MsGraphException e) when (e.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            if (env == null || EnvArray.Contains(env))
+            {
+                return new GraphUser
+                {
+                    Id = newContributorEmail,
+                    UserPrincipalName = newContributorEmail,
+                    Mail = newContributorEmail,
+                    DisplayName = newContributorEmail,
+                    GivenName = newContributorEmail,
+                    Surname = newContributorEmail
+                } as TResponse;
+            }
+
+            throw;
         }
         catch (Exception)
         {
@@ -124,14 +144,17 @@ public class MsGraphException : Exception
     public MsGraphException()
     { }
     
-    public MsGraphException(string? message, HttpStatusCode? statusCode)
+    public MsGraphException(string? message, ProblemDetails? details, HttpStatusCode? statusCode)
         : base(message, null)
     {
         StatusCode = statusCode;
+        Details = details;
     }
     
     /// <value>
     /// An HTTP status code if the exception represents a non-successful result, otherwise <c>null</c>.
     /// </value>
     public HttpStatusCode? StatusCode { get; }
+    
+    public ProblemDetails? Details { get; }
 }

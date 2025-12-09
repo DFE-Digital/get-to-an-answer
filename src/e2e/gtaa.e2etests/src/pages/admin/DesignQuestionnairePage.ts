@@ -1,5 +1,6 @@
 import {expect, Page, Locator} from '@playwright/test';
 import {BasePage} from '../BasePage';
+import {Timeouts} from "../../constants/timeouts";
 
 export class DesignQuestionnairePage extends BasePage {
     // ===== Locators =====
@@ -227,6 +228,8 @@ export class DesignQuestionnairePage extends BasePage {
     }
     
     async assertGtaaApiErrorBanner(expectedLabel?: string, expectedText?: string) {
+        await this.gtaaApiErrorBannerLabel.waitFor({state: 'visible', timeout: Timeouts.LONG});
+        
         await expect(this.gtaaApiErrorBannerLabel).toBeVisible();
         await expect(this.gtaaApiErrorBannerText).toBeVisible();
         

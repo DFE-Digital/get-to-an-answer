@@ -269,8 +269,11 @@ test.describe('Get to an answer view questions', () => {
 
             // Navigate to view questions page on both pages
             const viewQuestionPage1 = await goToViewQuestionsPageByUrl(page1, questionnaireId);
+            await viewQuestionPage1.waitForPageLoad();
+            
             const viewQuestionPage2 = await goToViewQuestionsPageByUrl(page2, questionnaireId);
-
+            await viewQuestionPage2.waitForPageLoad();
+            
             // Tab 1: Move question 2 up
             await viewQuestionPage1.table.moveUpByIndex(2);
             await viewQuestionPage1.waitForPageLoad();

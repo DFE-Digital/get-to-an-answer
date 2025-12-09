@@ -35,13 +35,13 @@ export class AddQuestionnairePage extends BasePage {
             '#main-content-container a.govuk-back-link'
         );
         this.titleInput = this.page.locator(
-            'input#questionnaire-title'
+            'input#Title'
         );
         this.saveAndContinueButton = this.page.getByRole(
             'button', {name: 'Save and continue'}
         );
         this.supportiveHint = this.page.locator(
-            '#questionnaire-title-hint'
+            '#Title-hint'
         );
         this.errorSummary = this.page.locator(
             '.govuk-error-summary[role="alert"][tabindex="-1"]'
@@ -53,14 +53,14 @@ export class AddQuestionnairePage extends BasePage {
             'a[href="#Title"]'
         );
         this.titleFormGroup = page.locator(
-            '.govuk-form-group:has(#questionnaire-title)'
+            '.govuk-form-group:has(#Title)'
         );
 
         this.inlineUpdateTitleError = this.titleFormGroup.locator(
-            '#questionnaire-title-field-error'
+            '#Title-field-error'
         );
         this.inlineTitleError = this.titleFormGroup.locator(
-            '#questionnaire-title-error'
+            '#Title-error'
         );
         this.error = this.page.locator(
             '#Title-error'
@@ -118,14 +118,14 @@ export class AddQuestionnairePage extends BasePage {
 
         if (this.mode === 'update') {
             expect(ariaValue, '❌ aria-describedby missing hint id')
-                .toContain('questionnaire-title-hint');
+                .toContain('Title-hint');
             expect(ariaValue, '❌ aria-describedby missing error message id')
-                .toContain('questionnaire-title-error');
+                .toContain('title-field-error');
         } else {
             expect(ariaValue, '❌ aria-describedby missing hint id')
-                .toContain('questionnaire-title-hint');
+                .toContain('Title-hint');
             expect(ariaValue, '❌ aria-describedby missing error message id')
-                .toContain('questionnaire-title--error');
+                .toContain('title-field-error');
         }
     }
 

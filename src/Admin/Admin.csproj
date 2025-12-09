@@ -17,6 +17,7 @@
     <ItemGroup>
       <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
       <PackageReference Include="Azure.Storage.Blobs" />
+      <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
       <PackageReference Include="Microsoft.Identity.Abstractions" />
       <PackageReference Include="Microsoft.Identity.Web" />

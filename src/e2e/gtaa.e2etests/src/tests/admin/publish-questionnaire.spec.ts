@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
 import {
+    addContributor,
     createQuestionnaire,
-    getQuestionnaire
+    getQuestionnaire,
+    publishQuestionnaire, updateQuestionnaire,
 } from '../../test-data-seeder/questionnaire-data';
 
 import { signIn, goToDesignQuestionnairePageByUrl } from '../../helpers/admin-test-helper';
@@ -20,6 +22,10 @@ test.describe('Get to an answer publish questionnaire', () => {
 
     test('Publish questionnaire successfully (happy path)', async ({ page, request }) => {
         const { questionnaire } = await createQuestionnaire(request, token);
+        
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` }, token);
+
+        await addContributor(request, questionnaire.id, 'user-1', token)
 
         const { question } = await createQuestion(request, questionnaire.id, token, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
 
@@ -93,6 +99,10 @@ test.describe('Get to an answer publish questionnaire', () => {
     test('Publish questionnaire with no question returns error publishing (unhappy path)', async ({ page, request }) => {
         const { questionnaire } = await createQuestionnaire(request, token);
 
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` }, token);
+
+        await addContributor(request, questionnaire.id, 'user-1', token)
+
         await signIn(page, token);
 
         const questionnaireId = questionnaire.id;
@@ -125,6 +135,10 @@ test.describe('Get to an answer publish questionnaire', () => {
 
     test('Publish questionnaire with 1 question (but no answers) returns error publishing (unhappy path)', async ({ page, request }) => {
         const { questionnaire } = await createQuestionnaire(request, token);
+
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` }, token);
+
+        await addContributor(request, questionnaire.id, 'user-1', token)
 
         await createQuestion(request, questionnaire.id, token, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
 
@@ -160,6 +174,10 @@ test.describe('Get to an answer publish questionnaire', () => {
 
     test('Publish questionnaire with last question (but answer wrong destination type) returns error publishing (unhappy path)', async ({ page, request }) => {
         const { questionnaire } = await createQuestionnaire(request, token);
+
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` }, token);
+
+        await addContributor(request, questionnaire.id, 'user-1', token)
 
         const { question } = await createQuestion(request, questionnaire.id, token, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
 
@@ -210,6 +228,10 @@ test.describe('Get to an answer publish questionnaire', () => {
     test('Publish questionnaire with cyclic flow returns error publishing (unhappy path)', async ({ page, request }) => {
         const { questionnaire } = await createQuestionnaire(request, token);
 
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` }, token);
+
+        await addContributor(request, questionnaire.id, 'user-1', token)
+
         const { question } = await createQuestion(request, questionnaire.id, token, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
 
         const { question: question2 } = await createQuestion(request, questionnaire.id, token, 'second question', QuestionType.MultiSelect, undefined);
@@ -243,7 +265,7 @@ test.describe('Get to an answer publish questionnaire', () => {
         // You should see an error banner at the top of the page
         await editQuestionnairePage.assertGtaaApiErrorBanner(
             'Error: Publishing the questionnaire failed.',
-            "Question 1 was be referenced twice in the same flow."
+            "Question 1 was referenced twice in the same flow."
         );
 
         // Verify via API that the questionnaire is now published
