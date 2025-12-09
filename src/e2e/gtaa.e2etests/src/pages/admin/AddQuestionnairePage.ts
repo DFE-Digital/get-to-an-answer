@@ -36,16 +36,16 @@ export class AddQuestionnairePage extends BasePage {
             '#main-content-container a.govuk-back-link'
         );
         this.titleInput = this.page.locator(
-            'input#questionnaire-title'
+            'input#Title'
         );
         this.saveAndContinueButton = this.page.getByRole(
             'button', {name: 'Save and continue'}
         );
         this.titleLabel = this.page.locator(
-            'label[for="questionnaire-title"]'
+            'label[for="Title"]'
         );
         this.supportiveHint = this.page.locator(
-            '#questionnaire-title-hint'
+            '#Title-hint'
         );
         this.errorSummary = this.page.locator(
             '.govuk-error-summary[role="alert"][tabindex="-1"]'
@@ -57,14 +57,14 @@ export class AddQuestionnairePage extends BasePage {
             'a[href="#Title"]'
         );
         this.titleFormGroup = page.locator(
-            '.govuk-form-group:has(#questionnaire-title)'
+            '.govuk-form-group:has(#Title)'
         );
 
         this.inlineUpdateTitleError = this.titleFormGroup.locator(
-            '#questionnaire-title-field-error'
+            '#Title-field-error'
         );
         this.inlineTitleError = this.titleFormGroup.locator(
-            '#questionnaire-title-error'
+            '#Title-error'
         );
         this.error = this.page.locator(
             '#Title-error'
@@ -76,7 +76,7 @@ export class AddQuestionnairePage extends BasePage {
             '#DescribedBy'
         );
     }
-
+    
     // ===== Actions =====
     async ClickBackToQuestionnaireLink(): Promise<void> {
         await Promise.all([
@@ -123,12 +123,12 @@ export class AddQuestionnairePage extends BasePage {
 
         if (this.mode === 'update') {
             expect(ariaValue, '❌ aria-describedby missing hint id')
-                .toContain('forms-name-input-name-hint');
+                .toContain('Title-hint');
             expect(ariaValue, '❌ aria-describedby missing error message id')
                 .toContain('title-field-error');
         } else {
             expect(ariaValue, '❌ aria-describedby missing hint id')
-                .toContain('questionnaire-title-hint');
+                .toContain('Title-hint');
             expect(ariaValue, '❌ aria-describedby missing error message id')
                 .toContain('title-field-error');
         }
@@ -144,7 +144,25 @@ export class AddQuestionnairePage extends BasePage {
 
         await this.errorLink.click();
         if (browserName !== 'webkit') {
-            await expect(this.errorLink).toBeFocused();
+            await this.errorLink.waitFor({state: 'visible', timeout: Timeouts.LONG});
+            await expect(this.errorSummary, '❌ Error summary text mismatch').toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
+        }
+    }
+
+    async validateErrorLinkBehaviour(link: Locator, expectedMessage: string, browserName: string) {
+        await expect(link, '❌ Error summary link missing').toBeVisible();
+        await expect(link, '❌ Error link text mismatch').toHaveText(expectedMessage);
+
+        await link.click();
+
+        if (browserName !== 'webkit') {
+            await expect(this.titleInput, '❌ Title input not focused after error link click').toBeFocused();
+            await expect(this.errorSummary, '❌ Error summary text mismatch').toContainText(expectedMessage);
+
+            const outline = await this.titleInput.evaluate((el) => {
+                return window.getComputedStyle(el).getPropertyValue('outline');
+            });
+            expect(outline, '❌ Title input does not show focus outline').not.toBe('none');
         }
     }
 

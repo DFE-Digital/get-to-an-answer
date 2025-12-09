@@ -6,7 +6,7 @@
   const string title = "What's the name of your questionnaire?";
   ViewData["Title"] = title;
 
-  const string inputId = "questionnaire-title";
+  const string inputId = "Title";
 }
 
 @section BeforeContent
@@ -35,7 +35,7 @@
         
         <govuk-input id="@inputId"
                class="govuk-input"
-               aria-describedby="forms-name-input-name-hint"
+               aria-describedby="@inputId-hint"
                type="text"
                name="@nameof(Model.Title)"
                asp-for="@Model.Title"
