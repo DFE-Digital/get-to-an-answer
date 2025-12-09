@@ -25,6 +25,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     [Required(ErrorMessage = "Select question type")]
     [BindProperty] public QuestionType QuestionType { get; set; }
 
+    [BindProperty]
     public List<AnswerSummaryViewModel> Answers { get; } = [];
 
     [BindProperty] public string QuestionNumber { get; set; } = 1.ToString();
@@ -53,6 +54,8 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
             }
 
             PopulateFields(question);
+            
+            await GetAnswers();
         }
         catch (Exception e)
         {
@@ -60,18 +63,10 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
             return RedirectToErrorPage();
         }
 
-        var answers = await apiClient.GetAnswersAsync(QuestionId);
-        Answers.Clear();
-        Answers.AddRange(answers.Select(a => new AnswerSummaryViewModel
-        {
-            Content = a.Content,
-            Priority = Convert.ToString(a.Priority, CultureInfo.CurrentCulture),
-            Destination = ToDestDisplayName(a.DestinationType)
-        }));
 
         return Page();
     }
-    
+
     private static string ToDestDisplayName(DestinationType? type) => type switch
     {
         DestinationType.Question => "Specific question",
@@ -116,6 +111,8 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
                 CurrentQuestionHasNextOne = true;
                 NextQuestionId = nextQuestionInOrder.Id;
             }
+            
+            await GetAnswers();
         }
         catch (Exception e)
         {
@@ -142,6 +139,18 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     
     public IActionResult OnPostAddQuestion() => Redirect(string.Format(Routes.AddQuestion, QuestionnaireId));
 
+    private async Task GetAnswers()
+    {
+        var answers = await apiClient.GetAnswersAsync(QuestionId);
+        Answers.Clear();
+        Answers.AddRange(answers.Select(a => new AnswerSummaryViewModel
+        {
+            Content = a.Content,
+            Priority = Convert.ToString(a.Priority, CultureInfo.CurrentCulture),
+            Destination = ToDestDisplayName(a.DestinationType)
+        }));
+    }
+    
     private async Task<QuestionDto?> GetQuestion() => await apiClient.GetQuestionAsync(QuestionId);
 
     private void PopulateFields(QuestionDto question)
