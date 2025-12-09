@@ -36,16 +36,16 @@ export class AddQuestionnairePage extends BasePage {
             '#main-content-container a.govuk-back-link'
         );
         this.titleInput = this.page.locator(
-            'input#title'
+            'input#Title'
         );
         this.saveAndContinueButton = this.page.getByRole(
             'button', {name: 'Save and continue'}
         );
         this.titleLabel = this.page.locator(
-            'label[for="title"]'
+            'label[for="Title"]'
         );
         this.supportiveHint = this.page.locator(
-            '#title-hint'
+            '#Title-hint'
         );
         this.errorSummary = this.page.locator(
             '.govuk-error-summary[role="alert"][tabindex="-1"]'
@@ -57,14 +57,14 @@ export class AddQuestionnairePage extends BasePage {
             'a[href="#Title"]'
         );
         this.titleFormGroup = page.locator(
-            '.govuk-form-group:has(#title)'
+            '.govuk-form-group:has(#Title)'
         );
 
         this.inlineUpdateTitleError = this.titleFormGroup.locator(
             '#title-field-error'
         );
         this.inlineTitleError = this.titleFormGroup.locator(
-            '#title-error'
+            '#Title-error'
         );
         this.error = this.page.locator(
             '#Title-error'
@@ -123,12 +123,12 @@ export class AddQuestionnairePage extends BasePage {
 
         if (this.mode === 'update') {
             expect(ariaValue, '❌ aria-describedby missing hint id')
-                .toContain('title-hint');
+                .toContain('Title-hint');
             expect(ariaValue, '❌ aria-describedby missing error message id')
                 .toContain('title-field-error');
         } else {
             expect(ariaValue, '❌ aria-describedby missing hint id')
-                .toContain('title-hint');
+                .toContain('Title-hint');
             expect(ariaValue, '❌ aria-describedby missing error message id')
                 .toContain('title-field-error');
         }
