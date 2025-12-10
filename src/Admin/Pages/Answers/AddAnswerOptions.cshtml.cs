@@ -10,27 +10,34 @@ using Newtonsoft.Json;
 namespace Admin.Pages.Answers;
 
 [Authorize]
-public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApiClient apiClient) : 
+public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApiClient apiClient) :
     AnswerOptionsPageModel(apiClient)
 {
     private readonly IApiClient _apiClient = apiClient;
+
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId);
 
-        var questionTypeValue = TempData.Peek("QuestionType");
-        if (questionTypeValue is int intVal && Enum.IsDefined(typeof(QuestionType), intVal))
+        try
         {
-            RetrievedQuestionType = (QuestionType)intVal;
+            var question = await _apiClient.GetQuestionAsync(QuestionId);
+
+            RetrievedQuestionType = question?.Type;
+
+            Options.Add(new AnswerOptionsViewModel { OptionNumber = 0, QuestionType = RetrievedQuestionType });
+            Options.Add(new AnswerOptionsViewModel { OptionNumber = 1, QuestionType = RetrievedQuestionType });
+
+            await HydrateOptionListsAsync();
+            ReassignOptionNumbers();
+
+            return Page();
         }
-        
-        Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
-        Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
-
-        await HydrateOptionListsAsync();
-        ReassignOptionNumbers();
-
-        return Page();
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error loading data for question {QuestionId}", QuestionId);
+            return NotFound();
+        }
     }
 
     // Handler for "Continue"
@@ -67,8 +74,9 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
                 });
             }
 
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
-            
+            TempData[nameof(QuestionnaireState)] =
+                JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+
             return Redirect(string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId));
         }
         catch (Exception ex)
@@ -79,7 +87,7 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
             return RedirectToErrorPage();
         }
     }
-    
+
     public async Task<IActionResult> OnPostRemoveOption(int index)
     {
         Options.RemoveAt(index);
