@@ -19,7 +19,6 @@
 }
 
 
-<input type="hidden" asp-for="QuestionNumber"/>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -29,6 +28,8 @@
       Add a question
     </h1>
     <form method="post" accept-charset="UTF-8">
+      <input type="hidden" asp-for="QuestionNumber"/>
+      <input type="hidden" asp-for="BackLinkSlug"/>
       <!-- Question text -->
       <govuk-form-group asp-for="@Model.QuestionContent">
         <label class="govuk-label govuk-label--m" for="QuestionContent">
@@ -47,7 +48,7 @@
                      type="text"
                      asp-for="QuestionContent"
                      value="@Model.QuestionContent"
-                     govuk-error-for="@Model.QuestionContent" />
+                     govuk-error-for="@Model.QuestionContent"/>
       </govuk-form-group>
 
       <!-- Hint text -->
@@ -56,8 +57,8 @@
           Hint text (optional)
         </label>
         <div class="govuk-hint" id="QuestionHintText-hint">
-          You can add a short sentence to help people answer the question. 
-          For example, if someone can select one or more options, use 'Select all that apply'. 
+          You can add a short sentence to help people answer the question.
+          For example, if someone can select one or more options, use 'Select all that apply'.
         </div>
 
         <govuk-field-error asp-for="@Model.QuestionHintText" error-id="QuestionHintText-error">
@@ -89,11 +90,11 @@
           <div class="govuk-radios" data-module="govuk-radios">
             <div class="govuk-radios__item">
               <govuk-input class="govuk-radios__input"
-                     id="QuestionType"           
-                     asp-for="QuestionType"
-                     type="radio"
-                     value="@((int)QuestionType.SingleSelect)"
-                     govuk-error-for="@Model.QuestionType" />
+                           id="QuestionType"
+                           asp-for="QuestionType"
+                           type="radio"
+                           value="@((int)QuestionType.SingleSelect)"
+                           govuk-error-for="@Model.QuestionType"/>
               <label class="govuk-label govuk-radios__label" for="QuestionType">
                 One option only (using <a href="https://design-system.service.gov.uk/components/radios/">radio buttons</a>)
               </label>
@@ -104,11 +105,11 @@
 
             <div class="govuk-radios__item">
               <govuk-input class="govuk-radios__input"
-                     id="QuestionType-Dropdown"
-                     asp-for="QuestionType"
-                     type="radio"
-                     value="@((int)QuestionType.DropdownSelect)"
-                     govuk-error-for="@Model.QuestionType" />
+                           id="QuestionType-Dropdown"
+                           asp-for="QuestionType"
+                           type="radio"
+                           value="@((int)QuestionType.DropdownSelect)"
+                           govuk-error-for="@Model.QuestionType"/>
               <label class="govuk-label govuk-radios__label" for="QuestionType-Dropdown">
                 One option only (using a <a href="https://design-system.service.gov.uk/components/select/">drop-down</a>)
               </label>
@@ -119,11 +120,11 @@
 
             <div class="govuk-radios__item">
               <govuk-input class="govuk-radios__input"
-                     id="QuestionType-MultiSelect"
-                     asp-for="QuestionType"
-                     type="radio"
-                     value="@((int)QuestionType.MultiSelect)"
-                     govuk-error-for="@Model.QuestionType" />
+                           id="QuestionType-MultiSelect"
+                           asp-for="QuestionType"
+                           type="radio"
+                           value="@((int)QuestionType.MultiSelect)"
+                           govuk-error-for="@Model.QuestionType"/>
               <label class="govuk-label govuk-radios__label" for="QuestionType-MultiSelect">
                 One or more options (using <a href="https://design-system.service.gov.uk/components/checkboxes/">checkboxes</a>)
               </label>
