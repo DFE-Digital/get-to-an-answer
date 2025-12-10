@@ -5,12 +5,14 @@ export class ViewContributorTable {
     private readonly page: Page;
     private readonly table: Locator;
     private readonly bodyRows: Locator;
+    private readonly removeButtons: Locator;
 
     // ===== Constructor =====
     constructor(page: Page) {
         this.page = page;
-        this.table = this.page.locator('main[role="main"] table.govuk-table');
+        this.table = this.page.locator('table.govuk-table');
         this.bodyRows = this.table.locator('tbody > tr');
+        this.removeButtons = this.table.locator('button.govuk-button.govuk-button--warning[type="submit"]');
     }
 
     // ===== Actions =====
@@ -42,8 +44,32 @@ export class ViewContributorTable {
         expect(firstRowCellCount).toBeGreaterThan(2); // >=3 cols (Name, Email, Role)
     }
 
+    async expectedRemoveContributorButtonsDisabled() {
+        const buttons = await this.removeButtons.all();
+        for (const button of buttons) {
+            await expect(button).toBeDisabled();
+        }
+    }
+    
+    async expectedRemoveContributorButtonsEnabled() {
+        const buttons = await this.removeButtons.all();
+        for (const button of buttons) {
+            await expect(button).toBeEnabled();
+        }
+    }
+
     // ===== Helpers =====
-    private rowByEmail(email: string): Locator {
+    public rowByEmail(email: string): Locator {
         return this.bodyRows.filter({hasText: email}).first();
+    }
+
+    public async hasPerson(emailOrId: string): Promise<boolean> {
+        const count = await this.bodyRows.filter({hasText: emailOrId}).count()
+        return count > 0;
+    }
+
+    public rowByIndex(index: number): Locator {
+        // 1-based index external API → 0-based nth()
+        return this.bodyRows.nth(index - 1);
     }
 }

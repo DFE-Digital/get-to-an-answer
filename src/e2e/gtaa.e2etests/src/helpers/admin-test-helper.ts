@@ -12,6 +12,7 @@ import {AddQuestionnaireStartPage} from "../pages/admin/AddQuestionnaireStartPag
 import {ViewResultsPagesPage} from "../pages/admin/ViewResultsPagesPage";
 import {AddResultsPagePage} from "../pages/admin/AddResultsPagePage";
 import {EditResultsPagePage} from "../pages/admin/EditResultsPagePage";
+import {ViewContributorPage} from "../pages/admin/ViewContributorPage";
 
 type LoadState = 'domcontentloaded' | 'load' | 'networkidle';
 
@@ -26,7 +27,7 @@ export async function signIn(page: Page, bearerToken?: string): Promise<ViewQues
     const signInPage = new SignInPage(page);
 
     await signInPage.openSignInPage(bearerToken);
-    await signInPage.clickSignIn();
+    await signInPage.acceptCookiesIfVisible();
 
     const termsOfUsePage = new TermsOfUsePage(page);
     await termsOfUsePage.acceptCookiesIfVisible();
@@ -34,6 +35,7 @@ export async function signIn(page: Page, bearerToken?: string): Promise<ViewQues
 
     const viewQuestionnairePage = new ViewQuestionnairePage(page);
     await viewQuestionnairePage.waitForPageLoad();
+    await signInPage.acceptCookiesIfVisible();
 
     return viewQuestionnairePage;
 }
@@ -242,4 +244,25 @@ export async function goToEditResultPagePageByUrl(
     await addResultsPagePage.waitForPageLoad();
 
     return addResultsPagePage;
+}
+
+export async function goToQuestionnaireContributorsPageByUrl(
+    page: Page,
+    questionnaireId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<ViewContributorPage> {
+    
+    const adminUrl = EnvConfig.ADMIN_URL;
+    
+    // to cache persistence questionnaire information
+    const trackQuestionnaireUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/track`;
+    await page.goto(trackQuestionnaireUrl, {waitUntil});
+    
+    const viewContributorsUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/contributors`;
+
+    await page.goto(viewContributorsUrl, {waitUntil});
+
+    const viewContributorPage = new ViewContributorPage(page)
+    await viewContributorPage.waitForPageLoad();
+
+    return viewContributorPage;
 }

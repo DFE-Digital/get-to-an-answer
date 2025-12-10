@@ -1,6 +1,7 @@
 import {expect, test} from '@playwright/test';
 import {AnswerDestinationType, EntityStatus, QuestionType} from '../../constants/test-data-constants';
 import {
+    addContributor,
     createQuestionnaire, getNextState,
     getQuestionnaire,
     publishQuestionnaire,
@@ -16,6 +17,12 @@ test.describe('POST /api/questionnaires/{questionnaireId}/next-state', () => {
         
         // Create questionnaire -> 2 questions -> publish -> call next-state
         const { questionnaire } = await createQuestionnaire(request, token);
+
+        await updateQuestionnaire(request, questionnaire.id, { 
+            slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` }, token);
+
+        await addContributor(request, questionnaire.id, 'user-1', token)
+        
         const { question: q1 } = await createQuestion(request, questionnaire.id, token, 'Q1', QuestionType.MultiSelect);
         const { question: q2 } = await createQuestion(request, questionnaire.id, token, 'Q2', QuestionType.SingleSelect);
 
@@ -119,6 +126,11 @@ test.describe('POST /api/questionnaires/{questionnaireId}/next-state', () => {
 
     test('handles external link destination (200) with url in response', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
+
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
+
+        await addContributor(request, questionnaire.id, 'user-1')
+        
         const { question: q1 } = await createQuestion(request, questionnaire.id, undefined, 'Q1', QuestionType.SingleSelect);
 
         const {answer} = await createAnswer(request, questionnaire.id, q1.id, 'Go External', undefined, 1,

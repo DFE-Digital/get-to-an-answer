@@ -6,8 +6,9 @@ export class BasePage {
     protected readonly page: Page;
 
     //Locators for web page Header
-    public readonly WebsiteNameLink: Locator;
+    public readonly dfeWebsiteLink: Locator;
     public readonly WebsiteAdminName: Locator;
+    public readonly WebsiteNameLink: Locator;
     public readonly SignOutLink: Locator;
     public readonly defaultLogo: Locator;
     public readonly logoLink: Locator;
@@ -37,8 +38,9 @@ export class BasePage {
         // ===== Locators for web page header =====
         this.logoLink = page.locator('a.govuk-header__link--homepage');
         this.defaultLogo = page.locator('img.govuk-header__logotype');
-        this.WebsiteNameLink = page.locator('header.dfe-header a.dfe-header__link--service');
+        this.dfeWebsiteLink = page.locator('header.dfe-header a.dfe-header__link--service');
         this.WebsiteAdminName = page.locator('nav .govuk-service-navigation__text');
+        this.WebsiteNameLink = page.locator('nav .govuk-service-navigation__link');
         this.SignOutLink = page.getByRole('link', {name: /sign out/i});
 
         // ===== Locators for web page Footers =====
@@ -74,6 +76,13 @@ export class BasePage {
     }
     
     // ===== Verify header Links are visible =====
+    async verifyPublicHeaderLinks() {
+        //await expect(this.WebsiteNameLink).toHaveText(/Support for/i); //TBC
+        await expect(this.WebsiteNameLink, '❌ Website name link is not visible on the page').toBeVisible();
+
+        await expect(this.logoLink,'❌ Logo link is not visible on the page').toBeVisible();
+        await expect(this.defaultLogo, '❌ Default logo is not visible on the page').toBeVisible();
+    }
     async verifyHeaderLinks() {
         //await expect(this.WebsiteNameLink).toHaveText(/Support for/i); //TBC
         //await expect(this.WebsiteNameLink, '❌ Website name link is not visible on the page').toBeVisible();

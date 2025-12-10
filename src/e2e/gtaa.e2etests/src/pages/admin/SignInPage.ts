@@ -64,7 +64,7 @@ export class SignInPage extends BasePage {
     // }
 
     async assertPageElements() {
-        await this.verifyHeaderLinks()
+        await this.verifyPublicHeaderLinks()
         await this.verifyFooterLinks();
         await expect(this.mainHeading, '❌ Main heading not visible').toBeVisible();
         await expect(this.subHeading, '❌ Sub heading not visible').toBeVisible();

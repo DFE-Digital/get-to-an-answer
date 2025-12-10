@@ -5,7 +5,7 @@ import {
     createQuestionnaire,
     publishQuestionnaire,
     updateQuestionnaire,
-    getQuestionnaire, getInitialState
+    getQuestionnaire, getInitialState, addContributor
 } from '../../test-data-seeder/questionnaire-data';
 import { createQuestion } from '../../test-data-seeder/question-data';
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";
@@ -13,6 +13,10 @@ import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 test.describe('GET /api/questionnaires/{questionnaireId}/initial-state', () => {
     test('returns initial question for published questionnaire (200)', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
+
+        await addContributor(request, questionnaire.id, 'user-1')
+        
         // seed at least one question to allow publish
         const { question } = await createQuestion(request, questionnaire.id, undefined, 'Start Q', QuestionType.SingleSelect);
         

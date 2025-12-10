@@ -2,6 +2,7 @@ import {Page, Locator, expect} from '@playwright/test';
 import {BasePage} from '../BasePage';
 import {ViewQuestionTable} from './components/ViewQuestionTable';
 import {ErrorMessages} from "../../constants/test-data-constants";
+import {Timeouts} from "../../constants/timeouts";
 
 export class ViewQuestionPage extends BasePage {
     // ===== Locators  ===== 

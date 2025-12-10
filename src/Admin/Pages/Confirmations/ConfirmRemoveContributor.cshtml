@@ -1,4 +1,4 @@
-﻿@page "/admin/questionnaires/{questionnaireId:guid}/contributors/{contentId:guid}/remove-confirmation"
+﻿@page "/admin/questionnaires/{questionnaireId:guid}/contributors/{contributorId:guid}/remove-confirmation"
 @addTagHelper *, Common
 @using Common.Enum
 @model Admin.Pages.Confirmations.ConfirmRemoveContributor
@@ -10,24 +10,23 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds-from-desktop">
       <form method="post" class="govuk-!-margin-top-6">
-          
           <input type="hidden" name="ContributorEmail" value="@Model.ContributorEmail"/>
           <input type="hidden" name="ContributorId" value="@Model.ContributorId"/>
           <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
               <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                  <h2 class="govuk-fieldset__heading">
-                      <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
+                  <h2 id="remove-contributor-title" class="govuk-fieldset__heading">
+                      <span id="current-questionnaire-title" class="govuk-caption-l">@Model.QuestionnaireTitle</span>
                       Are you sure you want to remove access for '@Model.ContributorEmail'?
                   </h2>
               </legend>
 
-              <div class="govuk-hint govuk-!-margin-bottom-8">
+              <div id="remove-contributor-hint" class="govuk-hint govuk-!-margin-bottom-8">
                   This person will no longer be able to view or edit the questionnaire.
               </div>
 
               <div class="govuk-radios" data-module="govuk-radios">
                   <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="finished-yes" name="DeleteContributor" type="radio" asp-for="@Model.RemoveContributor"
+                      <input class="govuk-radios__input" id="finished-yes" name="RemoveContributor" type="radio" asp-for="@Model.RemoveContributor"
                              value="true">
                       <label class="govuk-label govuk-radios__label" for="finished-yes">
                           Yes, remove person
@@ -35,7 +34,7 @@
                   </div>
 
                   <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="finished-no" name="DeleteContributor" type="radio" asp-for="@Model.RemoveContributor"
+                      <input class="govuk-radios__input" id="finished-no" name="RemoveContributor" type="radio" asp-for="@Model.RemoveContributor"
                              value="false">
                       <label class="govuk-label govuk-radios__label" for="finished-no">
                           No, keep person
@@ -44,7 +43,7 @@
               </div>
           </fieldset>
 
-          <button class="govuk-button govuk-!-margin-top-4" data-module="govuk-button" type="submit"
+          <button id="continue-btn" class="govuk-button govuk-!-margin-top-4" data-module="govuk-button" type="submit"
                   asp-page-handler="Continue">
               Continue
           </button>

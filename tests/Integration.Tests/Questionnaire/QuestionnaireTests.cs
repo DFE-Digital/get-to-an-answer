@@ -854,6 +854,13 @@ public class QuestionnaireTests(ApiFixture factory) :
         {
             createRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await createRes.Content.ReadAsStringAsync());
+
+            await UpdateById(id, new { Slug = $"to-publish-{Guid.NewGuid()}" });
+            
+            var updateRes = await Update(method: HttpMethod.Put, routePrefixOverride: $"/api/questionnaires/{id}/contributors", 
+                payload: new { Id = "mock.user1@education.gov.uk" });
+            
+            updateRes.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
         var question = await Create<QuestionDto>(payload: new { QuestionnaireId = id, Content = "Q1?", Type = QuestionType.MultiSelect }, routePrefixOverride: "/api/questions");
@@ -869,7 +876,7 @@ public class QuestionnaireTests(ApiFixture factory) :
         
         // Act
         using var res = await Update(method: HttpMethod.Patch, routePrefixOverride: $"/api/questionnaires/{id}?action={QuestionnaireAction.Publish}");
-    
+
         // Assert
         res.StatusCode.Should().Be(HttpStatusCode.NoContent);
     
@@ -950,6 +957,13 @@ public class QuestionnaireTests(ApiFixture factory) :
         {
             createRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await createRes.Content.ReadAsStringAsync());
+
+            await UpdateById(id, new { Slug = "to-publish" });
+            
+            var updateRes = await Update(method: HttpMethod.Put, routePrefixOverride: $"/api/questionnaires/{id}/contributors", 
+                payload: new { Id = "mock.user1@education.gov.uk" }, bearerToken: JwtTestTokenGenerator.ValidJwtToken);
+            
+            updateRes.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
     
         var question = await Create<QuestionDto>(payload: new { QuestionnaireId = id, Content = "Q1?", Type = QuestionType.MultiSelect }, routePrefixOverride: "/api/questions");
