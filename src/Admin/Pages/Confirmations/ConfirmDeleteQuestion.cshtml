@@ -27,11 +27,11 @@
         <span class="govuk-hint govuk-!-margin-bottom-8">
             Once you delete a question, you cannot recover it. If it's already published, it may affect your questionnaire.
         </span>
-        <form method="post" accept-charset="UTF-8">
+        <form method="post" accept-charset="UTF-8" class="govuk-!-margin-top-6">
             <input type="hidden" asp-for="QuestionNumber"/>
             <input type="hidden" asp-for="@Model.BackLinkSlug"/>
 
-            <govuk-form-group asp-for="@Model.ConfirmDelete" specific-id-for-form-group-error="ConfirmDelete-error">
+            <govuk-form-group asp-for="@Model.ConfirmDelete" specific-id-for-form-group-error="ConfirmDelete-error" class="govuk-!-margin-top-6">
                 <fieldset class="govuk-fieldset">
                     <govuk-field-error asp-for="@Model.ConfirmDelete" error-id="ConfirmDelete-error">
                     </govuk-field-error>
@@ -62,7 +62,7 @@
                     </div>
                 </fieldset>
             </govuk-form-group>
-            <div class="govuk-!-margin-top-5">
+            <div class="govuk-!-margin-top-6">
                 <button class="govuk-button govuk-button--primary" type="submit">Continue</button>
             </div>
         </form>
