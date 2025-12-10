@@ -2,13 +2,10 @@ import {expect, test} from "@playwright/test";
 import {AddQuestionPage, QuestionRadioLabel} from "../../pages/admin/AddQuestionPage";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
 import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
-import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
-import {
-    signIn, goToEditQuestionnairePageByUrl, goToAddQuestionPageByUrl, goToAddQuestionnairePage
-} from '../../helpers/admin-test-helper';
+import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
+import {signIn, goToAddQuestionPageByUrl} from '../../helpers/admin-test-helper';
 import {JwtHelper} from "../../helpers/JwtHelper";
-import {createQuestionnaire, getQuestionnaire} from "../../test-data-seeder/questionnaire-data";
-import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
+import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {PageHeadings} from "../../constants/test-data-constants";
 
 test.describe('Get to an answer add question to questionnaire', () => {

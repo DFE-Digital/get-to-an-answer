@@ -1,19 +1,13 @@
 import {expect, test} from "@playwright/test";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
-import {
-    goToEditQuestionnairePageByUrl,
-    goToUpdateQuestionnairePageByUrl,
-    goToViewQuestionsPageByUrl,
-    signIn
-} from "../../helpers/admin-test-helper";
+import {goToViewQuestionsPageByUrl, signIn} from "../../helpers/admin-test-helper";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
-import {createQuestionnaire, publishQuestionnaire} from "../../test-data-seeder/questionnaire-data";
+import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {createQuestion, deleteQuestion} from "../../test-data-seeder/question-data";
 import {expect200HttpStatusCode} from "../../helpers/api-assertions-helper";
-import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {AddQuestionPage} from "../../pages/admin/AddQuestionPage";
-import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
+import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 import {AnswerDestinationType, ErrorMessages, PageHeadings} from "../../constants/test-data-constants";
 
@@ -23,7 +17,7 @@ test.describe('Get to an answer view questions', () => {
     let qResp3: any;
 
     let viewQuestionnairePage: ViewQuestionnairePage;
-    let editQuestionnairePage: EditQuestionnairePage;
+    let designQuestionnairePage: DesignQuestionnairePage;
     let viewQuestionPage: ViewQuestionPage;
     let addQuestionPage: AddQuestionPage;
 
@@ -123,8 +117,8 @@ test.describe('Get to an answer view questions', () => {
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
 
         await viewQuestionPage.ClickBackToEditQuestionnaireLink();
-        editQuestionnairePage = await EditQuestionnairePage.create(page);
-        expect(editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        expect(designQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
     });
 
     test('Save and continue with No I will come back later radio navigates to Edit questionnaire page', async ({page}) => {
@@ -136,8 +130,8 @@ test.describe('Get to an answer view questions', () => {
 
         await viewQuestionPage.saveAndContinue();
 
-        editQuestionnairePage = await EditQuestionnairePage.create(page);
-        await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        await designQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
     });
 
     test('Save and continue with Yes radio navigates to Edit questionnaire page', async ({page}) => {
@@ -149,8 +143,8 @@ test.describe('Get to an answer view questions', () => {
 
         await viewQuestionPage.saveAndContinue();
 
-        editQuestionnairePage = await EditQuestionnairePage.create(page);
-        await editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        await designQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
     });
 
     test('List existing questions', async ({page}) => {
@@ -275,8 +269,11 @@ test.describe('Get to an answer view questions', () => {
 
             // Navigate to view questions page on both pages
             const viewQuestionPage1 = await goToViewQuestionsPageByUrl(page1, questionnaireId);
+            await viewQuestionPage1.waitForPageLoad();
+            
             const viewQuestionPage2 = await goToViewQuestionsPageByUrl(page2, questionnaireId);
-
+            await viewQuestionPage2.waitForPageLoad();
+            
             // Tab 1: Move question 2 up
             await viewQuestionPage1.table.moveUpByIndex(2);
             await viewQuestionPage1.waitForPageLoad();

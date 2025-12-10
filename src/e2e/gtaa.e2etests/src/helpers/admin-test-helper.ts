@@ -5,13 +5,14 @@ import {ViewQuestionPage} from '../pages/admin/ViewQuestionPage';
 import {AddQuestionnairePage} from '../pages/admin/AddQuestionnairePage';
 import {AddQuestionPage} from '../pages/admin/AddQuestionPage';
 import {AddAnswerPage} from '../pages/admin/AddAnswerPage';
-import {EditQuestionnairePage} from "../pages/admin/EditQuestionnairePage";
+import {DesignQuestionnairePage} from "../pages/admin/DesignQuestionnairePage";
 import {TermsOfUsePage} from "../pages/admin/TermsOfUsePage";
 import {EnvConfig} from '../config/environment-config';
 import {AddQuestionnaireStartPage} from "../pages/admin/AddQuestionnaireStartPage";
 import {ViewResultsPagesPage} from "../pages/admin/ViewResultsPagesPage";
 import {AddResultsPagePage} from "../pages/admin/AddResultsPagePage";
 import {EditResultsPagePage} from "../pages/admin/EditResultsPagePage";
+import {ViewContributorPage} from "../pages/admin/ViewContributorPage";
 
 type LoadState = 'domcontentloaded' | 'load' | 'networkidle';
 
@@ -26,7 +27,7 @@ export async function signIn(page: Page, bearerToken?: string): Promise<ViewQues
     const signInPage = new SignInPage(page);
 
     await signInPage.openSignInPage(bearerToken);
-    await signInPage.clickSignIn();
+    await signInPage.acceptCookiesIfVisible();
 
     const termsOfUsePage = new TermsOfUsePage(page);
     await termsOfUsePage.acceptCookiesIfVisible();
@@ -34,6 +35,7 @@ export async function signIn(page: Page, bearerToken?: string): Promise<ViewQues
 
     const viewQuestionnairePage = new ViewQuestionnairePage(page);
     await viewQuestionnairePage.waitForPageLoad();
+    await signInPage.acceptCookiesIfVisible();
 
     return viewQuestionnairePage;
 }
@@ -49,7 +51,7 @@ export async function goToAddQuestionnairePage(page: Page): Promise<AddQuestionn
     return addQuestionnairePage;
 }
 
-export async function goToEditQuestionnairePage(page: Page): Promise<EditQuestionnairePage> {
+export async function goToEditQuestionnairePage(page: Page): Promise<DesignQuestionnairePage> {
     const viewQuestionnairePage = new ViewQuestionnairePage(page);
     await viewQuestionnairePage.waitForPageLoad();
     await viewQuestionnairePage.clickCreateNewQuestionnaire();
@@ -57,10 +59,10 @@ export async function goToEditQuestionnairePage(page: Page): Promise<EditQuestio
     const addQuestionnairePage = new AddQuestionnairePage(page);
     await addQuestionnairePage.waitForPageLoad();
 
-    const editQuestionnairePage = new EditQuestionnairePage(page);
-    await editQuestionnairePage.waitForPageLoad();
+    const designQuestionnairePage = new DesignQuestionnairePage(page);
+    await designQuestionnairePage.waitForPageLoad();
 
-    return editQuestionnairePage;
+    return designQuestionnairePage;
 }
 
 // =====  URL based page navigation =====
@@ -97,20 +99,20 @@ export async function goToUpdateQuestionPageByUrl(
     return addQuestionPage;
 }
 
-export async function goToEditQuestionnairePageByUrl(
+export async function goToDesignQuestionnairePageByUrl(
     page: Page,
     questionnaireId: string,
-    waitUntil: LoadState = 'networkidle'): Promise<EditQuestionnairePage> {
+    waitUntil: LoadState = 'networkidle'): Promise<DesignQuestionnairePage> {
 
     const adminUrl = EnvConfig.ADMIN_URL;
     const editUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/track`;
 
     await page.goto(editUrl, {waitUntil});
 
-    const editQuestionnairePage = new EditQuestionnairePage(page)
-    await editQuestionnairePage.waitForPageLoad();
+    const designQuestionnairePage = new DesignQuestionnairePage(page)
+    await designQuestionnairePage.waitForPageLoad();
 
-    return editQuestionnairePage;
+    return designQuestionnairePage;
 }
 
 export async function goToViewQuestionsPageByUrl(
@@ -194,6 +196,23 @@ export async function goToAddAnswerPageByUrl(
     return addAnswerPage;
 }
 
+export async function goToUpdateAnswerPageByUrl(
+    page: Page,
+    questionnaireId: string,
+    questionId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<AddAnswerPage> {
+
+    const adminUrl = EnvConfig.ADMIN_URL;
+    const addAnswerUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/questions/${questionId}/answers/edit`;
+
+    await page.goto(addAnswerUrl, {waitUntil});
+
+    const addAnswerPage = new AddAnswerPage(page, 'update')
+    await addAnswerPage.waitForPageLoad();
+
+    return addAnswerPage;
+}
+
 export async function goToAddResultPagePageByUrl(
     page: Page,
     questionnaireId: string,
@@ -225,4 +244,25 @@ export async function goToEditResultPagePageByUrl(
     await addResultsPagePage.waitForPageLoad();
 
     return addResultsPagePage;
+}
+
+export async function goToQuestionnaireContributorsPageByUrl(
+    page: Page,
+    questionnaireId: string,
+    waitUntil: LoadState = 'networkidle'): Promise<ViewContributorPage> {
+    
+    const adminUrl = EnvConfig.ADMIN_URL;
+    
+    // to cache persistence questionnaire information
+    const trackQuestionnaireUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/track`;
+    await page.goto(trackQuestionnaireUrl, {waitUntil});
+    
+    const viewContributorsUrl = `${adminUrl}/admin/questionnaires/${questionnaireId}/contributors`;
+
+    await page.goto(viewContributorsUrl, {waitUntil});
+
+    const viewContributorPage = new ViewContributorPage(page)
+    await viewContributorPage.waitForPageLoad();
+
+    return viewContributorPage;
 }

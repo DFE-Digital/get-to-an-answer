@@ -29,7 +29,7 @@
         </h2>
       </div>
       <div class="govuk-notification-banner__content">
-        <h3 class="govuk-notification-banner__heading">
+        <h3 id="just-saved-access-changes-banner-text" class="govuk-notification-banner__heading">
           Your changes to access has been saved
         </h3>
       </div>
@@ -40,11 +40,11 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
-      <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
+    <h1 id="manage-access-title" class="govuk-heading-l govuk-!-margin-bottom-2">
+      <span id="current-questionnaire-title" class="govuk-caption-l">@Model.QuestionnaireTitle</span>
       Manage access
     </h1>
-    <div class="govuk-hint govuk-!-margin-bottom-8">
+    <div id="manage-access-hint" class="govuk-hint govuk-!-margin-bottom-8">
       <p>It's recommended that at least 2 people have access to a questionnaire to make sure it can be maintained.</p>
 
       <p>The following people have access to view or edit this questionnaire. </p>
@@ -66,24 +66,29 @@
           </tr>
           </thead>
           <tbody class="govuk-table__body">
-          @foreach (var contributor in contributors)
+          @for (var index = 0; index < contributors.Count; index++)
           {
+            var contributor = contributors[index];
+            var row = index + 1;
+            
             <tr class="govuk-table__row govuk-table__row-v-centered">
               <td class="govuk-table__cell">@contributor.DisplayName</td>
               <td class="govuk-table__cell">@contributor.UserPrincipalName</td>
               <td class="govuk-table__cell">
                 <form method="post">
+                  <input type="hidden" asp-for="@Model.BackLinkSlug" />
                   <input type="hidden" name="ContributorEmail" value="@contributor.UserPrincipalName"/>
                   <input type="hidden" name="ContributorId" value="@contributor.Id"/>
-                      
+
                   @if (canDeleteContributors)
                   {
-                    <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit"
-                            asp-page-handler="DeleteContributor">Delete contributor</button>
+                    <button id="remove-contributor-@row" class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit"
+                            asp-page-handler="DeleteContributor">Remove</button>
                   }
                   else
                   {
-                    <button disabled class="govuk-button govuk-button--warning" data-module="govuk-button" type="button">
+                    <button id="remove-contributor-@row" disabled class="govuk-button govuk-button--warning" 
+                            data-module="govuk-button" type="button">
                       Remove
                     </button>
                   }
@@ -96,7 +101,7 @@
       }
     </div>
     <div class="govuk-button-group">
-      <a class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" 
+      <a id="add-person" class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" 
          href="@string.Format(Routes.AddContributor, Model.QuestionnaireId)">Add person</a>
     </div>
   </div>

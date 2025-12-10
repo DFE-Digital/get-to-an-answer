@@ -1,9 +1,8 @@
 import {expect, Page, Locator} from '@playwright/test';
 import {BasePage} from '../BasePage';
+import {Timeouts} from "../../constants/timeouts";
 
-type Mode = 'create' | 'edit' | 'clone';
-
-export class EditQuestionnairePage extends BasePage {
+export class DesignQuestionnairePage extends BasePage {
     // ===== Locators =====
     private readonly main: Locator;
     private readonly banner: Locator;
@@ -42,7 +41,7 @@ export class EditQuestionnairePage extends BasePage {
     private readonly gtaaApiErrorBannerLabel: Locator;
     private readonly gtaaApiErrorBannerText: Locator;
     
-    constructor(page: Page, mode: Mode = 'edit') {
+    constructor(page: Page) {
         super(page);
         this.main = this.page.locator('main.govuk-main-wrapper[role="main"]');
         this.banner = this.page.locator('div.govuk-notification-banner--success[role="alert"]');
@@ -229,6 +228,8 @@ export class EditQuestionnairePage extends BasePage {
     }
     
     async assertGtaaApiErrorBanner(expectedLabel?: string, expectedText?: string) {
+        await this.gtaaApiErrorBannerLabel.waitFor({state: 'visible', timeout: Timeouts.LONG});
+        
         await expect(this.gtaaApiErrorBannerLabel).toBeVisible();
         await expect(this.gtaaApiErrorBannerText).toBeVisible();
         

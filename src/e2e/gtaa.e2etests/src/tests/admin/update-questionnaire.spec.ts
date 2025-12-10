@@ -10,9 +10,9 @@ import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {
     signIn,
     goToUpdateQuestionnairePageByUrl,
-    goToEditQuestionnairePageByUrl
+    goToDesignQuestionnairePageByUrl
 } from '../../helpers/admin-test-helper';
-import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
+import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaireSlugPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
@@ -25,7 +25,7 @@ test.describe('Get to an answer update questionnaire', () => {
     
     let viewQuestionnairePage: ViewQuestionnairePage;
     let addQuestionnairePage: AddQuestionnairePage;
-    let editQuestionnairePage: EditQuestionnairePage;
+    let designQuestionnairePage: DesignQuestionnairePage;
     let updateQuestionnaireSlugPage: UpdateQuestionnaireSlugPage;
 
     test.beforeEach(async ({request, page}) => {
@@ -49,10 +49,11 @@ test.describe('Get to an answer update questionnaire', () => {
         viewQuestionnairePage = await signIn(page, token);
         addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
         await addQuestionnairePage.ClickBackToQuestionnaireLink();
-        editQuestionnairePage = await EditQuestionnairePage.create(page);
-        expect(editQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        expect(designQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
     });
 
+    //TBC, CARE-1592 bug raised
     test('Error summary appears on submit with missing title', async ({page, browserName}) => {
         viewQuestionnairePage = await signIn(page, token);
         addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
@@ -80,6 +81,7 @@ test.describe('Get to an answer update questionnaire', () => {
         await addQuestionnairePage.validateTitleFormGroup();
     });
 
+    // TBC, CARE-1546 bug raised
     test('Accessible aria-describedby includes hint id and error message id', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
@@ -101,11 +103,11 @@ test.describe('Get to an answer update questionnaire', () => {
         await addQuestionnairePage.enterTitle(newTitle);
         await addQuestionnairePage.clickSaveAndContinue();
 
-        editQuestionnairePage = await EditQuestionnairePage.create(page);
-        await editQuestionnairePage.expectSuccessBannerVisible();
-        await editQuestionnairePage.validateHeadingAndStatus();
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        await designQuestionnairePage.expectSuccessBannerVisible();
+        await designQuestionnairePage.validateHeadingAndStatus();
 
-        await editQuestionnairePage.ClickBackToQuestionnaireLink()
+        await designQuestionnairePage.ClickBackToQuestionnaireLink()
         viewQuestionnairePage = await ViewQuestionnairePage.create(page);
 
         const statusValue = questionnaireGetResponse.questionnaireGetBody.status;
@@ -152,8 +154,8 @@ test.describe('Get to an answer update questionnaire', () => {
         
         viewQuestionnairePage = await signIn(page, token);
 
-        editQuestionnairePage = await goToEditQuestionnairePageByUrl(page, questionnaire.id);
-        await editQuestionnairePage.createQuestionnaireId();
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaire.id);
+        await designQuestionnairePage.createQuestionnaireId();
 
         updateQuestionnaireSlugPage = await UpdateQuestionnaireSlugPage.create(page);
 

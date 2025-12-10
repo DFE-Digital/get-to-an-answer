@@ -362,7 +362,7 @@ public class ApiClient : IApiClient
         try
         {
             // Deserialize a ProblemDetails response for specific error handling.
-            var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(errorBody);
+            TryDeserialize<ProblemDetails>(errorBody, out var problemDetails);
             
             var statusCode = problemDetails?.Status ?? (int) response.StatusCode;
 
@@ -378,6 +378,22 @@ public class ApiClient : IApiClient
             _logger.LogError($"API request '{response.RequestMessage?.RequestUri?.AbsolutePath}' failed with status code '{response.StatusCode}', error: '{errorBody}'");
             throw;
         }
+    }
+    
+
+    private bool TryDeserialize<T>(string json, out T? result) where T : class
+    {
+        try
+        {
+            result = JsonSerializer.Deserialize<T>(json);
+        }
+        catch (Exception)
+        {
+            _logger.LogError($"Failed to deserialize '{json}' to type '{typeof(T)}'");
+            result = null;
+        }
+
+        return result != null;
     }
 }
 

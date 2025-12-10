@@ -196,6 +196,15 @@ export class ViewQuestionTable {
         await link.click();
     }
 
+    async clickEditByQuestionContent(questionContent: string): Promise<void> {
+        const row = this.rows.filter({ hasText: questionContent }).first();
+        await expect(row, `❌ Row with question content "${questionContent}" not found`).toBeVisible();
+
+        const editLink = row.getByRole('link', { name: /Edit/i });
+        await expect(editLink, `❌ Edit link not visible for question "${questionContent}"`).toBeVisible();
+        await editLink.click();
+    }
+
     async moveUpByIndex(index: number): Promise<void> {
         const row = this.rowByIndex(index);
         const link = this.getMoveUpLinkForRow(row);

@@ -1,7 +1,7 @@
 import {test, expect} from "@playwright/test";
 import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {goToAddQuestionnairePage, signIn} from '../../helpers/admin-test-helper';
-import {EditQuestionnairePage} from "../../pages/admin/EditQuestionnairePage";
+import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {ErrorMessages} from "../../constants/test-data-constants";
@@ -10,7 +10,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
     let token: string;
     let viewQuestionnairePage: ViewQuestionnairePage;
     let addQuestionnairePage: AddQuestionnairePage;
-    let editQuestionnairePage: EditQuestionnairePage;
+    let designQuestionnairePage: DesignQuestionnairePage;
 
     test.beforeEach(async ({page}) => {
         token = JwtHelper.NoRecordsToken();
@@ -23,9 +23,9 @@ test.describe('Get to an answer create a new questionnaire', () => {
         addQuestionnairePage = await AddQuestionnairePage.create(page);
         await addQuestionnairePage.addQuestionnaire();
 
-         editQuestionnairePage = await EditQuestionnairePage.create(page);
-         await editQuestionnairePage.validateHeadingAndStatus();
-         await editQuestionnairePage.expectSuccessBannerVisible();
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+         await designQuestionnairePage.validateHeadingAndStatus();
+         await designQuestionnairePage.expectSuccessBannerVisible();
     });
 
     test('Validate presence of elements on add new questionnaire page', async ({page}) => {
@@ -43,6 +43,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await viewQuestionnairePage.expectQuestionnaireHeadingOnPage();
     });
     
+    // TBC, CARE-1592 bug raised
     test('Submit a new questionnaire with missing title', async ({page, browserName}) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
 
@@ -73,7 +74,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await addQuestionnairePage.validateTitleFormGroup();
     });
     
-    // TBC, aria-described by id's need correction (CARE-1546) during accessibility testing
+    //TBC, CARE-1546 bug raised
     test('Submit a new questionnaire with invalid title to validate aria-describedby', async ({page}) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
 

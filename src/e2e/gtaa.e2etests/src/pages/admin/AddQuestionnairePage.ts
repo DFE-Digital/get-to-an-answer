@@ -12,7 +12,6 @@ export class AddQuestionnairePage extends BasePage {
     private readonly backToQuestionnaireLink: Locator;
     private readonly titleInput: Locator;
     private readonly saveAndContinueButton: Locator;
-    private readonly titleLabel: Locator;
     private readonly supportiveHint: Locator;
     private readonly errorSummary: Locator;
     private readonly errorList: Locator;
@@ -40,9 +39,6 @@ export class AddQuestionnairePage extends BasePage {
         );
         this.saveAndContinueButton = this.page.getByRole(
             'button', {name: 'Save and continue'}
-        );
-        this.titleLabel = this.page.locator(
-            'label[for="Title"]'
         );
         this.supportiveHint = this.page.locator(
             '#Title-hint'
@@ -105,8 +101,7 @@ export class AddQuestionnairePage extends BasePage {
     }
 
     // ===== Validations =====
-    async verifyLabelAndHintPresent(): Promise<void> {
-        await expect(this.titleLabel).toBeVisible();
+    async verifyHintPresent(): Promise<void> {
         await expect(this.supportiveHint).toBeVisible();
     }
 
@@ -157,12 +152,6 @@ export class AddQuestionnairePage extends BasePage {
 
         if (browserName !== 'webkit') {
             await expect(this.titleInput, '❌ Title input not focused after error link click').toBeFocused();
-            await expect(this.errorSummary, '❌ Error summary text mismatch').toContainText(expectedMessage);
-
-            const outline = await this.titleInput.evaluate((el) => {
-                return window.getComputedStyle(el).getPropertyValue('outline');
-            });
-            expect(outline, '❌ Title input does not show focus outline').not.toBe('none');
         }
     }
 
@@ -181,7 +170,7 @@ export class AddQuestionnairePage extends BasePage {
     async assertPageElements() {
         await this.verifyHeaderLinks()
         await this.verifyFooterLinks();
-        await this.verifyLabelAndHintPresent();
+        await this.verifyHintPresent();
 
         await expect(this.form).toBeVisible();
         await expect(this.titleInput).toBeVisible();

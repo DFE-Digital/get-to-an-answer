@@ -46,14 +46,6 @@ public class QuestionnaireCustomStyling(
         if (!ModelState.IsValid)
             return Page();
         
-        if (!UpdateRequest.IsAccessibilityAgreementAccepted)
-        {
-            ModelState.AddModelError("UpdateRequest.IsAccessibilityAgreementAccepted", 
-                "You must accept the accessibility agreement");
-
-            return Page();
-        }
-        
         var questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId);
         
         if (resetStyling)
@@ -81,7 +73,17 @@ public class QuestionnaireCustomStyling(
                 await apiClient.DeleteQuestionnaireDecorativeImageAsync(QuestionnaireId);
                 
                 TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustRemovedStartPageImage = true });
+                
+                return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
             }
+        }
+        
+        if (!UpdateRequest.IsAccessibilityAgreementAccepted)
+        {
+            ModelState.AddModelError("UpdateRequest.IsAccessibilityAgreementAccepted", 
+                "You must accept the accessibility agreement");
+
+            return Page();
         }
 
         if (file is not null && questionnaire is not null)
