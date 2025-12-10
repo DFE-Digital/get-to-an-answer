@@ -23,6 +23,7 @@
     
     
     <form method="post" accept-charset="UTF-8">
+      <input type="hidden" asp-for="@Model.BackLinkSlug" />
       <!-- Contributor Email -->
       <govuk-form-group asp-for="@Model.ContributorEmail">
         <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
@@ -36,7 +37,7 @@
           <div id="add-person-hint" class="govuk-hint govuk-!-margin-bottom-8">
             <p>Add the DfE email address for the person you want to give access to.</p>
 
-            <p>Once you add them, they can edit the questionnaire when they sign in.</p> 
+            <p>Once you add them, they can edit the questionnaire when they sign in.</p>
           </div>
 
           <govuk-field-error asp-for="@Model.ContributorEmail" error-id="ContributorEmail-error">

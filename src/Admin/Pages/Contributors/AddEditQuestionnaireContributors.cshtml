@@ -76,9 +76,10 @@
               <td class="govuk-table__cell">@contributor.UserPrincipalName</td>
               <td class="govuk-table__cell">
                 <form method="post">
+                  <input type="hidden" asp-for="@Model.BackLinkSlug" />
                   <input type="hidden" name="ContributorEmail" value="@contributor.UserPrincipalName"/>
                   <input type="hidden" name="ContributorId" value="@contributor.Id"/>
-                      
+
                   @if (canDeleteContributors)
                   {
                     <button id="remove-contributor-@row" class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit"

@@ -29,14 +29,15 @@
       <p>Once you make a copy of this questionnaire, you will be directed to 'Create a questionnaire' of the new copy.</p>
     </div>
     <form accept-charset="UTF-8" method="post">
+      <input type="hidden" asp-for="@Model.BackLinkSlug"/>
       <govuk-form-group asp-for="@Model.Title">
         <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
             <h2 class="govuk-fieldset__heading">
-              What is the title of the copy of this questionnaire? 
+              What is the title of the copy of this questionnaire?
             </h2>
           </legend>
-          
+
           <govuk-field-error asp-for="@Model.Title" error-id="@inputId-field-error"></govuk-field-error>
 
           <govuk-input id="@inputId"

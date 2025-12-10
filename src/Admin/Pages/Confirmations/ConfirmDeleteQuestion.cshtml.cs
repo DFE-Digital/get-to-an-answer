@@ -24,7 +24,7 @@ public class ConfirmDeleteQuestion(ILogger<ConfirmDeleteQuestion> logger, IApiCl
 
     public IActionResult OnGet()
     {
-        BackLinkSlug = string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionId);
+        BackLinkSlug = string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId);
         QuestionNumber = TempData.Peek("NumberOfQuestionToBeDeleted") as string;
         return Page();
     }

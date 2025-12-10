@@ -120,44 +120,45 @@ else if (Model.QuestionnaireState is { JustDeleted: true })
       }
     </div>
     <form method="post" class="govuk-!-margin-top-6">
+      <input type="hidden" asp-for="@Model.BackLinkSlug" /> 
       <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-              <h2 class="govuk-fieldset__heading">
-                  Have you finished editing result pages?
-              </h2>
-          </legend>
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+          <h2 class="govuk-fieldset__heading">
+            Have you finished editing result pages?
+          </h2>
+        </legend>
 
-          <div id="finished-hint" class="govuk-hint">
-              Selecting “Yes” will mark this task as complete. You’ll still be able to make changes if you
-              need to.
+        <div id="finished-hint" class="govuk-hint">
+          Selecting “Yes” will mark this task as complete. You’ll still be able to make changes if you
+          need to.
+        </div>
+
+        <div class="govuk-radios" data-module="govuk-radios">
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="finished-yes" name="FinishedEditing" type="radio"
+                   asp-for="@Model.FinishedEditing"
+                   value="true">
+            <label class="govuk-label govuk-radios__label" for="finished-yes">
+              Yes
+            </label>
           </div>
 
-          <div class="govuk-radios" data-module="govuk-radios">
-              <div class="govuk-radios__item">
-                  <input class="govuk-radios__input" id="finished-yes" name="FinishedEditing" type="radio"
-                         asp-for="@Model.FinishedEditing"
-                         value="true">
-                  <label class="govuk-label govuk-radios__label" for="finished-yes">
-                      Yes
-                  </label>
-              </div>
-
-              <div class="govuk-radios__item">
-                  <input class="govuk-radios__input" id="finished-no" name="FinishedEditing" type="radio"
-                         asp-for="@Model.FinishedEditing"
-                         value="false">
-                  <label class="govuk-label govuk-radios__label" for="finished-no">
-                      No, I’ll come back later
-                  </label>
-              </div>
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="finished-no" name="FinishedEditing" type="radio"
+                   asp-for="@Model.FinishedEditing"
+                   value="false">
+            <label class="govuk-label govuk-radios__label" for="finished-no">
+              No, I’ll come back later
+            </label>
           </div>
+        </div>
       </fieldset>
 
       <button class="govuk-button govuk-!-margin-top-4" data-module="govuk-button" type="submit"
               asp-page-handler="SaveAndContinue">
-          Save and continue
+        Save and continue
       </button>
-  </form>
+    </form>
 
   </div>
 </div>
