@@ -111,15 +111,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             ModelState.Remove(key);
         }
     }
-
-    private void RemoveModelStateErrorsForFields()
-    {
-        foreach (var key in ModelState.Keys)
-        {
-            ModelState[key]?.Errors.Clear();
-        }
-    }
-
+    
     private async Task PopulateFieldWithExistingValues()
     {
         var existingAnswers = await _apiClient.GetAnswersAsync(QuestionId);

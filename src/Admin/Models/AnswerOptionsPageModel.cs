@@ -52,6 +52,14 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         return Page();
     }
     
+    protected void RemoveModelStateErrorsForFields()
+    {
+        foreach (var key in ModelState.Keys)
+        {
+            ModelState[key]?.Errors.Clear();
+        }
+    }
+    
     protected void ReassignOptionNumbers()
     {
         for (var index = 0; index < Options.Count; index++)

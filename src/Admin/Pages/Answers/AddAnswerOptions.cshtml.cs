@@ -98,14 +98,6 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
         ReassignOptionNumbers();
         return Page();
     }
-
-    private void RemoveModelStateErrorsForFields()
-    {
-        foreach (var key in ModelState.Keys)
-        {
-            ModelState[key]?.Errors.Clear();
-        }
-    }
     
     private void RemoveModelStateEntriesForOption(int index)
     {
