@@ -39,9 +39,11 @@ jobs:
         if: ${{ env.ENVIRONMENT == 'Local' }}
         working-directory: ./src
         env:
-          DEFAULT_CONNECTION_STRING: ${{ secrets.DEFAULT_CONNECTION_STRING }}
-          SQLSERVER_SA_PASSWORD: ${{ secrets.SQLSERVER_SA_PASSWORD }}
-          ASPNETCORE_ENVIRONMENT: "Local"
+          E2E_SQLSERVER_CONNECTION_STRING: ${{ secrets.E2E_SQLSERVER_CONNECTION_STRING }}
+          E2E_SQLSERVER_SA_PASSWORD: ${{ secrets.E2E_SQLSERVER_SA_PASSWORD }}
+          E2E_AZURITE_CONNECTION_STRING: ${{ secrets.E2E_AZURITE_CONNECTION_STRING }}
+          E2E_CERT_PASSWORD: ${{ secrets.E2E_CERT_PASSWORD }}
+          ASPNETCORE_ENVIRONMENT: ${{ env.ENVIRONMENT }}
           AZURE_AD_CLIENT_ID: "123"
           AZURE_AD_TENANT_ID: "456"
           AZURE_AD_CLIENT_SECRET: "789"
@@ -52,11 +54,10 @@ jobs:
       - name: Install dependencies
         working-directory: ./src/e2e/gtaa.e2etests
         run: yarn install
-      
-      #     Temporarily disabled these until work starts on the new frontend and admin projects
-      #      - name: Install Playwright Browsers
-      #        working-directory: ./src/e2e/gtaa.e2etests
-      #        run: yarn playwright install --with-deps
+
+      - name: Install Playwright Browsers
+        working-directory: ./src/e2e/gtaa.e2etests
+        run: yarn playwright install --with-deps
 
       - name: Run healthcheck
         if: steps.run.outcome == 'success'
