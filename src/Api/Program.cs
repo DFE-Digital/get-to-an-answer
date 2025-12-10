@@ -26,7 +26,8 @@ var builderIsLocalEnvironment = builder.Environment.IsEnvironment(localEnvironme
 if (builderIsLocalEnvironment)
 {
     builder.Configuration
-        .AddUserSecrets<Program>(optional: true, reloadOnChange: true);
+        .AddUserSecrets<Program>(optional: true, reloadOnChange: true)
+        .AddEnvironmentVariables();
 }
 
 Log.Logger = new LoggerConfiguration()
