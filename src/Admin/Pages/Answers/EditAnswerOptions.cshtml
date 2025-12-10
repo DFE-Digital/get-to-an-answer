@@ -48,11 +48,13 @@
     <h2 class="govuk-heading-m govuk-!-margin-top-6">Answer options</h2>
 
     <form method="post" accept-charset="UTF-8">
+      <input type="hidden" asp-for="@Model.BackLinkSlug" />
+      
       @foreach (var answerId in Model.DeletedAnswerIds)
       {
         <input type="hidden" name="DeletedAnswerIds" value="@answerId"/>
       }
-      
+
       @for (var index = 0; index < Model.Options.Count; index++)
       {
         var viewData = new ViewDataDictionary(ViewData)
