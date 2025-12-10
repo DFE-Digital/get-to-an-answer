@@ -60,6 +60,7 @@ test.describe('Get to an answer update questionnaire', () => {
         
         addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
         await addAnswerPage.expectAnswerHeadingOnPage();
+        
         //delete answer and validate it's deleted in the table
 
     });

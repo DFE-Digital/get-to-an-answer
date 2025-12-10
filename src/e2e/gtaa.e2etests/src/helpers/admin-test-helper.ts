@@ -51,7 +51,7 @@ export async function goToAddQuestionnairePage(page: Page): Promise<AddQuestionn
     return addQuestionnairePage;
 }
 
-export async function goToEditQuestionnairePage(page: Page): Promise<DesignQuestionnairePage> {
+export async function goToDesignQuestionnairePage(page: Page): Promise<DesignQuestionnairePage> {
     const viewQuestionnairePage = new ViewQuestionnairePage(page);
     await viewQuestionnairePage.waitForPageLoad();
     await viewQuestionnairePage.clickCreateNewQuestionnaire();

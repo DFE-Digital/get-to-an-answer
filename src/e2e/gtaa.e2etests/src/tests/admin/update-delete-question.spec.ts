@@ -10,6 +10,7 @@ import {createQuestion, getQuestion} from "../../test-data-seeder/question-data"
 import {AddQuestionPage, QuestionRadioLabel} from "../../pages/admin/AddQuestionPage";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
 import {DeleteQuestionConfirmationPage} from "../../pages/admin/DeleteQuestionConfirmationPage";
+import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 
 test.describe('Get to an answer update question', () => {
     let token: string;
@@ -40,7 +41,7 @@ test.describe('Get to an answer update question', () => {
     test('Back link takes to view question list from Edit question page', async ({page}) => {
         await signIn(page, token);
         addQuestionPage = await goToUpdateQuestionPageByUrl(page, questionnaireId, question1Id);
-        
+
         await addQuestionPage.verifyBackLinkPresent();
         await addQuestionPage.clickBackLink();
 
@@ -48,7 +49,7 @@ test.describe('Get to an answer update question', () => {
         await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
     });
 
-    test('Save question updates question data successfully', async ({request, page}) => {
+    test('Save question updates question data successfully via api', async ({request, page}) => {
         const {questionGetBody: originalQuestion} = await getQuestion(request, question1Id, token);
 
         // Verify original data exists
@@ -88,8 +89,68 @@ test.describe('Get to an answer update question', () => {
 
         await addQuestionPage.validateSuccessBanner();
     });
-    
-    test('Error summary on invalid submit with missing required fields when updating question', async ({page, browserName}) => {
+
+    test('Save question updates question data successfully via web', async ({request, page}) => {
+        const {answer} = await createSingleAnswer(request, {
+            questionId: question1Id, questionnaireId, content: 'Answer A'
+        }, token);
+
+        const {questionGetBody: originalQuestion} = await getQuestion(request, question1Id, token);
+
+        // Verify original data exists
+        expect(originalQuestion.content).toBeDefined();
+        expect(originalQuestion.type).toBeDefined();
+
+        // Store original values
+        const originalContent = originalQuestion.content;
+        const originalType = originalQuestion.type;
+        const originalDescription = originalQuestion.description;
+
+        // Navigate to edit page
+        await signIn(page, token);
+        addQuestionPage = await goToUpdateQuestionPageByUrl(page, questionnaireId, question1Id);
+
+        // Update question data
+        const updatedContent = `Updated Question - ${Date.now()}`;
+        const updatedHintText = `Updated hint text - ${Date.now()}`;
+
+        await addQuestionPage.enterQuestionContent(updatedContent);
+        await addQuestionPage.enterQuestionHintText(updatedHintText);
+        await addQuestionPage.chooseQuestionType(QuestionRadioLabel.SingleSelectLong);
+        await addQuestionPage.clickSaveQuestion();
+
+        // Verify the update via form data
+        await addQuestionPage.clickBackLink();
+        viewQuestionPage = await ViewQuestionPage.create(page);
+        await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
+
+        await viewQuestionPage.table.clickEditByQuestionContent(updatedContent);
+        addQuestionPage = await AddQuestionPage.create(page);
+
+        // Assert original data was different from updated
+        const currentContent = await addQuestionPage.getQuestionContent();
+        expect(currentContent).not.toBe(originalContent);
+        const currentHint = await addQuestionPage.getQuestionHintText();
+        expect(currentHint).not.toBe(originalContent);
+
+        // Assert updated data
+        expect(currentContent).toBe(updatedContent);
+        expect(currentHint).toBe(updatedHintText);
+        expect(
+            await addQuestionPage.isQuestionTypeSelected(QuestionRadioLabel.SingleSelectLong),
+            `❌ SingleSelectShort radio should be selected`
+        ).toBe(true);
+
+        // Assert answer row data is not empty and populated with original asnwer data
+        const rowData = await addQuestionPage.table.getAnswerRowData(answer.content);
+        expect(rowData.answer, '❌ Answer content should be updated').toBe(answer.content);
+        expect(rowData.destination, '❌ Destination should remain "Next question"').toBe('Next question');
+    });
+
+    test('Error summary on invalid submit with missing required fields when updating question', async ({
+                                                                                                           page,
+                                                                                                           browserName
+                                                                                                       }) => {
         await signIn(page, token);
         addQuestionPage = await goToUpdateQuestionPageByUrl(page, questionnaireId, question1Id);
 
@@ -141,7 +202,7 @@ test.describe('Get to an answer update question', () => {
 
         await addQuestionPage.validateInlineQuestionContentError();
     });
-    
+
     test('Update an existing question with invalid content to validate aria-describedby', async ({page}) => {
         await signIn(page, token);
         addQuestionPage = await goToUpdateQuestionPageByUrl(page, questionnaireId, question1Id);
