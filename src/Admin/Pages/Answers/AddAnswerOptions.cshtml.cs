@@ -92,12 +92,21 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
     {
         Options.RemoveAt(index);
         RemoveModelStateEntriesForOption(index);
+        RemoveModelStateErrorsForFields();
 
         await HydrateOptionListsAsync();
         ReassignOptionNumbers();
         return Page();
     }
 
+    private void RemoveModelStateErrorsForFields()
+    {
+        foreach (var key in ModelState.Keys)
+        {
+            ModelState[key]?.Errors.Clear();
+        }
+    }
+    
     private void RemoveModelStateEntriesForOption(int index)
     {
         var prefixBracket = $"Options[{index}]";
