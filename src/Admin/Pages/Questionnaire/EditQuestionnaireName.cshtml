@@ -22,24 +22,25 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <form accept-charset="UTF-8" method="post">
+      <input type="hidden" asp-for="@Model.BackLinkSlug"/>
       <govuk-form-group asp-for="@Model.Title">
         <h1 class="govuk-heading-l govuk-!-margin-0">
           <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
           <label for="@inputId" class="govuk-label govuk-label--l">@title</label>
-        </h1> 
+        </h1>
         <div class="govuk-hint govuk-!-margin-bottom-8" id="@inputId-hint">
           <p>The questionnaire will be shown at the top of each page.</p>
           <p>Use a name that describes what it helps people to do. For example 'Check your care leaver support'.</p>
         </div>
         <govuk-field-error asp-for="@Model.Title" error-id="@inputId-field-error"></govuk-field-error>
-        
+
         <govuk-input id="@inputId"
-               class="govuk-input"
-               aria-describedby="@inputId-hint"
-               type="text"
-               name="@nameof(Model.Title)"
-               asp-for="@Model.Title"
-               govuk-error-for="@Model?.Title" />
+                     class="govuk-input"
+                     aria-describedby="@inputId-hint"
+                     type="text"
+                     name="@nameof(Model.Title)"
+                     asp-for="@Model.Title"
+                     govuk-error-for="@Model?.Title"/>
       </govuk-form-group>
       <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
     </form>

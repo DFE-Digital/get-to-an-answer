@@ -22,23 +22,24 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <form accept-charset="UTF-8" method="post">
+      <input type="hidden" asp-for="@Model.BackLinkSlug" />
       <govuk-form-group asp-for="@Model.Slug">
         <h1 class="govuk-label-wrapper">
           <label for="@inputId" class="govuk-label govuk-label--l">@title</label>
-        </h1> 
+        </h1>
         <div class="govuk-hint" id="@inputId-hint">
           <p>The questionnaire will be shown at the top of each page.</p>
           <p>Use a name that describes what it helps people to do. For example 'Check your care leaver support'.</p>
         </div>
         <govuk-field-error asp-for="@Model.Slug" error-id="@inputId-field-error"></govuk-field-error>
-        
+
         <govuk-input id="@inputId"
-               class="govuk-input"
-               aria-describedby="forms-name-input-name-hint"
-               type="text"
-               name="@nameof(Model.Slug)"
-               asp-for="@Model.Slug"
-               govuk-error-for="@Model?.Slug" />
+                     class="govuk-input"
+                     aria-describedby="forms-name-input-name-hint"
+                     type="text"
+                     name="@nameof(Model.Slug)"
+                     asp-for="@Model.Slug"
+                     govuk-error-for="@Model?.Slug"/>
       </govuk-form-group>
       <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
     </form>

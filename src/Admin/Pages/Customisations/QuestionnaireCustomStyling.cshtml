@@ -198,15 +198,15 @@
                     <p>You must upload an image at the size xxxx</p>
                 </div>
                 <div class="govuk-form-group govuk-!-margin-bottom-6">
-                    <label class="govuk-label" for="file-upload-1" id="file-upload-1-label">
+                    <label class="govuk-label" for="decorative-image-upload" id="decorative-image-upload-label">
                         Upload a file
                     </label>
                     <div class="govuk-drop-zone"
                          data-module="govuk-file-upload">
-                        <input id="file-upload-1" class="govuk-file-upload" asp-for="UpdateRequest.DecorativeImage"
+                        <input id="decorative-image-upload" class="govuk-file-upload" asp-for="UpdateRequest.DecorativeImage"
                                value="@(Model?.UpdateRequest.DecorativeImage ?? "")" 
                                type="file"
-                               accept="image/*">
+                               accept="image/png, image/jpeg">
                     </div>
                 </div>
                 
@@ -227,7 +227,7 @@
                 <p class="govuk-hint">
                     Use this to reset the styling to DfE styling.
                 </p>
-                <button id="file-upload" type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary" 
+                <button id="reset-styling" type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary" 
                         data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="" 
                         name="ResetStyling" value="true">Reset to DfE styling</button>
             </div>
@@ -271,7 +271,7 @@
                 </fieldset>
             </govuk-form-group>
 
-            <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button"
+            <button id="save-and-continue" type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button"
                     data-prevent-double-click="true" data-govuk-button-init="">Save and continue
             </button>
         </form>
@@ -280,7 +280,7 @@
 
 @section Scripts
 {
-    <script>
+    <script asp-add-nonce="true">
         window.addEventListener('load', function () {
 
             const uploadedView = document.querySelector('.govuk-file-upload-button__status');

@@ -316,6 +316,12 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (questionnaire == null)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             
+            if (string.IsNullOrWhiteSpace(questionnaire.Slug))
+                return BadRequest(ProblemTrace("The questionnaire ID is missing", 400));
+            
+            if (questionnaire.Contributors.Count < 2)
+                return BadRequest(ProblemTrace("The questionnaire needs to be accessible by 2 people", 400));
+            
             if (questionnaire.Questions.Count == 0)
                 return BadRequest(ProblemTrace("The questionnaire has no questions", 400));
 
@@ -370,7 +376,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
     {
         if (visited.ContainsKey(current.Id))
         {
-            return (BranchingHealthType.Cyclic, $"Question {current.Order} was be referenced twice in the same flow.");
+            return (BranchingHealthType.Cyclic, $"Question {current.Order} was referenced twice in the same flow.");
         }
         
         var visitedList = new Dictionary<Guid, bool>(visited) { { current.Id, true } };

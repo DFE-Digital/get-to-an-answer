@@ -1,5 +1,6 @@
 import {expect, test} from '@playwright/test';
 import {
+    addContributor,
     createQuestionnaire, deleteQuestionnaire,
     getQuestionnaire,
     publishQuestionnaire,
@@ -14,6 +15,10 @@ import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 test.describe('PUT Publish questionnaire api request', () => {
     test('Validate PUT publish questionnaire', async ({request}) => {
         const { questionnaire } = await createQuestionnaire(request);
+
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
+
+        await addContributor(request, questionnaire.id, 'user-1')
 
         const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
         
@@ -67,6 +72,10 @@ test.describe('PUT Publish questionnaire api request', () => {
     test('Validate POST publish unauthorised questionnaire', async ({request}) => {
         const { questionnaire } = await createQuestionnaire(request);
 
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
+
+        await addContributor(request, questionnaire.id, 'user-1')
+
         const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
         
         await createSingleAnswer(request, {
@@ -82,6 +91,8 @@ test.describe('PUT Publish questionnaire api request', () => {
 
     test('Validate POST publish unauthorised questionnaire with expired token', async ({request}) => {
         const { questionnaire } = await createQuestionnaire(request);
+
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
 
         await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
 

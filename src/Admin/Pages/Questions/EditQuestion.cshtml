@@ -73,6 +73,8 @@
             Edit question
         </h1>
         <form method="post">
+            <input type="hidden" asp-for="@Model.BackLinkSlug" />
+            
             <govuk-form-group asp-for="QuestionContent">
                 <label class="govuk-label govuk-label--m" for="QuestionContent">
                     Your question
@@ -80,13 +82,13 @@
                 <div class="govuk-hint" id="QuestionContent-hint">
                     Ask the question the way you would in person. For example, ‘Which of these countries have you lived in?’
                 </div>
-                
+
                 <govuk-field-error asp-for="QuestionContent" error-id="QuestionContent-error"/>
                 <govuk-input id="QuestionContent"
                              asp-for="QuestionContent"
                              class="govuk-input"
                              govuk-error-for="QuestionContent-error"/>
-                
+
             </govuk-form-group>
 
             <govuk-form-group asp-for="QuestionHintText">
@@ -94,10 +96,10 @@
                     Hint text (optional)
                 </label>
                 <div class="govuk-hint" id="QuestionHintText-hint">
-                    You can add a short sentence to help people answer the question. 
-                    For example, if someone can select one or more options, use 'Select all that apply'. 
+                    You can add a short sentence to help people answer the question.
+                    For example, if someone can select one or more options, use 'Select all that apply'.
                 </div>
-                
+
                 <textarea class="govuk-textarea"
                           id="QuestionHintText"
                           asp-for="QuestionHintText"

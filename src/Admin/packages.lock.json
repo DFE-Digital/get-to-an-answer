@@ -24,6 +24,16 @@
           "Azure.Storage.Common": "12.24.0"
         }
       },
+      "Joonasw.AspNetCore.SecurityHeaders": {
+        "type": "Direct",
+        "requested": "[6.0.0, )",
+        "resolved": "6.0.0",
+        "contentHash": "tuiKMG/YEMXzDC5Wpi6/HMPC2nUW9OgNZ0w5iPckd0Y9RI8zZ5i4eicN554P//lBn9Ht2pRLwK7NdTk1BAeqew==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.3",
+          "Microsoft.Extensions.Options": "9.0.3"
+        }
+      },
       "Microsoft.AspNetCore.Authentication.JwtBearer": {
         "type": "Direct",
         "requested": "[9.0.9, )",

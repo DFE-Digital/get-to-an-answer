@@ -17,14 +17,11 @@ test.describe('Get to an answer terms of use page', () => {
     });
 
     test('Validate presence of elements on terms of use page', async ({page}) => {
-        await signInPage.clickSignIn();
-
         termsOfUsePage = await TermsOfUsePage.create(page);
         await termsOfUsePage.assertPageElements();
     });
 
     test('Acceptance control present - fieldset and checkbox are visible', async ({page}) => {
-        await signInPage.clickSignIn();
         termsOfUsePage = await TermsOfUsePage.create(page);
 
         await termsOfUsePage.verifyFieldsetVisible();
@@ -32,7 +29,6 @@ test.describe('Get to an answer terms of use page', () => {
     });
 
     test('Validation when not accepted - error summary, inline error appear', async ({page}) => {
-        await signInPage.clickSignIn();
         termsOfUsePage = await TermsOfUsePage.create(page);
 
         await termsOfUsePage.submitWithoutAccepting();
@@ -44,7 +40,6 @@ test.describe('Get to an answer terms of use page', () => {
     });
 
     test('Successful acceptance - checkbox is ticked and user navigates to next step', async ({page}) => {
-        await signInPage.clickSignIn();
         termsOfUsePage = await TermsOfUsePage.create(page);
 
         await termsOfUsePage.acceptTerms();
