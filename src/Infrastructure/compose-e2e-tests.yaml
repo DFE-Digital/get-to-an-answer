@@ -6,7 +6,8 @@ services:
     command: >
       bash -c "
         echo 'Generating self-signed certificate...' &&
-        dotnet dev-certs https -ep /https/https-dev.pfx -p "${CERT_PASSWORD}" &&
+        dotnet dev-certs https --clean && 
+        dotnet dev-certs https -ep /https/https-dev.pfx -p "${E2E_CERT_PASSWORD}" &&
         ls -l /https &&
         sleep 5
       "
@@ -24,8 +25,8 @@ services:
       - cert-generator
     environment:
       - ApiSettings__BaseUrl=http://web-api:8080
-      - BlobStorage__ConnectionString=${BLOB_STORAGE_CONNECTION_STRING}
-      - BlobStorage__CContainerName=images
+      - BlobStorage__ConnectionString=${E2E_AZURITE_CONNECTION_STRING}
+      - BlobStorage__ContainerName=images
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - AzureAd__ClientId=${AZURE_AD_CLIENT_ID}
       - AzureAd__Secret=${AZURE_AD_CLIENT_SECRET}
@@ -36,7 +37,7 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:8080;https://0.0.0.0:8443
       - ASPNETCORE_Kestrel__Endpoints__Https__Url=https://0.0.0.0:8443
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/https-dev.pfx
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${E2E_CERT_PASSWORD}
     ports:
       - "8081:8080"
       - "8453:8443"
@@ -60,8 +61,8 @@ services:
       - sqlserver
       - cert-generator
     environment:
-      - ConnectionStrings__DefaultConnection=${DEFAULT_CONNECTION_STRING}
-      - SQLSERVER_SA_PASSWORD=${SQLSERVER_SA_PASSWORD}
+      - ConnectionStrings__DefaultConnection=${E2E_SQLSERVER_CONNECTION_STRING}
+      - SQLSERVER_SA_PASSWORD=${E2E_SQLSERVER_SA_PASSWORD}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - AzureAd__ClientId=${AZURE_AD_CLIENT_ID}
       - AzureAd__TenantId=${AZURE_AD_TENANT_ID}
@@ -88,14 +89,14 @@ services:
       - cert-generator
     environment:
       - ApiSettings__BaseUrl=http://web-api:8080
-      - BlobStorage__ConnectionString=${BLOB_STORAGE_CONNECTION_STRING}
+      - BlobStorage__ConnectionString=${E2E_AZURITE_CONNECTION_STRING}
       - BlobStorage__ContainerName=images
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ASPNETCORE_URLS=http://0.0.0.0:8080;https://0.0.0.0:8443
       - ASPNETCORE_HTTPS_PORTS=8443
       - ASPNETCORE_Kestrel__Endpoints__Https__Url=https://0.0.0.0:8443
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/https-dev.pfx
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${E2E_CERT_PASSWORD}
     ports:
       - "8082:8080"
       - "8463:8443"
@@ -112,12 +113,12 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=${SQLSERVER_SA_PASSWORD}
+      - SA_PASSWORD=${E2E_SQLSERVER_SA_PASSWORD}
     ports:
       - "1433:1433"
     healthcheck:
       # Use CMD-SHELL so the SA password env var is expanded inside the command
-      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$SQLSERVER_SA_PASSWORD\" -Q \"SELECT 1\" || exit 1" ]
+      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$E2E_SQLSERVER_SA_PASSWORD\" -Q \"SELECT 1\" || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
