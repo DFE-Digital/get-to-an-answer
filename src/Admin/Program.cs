@@ -11,10 +11,14 @@ using Common.Telemetry;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.HttpsPolicy;
+using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.Identity.Web.UI;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using static System.TimeSpan;
 using Serilog;
+using HstsOptions = Joonasw.AspNetCore.SecurityHeaders.HstsOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,16 +34,18 @@ var builderIsLocalEnvironment = builder.Environment.IsEnvironment(localEnvironme
 if (builderIsLocalEnvironment)
 {
     builder.Configuration
-        .AddUserSecrets<Program>(optional: true, reloadOnChange: true);
+        .AddUserSecrets<Program>(optional: true, reloadOnChange: true)
+        .AddEnvironmentVariables();
     builder.Services.AddMockAzureAdForMvc();
 }
 
+builder.Services.AddCsp(nonceByteAmount: 32);
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.CheckConsentNeeded = _ => true;
     
     // disabled everything else because the Entra ID was failing to store cookies,
-    // but when reconfigured the the consent cookie was still not being stored
+    // but when reconfigured the consent cookie was still not being stored
     options.MinimumSameSitePolicy = SameSiteMode.None;
 });
 
@@ -156,8 +162,76 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
     
+#region Content Security (CSP) and Headers
+
+// HSTS
+app.UseStrictTransportSecurity(new HstsOptions(FromDays(365), true, true));
+
+// Security Headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+    await next();
+});
+    
 // Cookie Security
 app.UseCookiePolicy();
+
+// Content Security Policy
+app.UseCsp(x =>
+{
+    x.ByDefaultAllow.FromNowhere();
+
+    var config = app.Configuration.GetSection("Csp").Get<CspConfiguration>() ?? new CspConfiguration();
+        
+    x.AllowScripts
+        .FromSelf()
+        .AddNonce();
+
+    config.AllowScriptUrls.ForEach(f => x.AllowScripts.From(f));
+    config.AllowHashes.ForEach(f => x.AllowScripts.WithHash(f));
+
+    x.AllowStyles
+        .FromSelf()
+        .AllowUnsafeInline();
+
+    x.AllowManifest
+        .FromSelf();
+
+    config.AllowStyleUrls.ForEach(f => x.AllowStyles.From(f));
+
+    x.AllowFonts
+        .FromSelf()
+        .From("data:");
+
+    config.AllowFontUrls.ForEach(f => x.AllowFonts.From(f));
+        
+    x.AllowFraming.FromSelf(); // Block framing on other sites, equivalent to X-Frame-Options: DENY
+    config.AllowFrameUrls.ForEach(f => x.AllowFraming.From(f));
+    config.AllowFrameUrls.ForEach(f => x.AllowFrames.From(f));
+
+    x.AllowFormActions.ToSelf();
+
+    x.AllowImages
+        .FromSelf()
+        .From("data:");
+        
+    config.AllowImageUrls.ForEach(f => x.AllowImages.From(f));
+
+    x.AllowConnections
+        .ToSelf();
+        
+    config.AllowConnectUrls.ForEach(f => x.AllowConnections.To(f));
+        
+    if (config.ReportOnly)
+    {
+        x.SetReportOnly();
+    }
+});
+
+#endregion
 
 #region Rebrand
 

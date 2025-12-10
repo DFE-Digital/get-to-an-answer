@@ -80,7 +80,7 @@
 
 
 @section Scripts {
-  <script type="text/javascript">
+  <script asp-add-nonce="true" type="text/javascript">
 
     GOVUK.Modules.AppStepNav.prototype.addButtonstoSteps = function () {
       for (let i = 0; i < this.$module.steps.length; i++) {

@@ -16,6 +16,7 @@ public class AddContributor(ILogger<AddContributor> logger,
     IApiClient apiClient, IMsGraphClient graphClient) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
+    
     [BindProperty] 
     [Required(ErrorMessage = "Enter a person's email")]
     public string ContributorEmail { get; set; } = "";

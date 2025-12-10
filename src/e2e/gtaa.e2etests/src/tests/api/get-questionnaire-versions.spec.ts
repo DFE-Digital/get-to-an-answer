@@ -2,8 +2,8 @@ import {test, expect} from '@playwright/test';
 import {
     createQuestionnaire,
     updateQuestionnaire,
-    publishQuestionnaire, 
-    listQuestionnaireVersions
+    publishQuestionnaire,
+    listQuestionnaireVersions, addContributor
 } from "../../test-data-seeder/questionnaire-data";
 import {AnswerDestinationType, GUID_REGEX} from "../../constants/test-data-constants";
 import {createQuestion, updateQuestion} from "../../test-data-seeder/question-data";
@@ -16,8 +16,11 @@ test('should return versions for existing questionnaire', async ({request}) => {
     const id = questionnaire.id;
 
     // Update questionnaire to create a new version
-    await updateQuestionnaire(request, id, {title: 'Updated Title'});
+    await updateQuestionnaire(request, id, {
+        title: 'Updated Title', slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
     
+    await addContributor(request, id, 'user-1')
+
     const { question } = await createQuestion(request, id, undefined, 'Q1?')
     
     await createSingleAnswer(request, {
@@ -43,6 +46,10 @@ test('retrieve all versions of a questionnaire includes required fields', async 
     // Given a questionnaire exists with 5 published versions
     const { questionnaire } = await createQuestionnaire(request, undefined, 
         'Base Q', "Content");
+    
+    await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
+
+    await addContributor(request, questionnaire.id, 'user-1')
 
     const { question } = await createQuestion(request, questionnaire.id, undefined, 'Q1?')
     const { answer } = await createSingleAnswer(request, {
@@ -60,8 +67,9 @@ test('retrieve all versions of a questionnaire includes required fields', async 
         await updateQuestionnaire(request, id, {
             title: `Title v${i}`,
             content: `Content v${i}`,
+            slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}`
         });
-
+        
         await updateQuestion(request, questionnaire.id, undefined, `Q1 v${i}?`)
         await updateAnswer(request, answer.id, {
             content: `A1 v${i}`,
@@ -131,11 +139,11 @@ test('retrieve all versions of a questionnaire includes required fields', async 
         const v = 5 - i
         
         if (versions[i].version === 2) {
-            expect(versions[i].changeLog.length).toBe(8);
+            expect(versions[i].changeLog.length).toBe(9);
         } else if (versions[i].version === 4) {
-            expect(versions[i].changeLog.length).toBe(8);
+            expect(versions[i].changeLog.length).toBe(9);
         } else {
-            expect(versions[i].changeLog.length).toBe(3);
+            expect(versions[i].changeLog.length).toBe(4);
         }
         assertChanges(versions[i].changeLog, {
             path: "$.title",
@@ -202,6 +210,10 @@ test('versions are ordered by version number descending', async ({ request }) =>
     // Given a questionnaire with specific publish sequence
     const { questionnaire } = await createQuestionnaire(request, undefined, 'Order Test');
     const id = questionnaire.id;
+    
+    await updateQuestionnaire(request, id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
+
+    await addContributor(request, id, 'user-1')
 
     const { question } = await createQuestion(request, id, undefined, 'Q1?')
 
@@ -239,6 +251,10 @@ test('versions are ordered by version number descending', async ({ request }) =>
 test('single-version questionnaire returns exactly one publish and one current draft', async ({ request }) => {
     const { questionnaire } = await createQuestionnaire(request, undefined, 'Single' );
     const id = questionnaire.id;
+    
+    await updateQuestionnaire(request, id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
+
+    await addContributor(request, id, 'user-1')
 
     const { question } = await createQuestion(request, id, undefined, 'Q1?')
 

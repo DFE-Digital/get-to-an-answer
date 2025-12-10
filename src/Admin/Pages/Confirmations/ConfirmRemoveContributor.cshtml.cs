@@ -13,16 +13,16 @@ public class ConfirmRemoveContributor(IApiClient apiClient) : QuestionnairesPage
     [FromRoute(Name = "questionnaireId")]
     public Guid QuestionnaireId { get; set; }
     
-    [FromRoute(Name = "contentId")]
+    [FromRoute(Name = "contributorId")]
     public Guid ContributorId { get; set; }
     
-    [TempData(Key = "ContributorEmail")] public string? ContributorEmail { get; set; }
+    public string? ContributorEmail { get; set; }
     
     [BindProperty] public bool RemoveContributor { get; set; }
 
     public void OnGet()
     {
-        ContributorEmail = TempData.Peek("ContributorEmail") as string;
+        ContributorEmail = TempData.Peek("ContributorEmail")?.ToString();
     }
     
     public async Task<IActionResult> OnPostContinueAsync()

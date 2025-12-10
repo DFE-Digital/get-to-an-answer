@@ -1,6 +1,56 @@
 version: '3.8'
 
 services:
+  cert-generator:
+    image: mcr.microsoft.com/dotnet/sdk:9.0   # or your target SDK
+    command: >
+      bash -c "
+        echo 'Generating self-signed certificate...' &&
+        dotnet dev-certs https -ep /https/https-dev.pfx -p "${CERT_PASSWORD}" &&
+        ls -l /https &&
+        sleep 5
+      "
+    volumes:
+      - https-cert:/https
+      
+  web-admin:
+    image: web-admin:e2e
+    build:
+      context: ../..
+      dockerfile: src/Admin/Dockerfile
+    depends_on:
+      - web-api
+      - azurite
+      - cert-generator
+    environment:
+      - ApiSettings__BaseUrl=http://web-api:8080
+      - BlobStorage__ConnectionString=${BLOB_STORAGE_CONNECTION_STRING}
+      - BlobStorage__CContainerName=images
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - AzureAd__ClientId=${AZURE_AD_CLIENT_ID}
+      - AzureAd__Secret=${AZURE_AD_CLIENT_SECRET}
+      - AzureAd__TenantId=${AZURE_AD_TENANT_ID}
+      - AzureAd__Instance=${AZURE_AD_INSTANCE}
+      - AzureAd__Domain=${AZURE_AD_DOMAIN}
+      - ASPNETCORE_HTTPS_PORTS=8443
+      - ASPNETCORE_URLS=http://0.0.0.0:8080;https://0.0.0.0:8443
+      - ASPNETCORE_Kestrel__Endpoints__Https__Url=https://0.0.0.0:8443
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/https-dev.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
+    ports:
+      - "8081:8080"
+      - "8453:8443"
+    volumes:
+      - https-cert:/https
+    command:
+      - dotnet dev-certs https --trust
+    healthcheck:
+      # Use CMD-SHELL so shell interpolation works and ensure a non-zero exit on failure
+      test: [ "CMD-SHELL", "echo 'Calling /health healthcheck' && curl -f http://localhost:8080/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      
   web-api:
     image: web-api:e2e
     build:
@@ -8,6 +58,7 @@ services:
       dockerfile: src/Api/Dockerfile
     depends_on:
       - sqlserver
+      - cert-generator
     environment:
       - ConnectionStrings__DefaultConnection=${DEFAULT_CONNECTION_STRING}
       - SQLSERVER_SA_PASSWORD=${SQLSERVER_SA_PASSWORD}
@@ -18,7 +69,38 @@ services:
       - AzureAd__Domain=${AZURE_AD_DOMAIN}
       - ASPNETCORE_URLS=http://0.0.0.0:8080
     ports:
-      - 8080:8080
+      - "8080:8080"
+    healthcheck:
+      # Use CMD-SHELL so shell interpolation works and ensure a non-zero exit on failure
+      test: [ "CMD-SHELL", "echo 'Calling /health healthcheck' && curl -f http://localhost:8080/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      
+  web-frontend:
+    image: web-frontend:e2e
+    build:
+      context: ../..
+      dockerfile: src/Frontend/Dockerfile
+    depends_on:
+      - web-api
+      - azurite
+      - cert-generator
+    environment:
+      - ApiSettings__BaseUrl=http://web-api:8080
+      - BlobStorage__ConnectionString=${BLOB_STORAGE_CONNECTION_STRING}
+      - BlobStorage__ContainerName=images
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_URLS=http://0.0.0.0:8080;https://0.0.0.0:8443
+      - ASPNETCORE_HTTPS_PORTS=8443
+      - ASPNETCORE_Kestrel__Endpoints__Https__Url=https://0.0.0.0:8443
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/https-dev.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
+    ports:
+      - "8082:8080"
+      - "8463:8443"
+    volumes:
+      - https-cert:/https
     healthcheck:
       # Use CMD-SHELL so shell interpolation works and ensure a non-zero exit on failure
       test: [ "CMD-SHELL", "echo 'Calling /health healthcheck' && curl -f http://localhost:8080/health || exit 1" ]
@@ -39,3 +121,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck
+    ports:
+      - "10111:10000"
+      
+volumes:
+  https-cert:
+    
