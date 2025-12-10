@@ -14,8 +14,6 @@ public class BasePageModel : PageModel
     [BindProperty(SupportsGet = true)] 
     public string? BackLinkSlug { get; set; }
     
-    private const string BackLinkTempDataKey = "BackLinkSlugTempData";
-
     protected virtual ActionResult RedirectToErrorPage() => Redirect("/error");
 
     public string? QuestionnaireTitle { 
@@ -52,35 +50,6 @@ public class BasePageModel : PageModel
 
             return null;
         } 
-    }
-    
-    // public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context,
-    //     PageHandlerExecutionDelegate next)
-    // {
-    //     TryRestoreBackLinkFromTempData();
-    //
-    //     await next();
-    //
-    //     SaveBackLinkToTempDataIfPresent();
-    // }
-
-    private void TryRestoreBackLinkFromTempData()
-    {
-        if (!string.IsNullOrEmpty(BackLinkSlug))
-            return;
-
-        if (TempData.Peek(BackLinkTempDataKey) is string restored && !string.IsNullOrEmpty(restored))
-        {
-            BackLinkSlug = restored;
-        }
-    }
-
-    private void SaveBackLinkToTempDataIfPresent()
-    {
-        if (!string.IsNullOrEmpty(BackLinkSlug))
-        {
-            TempData[BackLinkTempDataKey] = BackLinkSlug;
-        }
     }
     
     public bool HasErrors() => ViewData.ModelState is { IsValid: false, ErrorCount: > 0 };

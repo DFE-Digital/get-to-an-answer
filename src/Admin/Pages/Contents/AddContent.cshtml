@@ -28,6 +28,7 @@
       
     </div>
     <form method="post" accept-charset="UTF-8">
+      <input type="hidden" asp-for="@Model.BackLinkSlug" />
       <!-- Content title -->
       <govuk-form-group asp-for="@Model.ContentTitle">
         <label class="govuk-label govuk-label--m" for="ContentTitle">
@@ -77,7 +78,7 @@
           Results reference (optional)
         </label>
         <div class="govuk-hint" id="ContentRefName-hint">
-          <p>Add a reference to help you find the right results page when making edits. These are not visible to users.</p> 
+          <p>Add a reference to help you find the right results page when making edits. These are not visible to users.</p>
 
           <p>If you do not add a reference, the results page will be listed as its title.</p>
         </div>

@@ -30,13 +30,14 @@
     </div>
     
     <form method="post" accept-charset="UTF-8">
+      <input type="hidden" asp-for="@Model.BackLinkSlug" /> 
       <!-- Content title -->
       <govuk-form-group asp-for="@Model.DisplayTitle">
         <label class="govuk-label govuk-label--m" for="DisplayTitle">
           Add a title
         </label>
         <div class="govuk-hint" id="DisplayTitle-hint">
-          This will appear at the top of your start page. 
+          This will appear at the top of your start page.
         </div>
 
         <govuk-field-error asp-for="@Model.DisplayTitle" error-id="DisplayTitle-error">
@@ -77,8 +78,8 @@
                 data-prevent-double-click="true" asp-page-handler="SaveStartPage">
           Save and continue
         </button>
-        
-        <button id="remove-start-page" class="govuk-button govuk-button--warning" type="submit" formnovalidate="formnovalidate" 
+
+        <button id="remove-start-page" class="govuk-button govuk-button--warning" type="submit" formnovalidate="formnovalidate"
                 data-module="govuk-button"data-prevent-double-click="true" asp-page-handler="ClearStartPage">
           Remove start page
         </button>
