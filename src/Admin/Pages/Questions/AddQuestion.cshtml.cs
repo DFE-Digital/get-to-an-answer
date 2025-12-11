@@ -67,8 +67,6 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
                 Type = QuestionType
             });
             
-            TempData["QuestionType"] = (int)QuestionType;
-         
             return Redirect(string.Format(Routes.AddAnswerOptions, QuestionnaireId, response?.Id));
         }
         catch (Exception e)

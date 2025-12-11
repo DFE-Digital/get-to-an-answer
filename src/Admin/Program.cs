@@ -212,7 +212,11 @@ app.UseCsp(x =>
     config.AllowFrameUrls.ForEach(f => x.AllowFraming.From(f));
     config.AllowFrameUrls.ForEach(f => x.AllowFrames.From(f));
 
-    x.AllowFormActions.ToSelf();
+    x.AllowFormActions
+        .ToSelf()
+        .To("https://login.microsoftonline.com")
+        .To("https://login.microsoft.com")
+        .To("https://autologon.microsoftazuread-sso.com");
 
     x.AllowImages
         .FromSelf()

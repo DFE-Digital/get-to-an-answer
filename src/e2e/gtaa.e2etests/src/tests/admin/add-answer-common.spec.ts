@@ -62,7 +62,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         
         removeButtonsCount = await addAnswerPage.getRemoveButtonCount();
         expect(removeButtonsCount).toBe(2);
-        await addAnswerPage.removeOption(1);
+        await addAnswerPage.removeOption(0);
         removeButtonsCount = await addAnswerPage.getRemoveButtonCount();
         expect(removeButtonsCount).toBe(1);
         
