@@ -39,6 +39,7 @@ test.describe('Get to an answer terms of use page', () => {
         await termsOfUsePage.validateFormGroupErrorClass();
     });
 
+    // This test should detect if the bug CARE-1599 occurs again on the Development environment
     test('Successful acceptance - checkbox is ticked and user navigates to next step', async ({page}) => {
         termsOfUsePage = await TermsOfUsePage.create(page);
 
