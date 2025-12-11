@@ -37,7 +37,7 @@ test.describe('Get to an answer update questionnaire', () => {
 
         designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
 
-        await designQuestionnairePage.deleteQuestionnaire();
+        await designQuestionnairePage.clickDeleteQuestionnaireButton();
 
         const deleteConfirmationPage = new DeleteQuestionnaireConfirmationPage(page);
         await deleteConfirmationPage.expectTwoRadiosPresent();
@@ -53,7 +53,7 @@ test.describe('Get to an answer update questionnaire', () => {
 
         designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
 
-        await designQuestionnairePage.deleteQuestionnaire();
+        await designQuestionnairePage.clickDeleteQuestionnaireButton();
 
         const deleteConfirmationPage = new DeleteQuestionnaireConfirmationPage(page);
         await deleteConfirmationPage.expectTwoRadiosPresent();
@@ -70,7 +70,7 @@ test.describe('Get to an answer update questionnaire', () => {
         const questionnaireIdToDelete = questionnaireGetResponse.questionnaireGetBody.id;
         designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireIdToDelete);
 
-        await designQuestionnairePage.deleteQuestionnaire();
+        await designQuestionnairePage.clickDeleteQuestionnaireButton();
 
         const deleteConfirmationPage = new DeleteQuestionnaireConfirmationPage(page);
         await deleteConfirmationPage.expectTwoRadiosPresent();

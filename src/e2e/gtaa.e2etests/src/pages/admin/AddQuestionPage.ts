@@ -189,15 +189,7 @@ export class AddQuestionPage extends BasePage {
         await expect(this.errorSummary).toBeVisible();
         await expect(this.inlineQuestionTypeError, '❌ Inline question type error not visible').toBeVisible();
     }
-
-    async validateQuestionTextFormGroup() {
-        // TODO: implement when requirements are known
-    }
-
-    async validateQuestionTypeFormGroup() {
-        // TODO: implement when requirements are known
-    }
-
+    
     async assertPageElements() {
         await this.verifyHeaderLinks();
         await this.verifyFooterLinks();
@@ -297,6 +289,12 @@ export class AddQuestionPage extends BasePage {
         await this.questionInput.fill(text);
     }
 
+    async getQuestionContent(): Promise<string> {
+        await this.questionInput.waitFor({state: 'visible', timeout: Timeouts.LONG});
+        const content = await this.questionInput.evaluate(el => (el as HTMLInputElement).value);
+        return content.trim();
+    }
+
     async clearQuestionContent(): Promise<void> {
         await this.questionInput.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await this.questionInput.clear();
@@ -306,6 +304,12 @@ export class AddQuestionPage extends BasePage {
         await this.hintTextarea.waitFor({state: 'visible', timeout: Timeouts.LONG});
         await this.hintTextarea.clear();
         await this.hintTextarea.fill(text);
+    }
+
+    async getQuestionHintText(): Promise<string> {
+        await this.hintTextarea.waitFor({state: 'visible', timeout: Timeouts.LONG});
+        const hintText = await this.hintTextarea.evaluate(el => (el as HTMLTextAreaElement).value);
+        return hintText.trim();
     }
 
     async clearQuestionHintText(): Promise<void> {
@@ -329,6 +333,19 @@ export class AddQuestionPage extends BasePage {
             case QuestionRadioLabel.MultiSelect:
                 await this.typeMulti.check();
                 break;
+        }
+    }
+
+    async isQuestionTypeSelected(type: QuestionRadioLabel): Promise<boolean> {
+        switch (type) {
+            case QuestionRadioLabel.SingleSelectShort:
+                return await this.typeSingleShort.isChecked();
+            case QuestionRadioLabel.SingleSelectLong:
+                return await this.typeSingleLong.isChecked();
+            case QuestionRadioLabel.MultiSelect:
+                return await this.typeMulti.isChecked();
+            default:
+                throw new Error(`Unknown question type: ${type}`);
         }
     }
 
