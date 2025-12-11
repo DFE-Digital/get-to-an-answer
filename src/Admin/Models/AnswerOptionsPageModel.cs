@@ -23,8 +23,6 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
 
     [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
-
-    [BindProperty] public QuestionType? RetrievedQuestionType { get; set; }
     
     // Handler for clicking "Add another option"
     public async Task<IActionResult> OnPostAddOption()
@@ -50,6 +48,14 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         // Re-render page with the extra option
         return Page();
+    }
+    
+    protected void RemoveModelStateErrorsForFields()
+    {
+        foreach (var key in ModelState.Keys)
+        {
+            ModelState[key]?.Errors.Clear();
+        }
     }
     
     protected void ReassignOptionNumbers()
@@ -125,7 +131,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         foreach (var option in Options)
         {
-            option.QuestionType = RetrievedQuestionType;
+            option.QuestionType = questions.Where(q => q.Id == QuestionId).Select(q => q.Type).FirstOrDefault();
             option.QuestionSelectList = questionSelect;
             option.ResultsPageSelectList = resultsSelect;
         }
