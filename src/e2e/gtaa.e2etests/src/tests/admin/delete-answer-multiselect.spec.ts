@@ -55,17 +55,35 @@ test.describe('Get to an answer update questionnaire', () => {
         await viewQuestionPage.table.clickEditByQuestionContent(question1Content);
 
         addQuestionPage = await AddQuestionPage.create(page);
-        rowData = await addQuestionPage.table.getAnswerRowData(answer1.content);
-        expect(rowData).toBeDefined();
+
+        // Get all answer contents before deletion
+        const initialAnswers = await addQuestionPage.table.getAllAnswerContents();
+        expect(initialAnswers.length).toBeGreaterThan(1);
+
+        // Choose an answer to delete (second answer)
+        const answerToDelete = initialAnswers[1];
 
         addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
         await addAnswerPage.expectAnswerHeadingOnPage();
-        
-        //delete an answer and validate it's deleted in the table
 
+        // Remove the chosen answer
+        await addAnswerPage.removeOption(1);
+        await addAnswerPage.clickSaveAnswersButton();
+
+        // Reload page and verify
+        await page.reload();
+        addQuestionPage = await AddQuestionPage.create(page);
+
+        // Get remaining answers
+        const remainingAnswers = await addQuestionPage.table.getAllAnswerContents();
+        
+        expect(remainingAnswers.length).toBe(initialAnswers.length - 1);
+        expect(remainingAnswers).not.toContain(answerToDelete);
+        expect(remainingAnswers).toContain(initialAnswers[0]);
     });
 
     test('Delete an answer successfully for question with 3 answers - multiselect', async ({page, request}) => {
+        // Create a third answer
         const {answer} = await createSingleAnswer(request, {
             questionnaireId, questionId: question1Id, content: 'A3',
             destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
@@ -73,14 +91,32 @@ test.describe('Get to an answer update questionnaire', () => {
 
         await signIn(page, token);
 
+        // Navigate to update a question page
         addQuestionPage = await goToUpdateQuestionPageByUrl(page, questionnaireId, question1Id);
-        rowData = await addQuestionPage.table.getAnswerRowData(answer.content);
-        expect(rowData).toBeDefined();
 
+        // Get all answer contents before deletion
+        const initialAnswers = await addQuestionPage.table.getAllAnswerContents();
+        expect(initialAnswers.length).toBe(3);
+
+        // Verify that a specific answer exists
+        expect(initialAnswers).toContain(answer.content);
+
+        // Navigate to update an answer page
         addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
         await addAnswerPage.expectAnswerHeadingOnPage();
 
-        //delete an answer and validate it's deleted in the table
+        // Remove the third answer
+        await addAnswerPage.removeOption(2);
+        await addAnswerPage.clickSaveAnswersButton();
 
+        // Reload page and verify
+        await page.reload();
+        addQuestionPage = await AddQuestionPage.create(page);
+
+        // Get remaining answers
+        const remainingAnswers = await addQuestionPage.table.getAllAnswerContents();
+        
+        expect(remainingAnswers.length).toBe(2);
+        expect(remainingAnswers).not.toContain(answer.content);
     });
 });

@@ -89,6 +89,21 @@ export class EditAnswerTable {
         return result;
     }
 
+    async getAllAnswerContents(): Promise<string[]> {
+        const rows = await this.rows.all();
+        const contents: string[] = [];
+
+        for (const row of rows) {
+            const firstColumn = row.locator('td').first();
+            const content = await firstColumn.textContent();
+            if (content) {
+                contents.push(content.trim());
+            }
+        }
+
+        return contents;
+    }
+
     // ===== Actions =====
     async openEdit(): Promise<void> {
         const editButton = this.card.getByRole('button', {name: /edit/i});
