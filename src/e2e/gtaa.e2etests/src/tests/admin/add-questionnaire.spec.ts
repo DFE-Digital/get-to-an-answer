@@ -43,7 +43,6 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await viewQuestionnairePage.expectQuestionnaireHeadingOnPage();
     });
     
-    // TBC, CARE-1592 bug raised
     test('Submit a new questionnaire with missing title', async ({page, browserName}) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
 

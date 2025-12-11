@@ -52,8 +52,7 @@ test.describe('Get to an answer update questionnaire', () => {
         designQuestionnairePage = await DesignQuestionnairePage.create(page);
         expect(designQuestionnairePage.validateHeading(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING));
     });
-
-    //TBC, CARE-1592 bug raised
+    
     test('Error summary appears on submit with missing title', async ({page, browserName}) => {
         viewQuestionnairePage = await signIn(page, token);
         addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
