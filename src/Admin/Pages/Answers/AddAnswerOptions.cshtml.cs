@@ -21,12 +21,8 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
 
         try
         {
-            var question = await _apiClient.GetQuestionAsync(QuestionId);
-
-            RetrievedQuestionType = question?.Type;
-
-            Options.Add(new AnswerOptionsViewModel { OptionNumber = 0, QuestionType = RetrievedQuestionType });
-            Options.Add(new AnswerOptionsViewModel { OptionNumber = 1, QuestionType = RetrievedQuestionType });
+            Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
+            Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
 
             await HydrateOptionListsAsync();
             ReassignOptionNumbers();
@@ -98,7 +94,7 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
         ReassignOptionNumbers();
         return Page();
     }
-    
+
     private void RemoveModelStateEntriesForOption(int index)
     {
         var prefixBracket = $"Options[{index}]";
