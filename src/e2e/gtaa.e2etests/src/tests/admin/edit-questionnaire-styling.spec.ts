@@ -86,14 +86,14 @@ test.describe('Questionnaire custom styling', () => {
         await expect(errorSummary, '❌ Error summary should be an alert').toHaveAttribute('role', 'alert');
 
         // Accessibility checkbox has inline error
-        const accessibilityError = page.locator('#forms-name-input-name-field-error');
+        const accessibilityError = page.locator('#forms-name-input-name-error');
         await expect(accessibilityError, '❌ Accessibility agreement inline error missing').toBeVisible();
 
         // Checkbox should reference the error via aria-describedby
         const checkbox = page.locator('#UpdateRequest-IsAccessibilityAgreementAccepted');
         const ariaDescribedBy = await checkbox.getAttribute('aria-describedby');
         expect(ariaDescribedBy ?? '', '❌ aria-describedby must reference error element')
-            .toContain('isaccessibilityagreementaccepted-field-error');
+            .toContain('isaccessibilityagreementaccepted-error');
     });
 
     test('Submitting with colours filled but without accessibility agreement shows validation error', async ({ page }) => {
@@ -115,7 +115,7 @@ test.describe('Questionnaire custom styling', () => {
         await expect(errorSummary, '❌ Error summary missing').toBeVisible();
 
         // Accessibility agreement should still be the field showing an error
-        const accessibilityError = page.locator('#forms-name-input-name-field-error');
+        const accessibilityError = page.locator('#forms-name-input-name-error');
         await expect(accessibilityError, '❌ Accessibility agreement inline error missing').toBeVisible();
     });
 

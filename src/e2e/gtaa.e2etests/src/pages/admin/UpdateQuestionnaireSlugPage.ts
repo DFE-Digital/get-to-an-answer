@@ -24,7 +24,7 @@ export class UpdateQuestionnaireSlugPage extends BasePage {
         this.errorList = this.page.locator('.govuk-error-summary__list');
         this.errorLink = this.page.locator('.govuk-error-summary__list a');
 
-        this.inlineSlugError = this.page.locator('#questionnaire-slug-field-error');
+        this.inlineSlugError = this.page.locator('#questionnaire-slug-error');
     }
 
     async expectHeadingOnEditSlugPage(expectedText?: string): Promise<void> {
