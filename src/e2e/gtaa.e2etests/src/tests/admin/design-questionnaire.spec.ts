@@ -16,37 +16,31 @@ import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
 import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
 import {createQuestion} from "../../test-data-seeder/question-data";
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";
+import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaireSlugPage";
+import {AddQuestionnaireStartPage} from "../../pages/admin/AddQuestionnaireStartPage";
+import {EditContinueButtonTextPage} from "../../pages/admin/EditContinueButtonTextPage";
+import {QuestionnaireStylingPage} from "../../pages/admin/QuestionnaireStylingPage";
 
 test.describe('Get to an answer create a new questionnaire', () => {
     let token: string;
     let questionnaireId: string;
     let question1Id: string;
-    let answer1: any;
-    let answer2: any;
-
+    
     let designQuestionnairePage: DesignQuestionnairePage;
     let viewQuestionnairePage: ViewQuestionnairePage;
     let addQuestionPage: AddQuestionPage;
     let viewQuestionPage: ViewQuestionPage;
     let addAnswerPage: AddAnswerPage;
+    let updateQuestionnaireSlugPage: UpdateQuestionnaireSlugPage;
+    let addQuestionnaireStartPage: AddQuestionnaireStartPage;
+    let editContinueButtonTextPage: EditContinueButtonTextPage;
+    let questionnaireStylingPage: QuestionnaireStylingPage;
+    
 
     test.beforeEach(async ({page, request}) => {
         token = JwtHelper.NoRecordsToken();
         const {questionnaire} = await createQuestionnaire(request, token);
         questionnaireId = questionnaire.id;
-
-        // const q1Resp = await createQuestion(request, questionnaireId, token,
-        //     undefined, QuestionType.SingleSelect);
-        // question1Id = q1Resp.question.id;
-        //
-        // answer1 = await createSingleAnswer(request, {
-        //     questionId: question1Id, questionnaireId, content: 'A1'
-        // }, token)
-        //
-        // answer2 = await createSingleAnswer(request, {
-        //     questionnaireId, questionId: question1Id, content: 'A2',
-        //     destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
-        // }, token)
     });
 
     test('Validate presence of core elements on design questionnaire page', async ({page}) => {
@@ -135,10 +129,10 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await viewQuestionPage.saveAndContinue();
 
         designQuestionnairePage = await DesignQuestionnairePage.create(page);
-        await designQuestionnairePage.validateTaskStatusByTaskName('In progress', 'Add or edit questions and answers');
+        await designQuestionnairePage.taskStatusAddEditQuestionsAnswers('In progress', 'Add or edit questions and answers');
     });
 
-    test('Validate add or edit questions and answers link Completed status', async ({page}) => {
+    test('Validate add or edit questions and answers link status as Completed', async ({page}) => {
         await signIn(page, token);
 
         designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
@@ -174,8 +168,72 @@ test.describe('Get to an answer create a new questionnaire', () => {
 
         designQuestionnairePage = await DesignQuestionnairePage.create(page);
         await designQuestionnairePage.assertQuestionnaireUpdatedSuccessBanner()
-        await designQuestionnairePage.validateTaskStatusByTaskName('Completed', 'Add or edit questions and answers');
+        await designQuestionnairePage.taskStatusAddEditQuestionsAnswers('Completed', 'Add or edit questions and answers');
     });
 
+    test('Validate add or edit questionnaire Id link status as Completed', async ({page}) => {
+        const inputSlug = `slug-${Date.now()}`;
+        await signIn(page, token);
 
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+        await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
+
+        await designQuestionnairePage.createQuestionnaireId();
+        
+        updateQuestionnaireSlugPage = await UpdateQuestionnaireSlugPage.create(page);
+        await updateQuestionnaireSlugPage.expectHeadingOnEditSlugPage(PageHeadings.EDIT_QUESTIONNAIRE_SLUG_PAGE_HEADING)
+        await updateQuestionnaireSlugPage.enterSlug(inputSlug);
+
+        await updateQuestionnaireSlugPage.submit()
+
+        await designQuestionnairePage.taskStatusAddEditQuestionnaireId('Completed', 'Add or edit questionnaire ID');
+    });
+
+    test('Validate add and edit start page link status as Optional', async ({page}) => {
+        await signIn(page, token);
+
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+        await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
+
+        await designQuestionnairePage.openStartPage();
+        
+        addQuestionnaireStartPage = await AddQuestionnaireStartPage.create(page);
+        await addQuestionnaireStartPage.enterQuestionnaireDisplayTitleInput("Questionnaire Start Page")
+        await addQuestionnaireStartPage.enterQuestionnaireDescriptionText("Questionnaire Description");
+        await addQuestionnaireStartPage.clickSaveAndContinue();
+        
+        await designQuestionnairePage.taskStatusAddEditStartPage('Optional', 'Add and edit start page');
+    });
+
+    test('Validate edit button text page link status as Optional', async ({page}) => {
+        await signIn(page, token);
+
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+        await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
+
+        await designQuestionnairePage.openEditButtonText();
+
+        editContinueButtonTextPage = await EditContinueButtonTextPage.create(page);
+        await editContinueButtonTextPage.enterButtonText("Save me")
+        await editContinueButtonTextPage.clickSaveAndContinue();
+
+        await designQuestionnairePage.taskStatusEditButtonTextPage('Optional', 'Edit button text');
+    });
+
+    test('Validate customise styling page link status as Optional', async ({page}) => {
+        await signIn(page, token);
+
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+        await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
+
+        await designQuestionnairePage.openCustomiseStyling();
+
+        questionnaireStylingPage = await QuestionnaireStylingPage.create(page);
+        
+        await questionnaireStylingPage.setErrorMessageColor("#FF0000")
+        await questionnaireStylingPage.acceptAccessibilityAgreement();
+        await questionnaireStylingPage.saveAndContinue();
+
+        await designQuestionnairePage.taskStatusCustomiseStylingPage('Optional', 'Customise styling');
+    });
 });

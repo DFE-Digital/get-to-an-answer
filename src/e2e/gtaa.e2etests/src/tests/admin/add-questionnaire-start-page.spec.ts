@@ -28,7 +28,7 @@ test.describe('Get to an answer add question to questionnaire', () => {
         await addQuestionnaireStartPage.clickBackLink();
 
         designQuestionnairePage = await DesignQuestionnairePage.create(page);
-        await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
+        await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
     });
 
     test('Successful submit of with optional fields populated', async ({request, page}) => {
@@ -37,7 +37,7 @@ test.describe('Get to an answer add question to questionnaire', () => {
         await addQuestionnaireStartPage.clickSaveAndContinue();
 
         designQuestionnairePage = await DesignQuestionnairePage.create(page);
-        await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
+        await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
 
         await designQuestionnairePage.expectSuccessBannerVisible();
         await designQuestionnairePage.assertSavedStartPageSuccessBanner();

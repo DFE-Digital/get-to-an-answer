@@ -428,10 +428,42 @@ export class DesignQuestionnairePage extends BasePage {
             'Add or edit questionnaire ID'
         );
     }
-
-    async validateTaskStatusByTaskName(taskStatus: string, taskName: string): Promise<void> {
+    
+    async taskStatusAddEditQuestionsAnswers(taskStatus: string, taskName: string): Promise<void> {
         await this.assertTaskStatus(
             this.edit_questionsAnswers_status,
+            taskStatus,
+            taskName
+        );
+    }
+
+    async taskStatusAddEditQuestionnaireId(taskStatus: string, taskName: string): Promise<void> {
+        await this.assertTaskStatus(
+            this.publish_questionnaireId_status,
+            taskStatus,
+            taskName
+        );
+    }
+    
+    async taskStatusAddEditStartPage(taskStatus: string, taskName: string): Promise<void> {
+        await this.assertTaskStatus(
+            this.edit_startPage_status,
+            taskStatus,
+            taskName
+        );
+    }
+    
+    async taskStatusEditButtonTextPage(taskStatus: string, taskName: string): Promise<void> {
+        await this.assertTaskStatus(
+            this.customise_buttonText_status,
+            taskStatus,
+            taskName
+        );
+    }
+    
+    async taskStatusCustomiseStylingPage(taskStatus: string, taskName: string): Promise<void> {
+        await this.assertTaskStatus(
+            this.customise_styling_status,
             taskStatus,
             taskName
         );
