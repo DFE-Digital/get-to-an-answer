@@ -131,14 +131,20 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.setExternalLink(0, 'https://www.example.com');
         await addAnswerPage.setAnswerRank(0, 1);
         
-        await addAnswerPage.clickAddAnotherOptionButton();
-        await  addAnswerPage.waitForPageLoad();
-
+      
         await addAnswerPage.setOptionContent(1, 'Second Answer Option');
         await addAnswerPage.setOptionHint(1, 'This is the second answer hint');
         await addAnswerPage.setExternalLink(1, 'https://www.example.com');
         await addAnswerPage.setAnswerRank(1, 2);
 
+        await addAnswerPage.clickAddAnotherOptionButton();
+        await  addAnswerPage.waitForPageLoad();
+
+        await addAnswerPage.setOptionContent(2, 'Third Answer Option');
+        await addAnswerPage.setOptionHint(2, 'This is the third answer hint');
+        await addAnswerPage.setExternalLink(2, 'https://www.example.com');
+        await addAnswerPage.setAnswerRank(2, 3);
+        
         await addAnswerPage.clickSaveAndContinueButton();
 
         const viewQuestionPage = await ViewQuestionPage.create(page);
