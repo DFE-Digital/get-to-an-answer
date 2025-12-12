@@ -1,14 +1,22 @@
-import { Page, Locator, expect } from '@playwright/test';
+import {Page, Locator, expect} from '@playwright/test';
 
 export class QuestionnaireVersionHistoryPage {
     readonly heading: Locator;
+    readonly backLink: Locator;
     readonly stepNav: Locator;
     readonly toggleAllVersionsButton: Locator;
+    readonly getVersionList: (level: number) => Locator;
 
     constructor(page: Page) {
         this.heading = page.locator('h1.govuk-heading-l');
+        this.backLink = page.getByRole('link', { name: 'Back' });
         this.stepNav = page.locator('#step-by-step-navigation');
         this.toggleAllVersionsButton = page.getByRole('button', {name: /versions/i});
+        this.getVersionList = (level: number) =>
+            page.locator(`.js-step [data-position="${level}"]`)
+                .locator('..') // move up to the <li>
+                .locator('.app-step-nav__panel .app-step-nav__list');
+
     }
 
     // ---- internal helpers ----
@@ -44,12 +52,16 @@ export class QuestionnaireVersionHistoryPage {
 
     // ---- show/hide changes per level ----
     async clickShowChanges(level: number): Promise<void> {
-        const button = this.getStepHeader(level).getByRole('button', { name: /Show Changes/i });
+        const button = this.getStepHeader(level).getByRole('button', {name: /Show Changes/i});
         await button.click();
     }
 
+    async clickBackLink(): Promise<void> {
+        await this.backLink.click();
+    }
+    
     async clickHideChanges(level: number): Promise<void> {
-        const button = this.getStepHeader(level).getByRole('button', { name: /Hide Changes/i });
+        const button = this.getStepHeader(level).getByRole('button', {name: /Hide Changes/i});
         await button.click();
     }
 
@@ -79,23 +91,22 @@ export class QuestionnaireVersionHistoryPage {
         const text = await tsLocator.innerText();
         return text.trim();
     }
-
-    // ---- level 1 shortcuts ----
-    async getLevel1Title(): Promise<string> {
-        return this.getVersionTitle(1);
-    }
-
-    async getLevel1UserEmail(): Promise<string> {
-        return this.getVersionUserEmail(1);
-    }
-
-    async getLevel1Timestamp(): Promise<string> {
-        return this.getVersionTimestamp(1);
-    }
-
+    
     // ---- changes text inside expanded panel ----
     async getChangesTextForLevel(level: number): Promise<string> {
         const text = await this.getStepPanel(level).innerText();
         return text.trim();
+    }
+
+    async expectVersionListHasItems(level: number): Promise<void> {
+        const list = this.getVersionList(level);
+
+        await expect(list, `❌ Change list <ol> for level ${level} is not visible`).toBeVisible();
+
+        const dataLength = await list.getAttribute('data-length');
+        expect(dataLength, `❌ data-length attribute missing for level ${level}`).not.toBeNull();
+
+        const lengthNum = Number(dataLength?.split(' ')[0] ?? 0);
+        expect(lengthNum, `❌ Expected data-length > 0 for level ${level}, but received ${lengthNum}`).toBeGreaterThan(0);
     }
 }

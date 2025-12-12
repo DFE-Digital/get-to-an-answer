@@ -124,7 +124,7 @@ export class DesignQuestionnairePage extends BasePage {
         // No id for this, so assert using text
         this.manage_viewVersions = this.manageSection.locator('#view-version-history');
         this.manage_viewVersions_status = this.manageSection.locator('#view-version-history-status');
-        this.manage_viewVersionsText = this.manageSection.getByText(/View questionnaire versions/i);
+        this.manage_viewVersionsText = this.manageSection.getByText(/View version history/i);
 
         // ----- Edit Section (links) -----
         this.edit_startPage = this.editSection.locator('#edit-start-page');
