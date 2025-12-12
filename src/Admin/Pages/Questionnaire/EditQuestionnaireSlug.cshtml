@@ -28,11 +28,14 @@
           <label for="@inputId" class="govuk-label govuk-label--l">@title</label>
         </h1>
         <div class="govuk-hint" id="@inputId-hint">
-          <p>The questionnaire will be shown at the top of each page.</p>
-          <p>Use a name that describes what it helps people to do. For example 'Check your care leaver support'.</p>
+          <p>The questionnaire ID is an identifier used to load the questionnaire into your service. You must do this before publishing the questionnaire.</p>
+          <p>The ID must only use lower case letters, numbers and hyphens, with no spaces.</p>
+          <p>This ID will not be visible to the end user.</p>
         </div>
+        
+        <h2>Questionnaire ID</h2>
         <govuk-field-error asp-for="@Model.Slug" error-id="@inputId-field-error"></govuk-field-error>
-
+        
         <govuk-input id="@inputId"
                      class="govuk-input"
                      aria-describedby="forms-name-input-name-hint"
@@ -41,7 +44,7 @@
                      asp-for="@Model.Slug"
                      govuk-error-for="@Model?.Slug"/>
       </govuk-form-group>
-      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>
+      <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Make a copy</button>
     </form>
   </div>
 </div>

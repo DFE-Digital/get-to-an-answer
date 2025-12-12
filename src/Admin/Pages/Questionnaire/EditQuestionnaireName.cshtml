@@ -3,7 +3,7 @@
 @model Admin.Pages.Questionnaire.EditQuestionnaireName
 
 @{
-  const string title = "What's the name of your questionnaire?";
+  const string title = "Edit questionnaire name";
   ViewData["Title"] = title;
 
   const string inputId = "Title";
@@ -26,11 +26,10 @@
       <govuk-form-group asp-for="@Model.Title">
         <h1 class="govuk-heading-l govuk-!-margin-0">
           <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-          <label for="@inputId" class="govuk-label govuk-label--l">@title</label>
+          <label for="@inputId" class="govuk-label govuk-label--l govuk-!-margin-top-3">@title</label>
         </h1>
-        <div class="govuk-hint govuk-!-margin-bottom-8" id="@inputId-hint">
-          <p>The questionnaire will be shown at the top of each page.</p>
-          <p>Use a name that describes what it helps people to do. For example 'Check your care leaver support'.</p>
+        <div class="govuk-hint govuk-!-margin-bottom-5" id="@inputId-hint">
+          <p>Give your questionnaire a name to help you find it later. This will not be visible to users.</p>
         </div>
         <govuk-field-error asp-for="@Model.Title" error-id="@inputId-field-error"></govuk-field-error>
 
