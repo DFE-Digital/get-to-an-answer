@@ -57,7 +57,7 @@ export class AddQuestionnairePage extends BasePage {
         );
 
         this.inlineUpdateTitleError = this.titleFormGroup.locator(
-            '#Title-field-error'
+            '#Title-error'
         );
         this.inlineTitleError = this.titleFormGroup.locator(
             '#Title-error'
@@ -120,12 +120,12 @@ export class AddQuestionnairePage extends BasePage {
             expect(ariaValue, '❌ aria-describedby missing hint id')
                 .toContain('Title-hint');
             expect(ariaValue, '❌ aria-describedby missing error message id')
-                .toContain('title-field-error');
+                .toContain('Title-error');
         } else {
             expect(ariaValue, '❌ aria-describedby missing hint id')
                 .toContain('Title-hint');
             expect(ariaValue, '❌ aria-describedby missing error message id')
-                .toContain('title-field-error');
+                .toContain('Title-error');
         }
     }
 

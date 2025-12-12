@@ -93,7 +93,7 @@ test.describe('Questionnaire custom styling', () => {
         const checkbox = page.locator('#UpdateRequest-IsAccessibilityAgreementAccepted');
         const ariaDescribedBy = await checkbox.getAttribute('aria-describedby');
         expect(ariaDescribedBy ?? '', '❌ aria-describedby must reference error element')
-            .toContain('isaccessibilityagreementaccepted-field-error');
+            .toContain('IsAccessibilityAgreementAccepted-error');
     });
 
     test('Submitting with colours filled but without accessibility agreement shows validation error', async ({ page }) => {

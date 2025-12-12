@@ -36,7 +36,7 @@ public class GovUkFieldErrorTagHelper : TagHelper
         }
 
         var message = entry!.Errors[0].ErrorMessage;
-        var id = ErrorId ?? $"{fullName}-field-error";
+        var id = ErrorId ?? $"{fullName}-error";
 
         output.TagName = "p";
         output.TagMode = TagMode.StartTagAndEndTag;

@@ -100,7 +100,7 @@ export class QuestionnaireStylingPage extends BasePage {
         this.inlineErrorStateColor = this.inlineErrorLink('state-color-error');
         this.inlineErrorErrorMessageColor = this.inlineErrorLink('error-color-error');
         this.inlineErrorAccessibilityAgreement = this.inlineErrorLink(
-            'forms-name-input-name-field-error'
+            'forms-name-input-name-error'
         );
     }
 
