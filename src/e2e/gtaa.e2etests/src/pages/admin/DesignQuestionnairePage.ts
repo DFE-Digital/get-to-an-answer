@@ -1,6 +1,7 @@
 import {expect, Page, Locator} from '@playwright/test';
 import {BasePage} from '../BasePage';
 import {Timeouts} from '../../constants/timeouts';
+import {TaskStatus} from "../../constants/test-data-constants";
 
 export class DesignQuestionnairePage extends BasePage {
     // ===== Page-level Locators =====
@@ -58,6 +59,9 @@ export class DesignQuestionnairePage extends BasePage {
 
     // Other general actions
     private readonly deleteQuestionnaireButton: Locator;
+    private readonly linkViewVersions: Locator;
+    private readonly linkPreviewQuestionnaire: Locator;
+    private readonly linkClone: Locator;
 
     // Notification banners
     private readonly justCreatedBannerText: Locator;
@@ -74,6 +78,9 @@ export class DesignQuestionnairePage extends BasePage {
     private readonly gtaaApiErrorBannerLabel: Locator;
     private readonly gtaaApiErrorBannerText: Locator;
 
+    private readonly addStartPageLink: Locator;
+    private readonly resultsPagesTaskStatus: Locator;
+    
     constructor(page: Page) {
         super(page);
 
@@ -115,10 +122,9 @@ export class DesignQuestionnairePage extends BasePage {
         this.manage_manageAccess = this.manageSection.locator('#manage-access');
         this.manage_makeCopy = this.manageSection.locator('#make-copy');
         // No id for this, so assert using text
-        this.manage_viewVersionsText = this.manageSection.getByText(/View questionnaire versions/i);
         this.manage_viewVersions = this.manageSection.locator('#view-version-history');
-        this.manage_viewVersions_status = this.manageSection
-            .locator('xpath=.//span[contains(text(),"View questionnaire versions")]/../../div[contains(@class,"govuk-task-list__status")]');
+        this.manage_viewVersions_status = this.manageSection.locator('#view-version-history-status');
+        this.manage_viewVersionsText = this.manageSection.getByText(/View questionnaire versions/i);
 
         // ----- Edit Section (links) -----
         this.edit_startPage = this.editSection.locator('#edit-start-page');
@@ -175,6 +181,12 @@ export class DesignQuestionnairePage extends BasePage {
         this.justRemovedStartPageImageBannerText = page.locator('#just-removed-start-page-image-banner-text');
         this.gtaaApiErrorBannerLabel = page.locator('#gtaa-api-error-banner-label');
         this.gtaaApiErrorBannerText = page.locator('#gtaa-api-error-banner-text');
+        this.linkViewVersions = this.page.locator('#view-version-history');
+        this.linkPreviewQuestionnaire = this.page.locator('#preview-questionnaire');
+        this.linkClone = this.page.locator('#make-copy');
+
+        this.addStartPageLink = page.locator('#edit-start-page');
+        this.resultsPagesTaskStatus = page.locator('#edit-results-pages-status');
     }
 
     // =====================================================
@@ -224,6 +236,10 @@ export class DesignQuestionnairePage extends BasePage {
         await this.customise_styling.click();
     }
 
+    async openViewVersionHistory() {
+        await this.linkViewVersions.click();
+    }
+
     async openBranchingMap(): Promise<void> {
         await this.review_branchingMap.click();
     }
@@ -243,12 +259,29 @@ export class DesignQuestionnairePage extends BasePage {
         ]);
     }
 
+    async openPreview() {
+        const [newPage] = await Promise.all([
+            this.page.context().waitForEvent('page'),
+            this.linkPreviewQuestionnaire.click()
+        ]);
+
+        return newPage;
+    }
+
     async openIntegrationGuide(): Promise<void> {
         await this.publish_integrationGuide.click();
     }
 
     async clickDeleteQuestionnaireButton(): Promise<void> {
         await this.deleteQuestionnaireButton.click();
+    }
+    
+    async openAddStartPage(): Promise<void> {
+        await expect(this.addStartPageLink, '❌ Add start page link missing').toBeVisible();
+        await Promise.all([
+            this.page.waitForLoadState('networkidle'),
+            this.addStartPageLink.click(),
+        ]);
     }
 
 
@@ -716,5 +749,41 @@ export class DesignQuestionnairePage extends BasePage {
 
     async validateQuestionnaireDefaultStatus(status: string): Promise<void> {
         expect(status.trim().toLowerCase(), '❌ Questionnaire default status is incorrect').toBe('draft');
+    }
+
+    // Assert that task list reflects that contributors and results pages have been configured
+    async expectTaskStatusReflectsConfiguredContributorsAndResults(): Promise<void> {
+        await this.verifyHeaderLinks();
+        await this.verifyFooterLinks();
+
+        const resultsStatusText =
+            (await this.resultsPagesTaskStatus.textContent())?.trim() ?? '';
+
+        expect(resultsStatusText.length).toBeGreaterThan(0);
+    }
+
+    async assertViewHistoryLinkDisabled() {
+        // check tag type is a span element when disabled
+        await expect(this.manage_viewVersions).toBeVisible();
+        await expect(this.manage_viewVersions, 'View history link should be a span element when disabled').toHaveJSProperty('tagName', 'SPAN');
+        
+        await expect(this.manage_viewVersions_status).toBeVisible();
+        await expect(this.manage_viewVersions_status, 'View history status should populated').toHaveText(TaskStatus.CANNOT_VIEW_HISTORY);
+        
+        // Verify disabled state attributes
+        await expect(this.manage_viewVersions, 'View history link should have aria-disabled attribute').toHaveAttribute('aria-disabled', 'true');
+        await expect(this.manage_viewVersions, 'View history link should have tabindex attribute').toHaveAttribute('tabindex', '-1');
+    }
+
+    async assertViewHistoryLinkEnabled() {
+        // check tag type is a anchor link element when enabled
+        await expect(this.manage_viewVersions).toBeVisible();
+        await expect(this.manage_viewVersions, 'View history link should be a anchor link element when enabled').toHaveJSProperty('tagName', 'A');
+
+        await expect(this.manage_viewVersions_status).not.toBeVisible();
+
+        // Verify disabled state attributes
+        await expect(this.manage_viewVersions, 'View history link should have aria-disabled attribute').not.toHaveAttribute('aria-disabled', 'true');
+        await expect(this.manage_viewVersions, 'View history link should have tabindex attribute').toHaveAttribute('tabindex', '-1');
     }
 }

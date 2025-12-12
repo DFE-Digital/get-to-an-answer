@@ -76,3 +76,7 @@ export const SuccessBannerMessages = {
     CREATED_RESULTS_PAGE_SUCCESS_MESSAGE: 'Your results page has been created.',
     UPDATED_RESULTS_PAGE_SUCCESS_MESSAGE: 'Your changes have been saved.',
 }
+
+export const TaskStatus = {
+     CANNOT_VIEW_HISTORY: 'Cannot view until published'
+}
