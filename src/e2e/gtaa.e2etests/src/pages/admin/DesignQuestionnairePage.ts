@@ -114,7 +114,7 @@ export class DesignQuestionnairePage extends BasePage {
         this.manage_manageAccess = this.manageSection.locator('#manage-access');
         this.manage_makeCopy = this.manageSection.locator('#make-copy');
         // No id for this, so assert using text
-        this.manage_viewVersions = this.manageSection.getByText(/View questionnaire versions/i);
+        this.manage_viewVersions = this.manageSection.locator('#view-version-history');
         this.manage_viewVersions_status = this.manageSection
             .locator('xpath=.//span[contains(text(),"View questionnaire versions")]/../../div[contains(@class,"govuk-task-list__status")]');
 
@@ -198,6 +198,10 @@ export class DesignQuestionnairePage extends BasePage {
         await this.manage_manageAccess.click();
     }
 
+    async openVersionHistory(): Promise<void> {
+        await this.manage_viewVersions.click();
+    }
+    
     async openStartPage(): Promise<void> {
         await this.edit_startPage.click();
     }

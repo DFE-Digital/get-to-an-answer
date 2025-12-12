@@ -226,6 +226,7 @@ test.describe('Get to an answer update question', () => {
 
         viewQuestionPage = new ViewQuestionPage(page);
         await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
+        await viewQuestionPage.assertQuestionDeletionSuccessBanner();
     });
 
     test('Delete a question with cancellation returns to edit page', async ({page}) => {
