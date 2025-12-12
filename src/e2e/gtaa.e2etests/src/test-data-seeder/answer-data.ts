@@ -1,7 +1,7 @@
 import {AnswerBuilder} from '../builders/AnswerBuilder';
 import {AnswerDestinationType} from '../constants/test-data-constants'
 import {JwtHelper} from "../helpers/JwtHelper";
-import {APIResponse} from "@playwright/test";
+import {APIRequestContext, APIResponse} from "@playwright/test";
 import {parseBody} from "../helpers/ParseBody";
 import { EnvConfig } from '../config/environment-config';
 
@@ -187,4 +187,85 @@ export async function deleteAnswer(
         deleteAnswerResponse: response,
         deleteAnswerBody: responseBody,
     }
+}
+
+export async function createMultiSelectAnswerSet(
+    request: APIRequestContext,
+    questionnaireId: string,
+    questionId: string,
+    contentId: string,
+    token: string
+): Promise<{ responses: APIResponse[] }> {
+    const payloads = [
+        {
+            questionId,
+            questionnaireId,
+            content: 'Multi option 1',
+            destinationType: AnswerDestinationType.CustomContent,
+            destinationContentId: contentId
+        },
+        {
+            questionId,
+            questionnaireId,
+            content: 'Multi option 2',
+            destinationType: AnswerDestinationType.CustomContent,
+            destinationContentId: contentId
+        },
+        {
+            questionId,
+            questionnaireId,
+            content: 'Multi option 3',
+            destinationType: AnswerDestinationType.CustomContent,
+            destinationContentId: contentId
+        },
+    ];
+
+    const responses: APIResponse[] = [];
+    for (const payload of payloads) {
+        const { answerPostResponse } = await createSingleAnswer(
+            request,
+            payload,
+            token
+        );
+        responses.push(answerPostResponse);
+    }
+
+    return { responses };
+}
+
+export async function createDropdownAnswerSet(
+    request: APIRequestContext,
+    questionnaireId: string,
+    questionId: string,
+    contentId: string,
+    token: string
+): Promise<{ responses: APIResponse[] }> {
+    const payloads = [
+        {
+            questionId,
+            questionnaireId,
+            content: 'Dropdown option 1',
+            destinationType: AnswerDestinationType.CustomContent,
+            destinationContentId: contentId
+        },
+        {
+            questionId,
+            questionnaireId,
+            content: 'Dropdown option 2',
+            destinationType: AnswerDestinationType.CustomContent,
+            destinationContentId: contentId
+        },
+    ];
+
+    const responses: APIResponse[] = [];
+    for (const payload of payloads) {
+        const { answerPostResponse } = await createSingleAnswer(
+            request,
+            payload,
+            token
+        );
+        responses.push(answerPostResponse);
+    }
+
+    return { responses };
 }

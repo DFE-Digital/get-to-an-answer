@@ -127,4 +127,9 @@ export class AddQuestionnaireStartPage extends BasePage {
     async clickRemoveStartPage(): Promise<void> {
         await this.removeStartPageButton.click();
     }
+    
+    async configureBasicStartPage(title: string, description: string): Promise<void> {
+        await this.questionnaireDisplayTitleInput.fill(title);
+        await this.questionnaireDescriptionText.fill(description);
+    }
 }
