@@ -98,7 +98,11 @@ app.Use(async (context, next) =>
 {
     context.Response.Headers.Remove("X-Frame-Options");
     
+    // Important: Because this service is design to be embedded in other sites,
+    // we need to allow it to be embedded in other sites,
+    // and we cant predict the domain of the target site.
     context.Response.Headers["Content-Security-Policy"] = "frame-ancestors *";
+    
     //context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
     //context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
     await next();
