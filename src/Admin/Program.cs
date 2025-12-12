@@ -211,12 +211,10 @@ app.UseCsp(x =>
     x.AllowFraming.FromSelf(); // Block framing on other sites, equivalent to X-Frame-Options: DENY
     config.AllowFrameUrls.ForEach(f => x.AllowFraming.From(f));
     config.AllowFrameUrls.ForEach(f => x.AllowFrames.From(f));
-
-    x.AllowFormActions
-        .ToSelf()
-        .To("https://login.microsoftonline.com")
-        .To("https://login.microsoft.com")
-        .To("https://autologon.microsoftazuread-sso.com");
+    
+    // Needs to anywhere because we can't predict the answer destination DfE users will select
+    // for questionnaire previews, meaning the expected behaviour will be broken  
+    x.AllowFormActions.ToAnywhere();
 
     x.AllowImages
         .FromSelf()
