@@ -36,7 +36,7 @@
           Your question
         </label>
         <div class="govuk-hint" id="QuestionContent-hint">
-          Ask the question the way you would in person. For example, ‘Which of these countries have you lived in?’
+          <p>Ask the question the way you would in person. For example, ‘Which of these countries have you lived in?’</p>
         </div>
 
         <govuk-field-error asp-for="@Model.QuestionContent" error-id="QuestionContent-error">
@@ -57,8 +57,11 @@
           Hint text (optional)
         </label>
         <div class="govuk-hint" id="QuestionHintText-hint">
-          You can add a short sentence to help people answer the question.
-          For example, if someone can select one or more options, use 'Select all that apply'.
+          <p>You can add a short sentence to help people answer the question.
+            For example, if someone can select one or more options, use 'Select all that apply'.
+          </p>
+          <p>You can format your text using Markdown. For example, to add links. To find out more, <a href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/">read this guidance on how to write Markdown.</a></p>
+
         </div>
 
         <govuk-field-error asp-for="@Model.QuestionHintText" error-id="QuestionHintText-error">

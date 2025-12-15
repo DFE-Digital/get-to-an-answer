@@ -24,17 +24,17 @@
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l govuk-!-margin-0">
             <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
-            Enter all options into one text box
+            Enter all answer options
         </h1>
-        <p class="govuk-hint govuk-!-margin-bottom-8">
-            People will be able to select one option from your list.
-        </p>
 
-        <h2 class="govuk-heading-l">Enter answer options for your list</h2>
-        <p class="govuk-body">
-            Enter each option on a new line
-        </p>
+        <div class="govuk-hint">
+        <p>Write each answer option on a new line.</p>
 
+        <p>Once you have added your options, you can edit them further on the 'Add answers' page.</p>
+
+        <p>You can format your text using Markdown. For example, to add links. To find out more, <a href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/">read this guidance on how to write Markdown.</a></p>
+
+        </div>  
         <form method="post" accept-charset="UTF-8">
             <input type="hidden" name="returnUrl" value="@($"{Request.Path}{Request.QueryString}")" />
             <input type="hidden" asp-for="QuestionNumber"/>

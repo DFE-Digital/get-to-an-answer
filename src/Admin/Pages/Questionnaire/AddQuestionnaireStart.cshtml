@@ -25,19 +25,19 @@
       <p id="current-questionnaire-title" class="govuk-caption-l">@Model.QuestionnaireTitle</p>
       Add and edit a start page
     </h1>
-    <div class="govuk-hint govuk-!-margin-bottom-8">
-      You can add a start page for people to see before they answer any questions. 
-    </div>
+    <div class="govuk-hint govuk-!-margin-top-4">
+      <p>You can add a start page to appear before the questions.</p> 
+      </div>
     
     <form method="post" accept-charset="UTF-8">
       <input type="hidden" asp-for="@Model.BackLinkSlug" /> 
       <!-- Content title -->
       <govuk-form-group asp-for="@Model.DisplayTitle">
         <label class="govuk-label govuk-label--m" for="DisplayTitle">
-          Add a title
+          Title
         </label>
-        <div class="govuk-hint" id="DisplayTitle-hint">
-          This will appear at the top of your start page.
+        <div class="govuk-hint govuk-!-padding-top-4" id="DisplayTitle-hint">
+          This will appear at the top of the start page.
         </div>
 
         <govuk-field-error asp-for="@Model.DisplayTitle" error-id="DisplayTitle-error">
@@ -55,12 +55,12 @@
       <!-- Main content -->
       <govuk-form-group asp-for="@Model.Description">
         <label class="govuk-label govuk-label--m" for="Description">
-          Add a description
+          Main content
         </label>
         <div class="govuk-hint" id="Description-hint">
-          <p>Your description should give the user just enough information to help them understand what the service does and whether it will meet their need.</p>
-
-          <p>It should include any information people are likely to need to answer questions. </p>
+          <p>This content should help someone understand what the service does and how it will help them.</p>
+          <p>It should also include any information people may need to answer questions.</p>
+          <p>You can format your text using Markdown. For example, to add headings or links. To find out more, <a href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown">read this guidance on how to write Markdown.</a></p>
         </div>
 
         <govuk-field-error asp-for="@Model.Description" error-id="Description-error">
@@ -81,7 +81,7 @@
 
         <button id="remove-start-page" class="govuk-button govuk-button--warning" type="submit" formnovalidate="formnovalidate"
                 data-module="govuk-button"data-prevent-double-click="true" asp-page-handler="ClearStartPage">
-          Remove start page
+          Delete start page
         </button>
       </div>
     </form>

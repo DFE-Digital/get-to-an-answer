@@ -25,14 +25,13 @@
       <input type="hidden" asp-for="@Model.BackLinkSlug" />
       <govuk-form-group asp-for="@Model.Title">
         <h1 class="govuk-label-wrapper">
-          <label for="@inputId" class="govuk-label govuk-label--l">Add questionnaire name</label>
+          <label for="@inputId" class="govuk-label govuk-label--l">Add a questionnaire name</label>
         </h1>
 
         <div class="govuk-hint" id="@inputId-hint">
-          The questionnaire name will be shown at the top of each page of the form.
-          <br/><br/>
-          Use a name that describes what the form will help people to do. For example ‘Check your care leaver support’.
+          Give your questionnaire a name to help you find it later. This will not be visible to users.
         </div>
+        <br/> 
 
         <govuk-field-error asp-for="@Model.Title" error-id="@inputId-error">
         </govuk-field-error>

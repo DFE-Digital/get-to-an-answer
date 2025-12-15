@@ -17,7 +17,10 @@
                     </h1>
                 </legend>
                 <div class="govuk-hint govuk-!-margin-bottom-8">
-                    By publishing this questionnaire, it will be available to service users.
+                    <p>Before you publish your questionnaire, make sure you have added all questions and answers, and created a questionnaire ID.</p>
+
+                <p>Once you have published your questionnaire, you'll still need to add it to your service before anyone can use it.</p>
+                
                 </div>
 
                 <div class="govuk-radios" data-module="govuk-radios">
@@ -33,7 +36,7 @@
                         <input class="govuk-radios__input" id="finished-no" name="PublishQuestionnaire" type="radio" asp-for="@Model.PublishQuestionnaire"
                                value="false">
                         <label class="govuk-label govuk-radios__label" for="finished-no">
-                            No, leave it in draft
+                            No, not yet
                         </label>
                     </div>
                 </div>

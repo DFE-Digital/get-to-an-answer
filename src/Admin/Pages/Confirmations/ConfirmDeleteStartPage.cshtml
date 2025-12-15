@@ -1,6 +1,5 @@
 ﻿@page "/admin/questionnaires/{questionnaireId:guid}/start-page/delete-confirmation"
 @addTagHelper *, Common
-@using Common.Enum
 @model Admin.Pages.Confirmations.ConfirmDeleteStartPage
 
 @{
@@ -17,11 +16,11 @@
                     Are you sure you want to delete your questionnaire's start page?
                 </h1>
             </legend>
-            <span class="govuk-hint govuk-!-margin-bottom-8">
-                By deleting this result page, existing answers using this result page will be broken.
-            </span>
+            <span class="govuk-hint govuk-!-margin-top-4">
+                Once you delete a start page, you cannot recover it. If it's already published, it may affect your questionnaire.            
+                </span>
 
-            <div class="govuk-radios" data-module="govuk-radios">
+            <div class="govuk-radios govuk-!-margin-top-4" data-module="govuk-radios">
                 <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="finished-yes" name="RemoveStartPage" type="radio" asp-for="@Model.RemoveStartPage"
                            value="true">
