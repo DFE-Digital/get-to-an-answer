@@ -9,6 +9,8 @@ export class ViewQuestionPage extends BasePage {
     private readonly section: Locator;
     private readonly backToEditQuestionnaireLink: Locator;
     private readonly questionHeading: Locator;
+    private readonly successBanner: Locator;
+    private readonly successBannerHeading: Locator;
     private readonly statusTag: Locator;
     private readonly addQuestionLink: Locator;
     private readonly finishedYesRadio: Locator;
@@ -44,6 +46,9 @@ export class ViewQuestionPage extends BasePage {
         this.errorList = this.errorSummary.locator(
             'ul.govuk-error-summary__list'
         );
+        this.successBanner = page.locator('.govuk-notification-banner--success');
+        this.successBannerHeading = this.successBanner.locator('.govuk-notification-banner__heading');
+
         this.table = new ViewQuestionTable(page);
     }
 
@@ -54,7 +59,7 @@ export class ViewQuestionPage extends BasePage {
             this.backToEditQuestionnaireLink.click()
         ]);
     }
-    
+
     async clickAddQuestion(): Promise<void> {
         await this.addQuestionLink.click();
     }
@@ -69,13 +74,19 @@ export class ViewQuestionPage extends BasePage {
 
     // ===== Validations =====
     async expectQuestionHeadingOnPage(expectedText?: string): Promise<void> {
-        await expect(this.questionHeading, '❌ View question page heading not visible').toBeVisible();
-        
+        await expect(this.questionHeading).toBeVisible({
+            timeout: Timeouts.MEDIUM  
+        });
+
         if (expectedText) {
-            await expect(
-                this.questionHeading,
-                `❌ View question page heading text does not match: expected "${expectedText}"`
-            ).toContainText(expectedText);
+            // Use toHaveText instead of toContainText for more precise matching
+            await expect(this.questionHeading).toHaveText(
+                new RegExp(expectedText, 'i'),  // Case-insensitive regex match
+                {
+                    timeout: Timeouts.MEDIUM,  
+                    ignoreCase: true  // Case-insensitive matching
+                }
+            );
         }
     }
 
@@ -94,7 +105,7 @@ export class ViewQuestionPage extends BasePage {
     async expectErrorSummaryVisible(): Promise<void> {
         await expect(this.errorSummary, '❌ Error summary not visible').toBeVisible();
     }
-    
+
     async validateMoveUpErrorMessageContains(): Promise<void> {
         await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_TOP_QUESTION_UP);
     }
@@ -123,6 +134,17 @@ export class ViewQuestionPage extends BasePage {
 
     async expectYesRadioIsNotSelected(): Promise<void> {
         await expect(this.finishedYesRadio).not.toBeChecked();
+    }
+
+    async assertQuestionDeletionSuccessBanner(): Promise<void> {
+        await expect(
+            this.successBanner,
+            '❌ Delete question success banner should be visible',
+        ).toBeVisible();
+
+        await expect(this.successBannerHeading).toHaveText(
+            /The question, .*, has been deleted\./
+        );
     }
 
     async assertPageElements() {

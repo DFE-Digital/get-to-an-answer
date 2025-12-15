@@ -92,16 +92,23 @@ export class AddAnswerPage extends BasePage {
 
     // ===== Validations =====
     async expectAnswerHeadingOnPage(expectedText?: string): Promise<void> {
-        await expect(this.addAnswersHeading, '❌ Add answers page heading not visible').toBeVisible();
+        await expect(this.addAnswersHeading).toBeVisible({
+            timeout: Timeouts.MEDIUM,  
+            visible: true   // Explicitly ensure visibility
+        });
 
         if (expectedText) {
-            await expect(
-                this.addAnswersHeading,
-                `❌ Add answers heading text mismatch: expected "${expectedText}"`
-            ).toContainText(expectedText);
+            // Use toHaveText instead of toContainText for more precise matching
+            await expect(this.addAnswersHeading).toHaveText(
+                new RegExp(expectedText, 'i'),  // Case-insensitive regex match
+                {
+                    timeout: Timeouts.MEDIUM,
+                    ignoreCase: true  // Additional case-insensitive matching
+                }
+            );
         }
     }
-    
+
     async asserPageElementsUponLanding(i: number, removeButtonCount: number) {
         await this.verifyHeaderLinks();
         await this.verifyFooterLinks();

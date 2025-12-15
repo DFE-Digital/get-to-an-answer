@@ -69,6 +69,8 @@ export const PageHeadings = {
     VIEW_RESULTS_PAGES_PAGE_HEADING: 'Add or edit results pages',
     ADD_RESULTS_PAGE_PAGE_HEADING: 'Add a results page',
     EDIT_RESULTS_PAGE_PAGE_HEADING: 'Edit your results page',
+    
+    VIEW_VERSION_HISTORY_PAGE_HEADING: 'View version history',
 }
 
 export const SuccessBannerMessages = {

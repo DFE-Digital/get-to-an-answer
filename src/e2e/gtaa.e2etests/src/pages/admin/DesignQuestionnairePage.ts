@@ -28,6 +28,7 @@ export class DesignQuestionnairePage extends BasePage {
     private readonly manage_manageAccess: Locator;
     private readonly manage_makeCopy: Locator;
     private readonly manage_viewVersions: Locator;
+    private readonly manage_viewVersionsText: Locator;
     private readonly manage_viewVersions_status: Locator;
 
     // Edit questionnaire
@@ -123,6 +124,7 @@ export class DesignQuestionnairePage extends BasePage {
         // No id for this, so assert using text
         this.manage_viewVersions = this.manageSection.locator('#view-version-history');
         this.manage_viewVersions_status = this.manageSection.locator('#view-version-history-status');
+        this.manage_viewVersionsText = this.manageSection.getByText(/View version history/i);
 
         // ----- Edit Section (links) -----
         this.edit_startPage = this.editSection.locator('#edit-start-page');
@@ -210,6 +212,10 @@ export class DesignQuestionnairePage extends BasePage {
         await this.manage_manageAccess.click();
     }
 
+    async openVersionHistory(): Promise<void> {
+        await this.manage_viewVersions.click();
+    }
+    
     async openStartPage(): Promise<void> {
         await this.edit_startPage.click();
     }
@@ -329,7 +335,7 @@ export class DesignQuestionnairePage extends BasePage {
         ).toBeVisible();
 
         await expect(
-            this.manage_viewVersions,
+            this.manage_viewVersionsText,
             '❌ "View questionnaire versions" text should be visible in Manage section',
         ).toBeVisible();
 

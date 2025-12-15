@@ -45,42 +45,78 @@ test.describe('Get to an answer update questionnaire', () => {
             destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
         }, token)
     });
-    
+
     test('Delete an answer successfully - single select question', async ({page}) => {
         await signIn(page, token);
         viewQuestionPage = await goToViewQuestionsPageByUrl(page, questionnaireId);
         await viewQuestionPage.expectQuestionHeadingOnPage();
-        
+
         viewQuestionPage = await ViewQuestionPage.create(page);
         await viewQuestionPage.table.clickEditByQuestionContent(question1Content);
 
         addQuestionPage = await AddQuestionPage.create(page);
-        rowData = await addQuestionPage.table.getAnswerRowData(answer1.content);
-        expect(rowData).toBeDefined();
-        
+
+        // Get the actual answer contents before deletion
+        const initialAnswers = await addQuestionPage.table.getAllAnswerContents();
+        expect(initialAnswers.length).toBeGreaterThan(1);
+
+        const answer1Content = initialAnswers[0];
+        const answer2Content = initialAnswers[1];
+
         addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
         await addAnswerPage.expectAnswerHeadingOnPage();
-        
-        //delete answer and validate it's deleted in the table
 
+        await addAnswerPage.removeOption(1);
+        await addAnswerPage.clickSaveAnswersButton();
+        
+        // Get remaining answers after deletion
+        const remainingAnswers = await addQuestionPage.table.getAllAnswerContents();
+
+        // Verify first-answer remains
+        expect(remainingAnswers).toContain(answer1Content);
+
+        // Verify second answer is removed
+        expect(remainingAnswers).not.toContain(answer2Content);
+
+        // Additional check for row count
+        expect(remainingAnswers.length).toBe(initialAnswers.length - 1);
     });
 
     test('Delete an answer successfully for question with 3 answers - single select', async ({page, request}) => {
+        // Create a third answer
         const {answer} = await createSingleAnswer(request, {
             questionnaireId, questionId: question1Id, content: 'A3',
             destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
         }, token)
-        
+
         await signIn(page, token);
-        
+
+        // Navigate to update a question page
         addQuestionPage = await goToUpdateQuestionPageByUrl(page, questionnaireId, question1Id);
-        rowData = await addQuestionPage.table.getAnswerRowData(answer.content);
-        expect(rowData).toBeDefined();
-        
+
+        // Get all answer contents before deletion
+        const initialAnswers = await addQuestionPage.table.getAllAnswerContents();
+        expect(initialAnswers.length).toBe(3);
+
+        // Verify that a specific answer exists
+        expect(initialAnswers).toContain(answer.content);
+
+        // Navigate to update an answer page
         addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
         await addAnswerPage.expectAnswerHeadingOnPage();
 
-        //delete an answer and validate it's deleted in the table
+        // Remove the third answer
+        await addAnswerPage.removeOption(2);
+        await addAnswerPage.clickSaveAnswersButton();
 
+        // Reload page and verify
+        await page.reload();
+        addQuestionPage = await AddQuestionPage.create(page);
+
+        // Get remaining answers
+        const remainingAnswers = await addQuestionPage.table.getAllAnswerContents();
+        
+        expect(remainingAnswers.length).toBe(2);
+        expect(remainingAnswers).not.toContain(answer.content);
     });
 });
