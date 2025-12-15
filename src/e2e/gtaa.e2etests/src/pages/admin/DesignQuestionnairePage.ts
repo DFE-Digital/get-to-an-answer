@@ -58,6 +58,7 @@ export class DesignQuestionnairePage extends BasePage {
 
     // Other general actions
     private readonly deleteQuestionnaireButton: Locator;
+    private readonly unpublishQuestionnaireButton: Locator;
     private readonly linkViewVersions: Locator;
     private readonly linkPreviewQuestionnaire: Locator;
     private readonly linkClone: Locator;
@@ -77,7 +78,6 @@ export class DesignQuestionnairePage extends BasePage {
     private readonly gtaaApiErrorBannerLabel: Locator;
     private readonly gtaaApiErrorBannerText: Locator;
 
-    private readonly addStartPageLink: Locator;
     private readonly resultsPagesTaskStatus: Locator;
     
     constructor(page: Page) {
@@ -164,6 +164,7 @@ export class DesignQuestionnairePage extends BasePage {
 
         // ----- Other buttons -----
         this.deleteQuestionnaireButton = page.locator('#delete-questionnaire');
+        this.unpublishQuestionnaireButton = page.locator('#unpublish-questionnaire');
 
         // ----- Banner Locators -----
         this.justCreatedBannerText = page.locator('#just-created-banner-text');
@@ -182,8 +183,6 @@ export class DesignQuestionnairePage extends BasePage {
         this.linkViewVersions = this.page.locator('#view-version-history');
         this.linkPreviewQuestionnaire = this.page.locator('#preview-questionnaire');
         this.linkClone = this.page.locator('#make-copy');
-
-        this.addStartPageLink = page.locator('#edit-start-page');
         this.resultsPagesTaskStatus = page.locator('#edit-results-pages-status');
     }
 
@@ -252,6 +251,13 @@ export class DesignQuestionnairePage extends BasePage {
             this.publish_publish.click(),
         ]);
     }
+    
+    async unpublishQuestionnaire(): Promise<void> {
+        await Promise.all([
+            this.page.waitForLoadState('networkidle'),
+            this.unpublishQuestionnaireButton.click(),
+        ])
+    }
 
     async openPreview() {
         const [newPage] = await Promise.all([
@@ -271,10 +277,10 @@ export class DesignQuestionnairePage extends BasePage {
     }
     
     async openAddStartPage(): Promise<void> {
-        await expect(this.addStartPageLink, '❌ Add start page link missing').toBeVisible();
+        await expect(this.edit_startPage, '❌ Add start page link missing').toBeVisible();
         await Promise.all([
             this.page.waitForLoadState('networkidle'),
-            this.addStartPageLink.click(),
+            this.edit_startPage.click(),
         ]);
     }
 
@@ -779,5 +785,9 @@ export class DesignQuestionnairePage extends BasePage {
         // Verify disabled state attributes
         await expect(this.manage_viewVersions, 'View history link should have aria-disabled attribute').not.toHaveAttribute('aria-disabled', 'true');
         await expect(this.manage_viewVersions, 'View history link should have tabindex attribute').toHaveAttribute('tabindex', '-1');
+    }
+
+    async assertUnpublishQuestionnaireButtonNotVisible() {
+        await expect(this.unpublishQuestionnaireButton).not.toBeVisible();
     }
 }

@@ -783,6 +783,11 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (questionnaire == null) 
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             
+            if (status == EntityStatus.Private && questionnaire.Status != EntityStatus.Published)
+            {
+                return BadRequest(ProblemTrace("You can only unpublish a published questionnaire", 400));
+            }
+            
             var versionNumber = 1;
 
             questionnaire.Status = status;

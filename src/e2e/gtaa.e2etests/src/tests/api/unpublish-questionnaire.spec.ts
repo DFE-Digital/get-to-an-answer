@@ -1,19 +1,37 @@
 import { expect, test } from '@playwright/test';
 import {
+    addContributor,
     createQuestionnaire,
     getQuestionnaire,
-    publishQuestionnaire, unpublishQuestionnaire,
+    publishQuestionnaire, unpublishQuestionnaire, updateQuestionnaire,
 } from '../../test-data-seeder/questionnaire-data';
 import { JwtHelper } from '../../helpers/JwtHelper';
-import { EntityStatus, QuestionType } from '../../constants/test-data-constants';
+import {AnswerDestinationType, EntityStatus, QuestionType} from '../../constants/test-data-constants';
 import { createQuestion } from '../../test-data-seeder/question-data';
+import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 
 test.describe('PATCH Unpublish questionnaire api request', () => {
     test('unpublishes a published questionnaire (204) and status becomes Private', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
+        
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
 
-        await createQuestion(request, questionnaire.id, undefined, 'Q', QuestionType.MultiSelect, undefined);
-        await publishQuestionnaire(request, questionnaire.id);
+        await addContributor(request, questionnaire.id, 'user-1')
+
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
+
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
+            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+        })
+
+        const { response: publishResponse } = await publishQuestionnaire(request, questionnaire.id);
+
+        expect(publishResponse.status()).toBe(204);
+
+        const { questionnaireGetBody: publishedQuestionnaire } = await getQuestionnaire(request, questionnaire.id);
+
+        expect(publishedQuestionnaire.status).toBe(EntityStatus.Published);
 
         const { response } = await unpublishQuestionnaire(request, questionnaire.id);
 
@@ -23,16 +41,18 @@ test.describe('PATCH Unpublish questionnaire api request', () => {
         expect(questionnaireGetBody.status).toBe(EntityStatus.Private);
     });
 
-    test('unpublishing a draft questionnaire returns 204 but remains Private/Draft', async ({ request }) => {
+    test('unpublishing a draft questionnaire returns 400 and in the same status', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
+        
+        const status = questionnaire.status;
 
         const { response } = await unpublishQuestionnaire(request, questionnaire.id);
 
-        expect(response.status()).toBe(204);
+        expect(response.status()).toBe(400);
 
         const { questionnaireGetBody } = await getQuestionnaire(request, questionnaire.id);
-        // Controller delegates to service which sets status to Private on unpublish path.
-        expect([EntityStatus.Private, EntityStatus.Draft]).toContain(questionnaireGetBody.status);
+        
+        expect(questionnaireGetBody.status).toBe(status);
     });
 
     test('invalid questionnaire id format returns 404', async ({ request }) => {
