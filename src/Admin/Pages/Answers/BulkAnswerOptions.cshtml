@@ -27,14 +27,14 @@
             Enter all options into one text box
         </h1>
 
-        <p class="govuk-body">
-            Write each answer option on a new line.
+        <div class="govuk-hint">
+        <p>Write each answer option on a new line.</p>
 
-            Once you have added your options, you can edit them further on the 'Add answers' page.
+        <p>Once you have added your options, you can edit them further on the 'Add answers' page.</p>
 
-            You can format your text using Markdown. For example, to add links. To find out more, read this guidance on how to write Markdown.
-        </p>
+        <p>You can format your text using Markdown. For example, to add links. To find out more, <a href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/">read this guidance on how to write Markdown.</a></p>
 
+        </div>  
         <form method="post" accept-charset="UTF-8">
             <input type="hidden" name="returnUrl" value="@($"{Request.Path}{Request.QueryString}")" />
             <input type="hidden" asp-for="QuestionNumber"/>
