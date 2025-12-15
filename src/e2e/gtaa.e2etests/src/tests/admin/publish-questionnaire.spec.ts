@@ -15,6 +15,7 @@ import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 import {QuestionnaireNextPage} from "../../pages/fe/QuestionnaireNextPage";
 import {AddQuestionnaireStartPage} from "../../pages/admin/AddQuestionnaireStartPage";
 import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
+import {UnpublishQuestionnaireConfirmationPage} from "../../pages/admin/UnpublishQuestionnaireConfirmationPage";
 
 test.describe('Get to an answer publish questionnaire', () => {
     let token: string;
@@ -275,6 +276,58 @@ test.describe('Get to an answer publish questionnaire', () => {
 
         // For the unhappy path we expect the questionnaire to remain in a non-published state
         expect(body.status === EntityStatus.Draft).toBeTruthy();
+    })
+    
+    test('republishing an unpublished questionnaire', async ({ page, request }) => {
+        const { questionnaire } = await createQuestionnaire(request, token);
+
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` }, token);
+
+        await addContributor(request, questionnaire.id, 'user-1', token)
+
+        const { question } = await createQuestion(request, questionnaire.id, token, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
+
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
+            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+        }, token)
+
+        await signIn(page, token);
+
+        const questionnaireId = questionnaire.id;
+
+        // Go to Edit a Questionnaire page and trigger publish flow
+        const editQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+
+        // This mirrors the existing pattern used for delete confirmation flows
+        await editQuestionnairePage.publishQuestionnaire();
+
+        let confirmPublishPage = new PublishQuestionnaireConfirmationPage(page);
+        await confirmPublishPage.expectTwoRadiosPresent();
+        await confirmPublishPage.chooseYes();
+        await confirmPublishPage.clickContinue();
+        
+        await editQuestionnairePage.assertQuestionnaireStatus('Published');
+        
+        // unpublish
+        await editQuestionnairePage.unpublishQuestionnaire();
+
+        const confirmUnpublishPage = new UnpublishQuestionnaireConfirmationPage(page);
+        await confirmUnpublishPage.expectTwoRadiosPresent();
+        await confirmUnpublishPage.chooseYes();
+        await confirmUnpublishPage.clickContinue();
+
+        await editQuestionnairePage.assertQuestionnaireStatus('Draft');
+        
+        // republish the questionnaire
+        await editQuestionnairePage.publishQuestionnaire();
+
+        confirmPublishPage = new PublishQuestionnaireConfirmationPage(page);
+        await confirmPublishPage.expectTwoRadiosPresent();
+        await confirmPublishPage.chooseYes();
+        await confirmPublishPage.clickContinue();
+
+        await editQuestionnairePage.assertQuestionnaireStatus('Published');
     })
     
     // CARE-1601 Test

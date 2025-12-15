@@ -85,12 +85,12 @@ test.describe('Get to an answer add an answer to a question', () => {
                                                                                                         request,
                                                                                                         page
                                                                                                     }) => {
-        const title = 'Test Content';
+        const referenceName = 'Test Content';
         const apiContentResponse = await createContent(request, {
             questionnaireId,
-            title,
+            title: 'Test Content',
             content: 'This is a test content for the start page.',
-            referenceName: 'test-content'
+            referenceName
         }, token)
 
         const questionContent = `Test Question - ${Date.now()}`;
@@ -103,12 +103,12 @@ test.describe('Get to an answer add an answer to a question', () => {
         
         await addAnswerPage.setOptionContent(0, 'First Answer Option');
         await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
-        await addAnswerPage.setInternalLink(0, title);
+        await addAnswerPage.setInternalLink(0, referenceName);
         await addAnswerPage.setAnswerRank(0, 1);
 
         await addAnswerPage.setOptionContent(1, 'Second Answer Option');
         await addAnswerPage.setOptionHint(1, 'This is the second answer hint');
-        await addAnswerPage.setInternalLink(1, title);
+        await addAnswerPage.setInternalLink(1, referenceName);
         await addAnswerPage.setAnswerRank(1, 2);
 
         await addAnswerPage.clickSaveAndContinueButton();

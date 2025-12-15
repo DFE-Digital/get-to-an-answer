@@ -401,7 +401,6 @@ test.describe('Get to an answer questionnaire versions history', () => {
             `${questionContent} was added to the content of question 2`,
             `${questionHintText} was added to the description of question 2`,
             "'2' was added to the order of question 2",
-            "'0' was added to the status of question 2",
             "'DropdownSelect' was added to the type of question 2",
             "'First Answer Option' was added to the content of answer 1 of question 2",
             "'This is the first answer hint' was added to the description of answer 1 of question 2",

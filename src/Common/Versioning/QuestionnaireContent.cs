@@ -35,7 +35,6 @@ public class QuestionContent
     public string? Content { get; set; }
     public string? Description { get; set; }
     public int? Order { get; set; }
-    public EntityStatus Status { get; set; }
     public QuestionType Type { get; set; }
     
     public List<AnswerContent>? Answers { get; set; }
