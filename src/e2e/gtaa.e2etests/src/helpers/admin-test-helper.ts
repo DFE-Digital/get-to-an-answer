@@ -13,6 +13,9 @@ import {ViewResultsPagesPage} from "../pages/admin/ViewResultsPagesPage";
 import {AddResultsPagePage} from "../pages/admin/AddResultsPagePage";
 import {EditResultsPagePage} from "../pages/admin/EditResultsPagePage";
 import {ViewContributorPage} from "../pages/admin/ViewContributorPage";
+import {QuestionnaireStartPreviewPage} from "../pages/admin/QuestionnaireStartPreviewPage";
+import {QuestionnaireNextPreviewPage} from "../pages/admin/QuestionnaireNextPreviewPage";
+import {QuestionnaireStylingPage} from "../pages/admin/QuestionnaireStylingPage";
 
 type LoadState = 'domcontentloaded' | 'load' | 'networkidle';
 
@@ -265,4 +268,43 @@ export async function goToQuestionnaireContributorsPageByUrl(
     await viewContributorPage.waitForPageLoad();
 
     return viewContributorPage;
+}
+
+// Navigate to start-preview (embed or not)
+export async function goToQuestionnaireStartPreviewByUrl(
+    page: Page,
+    questionnaireId: string,
+    embed: boolean
+): Promise<QuestionnaireStartPreviewPage> {
+    const embedFlag = embed ? 'true' : 'false';
+    await page.goto(
+        `/admin/questionnaires/${questionnaireId}/start-preview?embed=${embedFlag}`,
+        { waitUntil: 'networkidle' }
+    );
+    return QuestionnaireStartPreviewPage.create(page);
+}
+
+// Navigate directly to next-preview (embed or not)
+export async function goToQuestionnaireNextPreviewByUrl(
+    page: Page,
+    questionnaireId: string,
+    embed: boolean
+): Promise<QuestionnaireNextPreviewPage> {
+    const embedFlag = embed ? 'true' : 'false';
+    await page.goto(
+        `/admin/questionnaires/${questionnaireId}/next-preview?embed=${embedFlag}`,
+        { waitUntil: 'networkidle' }
+    );
+    return QuestionnaireNextPreviewPage.create(page);
+}
+
+// Navigate to questionnaire styling page
+export async function goToQuestionnaireStylingPageByUrl(
+    page: Page,
+    questionnaireId: string
+): Promise<QuestionnaireStylingPage> {
+    await page.goto(`/admin/questionnaires/${questionnaireId}/styling`, {
+        waitUntil: 'networkidle',
+    });
+    return QuestionnaireStylingPage.create(page);
 }
