@@ -11,7 +11,7 @@ import {AnswerDestinationType, EntityStatus, PageHeadings, QuestionType} from ".
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 import {
     goToAddQuestionPageByUrl,
-    goToDesignQuestionnairePageByUrl,
+    goToDesignQuestionnairePageByUrl, goToUpdateAnswerPageByUrl,
     goToUpdateQuestionPageByUrl,
     signIn
 } from "../../helpers/admin-test-helper";
@@ -21,6 +21,7 @@ import {QuestionnaireVersionHistoryPage} from "../../pages/admin/QuestionnaireVe
 import {AddQuestionPage, QuestionRadioLabel} from "../../pages/admin/AddQuestionPage";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
 import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
+import {DeleteQuestionConfirmationPage} from "../../pages/admin/DeleteQuestionConfirmationPage";
 
 test.describe('Get to an answer questionnaire versions history', () => {
     let token: string;
@@ -320,6 +321,7 @@ test.describe('Get to an answer questionnaire versions history', () => {
         await questionnaireVersionHistoryPage.expectChangeTexts(2, expectedList);
     });
 
+    // CARE-1609 bug raise to remove a line from the validation
     test('Questionnaire version history text changes validation after first publish - add question answers', async ({page, request}) => {
         const {questionnaire} = await createQuestionnaire(request, token);
         await updateQuestionnaire(request, questionnaire.id, {slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}`}, token);
@@ -414,6 +416,91 @@ test.describe('Get to an answer questionnaire versions history', () => {
         ];
         await questionnaireVersionHistoryPage.expectChangeTexts(2, expectedList);
     });
+
+    // CARE-1607 bug raised
+    // test('Questionnaire version history text changes validation after first publish - delete question answers', async ({page, request}) => {
+    //     const {questionnaire} = await createQuestionnaire(request, token);
+    //     await updateQuestionnaire(request, questionnaire.id, {slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}`}, token);
+    //
+    //     await addContributor(request, questionnaire.id, 'user-1', token)
+    //     const {question} = await createQuestion(request, questionnaire.id, token, 'Custom test question content',
+    //         QuestionType.SingleSelect, 'Custom test question hint text');
+    //
+    //     await createSingleAnswer(request, {
+    //         questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
+    //         destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+    //     }, token)
+    //
+    //     await signIn(page, token);
+    //
+    //     // Go to Edit a Questionnaire page and trigger publish flow
+    //     designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaire.id);
+    //
+    //     await designQuestionnairePage.publishQuestionnaire();
+    //     const confirmPublishPage = new PublishQuestionnaireConfirmationPage(page);
+    //     await confirmPublishPage.expectTwoRadiosPresent();
+    //     await confirmPublishPage.chooseYes();
+    //     await confirmPublishPage.clickContinue();
+    //
+    //     // Should land back on the tracking page for this questionnaire
+    //     await expect(page).toHaveURL(new RegExp(`/admin/questionnaires/${questionnaire.id}.*/track`));
+    //
+    //     // Delete an answer
+    //     addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaire.id, question.id);
+    //     await addAnswerPage.expectAnswerHeadingOnPage();
+    //
+    //     await addAnswerPage.removeOption(0);
+    //     await addAnswerPage.clickSaveAnswersButton();
+    //    
+    //     // Delete the question
+    //     addQuestionPage = await AddQuestionPage.create(page);
+    //     await addQuestionPage.clickDeleteQuestion();
+    //
+    //     const deleteConfirmationPage = new DeleteQuestionConfirmationPage(page);
+    //     await deleteConfirmationPage.validateOnPage();
+    //     await deleteConfirmationPage.selectYes();
+    //     await deleteConfirmationPage.clickContinue();
+    //
+    //     viewQuestionPage = new ViewQuestionPage(page);
+    //     await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
+    //     await viewQuestionPage.assertQuestionDeletionSuccessBanner();
+    //     await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
+    //     await viewQuestionPage.markFinishedEditing(true);
+    //     await viewQuestionPage.saveAndContinue();
+    //
+    //     // Open questionnaire version history
+    //     await designQuestionnairePage.openVersionHistory();
+    //     questionnaireVersionHistoryPage = new QuestionnaireVersionHistoryPage(page);
+    //
+    //     const lisQuestionnaireResponse = await listQuestionnaires(request, token);
+    //     const list: any[] = lisQuestionnaireResponse.questionnaireGetBody
+    //     expect(list.length).toBeGreaterThan(0);
+    //     const firstQuestionnaire = list[0];
+    //
+    //     await questionnaireVersionHistoryPage.clickShowChanges(2);
+    //
+    //     // Expected text values
+    //     const expectedList = [
+    //         "the status was changed from 'Published' to 'Draft'",
+    //         "'Completed' was added to the add questions and answers",
+    //         //`${questionContent} was added to the content of question 2`,
+    //         //`${questionHintText} was added to the description of question 2`,
+    //         "'2' was added to the order of question 2",
+    //         "'0' was added to the status of question 2",
+    //         "'DropdownSelect' was added to the type of question 2",
+    //         "'First Answer Option' was added to the content of answer 1 of question 2",
+    //         "'This is the first answer hint' was added to the description of answer 1 of question 2",
+    //         "'0' was added to the priority of answer 1 of question 2",
+    //         "'ExternalLink' was added to the destination type of answer 1 of question 2",
+    //         "'https://www.example.com' was added to the destination url of answer 1 of question 2",
+    //         "'Second Answer Option' was added to the content of answer 2 of question 2",
+    //         "'This is the second answer hint' was added to the description of answer 2 of question 2",
+    //         "'0' was added to the priority of answer 2 of question 2",
+    //         "'ExternalLink' was added to the destination type of answer 2 of question 2",
+    //         "'https://www.example.com' was added to the destination url of answer 2 of question 2"
+    //     ];
+    //     await questionnaireVersionHistoryPage.expectChangeTexts(2, expectedList);
+    // });
     
     async function validateVersionHistoryLevel(
         questionnaireVersionHistoryPage: QuestionnaireVersionHistoryPage,
