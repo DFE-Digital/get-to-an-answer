@@ -29,7 +29,7 @@
       _ => "<strong class=\"govuk-tag govuk-tag--grey\">Optional</strong>"
     });
 
-  var displayVersionHistory = questionnaire?.Status == EntityStatus.Published || questionnaire?.Version > 1;
+  var displayVersionHistory = questionnaire?.Status == EntityStatus.Published || questionnaire?.Version > 0;
 }
 
 @section BeforeContent
@@ -87,20 +87,20 @@
           <div class="govuk-task-list__name-and-hint">
             @if (displayVersionHistory)
             {
-              <a class="govuk-link gi" id="view-version-history"
+              <a class="govuk-link gi" id="view-version-history" tabindex="-1"
                  href="/admin/questionnaires/@questionnaire?.Id/version-history">
               View version history
               </a>
             }
             else
             {
-              <span>View questionnaire versions</span>
+              <span id="view-version-history" aria-disabled="true" tabindex="-1">View version history</span>
             }
           </div>
           <div class="govuk-task-list__status">
             @if (!displayVersionHistory)
             {
-              <div>Cannot view until published</div>
+              <div id="view-version-history-status">Cannot view until published</div>
             }
           </div>
         </li>
@@ -115,7 +115,7 @@
               Add or edit start page
             </a>
           </div>
-          <div class="govuk-task-list__status" id="optional-task-1-status">
+          <div class="govuk-task-list__status" id="edit-start-page-status">
             @OptionalStatusTag(CompletableTask.AddStartPage)
           </div>
         </li>
@@ -139,7 +139,7 @@
                id="edit-results-pages"
                href="/admin/questionnaires/@questionnaire?.Id/contents">Add or edit results pages</a>
           </div>
-          <div class="govuk-task-list__status">
+          <div class="govuk-task-list__status" id="edit-results-pages-status">
             @OptionalStatusTag(CompletableTask.AddContents)
           </div>
         </li>
@@ -179,7 +179,7 @@
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" id="preview-questionnaire"
+            <a id="preview-questionnaire" class="govuk-link govuk-task-list__link"
                href="/admin/questionnaires/@questionnaire?.Id/start-preview"
                target="_blank">Preview questionnaire (opens in new tab)</a>
           </div>

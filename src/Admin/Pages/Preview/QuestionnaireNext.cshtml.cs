@@ -64,7 +64,8 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             if (destination == null)
                 return NotFound();
 
-            if (!Embed && destination is { Type: DestinationType.ExternalLink, Content: not null })
+            // Redirect to external-link (if embedded or not, but different for Frontend, which is only standalone)
+            if (destination is { Type: DestinationType.ExternalLink, Content: not null })
             {
                 return Redirect(destination.Content);
             }

@@ -38,7 +38,7 @@ export async function createQuestionnaire(
 
 export async function getQuestionnaire(
     request: APIRequestContext,
-    questionnaireId: number,
+    questionnaireId: string,
     bearerToken?: string,
 ) {
     const response = await request.get(`${BASE_URL}/api/questionnaires/${questionnaireId}`, {
@@ -305,6 +305,18 @@ export async function removeContributor(
 
 export async function postClone(request: any, questionnaireId: string, body: { title: string }, token = JwtHelper.ValidToken) {
     return request.post(`${BASE_URL}/api/questionnaires/${questionnaireId}/clones`, {
+        data: body,
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        }
+    });
+}
+
+// Customisation
+
+export async function updateQuestionnaireContinueButton(request: any, questionnaireId: string, body: { continueButtonText: string }, token = JwtHelper.ValidToken) {
+    return request.patch(`${BASE_URL}/api/questionnaires/${questionnaireId}/continue-button`, {
         data: body,
         headers: {
             'Content-Type': 'application/json',
