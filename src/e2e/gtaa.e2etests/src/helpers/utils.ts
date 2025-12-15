@@ -13,3 +13,10 @@ export function formatTimestampToLongDate(timestamp: string): string {
 
     return formatted;
 }
+
+export function normalizeText(text: string): string {
+    return text
+        .replace(/\s+/g, '')        // remove ALL whitespace
+        .replace(/[^\w]/g, '')      // remove all non-alphanumeric characters
+        .toLowerCase();             // make it case-insensitive
+}
