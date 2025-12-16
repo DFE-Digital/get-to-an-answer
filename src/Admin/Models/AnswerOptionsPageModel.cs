@@ -118,6 +118,9 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         }
     }
     
+    private SelectListItem ToResultsPageSelectListItem(ContentDto content) => 
+        new(!string.IsNullOrWhiteSpace(content.ReferenceName) ? content.ReferenceName : content.Title, content.Id.ToString());
+    
     protected async Task HydrateOptionListsAsync()
     {
         var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
@@ -127,7 +130,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         
         var questionSelect = questions.Where(x => x.Id != QuestionId)
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
-        var resultsSelect = resultsPages.Select(r => new SelectListItem(r.Title, r.Id.ToString())).ToList();
+        var resultsSelect = resultsPages.Select(ToResultsPageSelectListItem).ToList();
 
         foreach (var option in Options)
         {
@@ -170,7 +173,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
 
         var resultsPagesForSelection = resultsPages
-            .Select(r => new SelectListItem(r.ReferenceName ?? r.Title, r.Id.ToString())).ToList();
+            .Select(ToResultsPageSelectListItem).ToList();
 
         return (questionForSelection, resultsPages, questionSelectionList, resultsPagesForSelection);
     }

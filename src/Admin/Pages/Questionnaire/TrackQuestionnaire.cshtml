@@ -30,6 +30,8 @@
     });
 
   var displayVersionHistory = questionnaire?.Status == EntityStatus.Published || questionnaire?.Version > 0;
+
+  var questionnaireStatus = questionnaire?.Status == EntityStatus.Private ? EntityStatus.Draft : questionnaire?.Status;
 }
 
 @section BeforeContent
@@ -48,8 +50,8 @@
     <dl class="govuk-!-margin-bottom-7">
       <dt class="govuk-visually-hidden">Status</dt>
       <dd class="govuk-!-margin-0">
-        <strong id="questionnaire-status" class="govuk-tag" data-status="@questionnaire?.Status">
-          @questionnaire?.Status
+        <strong id="questionnaire-status" class="govuk-tag" data-status="@questionnaireStatus">
+          @questionnaireStatus
         </strong>
       </dd>
     </dl>
