@@ -796,4 +796,10 @@ export class DesignQuestionnairePage extends BasePage {
     async assertUnpublishQuestionnaireButtonNotVisible() {
         await expect(this.unpublishQuestionnaireButton).not.toBeVisible();
     }
+
+    async assertQuestionnaireStatus(status: string) {
+        await expect(this.questionnaireStatus).toBeVisible();
+        const statusText = await this.questionnaireStatus.textContent();
+        await expect(statusText?.trim()).toBe(status)
+    }
 }

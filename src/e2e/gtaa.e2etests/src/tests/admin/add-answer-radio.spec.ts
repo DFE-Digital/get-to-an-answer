@@ -70,12 +70,12 @@ test.describe('Get to an answer add an answer to a question', () => {
     });
 
     test("Submit an answer to a single radio question with InternalResultsPage destination", async ({request, page}) => {
-        const title = 'Test Content';
+        const referenceName = 'Test Content';
         await createContent(request, {
             questionnaireId,
-            title,
+            title: 'Test Content',
             content: 'This is a test content for the start page.',
-            referenceName: 'test-content'
+            referenceName
         }, token)
 
         await signIn(page, token);
@@ -85,11 +85,11 @@ test.describe('Get to an answer add an answer to a question', () => {
 
         await addAnswerPage.setOptionContent(0, 'First Answer Option');
         await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
-        await addAnswerPage.setInternalLink(0, title);
+        await addAnswerPage.setInternalLink(0, referenceName);
 
         await addAnswerPage.setOptionContent(1, 'Second Answer Option');
         await addAnswerPage.setOptionHint(1, 'This is the second answer hint');
-        await addAnswerPage.setInternalLink(1, title);
+        await addAnswerPage.setInternalLink(1, referenceName);
 
         await addAnswerPage.clickSaveAndContinueButton();
 

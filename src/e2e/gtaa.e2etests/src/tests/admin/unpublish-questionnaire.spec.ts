@@ -16,6 +16,7 @@ import {QuestionnaireNextPage} from "../../pages/fe/QuestionnaireNextPage";
 import {AddQuestionnaireStartPage} from "../../pages/admin/AddQuestionnaireStartPage";
 import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {UnpublishQuestionnaireConfirmationPage} from "../../pages/admin/UnpublishQuestionnaireConfirmationPage";
+import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
 
 test.describe('Get to an answer unpublish questionnaire', () => {
     let token: string;
@@ -77,6 +78,10 @@ test.describe('Get to an answer unpublish questionnaire', () => {
 
         // Adjust the assertion here if your API uses a different property for the unpublish state
         expect(body.status === EntityStatus.Private).toBeTruthy();
+        
+        // Display as draft, straight after unpublishing
+        const designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        await designQuestionnairePage.assertQuestionnaireStatus('Draft');
     });
     
     test('Unpublish questionnaire not possible if not published (unhappy path)', async ({ page, request }) => {
