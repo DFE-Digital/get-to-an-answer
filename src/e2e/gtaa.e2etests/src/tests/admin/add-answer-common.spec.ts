@@ -104,12 +104,16 @@ test.describe('Get to an answer add an answer to a question', () => {
         
         await addAnswerPage.clickAddAnotherOptionButton();
         await addAnswerPage.asserPageElementsUponLanding(2, 3);
-        
-        await addAnswerPage.expectOptionLabelNumberMatchesIndex(0);
-        await addAnswerPage.expectOptionLabelNumberMatchesIndex(1);
-        await addAnswerPage.expectOptionLabelNumberMatchesIndex(2);
+
+        await addAnswerPage.setOptionContent(2, 'Third Answer Option');
+        await addAnswerPage.setOptionHint(2, 'This is the first answer hint');
+        await addAnswerPage.chooseDestination(2, 'InternalResultsPage');
         
         await addAnswerPage.clickSaveAndContinueButton();
+        
+        await addAnswerPage.errorSummaryLink("#Options-2-destination-internal").isVisible();
+        await addAnswerPage.assertAllOptionLabelsInOrder();
+        
         await addAnswerPage.asserPageElementsUponLanding(2, 3);
     })
     

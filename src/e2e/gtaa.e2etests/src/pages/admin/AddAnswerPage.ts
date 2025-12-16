@@ -99,6 +99,22 @@ export class AddAnswerPage extends BasePage {
         const label = this.optionNumber(index);
         await expect(label, `❌ Option label for index ${index} is missing`).toHaveText(`Option ${index + 1}`);
     }
+
+    async assertAllOptionLabelsInOrder(): Promise<void> {
+        const labels = this.page.locator('label.govuk-label.govuk-label--s[for*="OptionContent"]');
+        const count = await labels.count();
+        const seenLabels = new Set<string>();
+
+        for (let i = 0; i < count; i++) {
+            const label = labels.nth(i);
+            const textContent = (await label.textContent())?.trim() ?? '';
+            const expectedText = `Option ${i + 1}`;
+
+            expect(textContent, `❌ Label ${i + 1} text mismatch`).toBe(expectedText);
+            expect(seenLabels.has(textContent), `❌ Duplicate label detected: ${textContent}`).toBe(false);
+            seenLabels.add(textContent);
+        }
+    }
     
     async expectAnswerHeadingOnPage(expectedText?: string): Promise<void> {
         await expect(this.addAnswersHeading).toBeVisible({
