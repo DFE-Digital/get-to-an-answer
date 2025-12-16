@@ -118,7 +118,7 @@ test.describe('Get to an answer view questions', () => {
 
         await viewQuestionPage.ClickBackToEditQuestionnaireLink();
         designQuestionnairePage = await DesignQuestionnairePage.create(page);
-        expect(designQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING));
+        expect(designQuestionnairePage.validateHeading(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING));
     });
 
     test('Save and continue with No I will come back later radio navigates to Edit questionnaire page', async ({page}) => {
@@ -131,7 +131,7 @@ test.describe('Get to an answer view questions', () => {
         await viewQuestionPage.saveAndContinue();
 
         designQuestionnairePage = await DesignQuestionnairePage.create(page);
-        await designQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
+        await designQuestionnairePage.validateHeading(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
     });
 
     test('Save and continue with Yes radio navigates to Edit questionnaire page', async ({page}) => {
@@ -144,7 +144,7 @@ test.describe('Get to an answer view questions', () => {
         await viewQuestionPage.saveAndContinue();
 
         designQuestionnairePage = await DesignQuestionnairePage.create(page);
-        await designQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
+        await designQuestionnairePage.validateHeading(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
     });
 
     test('List existing questions', async ({page}) => {
