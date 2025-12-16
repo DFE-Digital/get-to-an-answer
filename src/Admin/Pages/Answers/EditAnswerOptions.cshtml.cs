@@ -87,10 +87,10 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             DeletedAnswerIds.Add(removedOption.AnswerId);
 
         Options.RemoveAt(index);
-        
+
         RemoveModelStateEntriesForOption(index);
         RemoveModelStateErrorsForFields();
-        
+
         await HydrateOptionListsAsync();
         ReassignOptionNumbers();
         return Page();
@@ -111,11 +111,13 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             ModelState.Remove(key);
         }
     }
-    
+
     private async Task PopulateFieldWithExistingValues()
     {
         var existingAnswers = await _apiClient.GetAnswersAsync(QuestionId);
-
+        var existingAnswerOptionIds = Options.Select(o => o.AnswerId).ToHashSet();
+        var optionNumber = existingAnswers.Count;
+        
         var (
             questionForSelection,
             _,
@@ -127,7 +129,10 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         foreach (var existingAnswer in existingAnswers)
         {
-            Options?.Add(new AnswerOptionsViewModel
+            if (existingAnswerOptionIds.Contains(existingAnswer.Id))
+                continue;
+            
+            Options.Add(new AnswerOptionsViewModel
             {
                 AnswerId = existingAnswer.Id,
                 QuestionSelectList = questionSelectionList,
@@ -136,7 +141,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
                 OptionContent = existingAnswer.Content,
                 OptionHint = existingAnswer.Description,
                 SelectedDestinationQuestion = existingAnswer.DestinationQuestionId?.ToString(),
-                OptionNumber = existingAnswers.Count - 1,
+                OptionNumber = optionNumber--,
                 QuestionType = currentQuestion?.Type,
                 RankPriority = existingAnswer.Priority.ToString(CultureInfo.InvariantCulture),
                 ExternalLink = existingAnswer.DestinationUrl,
