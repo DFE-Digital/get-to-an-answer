@@ -116,7 +116,6 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
     {
         var existingStoredAnswers = await _apiClient.GetAnswersAsync(QuestionId);
         var existingAnswerOptionIds = Options.Select(o => o.AnswerId).ToHashSet();
-        var optionNumber = existingStoredAnswers.Count;
         
         var (
             questionForSelection,
@@ -141,7 +140,6 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
                 OptionContent = existingAnswer.Content,
                 OptionHint = existingAnswer.Description,
                 SelectedDestinationQuestion = existingAnswer.DestinationQuestionId?.ToString(),
-                OptionNumber = optionNumber--,
                 QuestionType = currentQuestion?.Type,
                 RankPriority = existingAnswer.Priority.ToString(CultureInfo.InvariantCulture),
                 ExternalLink = existingAnswer.DestinationUrl,
