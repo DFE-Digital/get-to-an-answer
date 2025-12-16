@@ -114,9 +114,9 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
     private async Task PopulateFieldWithExistingValues()
     {
-        var existingAnswers = await _apiClient.GetAnswersAsync(QuestionId);
+        var existingStoredAnswers = await _apiClient.GetAnswersAsync(QuestionId);
         var existingAnswerOptionIds = Options.Select(o => o.AnswerId).ToHashSet();
-        var optionNumber = existingAnswers.Count;
+        var optionNumber = existingStoredAnswers.Count;
         
         var (
             questionForSelection,
@@ -127,7 +127,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
 
-        foreach (var existingAnswer in existingAnswers)
+        foreach (var existingAnswer in existingStoredAnswers)
         {
             if (existingAnswerOptionIds.Contains(existingAnswer.Id))
                 continue;
