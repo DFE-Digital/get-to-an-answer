@@ -87,10 +87,10 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             DeletedAnswerIds.Add(removedOption.AnswerId);
 
         Options.RemoveAt(index);
-        
+
         RemoveModelStateEntriesForOption(index);
         RemoveModelStateErrorsForFields();
-        
+
         await HydrateOptionListsAsync();
         ReassignOptionNumbers();
         return Page();
@@ -111,11 +111,12 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             ModelState.Remove(key);
         }
     }
-    
+
     private async Task PopulateFieldWithExistingValues()
     {
-        var existingAnswers = await _apiClient.GetAnswersAsync(QuestionId);
-
+        var existingStoredAnswers = await _apiClient.GetAnswersAsync(QuestionId);
+        var existingAnswerOptionIds = Options.Select(o => o.AnswerId).ToHashSet();
+        
         var (
             questionForSelection,
             _,
@@ -124,19 +125,20 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             ) = await GetPopulatePrerequisites();
 
         var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
-
-        foreach (var existingAnswer in existingAnswers)
+        
+        foreach (var existingAnswer in existingStoredAnswers)
         {
-            Options?.Add(new AnswerOptionsViewModel
+            if (existingAnswerOptionIds.Contains(existingAnswer.Id))
+                continue;
+            
+            Options.Add(new AnswerOptionsViewModel
             {
                 AnswerId = existingAnswer.Id,
                 QuestionSelectList = questionSelectionList,
-                AnswerDestination =
-                    MapAnswerDestination(existingAnswer.DestinationType),
+                AnswerDestination = MapAnswerDestination(existingAnswer.DestinationType),
                 OptionContent = existingAnswer.Content,
                 OptionHint = existingAnswer.Description,
                 SelectedDestinationQuestion = existingAnswer.DestinationQuestionId?.ToString(),
-                OptionNumber = existingAnswers.Count - 1,
                 QuestionType = currentQuestion?.Type,
                 RankPriority = existingAnswer.Priority.ToString(CultureInfo.InvariantCulture),
                 ExternalLink = existingAnswer.DestinationUrl,

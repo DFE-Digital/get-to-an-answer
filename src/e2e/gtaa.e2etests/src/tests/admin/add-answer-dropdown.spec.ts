@@ -76,7 +76,7 @@ test.describe('Get to an answer add an answer to a question', () => {
                                                                                                         page
                                                                                                     }) => {
         const referenceName = 'test-content';
-        const apiContentResponse = await createContent(request, {
+        await createContent(request, {
             questionnaireId,
             title: 'Test Content',
             content: 'This is a test content for the start page.',

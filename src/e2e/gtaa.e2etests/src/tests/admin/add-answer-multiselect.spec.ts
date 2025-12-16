@@ -23,7 +23,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         token = JwtHelper.NoRecordsToken();
         const {questionnaire} = await createQuestionnaire(request, token);
         questionnaireId = questionnaire.id;
-        
+
         const q1Resp = await createQuestion(request, questionnaireId, token,
             undefined, QuestionType.DropdownSelect);
         question1Id = q1Resp.question.id;
@@ -100,7 +100,7 @@ test.describe('Get to an answer add an answer to a question', () => {
 
         addAnswerPage = await AddAnswerPage.create(page);
         await addAnswerPage.expectAnswerHeadingOnPage();
-        
+
         await addAnswerPage.setOptionContent(0, 'First Answer Option');
         await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
         await addAnswerPage.setInternalLink(0, referenceName);
@@ -125,32 +125,33 @@ test.describe('Get to an answer add an answer to a question', () => {
 
         addAnswerPage = await AddAnswerPage.create(page);
         await addAnswerPage.expectAnswerHeadingOnPage();
-        
+
         await addAnswerPage.setOptionContent(0, 'First Answer Option');
         await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
         await addAnswerPage.setExternalLink(0, 'https://www.example.com');
         await addAnswerPage.setAnswerRank(0, 1);
-        
-      
+
+
         await addAnswerPage.setOptionContent(1, 'Second Answer Option');
         await addAnswerPage.setOptionHint(1, 'This is the second answer hint');
         await addAnswerPage.setExternalLink(1, 'https://www.example.com');
         await addAnswerPage.setAnswerRank(1, 2);
 
         await addAnswerPage.clickAddAnotherOptionButton();
-        await  addAnswerPage.waitForPageLoad();
+        await addAnswerPage.waitForPageLoad();
+        await addAnswerPage.assertAllOptionNumberLabelsInOrder();
 
         await addAnswerPage.setOptionContent(2, 'Third Answer Option');
         await addAnswerPage.setOptionHint(2, 'This is the third answer hint');
         await addAnswerPage.setExternalLink(2, 'https://www.example.com');
         await addAnswerPage.setAnswerRank(2, 3);
-        
+
         await addAnswerPage.clickSaveAndContinueButton();
 
         const viewQuestionPage = await ViewQuestionPage.create(page);
         await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
     });
-    
+
     test("Error summary appears on invalid submit with all missing required fields", async ({page, browserName}) => {
         const questionContent = `Test Question - ${Date.now()}`;
         await addQuestionPage.enterQuestionContent(questionContent);
@@ -159,7 +160,7 @@ test.describe('Get to an answer add an answer to a question', () => {
 
         addAnswerPage = await AddAnswerPage.create(page);
         await addAnswerPage.expectAnswerHeadingOnPage();
-        
+
         await addAnswerPage.clickSaveAndContinueButton();
         await addAnswerPage.validateMissingAllFieldsErrorMessageSummary(browserName);
     })
@@ -169,7 +170,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addQuestionPage.enterQuestionContent(questionContent);
         await addQuestionPage.chooseQuestionType(QuestionRadioLabel.MultiSelect);
         await addQuestionPage.clickSaveAndContinue();
-        
+
         addAnswerPage = await AddAnswerPage.create(page);
         await addAnswerPage.expectAnswerHeadingOnPage();
 

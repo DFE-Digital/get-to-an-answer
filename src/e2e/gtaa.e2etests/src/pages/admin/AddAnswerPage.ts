@@ -23,7 +23,7 @@ export class AddAnswerPage extends BasePage {
     private readonly errorLinkOptionContent: Locator;
     private readonly inlineOptionContentError: Locator;
     private readonly optionContentFormGroup: Locator;
-
+    
     private optionContent: (i: number) => Locator;
     private optionHint: (i: number) => Locator;
     private answerRank: (i: number) => Locator;
@@ -32,6 +32,7 @@ export class AddAnswerPage extends BasePage {
     private selectInternalResultsPage: (i: number) => Locator;
     private externalLinkInput: (i: number) => Locator;
     private inlineError: (i: number) => Locator;
+    private optionNumber: (index: number) => Locator;
 
     constructor(page: Page, mode: Mode = 'create') {
         super(page);
@@ -50,6 +51,9 @@ export class AddAnswerPage extends BasePage {
             'button[formaction*="RedirectToBulkEntry"]'
         ).first();
 
+        this.optionNumber = (index: number) =>
+            this.page.locator(`label[for="Options-${index}-OptionContent"]`);
+        
         this.optionContent = (i: number) =>
             page.locator(`input[name="Options[${i}].OptionContent"]`)
 
@@ -91,6 +95,28 @@ export class AddAnswerPage extends BasePage {
     }
 
     // ===== Validations =====
+    async assertAllOptionNumberLabelsInOrder(): Promise<void> {
+        const labels = this.page.locator('label.govuk-label.govuk-label--s[for*="OptionContent"]');
+        const count = await labels.count();
+        const seenLabels = new Set<string>();
+        let expectedTextIndex = 0;
+
+        for (let i = 0; i < count; i++) {
+            const label = labels.nth(i);
+            const textContent = (await label.textContent())?.trim() ?? '';
+            
+            if (!textContent.startsWith('Option '))
+                continue;
+            
+            expectedTextIndex++;
+            const expectedText = `Option ${expectedTextIndex}`;
+
+            expect(textContent, `❌ Label ${expectedTextIndex} text mismatch`).toBe(expectedText);
+            expect(seenLabels.has(textContent), `❌ Duplicate label detected: ${textContent}`).toBe(false);
+            seenLabels.add(textContent);
+        }
+    }
+    
     async expectAnswerHeadingOnPage(expectedText?: string): Promise<void> {
         await expect(this.addAnswersHeading).toBeVisible({
             timeout: Timeouts.MEDIUM,  
