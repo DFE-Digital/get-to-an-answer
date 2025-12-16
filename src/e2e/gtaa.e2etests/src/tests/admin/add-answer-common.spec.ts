@@ -87,6 +87,31 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.clickAddAnotherOptionButton();
         await addAnswerPage.asserPageElementsUponLanding(2, 3);
     });
+
+    test('Validate existing answer options are displayed upon saving and triggering validation', async ({page}) => {
+        await signIn(page, token);
+        addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+        
+        //Fill out initial options
+        await addAnswerPage.expectAnswerHeadingOnPage();
+        await addAnswerPage.setOptionContent(0, 'First Answer Option');
+        await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
+        await addAnswerPage.chooseDestination(0, 'NextQuestion');
+        
+        await addAnswerPage.setOptionContent(1, 'Second Answer Option');
+        await addAnswerPage.setOptionHint(1, 'This is the second answer hint');
+        await addAnswerPage.chooseDestination(1, 'NextQuestion');
+        
+        await addAnswerPage.clickAddAnotherOptionButton();
+        await addAnswerPage.asserPageElementsUponLanding(2, 3);
+        
+        await addAnswerPage.expectOptionLabelNumberMatchesIndex(0);
+        await addAnswerPage.expectOptionLabelNumberMatchesIndex(1);
+        await addAnswerPage.expectOptionLabelNumberMatchesIndex(2);
+        
+        await addAnswerPage.clickSaveAndContinueButton();
+        await addAnswerPage.asserPageElementsUponLanding(2, 3);
+    })
     
     //TBC, CARE-1579 bug raised to be covered later during accessibility testing
     // test('Accessible ids and aria-describedby for multiple options with hint', async ({page}) => {
