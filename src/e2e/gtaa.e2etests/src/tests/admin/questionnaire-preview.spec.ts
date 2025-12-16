@@ -1,4 +1,4 @@
-import {expect, test} from '@playwright/test';
+import {APIResponse, expect, test} from '@playwright/test';
 import {JwtHelper} from '../../helpers/JwtHelper';
 import {
     goToDesignQuestionnairePageByUrl,
@@ -11,7 +11,8 @@ import {
 } from '../../helpers/admin-test-helper';
 import {
     addContributor,
-    createQuestionnaire, getQuestionnaire,
+    createQuestionnaire,
+    getQuestionnaire,
     updateQuestionnaire,
     updateQuestionnaireContinueButton
 } from '../../test-data-seeder/questionnaire-data';
@@ -350,42 +351,87 @@ test.describe('Questionnaire preview run (start & next)', () => {
         startPreviewPage = await goToQuestionnaireStartPreviewByUrl(page, questionnaireId, false);
         await startPreviewPage.assertStructure();
 
-        // assert that the start page button remains the same
-        const btn = startPreviewPage.startButton;
-        await expect(btn).toHaveText(/Start now/i);
+        // assert that the start page button text remains the same
+        await startPreviewPage.assertStartButtonTextAndColor("Start now", updatedPrimaryButtonColor);
 
-        const buttonBackgroundColor = await btn.evaluate((el) =>
-            window.getComputedStyle(el).getPropertyValue('background-color')
-        );
-        expect(buttonBackgroundColor.length).toBeGreaterThan(0);
-        expect(convertColorToHex(buttonBackgroundColor)).toBe(updatedPrimaryButtonColor);
-
-        await btn.click();
+        await startPreviewPage.clickStartNow();
         
         const newContinueButtonText = "Continue preview"
         
         nextPreviewPage = await QuestionnaireNextPreviewPage.create(page);
-        await expect(nextPreviewPage.continueButton).toHaveText(newContinueButtonText);
+        
+        // to trigger the error state
         await nextPreviewPage.clickContinue();
 
-        const continueButtonColor = await nextPreviewPage.continueButton.evaluate((el) =>
-            window.getComputedStyle(el).getPropertyValue('background-color')
-        );
-        expect(continueButtonColor.length).toBeGreaterThan(0);
-        expect(convertColorToHex(continueButtonColor)).toBe(primaryButtonColor);
+        await nextPreviewPage.assertContinueButtonTextAndColor(newContinueButtonText, updatedPrimaryButtonColor);
 
-        const h1Color = await nextPreviewPage.questionHeading.evaluate((el) =>
-            window.getComputedStyle(el).getPropertyValue('color')
-        );
-        expect(h1Color.length).toBeGreaterThan(0);
-        expect(convertColorToHex(h1Color)).toBe(textColor);
-        
-        const errorSummaryColor = await nextPreviewPage.errorSummary.evaluate((el) =>
-            window.getComputedStyle(el).getPropertyValue('border-color')
-        );
-        expect(errorSummaryColor.length).toBeGreaterThan(0);
-        expect(convertColorToHex(errorSummaryColor)).toBe(errorMessageColor);
+        await nextPreviewPage.assertTextColor(textColor);
+
+        await nextPreviewPage.assertErrorComponentsColor(errorMessageColor);
     });
+
+    test('Multi select question with multiple answers selected and prioritised correctly', async ({ page, request }) => {
+        const { question, questionPostResponse } = await createQuestion(request, questionnaireId, token, "Q1", QuestionType.MultiSelect, undefined);
+        expect200HttpStatusCode(questionPostResponse, 201);
+
+        const { question: question2, questionPostResponse: question2PostResponse } = await createQuestion(request, questionnaireId, token, "Q1", QuestionType.MultiSelect, undefined);
+        expect200HttpStatusCode(question2PostResponse, 201);
+
+        const { content } = await createContent(request, {
+            questionnaireId,
+            title: 'Custom preview content',
+            content: 'Custom preview content **markdown**',
+            referenceName: 'custom-preview-content',
+        }, token)
+
+        const payloads = [
+            {
+                questionId: question.id,
+                questionnaireId,
+                content: 'Multi option 1',
+                priority: undefined, // lowest priority
+                destinationType: AnswerDestinationType.ExternalLink,
+                destinationUrl: 'https://www.gov.uk/'
+            },
+            {
+                questionId: question.id,
+                questionnaireId,
+                content: 'Multi option 2',
+                priority: 1, // highest priority
+                destinationType: AnswerDestinationType.CustomContent,
+                destinationContentId: content.id
+            },
+            {
+                questionId: question.id,
+                questionnaireId,
+                content: 'Multi option 3',
+                priority: 2, // second-highest priority
+                destinationType: AnswerDestinationType.Question,
+                destinationQuestionId: question2.id
+            },
+        ];
+
+        for (const payload of payloads) {
+            await createSingleAnswer(
+                request,
+                payload,
+                token
+            );
+        }
+        
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+        const newPage = await designQuestionnairePage.openPreview();
+        
+        nextPreviewPage = await QuestionnaireNextPreviewPage.create(newPage);
+        await nextPreviewPage.assertMultiSelectQuestion();
+        
+        await nextPreviewPage.selectAllCheckboxOptions();
+        
+        await nextPreviewPage.clickContinue();
+        
+        await nextPreviewPage.assertResultsPage(content.title, content.content.replace(/\*\*markdown\*\*/g, 'markdown'));
+    })
+    
 
     test.skip('Preview run reflects contributors and results pages configuration in related admin journeys', async ({ page }) => {
         contributorsPage = await goToQuestionnaireContributorsPageByUrl(page, questionnaireId);
@@ -394,7 +440,7 @@ test.describe('Questionnaire preview run (start & next)', () => {
         await contributorsPage.clickAddPerson();
         addContributorPage = await AddContributorPage.create(page);
 
-        const contributorEmail = `preview-owner-${Date.now()}@education.gov.uk`;
+        const contributorEmail = `00000000-0000-0000-0000-000000000002`;
         await addContributorPage.fillEmail(contributorEmail);
         await addContributorPage.clickSaveAndContinue();
 
@@ -467,9 +513,62 @@ test.describe('Questionnaire preview run (start & next)', () => {
         }
     });
     
-    // TODO: add test to confirm other logged in users to access the preview
+    // add test to confirm other logged in users to access the preview
     //  the questionnaire should have all the potential answer destinations, 
     //  the multi select should have priority selection
+    test('Other logged in users can access the preview, even when they are not contributors', async ({ request, page, browser }) => {
+        await designQuestionnairePage.openAddStartPage();
+        const startPageEditor = await AddQuestionnaireStartPage.create(page);
+        await startPageEditor.configureBasicStartPage('My preview title', 'Some description for preview');
+        await startPageEditor.clickSaveAndContinue();
+        
+        const { question, questionPostResponse } = await createQuestion(request, questionnaireId, token);
+        expect200HttpStatusCode(questionPostResponse, 201);
+
+        const { content, response } = await createContent(request, {
+            questionnaireId,
+            title: 'Custom preview content',
+            content: 'Custom preview content **markdown**',
+            referenceName: 'custom-preview-content',
+        }, token)
+        expect200HttpStatusCode(response, 201);
+
+        const { answerPostResponse } = await createSingleAnswer(
+            request,
+            {
+                questionId: question.id,
+                questionnaireId,
+                content: 'Single answer option',
+                destinationType: AnswerDestinationType.CustomContent,
+                destinationContentId: content.id,
+            },
+            token
+        );
+        expect200HttpStatusCode(answerPostResponse, 201);
+
+        // Create second browser context
+        const context2 = await browser.newContext();
+        const page2 = await context2.newPage();
+        
+        // the token of another user
+        const token2 = JwtHelper.NoRecordsToken();
+
+        await signIn(page2, token2);
+
+        // View another user's questionnaire preview
+        startPreviewPage = await goToQuestionnaireStartPreviewByUrl(page2, questionnaireId, false);
+        await startPreviewPage.assertStructure();
+        await startPreviewPage.clickStartNow()
+
+        nextPreviewPage = await QuestionnaireNextPreviewPage.create(page2);
+        await nextPreviewPage.assertSingleSelectQuestion();
+
+        await nextPreviewPage.selectFirstRadioOption();
+        await nextPreviewPage.clickContinue();
+
+        // Results page is rendered properly
+        await nextPreviewPage.assertResultsPage(content.title, content.content.replace(/\*\*markdown\*\*/g, 'markdown'));
+    })
     
     // TODO: add a test to confirm the desired error states, when:
     //  - the questionnaire has no questions
@@ -488,31 +587,6 @@ test.describe('Questionnaire preview run (start & next)', () => {
             questionnaireId: questionnaireId, questionId: question.id, content: 'A1',
             destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
         }, token)
-    }
-    
-    function convertColorToHex(color: string): string {
-        if (!color) return '';
-
-        // Handle RGB/RGBA format
-        if (color.startsWith('rgb')) {
-            const values = color.match(/\d+/g);
-            if (!values || values.length < 3) return color;
-
-            const r = parseInt(values[0]);
-            const g = parseInt(values[1]);
-            const b = parseInt(values[2]);
-
-            return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-        }
-
-        // Handle hex format
-        if (color.startsWith('#')) {
-            return color.length === 4
-                ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
-                : color;
-        }
-
-        return color;
     }
 
 });

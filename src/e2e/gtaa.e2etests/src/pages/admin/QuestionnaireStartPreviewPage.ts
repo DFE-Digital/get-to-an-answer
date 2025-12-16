@@ -1,5 +1,6 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from '../BasePage';
+import {convertColorToHex} from "../../helpers/utils";
 
 export class QuestionnaireStartPreviewPage extends BasePage {
     // ===== Locators =====
@@ -86,5 +87,43 @@ export class QuestionnaireStartPreviewPage extends BasePage {
             this.page.waitForLoadState('networkidle'),
             this.startButton.click(),
         ]);
+    }
+
+    async assertStartButtonTextAndColor(expectedText: string, expectedHexColor: string): Promise<void> {
+        const continueButtonColor = await this.startButton.evaluate((el) =>
+            window.getComputedStyle(el).getPropertyValue('background-color')
+        );
+        expect(continueButtonColor.length).toBeGreaterThan(0);
+        expect(convertColorToHex(continueButtonColor)).toBe(expectedHexColor);
+
+        await expect(this.startButton).toHaveText(expectedText);
+    }
+
+    async assertTextColor(expectedHexColor: string): Promise<void> {
+        // get all text (h1, h2, h3, h4, h5, h6, label, .govuk-body) 
+        // and check they match the expected hex color
+        // exclude error messages, as they are rendered in a different colour
+        const textElements = this.page.locator('h1, h2, h3, h4, h5, h6, label, .govuk-body');
+
+        const count = await textElements.count();
+        expect(count).toBeGreaterThan(0);
+
+        for (let i = 0; i < count; i++) {
+            const element = textElements.nth(i);
+
+            const isErrorText = await element.evaluate((el) =>
+                el.closest('.govuk-error-message, .govuk-error-summary') !== null
+            );
+
+            if (isErrorText) {
+                continue;
+            }
+
+            const color = await element.evaluate((el) =>
+                window.getComputedStyle(el).getPropertyValue('color')
+            );
+            expect(color.length).toBeGreaterThan(0);
+            expect(convertColorToHex(color)).toBe(expectedHexColor);
+        }
     }
 }

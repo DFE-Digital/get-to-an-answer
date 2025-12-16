@@ -59,12 +59,19 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             {
                 return Page();
             }
+            
+            Dictionary<Guid, float> finalPriorities = new();
+
+            foreach (var (key, value) in priorities)
+            {
+                finalPriorities.Add(key, value == 0 ? int.MaxValue : value);
+            }
 
             if (NextStateRequest.SelectedAnswerIds.Count > 1)
             {
-                var selectedAnswerId = priorities.OrderBy(kv => kv.Value).First().Key;
+                var selectedAnswerId = finalPriorities.OrderBy(kv => kv.Value).First().Key;
                 NextStateRequest.SelectedAnswerIds = [selectedAnswerId];
-            } 
+            }
         
             var destination = await apiClient.GetNextState(Questionnaire.Id, NextStateRequest);
         
