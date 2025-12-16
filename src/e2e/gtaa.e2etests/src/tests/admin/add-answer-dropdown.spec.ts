@@ -107,8 +107,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
 
         await addAnswerPage.expectAnswerHeadingOnPage();
-        await addAnswerPage.clickAddAnotherOptionButton();
-
+        
         await addAnswerPage.setOptionContent(0, 'First Answer Option');
         await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
         await addAnswerPage.setExternalLink(0, 'https://www.example.com');

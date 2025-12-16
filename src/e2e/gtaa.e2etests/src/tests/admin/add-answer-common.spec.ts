@@ -67,6 +67,8 @@ test.describe('Get to an answer add an answer to a question', () => {
         expect(removeButtonsCount).toBe(1);
         
         await addAnswerPage.clickAddAnotherOptionButton();
+        await addAnswerPage.assertAllOptionLabelsInOrder();
+
         await addAnswerPage.asserPageElementsUponLanding(0, 1);
     })
 
@@ -85,6 +87,8 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.chooseDestination(1, 'NextQuestion');
 
         await addAnswerPage.clickAddAnotherOptionButton();
+        await addAnswerPage.assertAllOptionLabelsInOrder();
+        
         await addAnswerPage.asserPageElementsUponLanding(2, 3);
     });
 

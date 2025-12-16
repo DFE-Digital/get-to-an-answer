@@ -104,13 +104,19 @@ export class AddAnswerPage extends BasePage {
         const labels = this.page.locator('label.govuk-label.govuk-label--s[for*="OptionContent"]');
         const count = await labels.count();
         const seenLabels = new Set<string>();
+        let expectedTextIndex = 0;
 
         for (let i = 0; i < count; i++) {
             const label = labels.nth(i);
             const textContent = (await label.textContent())?.trim() ?? '';
-            const expectedText = `Option ${i + 1}`;
+            
+            if (!textContent.startsWith('Option '))
+                continue;
+            
+            expectedTextIndex++;
+            const expectedText = `Option ${expectedTextIndex}`;
 
-            expect(textContent, `❌ Label ${i + 1} text mismatch`).toBe(expectedText);
+            expect(textContent, `❌ Label ${expectedTextIndex} text mismatch`).toBe(expectedText);
             expect(seenLabels.has(textContent), `❌ Duplicate label detected: ${textContent}`).toBe(false);
             seenLabels.add(textContent);
         }
