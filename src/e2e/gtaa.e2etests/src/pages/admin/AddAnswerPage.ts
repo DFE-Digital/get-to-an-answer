@@ -95,12 +95,7 @@ export class AddAnswerPage extends BasePage {
     }
 
     // ===== Validations =====
-    async expectOptionLabelNumberMatchesIndex(index: number): Promise<void> {
-        const label = this.optionNumber(index);
-        await expect(label, `❌ Option label for index ${index} is missing`).toHaveText(`Option ${index + 1}`);
-    }
-
-    async assertAllOptionLabelsInOrder(): Promise<void> {
+    async assertAllOptionNumberLabelsInOrder(): Promise<void> {
         const labels = this.page.locator('label.govuk-label.govuk-label--s[for*="OptionContent"]');
         const count = await labels.count();
         const seenLabels = new Set<string>();

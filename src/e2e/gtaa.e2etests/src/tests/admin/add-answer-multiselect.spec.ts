@@ -139,7 +139,7 @@ test.describe('Get to an answer add an answer to a question', () => {
 
         await addAnswerPage.clickAddAnotherOptionButton();
         await addAnswerPage.waitForPageLoad();
-        await addAnswerPage.assertAllOptionLabelsInOrder();
+        await addAnswerPage.assertAllOptionNumberLabelsInOrder();
 
         await addAnswerPage.setOptionContent(2, 'Third Answer Option');
         await addAnswerPage.setOptionHint(2, 'This is the third answer hint');

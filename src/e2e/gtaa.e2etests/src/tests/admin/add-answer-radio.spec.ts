@@ -71,7 +71,7 @@ test.describe('Get to an answer add an answer to a question', () => {
 
     test("Submit an answer to a single radio question with InternalResultsPage destination", async ({request, page}) => {
         const title = 'Test Content';
-        const apiContentResponse = await createContent(request, {
+        await createContent(request, {
             questionnaireId,
             title,
             content: 'This is a test content for the start page.',

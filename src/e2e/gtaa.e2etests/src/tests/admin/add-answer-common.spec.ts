@@ -62,12 +62,16 @@ test.describe('Get to an answer add an answer to a question', () => {
         
         removeButtonsCount = await addAnswerPage.getRemoveButtonCount();
         expect(removeButtonsCount).toBe(2);
-        await addAnswerPage.removeOption(0);
-        removeButtonsCount = await addAnswerPage.getRemoveButtonCount();
-        expect(removeButtonsCount).toBe(1);
         
+        await addAnswerPage.removeOption(0);
+        
+        removeButtonsCount = await addAnswerPage.getRemoveButtonCount();
+        
+        expect(removeButtonsCount).toBe(1);
+        await addAnswerPage.assertAllOptionNumberLabelsInOrder();
+
         await addAnswerPage.clickAddAnotherOptionButton();
-        await addAnswerPage.assertAllOptionLabelsInOrder();
+        await addAnswerPage.assertAllOptionNumberLabelsInOrder();
 
         await addAnswerPage.asserPageElementsUponLanding(0, 1);
     })
@@ -87,7 +91,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.chooseDestination(1, 'NextQuestion');
 
         await addAnswerPage.clickAddAnotherOptionButton();
-        await addAnswerPage.assertAllOptionLabelsInOrder();
+        await addAnswerPage.assertAllOptionNumberLabelsInOrder();
         
         await addAnswerPage.asserPageElementsUponLanding(2, 3);
     });
@@ -108,6 +112,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         
         await addAnswerPage.clickAddAnotherOptionButton();
         await addAnswerPage.asserPageElementsUponLanding(2, 3);
+        await addAnswerPage.assertAllOptionNumberLabelsInOrder();
 
         await addAnswerPage.setOptionContent(2, 'Third Answer Option');
         await addAnswerPage.setOptionHint(2, 'This is the first answer hint');
@@ -116,7 +121,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.clickSaveAndContinueButton();
         
         await addAnswerPage.errorSummaryLink("#Options-2-destination-internal").isVisible();
-        await addAnswerPage.assertAllOptionLabelsInOrder();
+        await addAnswerPage.assertAllOptionNumberLabelsInOrder();
         
         await addAnswerPage.asserPageElementsUponLanding(2, 3);
     })
