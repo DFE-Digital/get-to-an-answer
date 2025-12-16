@@ -1,9 +1,15 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from '../BasePage';
+import {convertColorToHex, getElementInfo} from "../../helpers/utils";
 
 export class QuestionnaireNextPreviewPage extends BasePage {
     // ===== Common Locators =====
+    
+    // Error state
     readonly errorSummary: Locator;
+    readonly errorFormGroup: Locator;
+    readonly errorFieldMessage: Locator;
+    readonly errorSummaryListLink: Locator;
 
     // Question mode
     readonly questionForm: Locator;
@@ -30,7 +36,10 @@ export class QuestionnaireNextPreviewPage extends BasePage {
         super(page);
 
         this.errorSummary = this.page.locator('.govuk-error-summary[role="alert"][tabindex="-1"]');
-
+        this.errorFormGroup = this.page.locator('.govuk-form-group--error');
+        this.errorFieldMessage = this.errorFormGroup.locator('.govuk-error-message');
+        this.errorSummaryListLink = this.errorSummary.locator('a[href^="#"]');
+        
         this.questionForm = this.page.locator('#question-form');
         this.questionFieldset = this.questionForm.locator('fieldset.govuk-fieldset');
         this.questionHeading = this.questionFieldset.locator('h1.govuk-fieldset__heading');
@@ -163,6 +172,17 @@ export class QuestionnaireNextPreviewPage extends BasePage {
         await expect(firstCheckbox).toBeChecked();
     }
 
+    async selectAllCheckboxOptions(): Promise<void> {
+        const checkboxes = await this.multiSelectCheckboxes
+            .locator('input.govuk-checkboxes__input[type="checkbox"]')
+            .all()
+
+        for (const checkbox of checkboxes) {
+            await checkbox.check();
+            await expect(checkbox).toBeChecked();
+        }
+    }
+
     async selectDropdownByIndex(index: number): Promise<void> {
         // index is 0-based including placeholder; callers should pass >=1 to skip placeholder
         await this.dropdownSelect.selectOption({ index });
@@ -171,5 +191,80 @@ export class QuestionnaireNextPreviewPage extends BasePage {
     async clickContinue(): Promise<void> {
         await this.continueButton.click();
         await this.waitForPageLoad();
+    }
+    
+    async assertContinueButtonTextAndColor(expectedText: string, expectedHexColor: string): Promise<void> {
+        const continueButtonColor = await this.continueButton.evaluate((el) =>
+            window.getComputedStyle(el).getPropertyValue('background-color')
+        );
+        expect(continueButtonColor.length).toBeGreaterThan(0);
+        expect(convertColorToHex(continueButtonColor)).toBe(expectedHexColor);
+        
+        await expect(this.continueButton).toHaveText(expectedText);
+    }
+
+    async assertTextColor(expectedHexColor: string): Promise<void> {
+        // get all text (h1, h2, h3, h4, h5, h6, label, .govuk-body) 
+        // and check they match the expected hex color
+        // exclude error messages, as they are rendered in a different colour
+        const textElements = this.page.locator('h1, h2, h3, h4, h5, h6, label, .govuk-body');
+        
+        const count = await textElements.count();
+        expect(count).toBeGreaterThan(0);
+
+        for (let i = 0; i < count; i++) {
+            const element = textElements.nth(i);
+
+            const isErrorText = await element.evaluate((el) =>
+                el.closest('.govuk-error-message, .govuk-error-summary, .govuk-hint') !== null
+            );
+            
+            if (isErrorText) {
+                continue;
+            }
+            
+            const color = await element.evaluate((el) =>
+                window.getComputedStyle(el).getPropertyValue('color')
+            );
+            expect(color.length).toBeGreaterThan(0);
+
+            // generate locator for each element to make debugging easier
+            const info = await getElementInfo(element);
+            
+            const actualHexColor = convertColorToHex(color);
+            expect(actualHexColor,
+                `For ${info.selector} [tag=${info.tagName}${info.id ? ' id=' + info.id : ''}${info.classes ? ' classes=' + info.classes : ''}], expected: ${expectedHexColor} but actual: ${actualHexColor}`)
+                .toBe(expectedHexColor);
+        }
+    }
+
+    async assertErrorComponentsColor(expectedHexColor: string): Promise<void> {
+        // Error summary should have same color as border of error field group
+        const errorSummaryColor = await this.errorSummary.evaluate((el) =>
+            window.getComputedStyle(el).getPropertyValue('border-color')
+        );
+        expect(errorSummaryColor.length).toBeGreaterThan(0);
+        expect(convertColorToHex(errorSummaryColor)).toBe(expectedHexColor);
+
+        // Error field group should have same color as summary
+        const errorFormGroupColor = await this.errorFormGroup.evaluate((el) =>
+            window.getComputedStyle(el).getPropertyValue('border-left-color')
+        );
+        expect(errorFormGroupColor.length).toBeGreaterThan(0);
+        expect(convertColorToHex(errorFormGroupColor)).toBe(expectedHexColor);
+        
+        // Error field message should have same color as summary
+        const errorFieldMessageColor = await this.errorFieldMessage.evaluate((el) =>
+            window.getComputedStyle(el).getPropertyValue('color')
+        );
+        expect(errorFieldMessageColor.length).toBeGreaterThan(0);
+        expect(convertColorToHex(errorFieldMessageColor)).toBe(expectedHexColor);
+        
+        // Error summary list link should have same color as summary
+        const errorSummaryListLinkColor = await this.errorSummaryListLink.evaluate((el) =>
+            window.getComputedStyle(el).getPropertyValue('color')
+        );
+        expect(errorSummaryListLinkColor.length).toBeGreaterThan(0);
+        expect(convertColorToHex(errorSummaryListLinkColor)).toBe(expectedHexColor);       
     }
 }
