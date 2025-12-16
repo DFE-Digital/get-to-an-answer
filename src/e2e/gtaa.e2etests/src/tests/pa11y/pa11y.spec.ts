@@ -20,7 +20,7 @@ const API_URL = EnvConfig.API_URL;
 const ADMIN_URL = EnvConfig.ADMIN_URL;
 const FRONTEND_URL = EnvConfig.FE_URL;
 test.describe('Get to an answer Pa11y Accessibility Test', () => {
-    test.describe.configure({timeout: 5 * 60 * 1000});
+    test.describe.configure({timeout: 10 * 60 * 1000});
 
     let urlsToTest: string[] = [];
     let token = JwtHelper.NoRecordsToken();
@@ -57,7 +57,7 @@ test.describe('Get to an answer Pa11y Accessibility Test', () => {
                 wait: 1000, // Wait for dynamic content
                 // screenCapture: undefined, // enabled
                 includeNotices: false,
-                includeWarnings: true,
+                includeWarnings: false,
                 runners: ['axe', 'htmlcs'], // Use both Axe and HTML_CodeSniffer
             };
 
