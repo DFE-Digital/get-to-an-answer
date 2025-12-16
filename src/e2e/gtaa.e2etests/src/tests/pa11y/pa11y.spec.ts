@@ -13,18 +13,18 @@ import {createQuestion} from "../../test-data-seeder/question-data";
 import {AnswerDestinationType} from "../../constants/test-data-constants";
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 import {EnvConfig} from "../../config/environment-config";
-import puppeteer, { Page } from "puppeteer";
+import puppeteer, {Page} from "puppeteer";
 import pa11y from "pa11y";
 
 const API_URL = EnvConfig.API_URL;
 const ADMIN_URL = EnvConfig.ADMIN_URL;
 const FRONTEND_URL = EnvConfig.FE_URL;
 test.describe('Get to an answer Pa11y Accessibility Test', () => {
-    test.describe.configure({ timeout: 5 * 60 * 1000 });
+    test.describe.configure({timeout: 5 * 60 * 1000});
 
     let urlsToTest: string[] = [];
     let token = JwtHelper.NoRecordsToken();
-    
+
     test.beforeEach(async ({request}) => {
         // Get base URL from the page context
         const entityIds: any = await loadSeeding(request, token);
@@ -37,7 +37,7 @@ test.describe('Get to an answer Pa11y Accessibility Test', () => {
         const browser = await puppeteer.launch({
             ignoreHTTPSErrors: true
         } as any);
-        
+
         try {
             const page: Page = await browser.newPage();
             await page.goto(`${ADMIN_URL}/dev/login?jt=${token}`, {waitUntil: 'networkidle0'});
@@ -47,7 +47,7 @@ test.describe('Get to an answer Pa11y Accessibility Test', () => {
 
             // Ensure screenshots directory exists
             const screenshotsDir = path.join(__dirname, '../../reports/pa11y-screenshots');
-            await fs.mkdir(screenshotsDir, { recursive: true });
+            await fs.mkdir(screenshotsDir, {recursive: true});
 
             // Pa11y configuration
             const pa11yOptions: any = {
@@ -69,12 +69,12 @@ test.describe('Get to an answer Pa11y Accessibility Test', () => {
                     .slice(0, 150); // avoid overly long filenames
                 return path.join(screenshotsDir, `${safeName}.png`);
             };
-            
-            await Promise.all(urlsToTest.map(async (url) => {
+
+            for (const url of urlsToTest) {
                 console.log(`\nTesting ${url}...`);
-                
+
                 try {
-                    const screenshotPath = getScreenshotPathForUrl(url)
+                    const screenshotPath = getScreenshotPathForUrl(url);
 
                     const result = await pa11y(url, {
                         ...pa11yOptions,
@@ -88,13 +88,14 @@ test.describe('Get to an answer Pa11y Accessibility Test', () => {
                         screenshot: screenshotPath
                     });
 
-                    // Log issues
                     if (result.issues.length > 0) {
                         console.log(`  Found ${result.issues.length} accessibility issues:`);
                         result.issues.forEach((issue: any, index: number) => {
                             console.log(`  ${index + 1}. [${issue.type}] ${issue.message}`);
                             console.log(`     Selector: ${issue.selector}`);
                             console.log(`     Code: ${issue.code}`);
+                            console.log(`     TypeCode: ${issue.typeCode}`);
+                            console.log(`     Runner: ${issue.runner}`);
                         });
                         failures.push(url);
                     } else {
@@ -108,7 +109,7 @@ test.describe('Get to an answer Pa11y Accessibility Test', () => {
                         error: error instanceof Error ? error.message : String(error)
                     });
                 }
-            }))
+            }
 
             // Generate summary report
             console.log('\n=== Pa11y Test Summary ===');
@@ -138,11 +139,11 @@ test.describe('Get to an answer Pa11y Accessibility Test', () => {
 // Helper function to fetch and parse sitemap
 async function fetchUrlsFromSitemap(
     request: APIRequestContext,
-    sitemapUrl: string, 
-    entityIds: { 
-        questionnaireId:any, 
-        firstQuestionId:any, 
-        contentId:any
+    sitemapUrl: string,
+    entityIds: {
+        questionnaireId: any,
+        firstQuestionId: any,
+        contentId: any
     }
 ): Promise<string[]> {
     try {
@@ -182,7 +183,7 @@ async function fetchUrlsFromSitemap(
 async function generateReport(results: any[] = []): Promise<void> {
     // Generate HTML report
     const totalIssues = results.reduce((sum, r) => sum + (r.issueCount > 0 ? r.issueCount : 0), 0);
-    
+
     // Prepare results with screenshot paths suitable for HTML
     const resultsWithScreenshotPaths = results.map((result: any) => ({
         ...result,
@@ -251,10 +252,10 @@ async function generateReport(results: any[] = []): Promise<void> {
                 <div class="url-header">
                     <h3>${result.url}</h3>
                     ${result.error ?
-            `<p class="error-message">❌ Error: ${result.error}</p>` :
-            result.issueCount === 0 ?
-                '<p class="success">✓ No accessibility issues found!</p>' :
-                `<p>Found ${result.issueCount} issue(s)</p>`}
+        `<p class="error-message">❌ Error: ${result.error}</p>` :
+        result.issueCount === 0 ?
+            '<p class="success">✓ No accessibility issues found!</p>' :
+            `<p>Found ${result.issueCount} issue(s)</p>`}
                 </div>
 
                 ${result.screenshotForHtml ? `
@@ -271,17 +272,22 @@ async function generateReport(results: any[] = []): Promise<void> {
                         <p><span class="issue-type">${issue.type}</span> #${index + 1}</p>
                         <p><strong>Message:</strong> ${issue.message}</p>
                         <p><strong>Code:</strong> ${issue.code}</p>
+                        <p><strong>Type code:</strong> ${issue.typeCode}</p>
+                        <p><strong>Runner:</strong> ${issue.runner}</p>
                         <p><strong>Selector:</strong> <code class="selector">${issue.selector}</code></p>
-                        ${issue.context ? `<div class="context"><strong>Context:</strong><br><code>${issue.context.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></div>` : ''}
+                        ${issue.context ? `<div class="context"><strong>Context:</strong><br><code>${issue.context
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;')}</code></div>` : ''}
                     </div>
-                `).join('') : ''}
+        `).join('') : ''}
+
             </div>
         `).join('')}
     </body>
     </html>`;
 
     const reportPath = path.join(__dirname, '../../reports/pa11y-report.html');
-    await fs.mkdir(path.dirname(reportPath), { recursive: true });
+    await fs.mkdir(path.dirname(reportPath), {recursive: true});
     await fs.writeFile(reportPath, htmlReport);
 
     console.log(`HTML report saved to: ${reportPath}`);
@@ -290,7 +296,7 @@ async function generateReport(results: any[] = []): Promise<void> {
 
 async function loadSeeding(request: APIRequestContext, token: string): Promise<object> {
     const entityIds: any = {}
-    
+
     const jsonFilePath = path.join(__dirname, '../../helpers/fedataseeder/questionnaire.json');
     const jsonText = await fs.readFile(jsonFilePath, 'utf8');
     const data = JSON.parse(jsonText);
@@ -379,6 +385,6 @@ async function loadSeeding(request: APIRequestContext, token: string): Promise<o
     }
     console.log('Seeding completed for questionnaire:', questionnaireId);
     await publishQuestionnaire(request, questionnaireId, token);
-    
+
     return entityIds;
 }
