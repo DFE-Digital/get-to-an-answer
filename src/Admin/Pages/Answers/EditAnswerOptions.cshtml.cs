@@ -125,7 +125,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             ) = await GetPopulatePrerequisites();
 
         var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
-
+        
         foreach (var existingAnswer in existingStoredAnswers)
         {
             if (existingAnswerOptionIds.Contains(existingAnswer.Id))
@@ -135,8 +135,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             {
                 AnswerId = existingAnswer.Id,
                 QuestionSelectList = questionSelectionList,
-                AnswerDestination =
-                    MapAnswerDestination(existingAnswer.DestinationType),
+                AnswerDestination = MapAnswerDestination(existingAnswer.DestinationType),
                 OptionContent = existingAnswer.Content,
                 OptionHint = existingAnswer.Description,
                 SelectedDestinationQuestion = existingAnswer.DestinationQuestionId?.ToString(),
