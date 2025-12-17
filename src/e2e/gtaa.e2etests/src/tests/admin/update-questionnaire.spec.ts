@@ -164,6 +164,6 @@ test.describe('Get to an answer update questionnaire', () => {
         await updateQuestionnaireSlugPage.submit()
         
         await updateQuestionnaireSlugPage.validateDuplicateSlugMessageSummary('webkit')
-        await updateQuestionnaireSlugPage.validateInlineSlugError();
+        await updateQuestionnaireSlugPage.validateDuplicateSlugInlineSlugError();
     });
 });

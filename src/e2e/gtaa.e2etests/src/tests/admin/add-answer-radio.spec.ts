@@ -136,4 +136,4 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.validateInlineQuestionContentError(0);
         await addAnswerPage.validateInlineQuestionContentError(1);
     })
-})
+});

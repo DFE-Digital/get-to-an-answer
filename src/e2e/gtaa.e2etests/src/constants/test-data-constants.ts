@@ -34,8 +34,11 @@ export const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9
 // ===== Admin related test data =====
 export const ErrorMessages = {
     ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE: 'Enter a questionnaire title',
-    ERROR_MESSAGE_DUPLICATE_QUESTIONNAIRE_SLUG: 'A questionnaire with this slug already exists',
     ERROR_MESSAGE_INVALID_TITLE: 'Enter a valid title',
+
+    ERROR_MESSAGE_DUPLICATE_QUESTIONNAIRE_SLUG: 'A questionnaire with this slug already exists',
+    ERROR_MESSAGE_EMPTY_QUESTIONNAIRE_SLUG: 'Enter a questionnaire ID',
+    ERROR_MESSAGE_INVALID_QUESTIONNAIRE_SLUG: 'Questionnaire IDs must contain only lowercase letters, numbers, and hyphens, and cannot start or end with a hyphen',
     
     ERROR_MESSAGE_TERMS_OF_USE: 'You need to accept the agreement to continue',
     
@@ -77,6 +80,7 @@ export const SuccessBannerMessages = {
     DELETED_RESULTS_PAGE_SUCCESS_MESSAGE: 'Your results page has been deleted.',
     CREATED_RESULTS_PAGE_SUCCESS_MESSAGE: 'Your results page has been created.',
     UPDATED_RESULTS_PAGE_SUCCESS_MESSAGE: 'Your changes have been saved.',
+    UPDATED_GENERIC_BANNER_SUCCESS_MESSAGE: 'Your changes have been saved.',
 }
 
 export const TaskStatus = {
