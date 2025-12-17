@@ -88,46 +88,30 @@ test.describe('Clone questionnaire page', () => {
         await cloneQuestionnairePage.clickMakeCopy();
 
         await designQuestionnairePage.validateHeadingAndStatus();
-        
-        // await designQuestionnairePage.expectSuccessBannerVisible();
-        
+
+        await designQuestionnairePage.expectSuccessBannerVisible();
+
         await designQuestionnairePage.assertQuestionnaireTitle(newTitle);
     });
     
     
-    //
-    // test('shows validation errors when the title is blank', async ({browserName}) => {
-    //     await clonePage.clearTitle();
-    //     await clonePage.clickMakeCopy();
-    //     await clonePage.expectValidationErrors(browserName);
-    // });
-    //
-    // test('error summary link focuses the input when the title is missing', async ({browserName}) => {
-    //     await clonePage.clearTitle();
-    //     await clonePage.clickMakeCopy();
-    //
-    //     const errorLink = await clonePage.errorSummaryLink('#Title');
-    //     await clonePage.validateErrorLinkBehaviour(errorLink, ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE, browserName);
-    // });
-    //
-    // test('submitting with a new title redirects to the questions list for the clone', async ({page}) => {
-    //     const newTitle = `Cloned from ${questionnaireTitle} - ${Date.now()}`;
-    //     await clonePage.enterTitle(newTitle);
-    //     await clonePage.clickMakeCopy();
-    //
-    //     await page.waitForURL(/\/admin\/questionnaires\/[0-9a-f-]+\/questions/);
-    //     const questionsPage = await ViewQuestionPage.create(page);
-    //     await questionsPage.expectQuestionHeadingOnPage();
-    //     expect(page.url()).toMatch(/\/admin\/questionnaires\/[0-9a-f-]+\/questions/);
-    // });
-    //
-    // test('saving the clone brings me back to the questionnaire design page', async ({page}) => {
-    //     const newTitle = `Clone saved ${Date.now()}`;
-    //     await clonePage.enterTitle(newTitle);
-    //     await clonePage.clickMakeCopy();
-    //
-    //     await page.waitForURL(/\/admin\/questionnaires\/[0-9a-f-]+\/questions/);
-    //     const questionsPage = await ViewQuestionPage.create(page);
-    //     await questionsPage.expectQuestionHeadingOnPage();
-    // });
+    test('Cloning questionnaire with invalid title to validate aria-describedby', async ({page}) => {
+        await viewQuestionnairePage.table.clickFirstQuestionnaireTitle();
+
+
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        await designQuestionnairePage.validateHeadingAndStatus();
+
+        await designQuestionnairePage.openMakeACopyPage();
+
+        cloneQuestionnairePage = await CloneQuestionnairePage.create(page);
+
+        await cloneQuestionnairePage.expectPrefilledTitle(questionnaireTitle);
+
+        await cloneQuestionnairePage.clearTitle();
+
+        await cloneQuestionnairePage.clickMakeCopy();
+        
+        await cloneQuestionnairePage.validateTitleFieldAriaDescribedBy();
+    })
 });

@@ -13,9 +13,9 @@ export class CloneQuestionnairePage extends BasePage {
 
     private readonly errorSummary: Locator;
     private readonly inlineTitleError: Locator;
-    private readonly errorLink : Locator;
-    private readonly errorList : Locator;
-    
+    private readonly errorLink: Locator;
+    private readonly errorList: Locator;
+
     constructor(page: Page) {
         super(page);
 
@@ -31,7 +31,7 @@ export class CloneQuestionnairePage extends BasePage {
         this.titleFormGroup = page.locator(
             '.govuk-form-group:has(#Title)'
         );
-        
+
         this.errorLink = this.page.locator(
             'a[href="#Title"]'
         );
@@ -90,5 +90,19 @@ export class CloneQuestionnairePage extends BasePage {
 
     async expectPrefilledTitle(originalTitle: string): Promise<void> {
         await expect(this.titleInput).toHaveValue(`Copy of ${originalTitle}`);
+    }
+
+    async validateTitleFieldAriaDescribedBy() {
+        const errorElement = this.inlineTitleError;
+
+        await errorElement.waitFor({state: 'visible', timeout: Timeouts.LONG});
+
+        const ariaValue = await this.titleInput.getAttribute('aria-describedby');
+        expect(ariaValue, '❌ aria-describedby is missing').not.toBeNull();
+
+        expect(ariaValue, '❌ aria-describedby missing hint id')
+            .toContain('Title-hint');
+        expect(ariaValue, '❌ aria-describedby missing error message id')
+            .toContain('title-field-error');
     }
 }
