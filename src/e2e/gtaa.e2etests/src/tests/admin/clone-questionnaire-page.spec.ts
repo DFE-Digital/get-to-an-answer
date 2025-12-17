@@ -1,27 +1,23 @@
-import {expect, test} from '@playwright/test';
+import {test} from '@playwright/test';
 import {JwtHelper} from '../../helpers/JwtHelper';
 import {signIn} from '../../helpers/admin-test-helper';
 import {createQuestionnaire} from '../../test-data-seeder/questionnaire-data';
 import {CloneQuestionnairePage} from '../../pages/admin/CloneQuestionnairePage';
 import {ErrorMessages} from "../../constants/test-data-constants";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
-import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
 
 test.describe('Clone questionnaire page', () => {
     let token: string;
-    let questionnaireId: string;
     let questionnaireTitle: string;
     let cloneQuestionnairePage: CloneQuestionnairePage;
     let viewQuestionnairePage: ViewQuestionnairePage;
-    let addQuestionnairePage: AddQuestionnairePage;
     let designQuestionnairePage: DesignQuestionnairePage;
 
     test.beforeEach(async ({request, page}) => {
         token = JwtHelper.NoRecordsToken();
 
         const {questionnaire} = await createQuestionnaire(request, token);
-        questionnaireId = questionnaire.id;
         questionnaireTitle = questionnaire.title;
 
         viewQuestionnairePage = await signIn(page, token);
