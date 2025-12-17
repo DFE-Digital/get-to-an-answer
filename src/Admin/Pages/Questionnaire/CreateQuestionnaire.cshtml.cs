@@ -18,7 +18,7 @@ public class CreateQuestionnaires(IApiClient apiClient, ILogger<CreateQuestionna
     [Required(ErrorMessage = "Enter a questionnaire title")]
     [GdsTitle]
     public string? Title { get; set; }
-    
+
     public IActionResult OnGet()
     {
         BackLinkSlug = Routes.QuestionnairesManage;

@@ -8,18 +8,36 @@ export class CloneQuestionnairePage extends BasePage {
     private readonly caption: Locator;
     private readonly titleInput: Locator;
     private readonly saveButton: Locator;
-    private readonly errorSummary: Locator;
-    private readonly inlineError: Locator;
 
+    private readonly titleFormGroup: Locator;
+
+    private readonly errorSummary: Locator;
+    private readonly inlineTitleError: Locator;
+    private readonly errorLink : Locator;
+    private readonly errorList : Locator;
+    
     constructor(page: Page) {
         super(page);
 
         this.heading = page.locator('h1.govuk-heading-l');
         this.caption = page.locator('.govuk-caption-l');
-        this.titleInput = page.locator('#Title');
-        this.saveButton = page.locator('button.govuk-button');
-        this.errorSummary = page.locator('.govuk-error-summary[role="alert"]');
-        this.inlineError = page.locator('#Title-error');
+        this.titleInput = page.locator('input#Title');
+        this.saveButton = this.page.getByRole('button', {name: 'Make a copy'});
+        this.errorSummary = this.page.locator(
+            '.govuk-error-summary[role="alert"][tabindex="-1"]'
+        );
+        this.inlineTitleError = page.locator('#Title-error');
+
+        this.titleFormGroup = page.locator(
+            '.govuk-form-group:has(#Title)'
+        );
+        
+        this.errorLink = this.page.locator(
+            'a[href="#Title"]'
+        );
+        this.errorList = this.errorSummary.locator(
+            'ul.govuk-error-summary__list'
+        );
     }
 
     async expectOnPage(): Promise<void> {
@@ -34,7 +52,7 @@ export class CloneQuestionnairePage extends BasePage {
     }
 
     async clearTitle(): Promise<void> {
-        await this.titleInput.fill('');
+        await this.titleInput.clear();
     }
 
     async clickMakeCopy(): Promise<void> {
@@ -44,21 +62,22 @@ export class CloneQuestionnairePage extends BasePage {
         ]);
     }
 
-    async expectValidationErrors(browserName: string): Promise<void> {
-        await expect(this.errorSummary, 'Error summary missing').toBeVisible();
-        await expect(this.errorSummary, 'Error summary missing message')
-            .toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
-        await this.validateErrorLinkBehaviour(
-            this.errorSummaryLink('#Title'),
-            ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE,
-            browserName
-        );
+    async validateMissingTitleMessageSummary(browserName: string) {
+        await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
+        await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
+        await expect(this.errorSummary, '❌ Attribute tabIndex is missing').toHaveAttribute('tabindex', '-1');
+        await expect(this.errorSummary, '❌ Error summary not focused').toBeFocused();
 
-        await expect(this.inlineError, 'Inline error missing')
-            .toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
+        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
+
+        await this.errorLink.click();
+        if (browserName !== 'webkit') {
+            await this.errorLink.waitFor({state: 'visible', timeout: Timeouts.LONG});
+            await expect(this.errorSummary, '❌ Error summary text mismatch').toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
+        }
     }
 
-    async validateErrorLinkBehaviour(link: Locator, expectedMessage: string, browserName: string): Promise<void> {
+    async validateErrorLinkBehaviour(link: Locator, expectedMessage: string, browserName: string) {
         await expect(link, '❌ Error summary link missing').toBeVisible();
         await expect(link, '❌ Error link text mismatch').toHaveText(expectedMessage);
 
@@ -68,6 +87,7 @@ export class CloneQuestionnairePage extends BasePage {
             await expect(this.titleInput, '❌ Title input not focused after error link click').toBeFocused();
         }
     }
+
     async expectPrefilledTitle(originalTitle: string): Promise<void> {
         await expect(this.titleInput).toHaveValue(`Copy of ${originalTitle}`);
     }

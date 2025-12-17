@@ -295,6 +295,10 @@ export class DesignQuestionnairePage extends BasePage {
         await this.questionnaireStatus.waitFor({state: 'visible'});
         return await this.questionnaireStatus.textContent() || '';
     }
+    
+    async openMakeACopyPage(): Promise<void> {
+        await this.manage_makeCopy.click();
+    }
 
     // =====================================================
     //              Generic status assertion helper
