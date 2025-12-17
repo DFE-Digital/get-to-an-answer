@@ -6,7 +6,7 @@
   const string title = "Make a copy of your questionnaire";
   ViewData["Title"] = title;
 
-  const string inputId = "questionnaire-title";
+  const string inputId = nameof(Model.Title);
 }
 
 @section BeforeContent
@@ -39,11 +39,11 @@
             </h2>
           </legend>
 
-          <govuk-field-error asp-for="@Model.Title" error-id="@inputId-field-error"></govuk-field-error>
+          <govuk-field-error asp-for="@Model.Title" error-id="@inputId-error"></govuk-field-error>
 
           <govuk-input id="@inputId"
                        class="govuk-input"
-                       aria-describedby="forms-name-input-name-hint"
+                       aria-describedby="@inputId-hint"
                        type="text"
                        name="@nameof(Model.Title)"
                        asp-for="@Model.Title"

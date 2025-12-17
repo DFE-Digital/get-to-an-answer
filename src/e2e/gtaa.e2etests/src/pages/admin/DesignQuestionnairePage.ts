@@ -295,11 +295,15 @@ export class DesignQuestionnairePage extends BasePage {
         await this.questionnaireStatus.waitFor({state: 'visible'});
         return await this.questionnaireStatus.textContent() || '';
     }
+    
+    async openMakeACopyPage(): Promise<void> {
+        await this.manage_makeCopy.click();
+    }
 
     // =====================================================
     //              Generic status assertion helper
     // =====================================================
-
+    
     private async assertTaskStatus(
         statusLocator: Locator,
         expectedStatus: string,
@@ -322,6 +326,11 @@ export class DesignQuestionnairePage extends BasePage {
     //                 Section Validation
     // =====================================================
 
+    async assertQuestionnaireTitle(expectedTitle: string): Promise<void> {
+        await expect(this.questionnaireTitle, '❌ Questionnaire title caption mismatch')
+            .toHaveText(expectedTitle);
+    }
+    
     async validateManageSection(): Promise<void> {
         await expect(this.manageSection, '❌ "Manage questionnaire" section UL should be visible').toBeVisible();
 
@@ -565,6 +574,7 @@ export class DesignQuestionnairePage extends BasePage {
         await expect(this.editQuestionnaireHeading, '❌ Page heading should be visible').toBeVisible();
         await expect(this.questionnaireStatus, '❌ Questionnaire status tag should be visible').toBeVisible();
     }
+    
 
     async expectEditQuestionnaireHeadingOnPage(expectedText?: string): Promise<void> {
         await expect(

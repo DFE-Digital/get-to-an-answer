@@ -15,21 +15,23 @@ namespace Admin.Pages.Questionnaire;
 [Authorize]
 public class CloneQuestionnaire(IApiClient apiClient, ILogger<CloneQuestionnaire> logger) : QuestionnairesPageModel
 {
-    [FromRoute(Name = "questionnaireId")]
-    public Guid QuestionnaireId { get; set; }
-    
+    [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
+
     [BindProperty(Name = "Title")]
     [Required(ErrorMessage = "Enter a questionnaire title")]
     [GdsTitle]
     public required string Title { get; set; }
-    
-    public IActionResult OnGet()
+
+    public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.QuestionnaireTrackById, QuestionnaireId);
-        Title = $"Copy of {QuestionnaireTitle}";
+
+        var currentQuestionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId);
+
+        Title = $"Copy of {currentQuestionnaire?.Title ?? QuestionnaireTitle}";
         return Page();
     }
-    
+
     public async Task<IActionResult> OnPost()
     {
         try
@@ -38,18 +40,19 @@ public class CloneQuestionnaire(IApiClient apiClient, ILogger<CloneQuestionnaire
             {
                 return Page();
             }
-            
-            var cloneQuestionnaireRequestDto = new CloneQuestionnaireRequestDto() { Title = Title };
-            
-            var cloneQuestionnaire = await apiClient.CloneQuestionnaireAsync(QuestionnaireId, cloneQuestionnaireRequestDto);
-            
+
+            var cloneQuestionnaireRequestDto = new CloneQuestionnaireRequestDto { Title = Title };
+
+            var cloneQuestionnaire =
+                await apiClient.CloneQuestionnaireAsync(QuestionnaireId, cloneQuestionnaireRequestDto);
+
             if (cloneQuestionnaire == null)
                 return RedirectToErrorPage();
-            
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustCloned = true });
-            
-            return Redirect(string.Format(Routes.QuestionnaireTrackById, cloneQuestionnaire.Id));
 
+            TempData[nameof(QuestionnaireState)] =
+                JsonConvert.SerializeObject(new QuestionnaireState { JustCloned = true });
+
+            return Redirect(string.Format(Routes.QuestionnaireTrackById, cloneQuestionnaire.Id));
         }
         catch (Exception e)
         {
