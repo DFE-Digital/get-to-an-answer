@@ -13,7 +13,7 @@ test.describe('Clone questionnaire page', () => {
     let questionnaireId: string;
     let questionnaireTitle: string;
     let cloneQuestionnairePage: CloneQuestionnairePage;
-    let viewQuestionnairePage : ViewQuestionnairePage;
+    let viewQuestionnairePage: ViewQuestionnairePage;
     let addQuestionnairePage: AddQuestionnairePage;
     let designQuestionnairePage: DesignQuestionnairePage;
 
@@ -23,24 +23,24 @@ test.describe('Clone questionnaire page', () => {
         const {questionnaire} = await createQuestionnaire(request, token);
         questionnaireId = questionnaire.id;
         questionnaireTitle = questionnaire.title;
-        
+
         viewQuestionnairePage = await signIn(page, token);
-        
+
     });
 
     test('Make a copy/Clone questionnaire page render with original title', async ({page}) => {
         await viewQuestionnairePage.table.clickFirstQuestionnaireTitle();
-        
+
         designQuestionnairePage = await DesignQuestionnairePage.create(page);
         await designQuestionnairePage.validateHeadingAndStatus();
-        
+
         await designQuestionnairePage.openMakeACopyPage();
-        
+
         cloneQuestionnairePage = await CloneQuestionnairePage.create(page);
-        
+
         await cloneQuestionnairePage.expectPrefilledTitle(questionnaireTitle);
     });
-    
+
 
     test('shows validation errors when the title is blank', async ({page, browserName}) => {
         await viewQuestionnairePage.table.clickFirstQuestionnaireTitle();
@@ -53,11 +53,11 @@ test.describe('Clone questionnaire page', () => {
         cloneQuestionnairePage = await CloneQuestionnairePage.create(page);
 
         await cloneQuestionnairePage.expectPrefilledTitle(questionnaireTitle);
-        
+
         await cloneQuestionnairePage.clearTitle();
-        
+
         await cloneQuestionnairePage.clickMakeCopy();
-        
+
         await cloneQuestionnairePage.validateMissingTitleMessageSummary(browserName);
         await cloneQuestionnairePage.validateErrorLinkBehaviour(
             cloneQuestionnairePage.errorSummaryLink('#Title'),
@@ -65,17 +65,36 @@ test.describe('Clone questionnaire page', () => {
             browserName
         )
     });
-    //
-    // test('submitting with a new title redirects to the questions list for the clone', async ({page}) => {
-    //     const newTitle = `Cloned from ${questionnaireTitle} - ${Date.now()}`;
-    //     await clonePage.enterTitle(newTitle);
-    //     await clonePage.clickMakeCopy();
-    //
-    //     await page.waitForURL(/\/admin\/questionnaires\/[0-9a-f-]+\/questions/);
-    //     const questionsPage = await ViewQuestionPage.create(page);
-    //     await questionsPage.expectQuestionHeadingOnPage();
-    //     expect(page.url()).toMatch(/\/admin\/questionnaires\/[0-9a-f-]+\/questions/);
-    // });
+
+    test('Cloning/making copy of questionnaire redirects to Design a questionnaire page of new copied questionnaire', async ({
+                                                                                                                                 browserName,
+                                                                                                                                 page
+                                                                                                                             }) => {
+        await viewQuestionnairePage.table.clickFirstQuestionnaireTitle();
+
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        await designQuestionnairePage.validateHeadingAndStatus();
+
+        await designQuestionnairePage.openMakeACopyPage();
+
+        cloneQuestionnairePage = await CloneQuestionnairePage.create(page);
+
+        await cloneQuestionnairePage.expectPrefilledTitle(questionnaireTitle);
+
+        const newTitle = `Cloned from ${questionnaireTitle} - ${Date.now()}`;
+
+        await cloneQuestionnairePage.enterTitle(newTitle);
+
+        await cloneQuestionnairePage.clickMakeCopy();
+
+        await designQuestionnairePage.validateHeadingAndStatus();
+        
+        // await designQuestionnairePage.expectSuccessBannerVisible();
+        
+        await designQuestionnairePage.assertQuestionnaireTitle(newTitle);
+    });
+    
+    
     //
     // test('shows validation errors when the title is blank', async ({browserName}) => {
     //     await clonePage.clearTitle();
