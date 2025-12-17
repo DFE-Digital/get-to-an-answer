@@ -4,7 +4,7 @@
 @model Admin.Pages.Version.QuestionnaireVersionHistory
 
 @{
-    ViewData["Title"] = "Questionnaire version history";
+    ViewData["Title"] = "View version history";
 }
 
 <style>
@@ -23,17 +23,17 @@
 
 <h1 class="govuk-heading-l govuk-!-margin-0">
   <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-  View version history
+  @ViewData["Title"]
 </h1>
-<div class="govuk-hint govuk-!-margin-bottom-8">
+<div id="version-history-hint" class="govuk-hint govuk-!-margin-bottom-8">
   <p>A version history is saved for every published version of the questionnaire. </p>
   <p>It also includes changes made to a published questionnaire.</p>
 </div>
-<div data-module="appstepnav"id="step-by-step-navigation" class="app-step-nav js-hidden app-step-nav--large" data-show-text="Show Changes" data-hide-text="Hide Changes" data-show-all-text="Show all versions" data-hide-all-text="Hide all versions">
+<div data-module="appstepnav" id="version-history-timeline" class="app-step-nav js-hidden app-step-nav--large" data-show-text="Show Changes" data-hide-text="Hide Changes" data-show-all-text="Show all versions" data-hide-all-text="Hide all versions">
   <ol class="app-step-nav__steps">
     @foreach (var version in Model.QuestionnaireVersions)
     {
-      <li class="app-step-nav__step js-step" id="check-you-re-allowed-to-drive">
+      <li class="app-step-nav__step js-step" id="questionnaire-version-@version.Version">
         <div class="app-step-nav__header js-toggle-panel" data-position="@version.Version">
           <h2 class="app-step-nav__title">
             <span class="app-step-nav__circle app-step-nav__circle--number">
@@ -50,7 +50,7 @@
           </h2>
         </div>
 
-        <div class="app-step-nav__panel js-panel" id="step-panel-check-you-re-allowed-to-drive-1">
+        <div class="app-step-nav__panel js-panel" id="questionnaire-version-@version.Version-changes-panel">
           <p class="app-step-nav__paragraph">The following are the list of changes since the last publish.</p>
 
           <ol class="app-step-nav__list " data-length="@version.ChangeLog?.Count ?? 0">
@@ -112,7 +112,7 @@
       }
     }
     
-    const $element = document.querySelector('#step-by-step-navigation');
+    const $element = document.querySelector('#version-history-timeline');
     const stepByStepNavigation = new GOVUK.Modules.AppStepNav($element).init();
   </script>
 }

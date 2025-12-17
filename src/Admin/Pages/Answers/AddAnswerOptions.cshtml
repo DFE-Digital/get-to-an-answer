@@ -6,7 +6,8 @@
 
 @{
   Layout = "_Layout";
-  ViewData["Title"] = "Create a list of answer options";
+  
+  ViewData["Title"] = "Add or edit answers";
 }
 
 @section BeforeContent
@@ -24,7 +25,7 @@
 
     <h1 class="govuk-heading-l govuk-!-margin-0">
       <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
-      Add or edit answers
+      @ViewData["Title"]
     </h1>
 
     <p class="govuk-hint  govuk-!-margin-bottom-8">
@@ -36,6 +37,7 @@
     
       <form method="post" accept-charset="UTF-8">
         <input name="returnUrl" type="hidden" value="@($"{Request.Path}{Request.QueryString}")"/>
+        @* TODO: Change this button to a link, so it can line wrap (same goes for the other button) *@
         <button type="submit" asp-page-handler="RedirectToBulkEntry"
                 class="govuk-button govuk-button--link govuk-!-margin-0">
           enter all the options into one text box
