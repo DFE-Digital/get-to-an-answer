@@ -172,6 +172,15 @@ export class QuestionnaireNextPreviewPage extends BasePage {
         await expect(firstCheckbox).toBeChecked();
     }
 
+    async unselectLastCheckboxOption(): Promise<void> {
+        const firstCheckbox = this.multiSelectCheckboxes
+            .locator('input.govuk-checkboxes__input[type="checkbox"]')
+            .last();
+
+        await firstCheckbox.uncheck();
+        await expect(firstCheckbox).not.toBeChecked();
+    }
+
     async selectAllCheckboxOptions(): Promise<void> {
         const checkboxes = await this.multiSelectCheckboxes
             .locator('input.govuk-checkboxes__input[type="checkbox"]')

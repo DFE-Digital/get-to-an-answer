@@ -42,7 +42,7 @@
   <div class="govuk-grid-column-two-thirds">
     <h1 id="manage-access-title" class="govuk-heading-l govuk-!-margin-bottom-2">
       <span id="current-questionnaire-title" class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-      Manage access
+      @ViewData["Title"]
     </h1>
     <div id="manage-access-hint" class="govuk-hint govuk-!-margin-bottom-8">
       <p>It's recommended that at least 2 people have access to a questionnaire to make sure it can be maintained.</p>
@@ -88,7 +88,7 @@
                   else
                   {
                     <button id="remove-contributor-@row" disabled class="govuk-button govuk-button--warning" 
-                            data-module="govuk-button" type="button">
+                            data-module="govuk-button" type="submit">
                       Remove
                     </button>
                   }

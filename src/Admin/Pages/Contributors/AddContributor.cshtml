@@ -5,7 +5,7 @@
 
 @{
   Layout = "_Layout";
-  ViewData["Title"] = "Add a contributor";
+  ViewData["Title"] = "Add person";
 }
 
 @section BeforeContent
@@ -20,17 +20,17 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    
-    
     <form method="post" accept-charset="UTF-8">
       <input type="hidden" asp-for="@Model.BackLinkSlug" />
       <!-- Contributor Email -->
       <govuk-form-group asp-for="@Model.ContributorEmail">
-        <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
+        <fieldset class="govuk-fieldset" aria-describedby="add-person-hint">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
             <h1 id="add-person-title" class="govuk-fieldset__heading">
               <span id="current-questionnaire-title" class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-              Add person
+              <label class="govuk-visually-hidden" for="ContributorEmail">
+                @ViewData["Title"]
+              </label>
             </h1>
           </legend>
 
@@ -45,8 +45,9 @@
 
           <govuk-input id="ContributorEmail"
                        class="govuk-input"
-                       aria-describedby="ContributorEmail-hint"
+                       aria-describedby="add-person-hint"
                        type="text"
+                       name="ContributorEmail"
                        asp-for="ContributorEmail"
                        value="@Model.ContributorEmail"
                        govuk-error-for="@Model.ContributorEmail"/>
