@@ -23,7 +23,7 @@ test.describe('Clone questionnaire page', () => {
         await clonePage.waitForPageLoad();
     });
 
-    test('renders helpers and caption with original title', async () => {
+    test('Make a copy/Clone questionnaire page render with original title', async () => {
         await clonePage.expectOnPage();
         await clonePage.expectPrefilledTitle(questionnaireTitle);
     });
@@ -42,6 +42,6 @@ test.describe('Clone questionnaire page', () => {
         await page.waitForURL(/\/admin\/questionnaires\/[0-9a-f-]+\/questions/);
         const questionsPage = await ViewQuestionPage.create(page);
         await questionsPage.expectQuestionHeadingOnPage();
-        expect(await page.url()).toMatch(/\/admin\/questionnaires\/[0-9a-f-]+\/questions/);
+        expect(page.url()).toMatch(/\/admin\/questionnaires\/[0-9a-f-]+\/questions/);
     });
 });

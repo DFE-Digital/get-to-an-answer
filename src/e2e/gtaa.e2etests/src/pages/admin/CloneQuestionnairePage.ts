@@ -16,10 +16,10 @@ export class CloneQuestionnairePage extends BasePage {
 
         this.heading = page.locator('h1.govuk-heading-l');
         this.caption = page.locator('.govuk-caption-l');
-        this.titleInput = page.locator('#questionnaire-title');
+        this.titleInput = page.locator('#Title');
         this.saveButton = page.locator('button.govuk-button');
         this.errorSummary = page.locator('.govuk-error-summary[role="alert"]');
-        this.inlineError = page.locator('#questionnaire-title-field-error');
+        this.inlineError = page.locator('#Title-error');
     }
 
     async expectOnPage(): Promise<void> {
@@ -46,10 +46,16 @@ export class CloneQuestionnairePage extends BasePage {
 
     async expectValidationErrors(browserName: string): Promise<void> {
         await expect(this.errorSummary, 'Error summary missing').toBeVisible();
-        await expect(this.errorSummary, 'Error summary missing message').toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
-        await this.validateErrorLinkBehaviour(this.errorSummaryLink(""), ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE, browserName);
+        await expect(this.errorSummary, 'Error summary missing message')
+            .toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
+        await this.validateErrorLinkBehaviour(
+            this.errorSummaryLink('#Title'),
+            ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE,
+            browserName
+        );
 
-        await expect(this.inlineError, 'Inline error missing').toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
+        await expect(this.inlineError, 'Inline error missing')
+            .toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
     }
 
     async validateErrorLinkBehaviour(link: Locator, expectedMessage: string, browserName: string): Promise<void> {
@@ -62,7 +68,6 @@ export class CloneQuestionnairePage extends BasePage {
             await expect(this.titleInput, '❌ Title input not focused after error link click').toBeFocused();
         }
     }
-
     async expectPrefilledTitle(originalTitle: string): Promise<void> {
         await expect(this.titleInput).toHaveValue(`Copy of ${originalTitle}`);
     }
