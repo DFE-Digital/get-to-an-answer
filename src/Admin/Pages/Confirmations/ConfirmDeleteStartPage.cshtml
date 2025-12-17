@@ -3,22 +3,22 @@
 @model Admin.Pages.Confirmations.ConfirmDeleteStartPage
 
 @{
-  ViewData["Title"] = "Delete your start page";
+  ViewData["Title"] = "Are you sure you want to delete your questionnaire's start page?";
 }
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds-from-desktop">
     <form method="post" class="govuk-!-margin-top-6">
-        <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
+        <fieldset class="govuk-fieldset" aria-describedby="delete-start-page-hint">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                 <h1 class="govuk-fieldset__heading">
                     <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-                    Are you sure you want to delete your questionnaire's start page?
+                    @ViewData["Title"]
                 </h1>
             </legend>
-            <span class="govuk-hint govuk-!-margin-top-4">
+            <span id="delete-start-page-hint" class="govuk-hint govuk-!-margin-top-4">
                 Once you delete a start page, you cannot recover it. If it's already published, it may affect your questionnaire.            
-                </span>
+            </span>
 
             <div class="govuk-radios govuk-!-margin-top-4" data-module="govuk-radios">
                 <div class="govuk-radios__item">

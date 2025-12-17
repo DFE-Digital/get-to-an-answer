@@ -4,7 +4,7 @@
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Delete question";
+    ViewData["Title"] = "Are you sure you want to delete this question?";
 }
 
 @section BeforeContent
@@ -17,50 +17,47 @@
     @await Html.PartialAsync("_ErrorSummary")
 }
 
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l govuk-!-margin-0">
             <p class="govuk-caption-l">Question @Model.QuestionNumber</p>
-            Are you sure you want to delete this question?
+            @ViewData["Title"]
         </h1>
         <span class="govuk-hint govuk-!-margin-bottom-8">
             Once you delete a question, you cannot recover it. If it's already published, it may affect your questionnaire.
         </span>
         <form method="post" accept-charset="UTF-8" class="govuk-!-margin-top-6">
-            <input type="hidden" asp-for="QuestionNumber"/>
-            <input type="hidden" asp-for="@Model.BackLinkSlug"/>
+            <input type="hidden" asp-for="QuestionNumber" name="QuestionNumber"/>
+            <input type="hidden" asp-for="@Model.BackLinkSlug" name="BackLinkSlug"/>
 
             <govuk-form-group asp-for="@Model.ConfirmDelete" specific-id-for-form-group-error="ConfirmDelete-error" class="govuk-!-margin-top-6">
-                <fieldset class="govuk-fieldset">
-                    <govuk-field-error asp-for="@Model.ConfirmDelete" error-id="ConfirmDelete-error">
-                    </govuk-field-error>
+                <govuk-field-error asp-for="@Model.ConfirmDelete" error-id="ConfirmDelete-error">
+                </govuk-field-error>
 
-                    <div class="govuk-radios" data-module="govuk-radios" id="ConfirmDelete">
-                        <div class="govuk-radios__item">
-                            <govuk-input class="govuk-radios__input"
-                                         id="ConfirmDelete-true"
-                                         name="ConfirmDelete"
-                                         asp-for="@Model.ConfirmDelete"
-                                         type="radio"
-                                         value="true"/>
-                            <label class="govuk-label govuk-radios__label" for="ConfirmDelete-true">
-                                Yes, delete it
-                            </label>
-                        </div>
-                        <div class="govuk-radios__item">
-                            <govuk-input class="govuk-radios__input"
-                                         id="ConfirmDelete-false"
-                                         name="ConfirmDelete"
-                                         asp-for="@Model.ConfirmDelete"
-                                         type="radio"
-                                         value="false"/>
-                            <label class="govuk-label govuk-radios__label" for="ConfirmDelete-false">
-                                No, keep it
-                            </label>
-                        </div>
+                <div class="govuk-radios" data-module="govuk-radios" id="ConfirmDelete">
+                    <div class="govuk-radios__item">
+                        <govuk-input class="govuk-radios__input"
+                                     id="ConfirmDelete-true"
+                                     name="ConfirmDelete"
+                                     asp-for="@Model.ConfirmDelete"
+                                     type="radio"
+                                     value="true"/>
+                        <label class="govuk-label govuk-radios__label" for="ConfirmDelete-true">
+                            Yes, delete it
+                        </label>
                     </div>
-                </fieldset>
+                    <div class="govuk-radios__item">
+                        <govuk-input class="govuk-radios__input"
+                                     id="ConfirmDelete-false"
+                                     name="ConfirmDelete"
+                                     asp-for="@Model.ConfirmDelete"
+                                     type="radio"
+                                     value="false"/>
+                        <label class="govuk-label govuk-radios__label" for="ConfirmDelete-false">
+                            No, keep it
+                        </label>
+                    </div>
+                </div>
             </govuk-form-group>
             <div class="govuk-!-margin-top-6">
                 <button class="govuk-button govuk-button--primary" type="submit">Continue</button>

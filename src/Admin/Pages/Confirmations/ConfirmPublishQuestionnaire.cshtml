@@ -2,25 +2,23 @@
 @model Admin.Pages.Confirmations.ConfirmPublishQuestionnaire
 
 @{
-    ViewData["Title"] = "Publish the questionnaire";
+    ViewData["Title"] = "Are you sure you want to publish this questionnaire?";
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form method="post" class="govuk-!-margin-top-6">
             @Html.AntiForgeryToken()
-            <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
+            <fieldset class="govuk-fieldset" aria-describedby="publish-questionnaire-hint">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                     <h1 class="govuk-fieldset__heading">
                         <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-                        Are you sure you want to publish this questionnaire?
+                        @ViewData["Title"]
                     </h1>
                 </legend>
-                <div class="govuk-hint govuk-!-margin-bottom-8">
+                <div id="publish-questionnaire-hint" class="govuk-hint govuk-!-margin-bottom-8">
                     <p>Before you publish your questionnaire, make sure you have added all questions and answers, and created a questionnaire ID.</p>
-
-                <p>Once you have published your questionnaire, you'll still need to add it to your service before anyone can use it.</p>
-                
+                    <p>Once you have published your questionnaire, you'll still need to add it to your service before anyone can use it.</p>
                 </div>
 
                 <div class="govuk-radios" data-module="govuk-radios">
