@@ -4,9 +4,10 @@ import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage
 import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaireSlugPage";
 import {expect, test} from "@playwright/test";
 import {JwtHelper} from "../../helpers/JwtHelper";
-import {createQuestionnaire, getQuestionnaire} from "../../test-data-seeder/questionnaire-data";
+import {createQuestionnaire, getQuestionnaire, updateQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {goToDesignQuestionnairePageByUrl, signIn} from "../../helpers/admin-test-helper";
 import {PageHeadings} from "../../constants/test-data-constants";
+import {expect200HttpStatusCode} from "../../helpers/api-assertions-helper";
 
 test.describe('Get to an answer add or edit questionnaire slug', () => {
     let token: string;
@@ -156,5 +157,43 @@ test.describe('Get to an answer add or edit questionnaire slug', () => {
         await designQuestionnairePage.createQuestionnaireId();
         const newSlugValue = await updateQuestionnaireSlugPage.slugInput.inputValue();
         expect(newSlugValue).toBe(secondSlug);
+    });
+
+    test('Duplicate slug from another questionnaire is not allowed ', async ({request, page}) => {
+        const initialSlug = `questionnaire-slug-${Math.floor(Math.random() * 1000000000)}`;
+        const {questionnaireGetBody} = await getQuestionnaire(
+            request,
+            questionnaireId,
+            token
+        );
+        
+        const {
+            updatedQuestionnairePostResponse
+        } = await updateQuestionnaire(
+            request,
+            questionnaireGetBody.id,
+            {
+                slug: initialSlug
+            }, token
+        );
+
+        expect200HttpStatusCode(updatedQuestionnairePostResponse, 204);
+
+        const {questionnaire} = await createQuestionnaire(request, token); // second questionnaire
+
+        viewQuestionnairePage = await signIn(page, token);
+
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaire.id);
+        await designQuestionnairePage.createQuestionnaireId();
+
+        updateQuestionnaireSlugPage = await UpdateQuestionnaireSlugPage.create(page);
+
+        await updateQuestionnaireSlugPage.expectHeadingOnEditSlugPage(PageHeadings.EDIT_QUESTIONNAIRE_SLUG_PAGE_HEADING)
+        await updateQuestionnaireSlugPage.enterSlug(initialSlug);
+
+        await updateQuestionnaireSlugPage.submit()
+
+        await updateQuestionnaireSlugPage.validateDuplicateSlugMessageSummary('webkit')
+        await updateQuestionnaireSlugPage.validateDuplicateSlugInlineSlugError();
     });
 });
