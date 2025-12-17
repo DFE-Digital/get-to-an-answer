@@ -5,7 +5,7 @@
 
 @{
   Layout = "_Layout";
-  ViewData["Title"] = "Add and edit your results pages";
+  ViewData["Title"] = "Add or edit results pages";
 }
 
 @section BeforeContent
@@ -80,7 +80,8 @@ else if (Model.QuestionnaireState is { JustDeleted: true })
   <div class="govuk-grid-column-two-thirds">
     <h1 id="view-results-pages-heading" class="govuk-heading-l govuk-!-margin-0">
       <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-      Add or edit results pages
+      
+      @ViewData["Title"]
     </h1>
     <div class="govuk-hint govuk-!-margin-bottom-8">
       <p>After answering questions, someone can end on a result page.</p>  

@@ -2,22 +2,22 @@
 @model Admin.Pages.Confirmations.ConfirmUnpublishQuestionnaire
 
 @{
-    ViewData["Title"] = "Unpublish the questionnaire";
+    ViewData["Title"] = "Are you sure you want to unpublish this questionnaire?";
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form method="post" class="govuk-!-margin-top-6">
             @Html.AntiForgeryToken()
-            <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
+            <fieldset class="govuk-fieldset" aria-describedby="unpublish-questionnaire-hint">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                     <h1 class="govuk-fieldset__heading">
                         <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-                        Are you sure you want to unpublish this questionnaire?
+                        @ViewData["Title"]
                     </h1>
                 </legend>
 
-                <div class="govuk-hint govuk-!-margin-bottom-8">
+                <div id="unpublish-questionnaire-hint" class="govuk-hint govuk-!-margin-bottom-8">
                     <p>Once you unpublish a questionnaire, people will not be able to view it. It may also affect pages on your service.</p> 
                     <p>You'll still be able to view it in draft.</p>
                 </div>

@@ -4,7 +4,7 @@
 @model Admin.Pages.Confirmations.ConfirmRemoveContributor
 
 @{
-  ViewData["Title"] = "Remove a contributor";
+  ViewData["Title"] = $"Are you sure you want to remove access for '{Model.ContributorEmail}'?";
 }
 
 <div class="govuk-grid-row">
@@ -12,11 +12,11 @@
       <form method="post" class="govuk-!-margin-top-6">
           <input type="hidden" name="ContributorEmail" value="@Model.ContributorEmail"/>
           <input type="hidden" name="ContributorId" value="@Model.ContributorId"/>
-          <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
+          <fieldset class="govuk-fieldset" aria-describedby="remove-contributor-hint">
               <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                   <h2 id="remove-contributor-title" class="govuk-fieldset__heading">
                       <span id="current-questionnaire-title" class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-                      Are you sure you want to remove access for '@Model.ContributorEmail'?
+                      @ViewData["Title"]
                   </h2>
               </legend>
 
