@@ -12,7 +12,7 @@ export class QuestionnaireVersionHistoryPage {
     constructor(page: Page) {
         this.heading = page.locator('h1.govuk-heading-l');
         this.backLink = page.getByRole('link', {name: 'Back'});
-        this.stepNav = page.locator('#step-by-step-navigation');
+        this.stepNav = page.locator('#version-history-timeline');
         this.toggleAllVersionsButton = page.getByRole('button', {name: /versions/i});
         this.getVersionList = (level: number) =>
             page.locator(`.js-step [data-position="${level}"]`)

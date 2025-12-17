@@ -10,10 +10,11 @@
     .Replace(".", "-");
   
   string Id(string suffix) => $"{prefix}-{suffix}";
-
-
+  
   var contentIdSuffix = "OptionContent";
   var contentHintIdSuffix = "OptionHint";
+  var contentHintHintIdSuffix = "OptionHintHint";
+  var priorityHintIdSuffix = "PriorityHint";
   var destinationIdSuffix = "AnswerDestination";
   var destinationSpecificSelectErrorId = $"{destinationIdSuffix}-specific-error";
 
@@ -42,7 +43,7 @@
   <label class="govuk-label govuk-label--s" for="@Id(contentHintIdSuffix)">
     Hint text (optional)
   </label>
-  <div class="govuk-hint" id="@Id(contentHintIdSuffix)">
+  <div class="govuk-hint" id="@Id(contentHintHintIdSuffix)">
     <p>You can add a short description to help people understand what this option is.</p>
     <p>You can format your text using Markdown. For example, to add links. To find out more, <a href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/">read this guidance on how to write Markdown.</a></p>
   </div>
@@ -51,15 +52,19 @@
             id="@Id(contentHintIdSuffix)"
             rows="4"
             asp-for="OptionHint"
-            aria-describedby="@Id(contentHintIdSuffix)"></textarea>
+            aria-describedby="@Id(contentHintHintIdSuffix)"></textarea>
 </govuk-form-group>
 
 <govuk-form-group asp-for="AnswerDestination" specific-id-for-form-group-error="@destinationFormGroupErrorId">
   <fieldset class="govuk-fieldset"
-            aria-describedby="@($"{Id($"{destinationIdSuffix}-hint")} {Id($"{destinationIdSuffix}-error")}")">
+            aria-describedby="@($"{Id($"{destinationIdSuffix}-hint")}")">
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
       Destination
     </legend>
+    
+    <div class="govuk-hint" id="@($"{Id($"{destinationIdSuffix}-hint")}")">
+      <p>Choose where people go next when they select this option.</p>
+    </div>
 
     <govuk-field-error asp-for="AnswerDestination" error-id="@Id($"{destinationIdSuffix}-error")">
     </govuk-field-error>
@@ -167,11 +172,11 @@
   @{
     if (Model.QuestionType == QuestionType.MultiSelect)
     {
-      <label class="govuk-label govuk-label--s govuk-!-margin-top-5" for="@Id(contentIdSuffix)">
+      <label class="govuk-label govuk-label--s govuk-!-margin-top-5" for="@Id("RankPriority")">
         Rank priority (optional)
       </label>
 
-      <div class="govuk-hint" id="@Id(contentHintIdSuffix)">
+      <div class="govuk-hint" id="@Id(priorityHintIdSuffix)">
         <p>You can rank options to set a priority order. </p>
         <p>If people select more than one option, they will be sent to the destination of the highest ranked option.</p>
         <p>Add 1 for the highest priority answer, add 2 for the highest priority answer, and so on.</p>
