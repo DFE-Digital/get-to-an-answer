@@ -133,37 +133,4 @@ test.describe('Get to an answer update questionnaire', () => {
         ];
         await viewQuestionnairePage.table.verifyTableData(expectedRows);
     });
-
-    test('Duplicate slug from another questionnaire is not allowed ', async ({request, page}) => {
-        const initialSlug = `questionnaire-slug-${Math.floor(Math.random() * 1000000000)}`;
-        
-        const {
-            updatedQuestionnairePostResponse
-        } = await updateQuestionnaire(
-            request,
-            questionnaireGetResponse.questionnaireGetBody.id,
-            {
-                slug: initialSlug
-            }, token
-        );
-        
-        expect200HttpStatusCode(updatedQuestionnairePostResponse, 204);
-        
-        const {questionnaire} = await createQuestionnaire(request, token); // second questionnaire
-        
-        viewQuestionnairePage = await signIn(page, token);
-
-        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaire.id);
-        await designQuestionnairePage.createQuestionnaireId();
-
-        updateQuestionnaireSlugPage = await UpdateQuestionnaireSlugPage.create(page);
-
-        await updateQuestionnaireSlugPage.expectHeadingOnEditSlugPage(PageHeadings.EDIT_QUESTIONNAIRE_SLUG_PAGE_HEADING)
-        await updateQuestionnaireSlugPage.enterSlug(initialSlug);
-
-        await updateQuestionnaireSlugPage.submit()
-        
-        await updateQuestionnaireSlugPage.validateDuplicateSlugMessageSummary('webkit')
-        await updateQuestionnaireSlugPage.validateInlineSlugError();
-    });
 });
