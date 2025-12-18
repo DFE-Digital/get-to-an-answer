@@ -116,42 +116,6 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
         }
     }
 
-    // private async Task PopulateFieldWithExistingValues()
-    // {
-    //     var existingStoredAnswers = await _apiClient.GetAnswersAsync(QuestionId);
-    //     var existingAnswerOptionIds = Options.Select(o => o.AnswerId).ToHashSet();
-    //     
-    //     var (
-    //         questionForSelection,
-    //         _,
-    //         questionSelectionList,
-    //         resultsPagesForSelection
-    //         ) = await GetPopulatePrerequisites();
-    //
-    //     var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
-    //     
-    //     foreach (var existingAnswer in existingStoredAnswers)
-    //     {
-    //         if (existingAnswerOptionIds.Contains(existingAnswer.Id))
-    //             continue;
-    //         
-    //         Options.Add(new AnswerOptionsViewModel
-    //         {
-    //             AnswerId = existingAnswer.Id,
-    //             QuestionSelectList = questionSelectionList,
-    //             AnswerDestination = MapAnswerDestination(existingAnswer.DestinationType),
-    //             OptionContent = existingAnswer.Content,
-    //             OptionHint = existingAnswer.Description,
-    //             SelectedDestinationQuestion = existingAnswer.DestinationQuestionId?.ToString(),
-    //             QuestionType = currentQuestion?.Type,
-    //             RankPriority = existingAnswer.Priority.ToString(CultureInfo.InvariantCulture),
-    //             ExternalLink = existingAnswer.DestinationUrl,
-    //             ResultsPageSelectList = resultsPagesForSelection,
-    //             SelectedResultsPage = existingAnswer.DestinationContentId.ToString()
-    //         });
-    //     }
-    // }
-
     private static AnswerDestination MapAnswerDestination(DestinationType? destinationType) =>
         destinationType switch
         {
