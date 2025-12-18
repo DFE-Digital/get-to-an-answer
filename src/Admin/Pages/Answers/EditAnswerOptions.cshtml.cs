@@ -15,7 +15,6 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 {
     private readonly IApiClient _apiClient = apiClient;
 
-    [BindProperty] public List<Guid> DeletedAnswerIds { get; set; } = [];
 
     public async Task<IActionResult> OnGet()
     {
@@ -48,28 +47,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         try
         {
-           
-            foreach (var option in Options)
-            {
-                
-                if (option.AnswerId != Guid.Empty)
-                {
-                    await UpdateAnswer(option);
-                }
-                else
-                {
-                    await CreateAnswer(option);
-                }
-            }
-
-            if (DeletedAnswerIds.Count > 0)
-            {
-                foreach (var answerId in DeletedAnswerIds.Where(x => x != Guid.Empty).Distinct().ToList())
-                {
-                    await _apiClient.DeleteAnswerAsync(answerId);
-                    DeletedAnswerIds.Remove(answerId);
-                }
-            }
+            await UpdateOrCreateAnswers();
         }
         catch (Exception e)
         {
@@ -90,7 +68,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             DeletedAnswerIds.Add(removedOption.AnswerId);
 
         Options.RemoveAt(index);
-
+ 
         RemoveModelStateEntriesForOption(index);
         RemoveModelStateErrorsForFields();
 

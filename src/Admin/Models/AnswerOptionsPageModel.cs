@@ -24,6 +24,8 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
     [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
 
+    [BindProperty] public List<Guid> DeletedAnswerIds { get; set; } = [];
+    
     // Handler for clicking "Add another option"
     public async Task<IActionResult> OnPostAddOption()
     {
@@ -145,13 +147,15 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
     {
         ValidateForDuplicateAnswers();
         ValidateSelectedQuestionsIfAny();
-
+        
         if (!ModelState.IsValid)
         {
             await PopulateOptionSelectionLists();
             return Page();
         }
 
+        await UpdateOrCreateAnswers();
+        
         var targetUrl = Url.Page("/Answers/BulkAnswerOptions", null, new
         {
             questionnaireId = QuestionnaireId,
@@ -283,6 +287,30 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             foreach (var item in group)
             {
                 ModelState.AddModelError($"Options[{item.index}].OptionContent", $"Option {item.index + 1} content is duplicated");
+            }
+        }
+    }
+    
+    protected async Task UpdateOrCreateAnswers()
+    {
+        foreach (var option in Options)
+        {
+            if (option.AnswerId != Guid.Empty)
+            {
+                await UpdateAnswer(option);
+            }
+            else
+            {
+                await CreateAnswer(option);
+            }
+        }
+
+        if (DeletedAnswerIds.Count > 0)
+        {
+            foreach (var answerId in DeletedAnswerIds.Where(x => x != Guid.Empty).Distinct().ToList())
+            {
+                await apiClient.DeleteAnswerAsync(answerId);
+                DeletedAnswerIds.Remove(answerId);
             }
         }
     }
