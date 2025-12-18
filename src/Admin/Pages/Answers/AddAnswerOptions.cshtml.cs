@@ -55,8 +55,7 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
 
         try
         {
-            
-            foreach (var option in Options)
+            foreach (var option in Options.Where(o => o.AnswerId == Guid.Empty))
             {
                 await _apiClient.CreateAnswerAsync(new CreateAnswerRequestDto
                 {

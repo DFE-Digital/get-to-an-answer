@@ -37,6 +37,15 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
     public async Task<IActionResult> OnPostSaveAnswerOptions()
     {
+        //TODO: review once fixed add answer duplicate content validation
+        // var answerOptionsContentStrings = Options
+        //     .Select(o => o.OptionContent?.Trim())
+        //     .Where(c => !string.IsNullOrEmpty(c))
+        //     .ToList();
+        //
+        // if (answerOptionsContentStrings.Distinct().Count() != answerOptionsContentStrings.Count)
+        //     ModelState.AddModelError(nameof(Options), "Duplicate answer option content found");
+        //
         ValidateSelectedQuestionsIfAny();
 
         if (!ModelState.IsValid)
@@ -47,8 +56,10 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         try
         {
+           
             foreach (var option in Options)
             {
+                
                 if (option.AnswerId != Guid.Empty)
                 {
                     await UpdateAnswer(option);
