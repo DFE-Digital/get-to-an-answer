@@ -35,8 +35,7 @@ public class AddEditEndResultContents(ILogger<AddEditEndResultContents> logger, 
 
             Contents = contents;
             
-            if (TempData.TryGetValue("CompletionTrackingMap", out var trackingMapObj) && 
-                trackingMapObj is string trackingMapJson)
+            if (TempData.Peek("CompletionTrackingMap") is string trackingMapJson)
             {
                 try
                 {
@@ -76,9 +75,7 @@ public class AddEditEndResultContents(ILogger<AddEditEndResultContents> logger, 
         await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
         {
             Task = CompletableTask.AddContents,
-            Status = FinishedEditing ? CompletionStatus.Completed : 
-                TempData.TryGetValue("QuestionCount", out var countObj) && countObj is > 0 ? 
-                    CompletionStatus.InProgress : CompletionStatus.NotStarted
+            Status = FinishedEditing ? CompletionStatus.Completed : CompletionStatus.Optional
         });
         
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));

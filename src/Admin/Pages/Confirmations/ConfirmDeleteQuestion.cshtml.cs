@@ -53,7 +53,7 @@ public class ConfirmDeleteQuestion(ILogger<ConfirmDeleteQuestion> logger, IApiCl
                 JsonConvert.SerializeObject(new QuestionNotificationSummary(IsDeleted: true,
                     QuestionTitle: questionTitle));
 
-            return Redirect(string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionId));
+            return Redirect(string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId));
         }
         
         return Redirect(string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId));

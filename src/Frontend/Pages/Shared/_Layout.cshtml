@@ -15,8 +15,6 @@
         languageCode = "en";
     }
 
-    ViewBag.FullName = User.FindFirst(ClaimTypes.Name)?.Value;
-
     var configViewModel = new ConfigViewModel();
 }
 
@@ -142,7 +140,7 @@
                             <a class="govuk-service-navigation__link" aria-current="true" href="https://www.forms.service.gov.uk/support">Support</a>
                         </li>
                         <li class="govuk-service-navigation__item app-service-navigation__item--featured">
-                            <span class="govuk-service-navigation__text">@ViewBag.FullName</span>
+                            <span class="govuk-service-navigation__text"></span>
                         </li>
                     </ul>
                 </nav>

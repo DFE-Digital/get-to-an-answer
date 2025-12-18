@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-export type EnvType = 'local' | 'test';
+export type EnvType = 'local' | 'development';
 export function loadEnvConfig(envName: EnvType) {
     const prefix = envName.toUpperCase();
 

@@ -12,8 +12,9 @@ import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaireSlugPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {DeleteQuestionnaireConfirmationPage} from "../../pages/admin/DeleteQuestionnaireConfirmationPage";
+import {ErrorMessages, SuccessBannerMessages} from "../../constants/test-data-constants";
 
-test.describe('Get to an answer update questionnaire', () => {
+test.describe('Get to an answer delete questionnaire', () => {
     let token: string;
     let questionnaireGetResponse: any;
 
@@ -46,6 +47,11 @@ test.describe('Get to an answer update questionnaire', () => {
 
         viewQuestionnairePage = await ViewQuestionnairePage.create(page);
         await viewQuestionnairePage.expectQuestionnaireHeadingOnPage();
+
+        await viewQuestionnairePage.assertQuestionnaireDeletionSuccessBanner(
+            SuccessBannerMessages.DELETED_QUESTIONNAIRE_SUCCESS_MESSAGE,
+            SuccessBannerMessages.DELETED_QUESTIONNAIRE_SUCCESS_SUB_MESSAGE
+        )
     });
 
     test('Delete questionnaire with cancellation returns to edit page', async ({page}) => {
@@ -85,5 +91,11 @@ test.describe('Get to an answer update questionnaire', () => {
         const deletedQuestionnaire = list.find((q: any) => q.id === questionnaireIdToDelete);
 
         expect(deletedQuestionnaire).toBeUndefined();
+
+        viewQuestionnairePage = await ViewQuestionnairePage.create(page);
+        await viewQuestionnairePage.assertQuestionnaireDeletionSuccessBanner(
+            SuccessBannerMessages.DELETED_QUESTIONNAIRE_SUCCESS_MESSAGE,
+            SuccessBannerMessages.DELETED_QUESTIONNAIRE_SUCCESS_SUB_MESSAGE
+        )
     });
 });

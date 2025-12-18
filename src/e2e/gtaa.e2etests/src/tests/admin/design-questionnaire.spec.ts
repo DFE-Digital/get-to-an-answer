@@ -189,11 +189,13 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await designQuestionnairePage.taskStatusAddEditQuestionnaireId('Completed', 'Add or edit questionnaire ID');
     });
 
-    test('Validate add and edit start page link status as Optional', async ({page}) => {
+    test('Validate add and edit start page link status as Completed', async ({page}) => {
         await signIn(page, token);
 
         designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
         await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
+
+        await designQuestionnairePage.taskStatusAddEditStartPage('Optional', 'Add and edit start page');
 
         await designQuestionnairePage.openStartPage();
         
@@ -202,14 +204,16 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await addQuestionnaireStartPage.enterQuestionnaireDescriptionText("Questionnaire Description");
         await addQuestionnaireStartPage.clickSaveAndContinue();
         
-        await designQuestionnairePage.taskStatusAddEditStartPage('Optional', 'Add and edit start page');
+        await designQuestionnairePage.taskStatusAddEditStartPage('Completed', 'Add and edit start page');
     });
 
-    test('Validate edit button text page link status as Optional', async ({page}) => {
+    test('Validate edit button text page link status as Completed', async ({page}) => {
         await signIn(page, token);
 
         designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
         await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
+
+        await designQuestionnairePage.taskStatusEditButtonTextPage('Optional', 'Edit button text');
 
         await designQuestionnairePage.openEditButtonText();
 
@@ -217,14 +221,16 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await editContinueButtonTextPage.enterButtonText("Save me")
         await editContinueButtonTextPage.clickSaveAndContinue();
 
-        await designQuestionnairePage.taskStatusEditButtonTextPage('Optional', 'Edit button text');
+        await designQuestionnairePage.taskStatusEditButtonTextPage('Completed', 'Edit button text');
     });
 
-    test('Validate customise styling page link status as Optional', async ({page}) => {
+    test('Validate customise styling page link status as Completed', async ({page}) => {
         await signIn(page, token);
 
         designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
         await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
+
+        await designQuestionnairePage.taskStatusCustomiseStylingPage('Optional', 'Customise styling');
 
         await designQuestionnairePage.openCustomiseStyling();
 
@@ -234,6 +240,6 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await questionnaireStylingPage.acceptAccessibilityAgreement();
         await questionnaireStylingPage.saveAndContinue();
 
-        await designQuestionnairePage.taskStatusCustomiseStylingPage('Optional', 'Customise styling');
+        await designQuestionnairePage.taskStatusCustomiseStylingPage('Completed', 'Customise styling');
     });
 });

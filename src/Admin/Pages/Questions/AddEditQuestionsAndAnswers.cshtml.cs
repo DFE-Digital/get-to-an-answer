@@ -41,8 +41,7 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
                 ModelState.AddModelError("QuestionMoveError", moveError);
             }
             
-            if (TempData.TryGetValue("CompletionTrackingMap", out var trackingMapObj) && 
-                trackingMapObj is string trackingMapJson)
+            if (TempData.Peek("CompletionTrackingMap") is string trackingMapJson)
             {
                 try
                 {
@@ -80,7 +79,7 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
         {
             Task = CompletableTask.AddQuestionsAndAnswers,
             Status = FinishedEditing ? CompletionStatus.Completed : 
-                TempData.TryGetValue("QuestionCount", out var countObj) && countObj is > 0 ? 
+                TempData.TryGetValue("QuestionCount", out var countObj) && (countObj ?? 0) is > 0 ? 
                     CompletionStatus.InProgress : CompletionStatus.NotStarted
         });
         

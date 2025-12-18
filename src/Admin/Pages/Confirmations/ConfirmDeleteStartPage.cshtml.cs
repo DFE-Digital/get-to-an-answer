@@ -1,5 +1,6 @@
 using Common.Client;
 using Common.Domain.Request.Update;
+using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
@@ -30,6 +31,12 @@ public class ConfirmDeleteStartPage(IApiClient apiClient,
                 {
                     DisplayTitle = string.Empty, // when empty the questionnaire run starts at the first question
                     Description = string.Empty,
+                });
+                
+                await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+                {
+                    Task = CompletableTask.AddStartPage,
+                    Status = CompletionStatus.Optional
                 });
             
                 TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustRemovedStartPage = true });

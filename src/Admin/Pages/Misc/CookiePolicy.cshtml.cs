@@ -1,11 +1,13 @@
 using Admin.Models;
 using Common.Models.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace Admin.Pages.Misc;
 
+[AllowAnonymous]
 public class CookiePolicy : BasePageModel
 {
     public IActionResult OnGet()
