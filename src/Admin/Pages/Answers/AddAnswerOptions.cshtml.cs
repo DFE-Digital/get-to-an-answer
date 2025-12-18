@@ -21,9 +21,14 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
 
         try
         {
-            Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
-            Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
-
+            await PopulateFieldWithExistingValues();
+            
+            if (Options.Count == 0)
+            {
+                Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
+                Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
+            }
+            
             await HydrateOptionListsAsync();
             ReassignOptionNumbers();
 
@@ -50,6 +55,7 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
 
         try
         {
+            
             foreach (var option in Options)
             {
                 await _apiClient.CreateAnswerAsync(new CreateAnswerRequestDto

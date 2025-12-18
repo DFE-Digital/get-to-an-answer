@@ -1,3 +1,4 @@
+using System.Globalization;
 using Common.Client;
 using Common.Domain;
 using Common.Domain.Request.Create;
@@ -159,7 +160,43 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         return Redirect(targetUrl ?? string.Empty);
     }
+    
+    protected async Task PopulateFieldWithExistingValues()
+    {
+        var existingStoredAnswers = await apiClient.GetAnswersAsync(QuestionId);
+        var existingAnswerOptionIds = Options.Select(o => o.AnswerId).ToHashSet();
+        
+        var (
+            questionForSelection,
+            _,
+            questionSelectionList,
+            resultsPagesForSelection
+            ) = await GetPopulatePrerequisites();
 
+        var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
+        
+        foreach (var existingAnswer in existingStoredAnswers)
+        {
+            if (existingAnswerOptionIds.Contains(existingAnswer.Id))
+                continue;
+            
+            Options.Add(new AnswerOptionsViewModel
+            {
+                AnswerId = existingAnswer.Id,
+                QuestionSelectList = questionSelectionList,
+                AnswerDestination = MapStoredAnswerDestination(existingAnswer.DestinationType),
+                OptionContent = existingAnswer.Content,
+                OptionHint = existingAnswer.Description,
+                SelectedDestinationQuestion = existingAnswer.DestinationQuestionId?.ToString(),
+                QuestionType = currentQuestion?.Type,
+                RankPriority = existingAnswer.Priority.ToString(CultureInfo.InvariantCulture),
+                ExternalLink = existingAnswer.DestinationUrl,
+                ResultsPageSelectList = resultsPagesForSelection,
+                SelectedResultsPage = existingAnswer.DestinationContentId.ToString()
+            });
+        }
+    }
+    
     protected async Task<(
         List<QuestionDto> Questions,
         List<ContentDto> ResultsPages,
@@ -231,6 +268,16 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             Description = option.OptionHint
         });
     }
+    
+    protected static AnswerDestination MapStoredAnswerDestination(DestinationType? destinationType) =>
+        destinationType switch
+        {
+            DestinationType.Question => AnswerDestination.NextQuestion,
+            DestinationType.CustomContent => AnswerDestination.InternalResultsPage,
+            DestinationType.ExternalLink => AnswerDestination.ExternalResultsPage,
+            null => AnswerDestination.NextQuestion,
+            _ => throw new ArgumentOutOfRangeException(nameof(destinationType), destinationType, null)
+        };
     
     protected static DestinationType MapDestination(AnswerDestination answerDestination) =>
         answerDestination switch
