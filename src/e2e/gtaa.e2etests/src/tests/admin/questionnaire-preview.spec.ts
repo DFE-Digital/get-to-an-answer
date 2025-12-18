@@ -370,7 +370,7 @@ test.describe('Questionnaire preview run (start & next)', () => {
         await nextPreviewPage.assertErrorComponentsColor(errorMessageColor);
     });
 
-    test('Multi select question with multiple answers selected and prioritised correctly', async ({ page, request }) => {
+    test('Multi select question with multiple answers selected is prioritised correctly', async ({ page, request }) => {
         const { question, questionPostResponse } = await createQuestion(request, questionnaireId, token, "Q1", QuestionType.MultiSelect, undefined);
         expect200HttpStatusCode(questionPostResponse, 201);
 
@@ -431,7 +431,82 @@ test.describe('Questionnaire preview run (start & next)', () => {
         
         await nextPreviewPage.assertResultsPage(content.title, content.content.replace(/\*\*markdown\*\*/g, 'markdown'));
     })
-    
+
+    test('Multi select question with multiple answers selected (excluding highest priority) is prioritised correctly', async ({ page, request }) => {
+        const { question, questionPostResponse } = await createQuestion(request, questionnaireId, token, "Q1", QuestionType.MultiSelect, undefined);
+        expect200HttpStatusCode(questionPostResponse, 201);
+
+        const { question: question2, questionPostResponse: question2PostResponse } = await createQuestion(request, questionnaireId, token, "Q2", QuestionType.SingleSelect, undefined);
+        expect200HttpStatusCode(question2PostResponse, 201);
+        
+        await createSingleAnswer(
+            request,
+            {
+                questionId: question2.id,
+                questionnaireId,
+                content: 'Single option 1',
+                destinationType: AnswerDestinationType.ExternalLink,
+                destinationUrl: 'https://www.gov.uk/'
+            },
+            token
+        );
+
+        const { content } = await createContent(request, {
+            questionnaireId,
+            title: 'Custom preview content',
+            content: 'Custom preview content **markdown**',
+            referenceName: 'custom-preview-content',
+        }, token)
+
+        const payloads = [
+            {
+                questionId: question.id,
+                questionnaireId,
+                content: 'Multi option 1',
+                priority: undefined, // lowest priority
+                destinationType: AnswerDestinationType.ExternalLink,
+                destinationUrl: 'https://www.gov.uk/'
+            },
+            {
+                questionId: question.id,
+                questionnaireId,
+                content: 'Multi option 3',
+                priority: 2, // second-highest priority
+                destinationType: AnswerDestinationType.Question,
+                destinationQuestionId: question2.id
+            },
+            {
+                questionId: question.id,
+                questionnaireId,
+                content: 'Multi option 2',
+                priority: 1, // highest priority
+                destinationType: AnswerDestinationType.CustomContent,
+                destinationContentId: content.id
+            },
+        ];
+
+        for (const payload of payloads) {
+            await createSingleAnswer(
+                request,
+                payload,
+                token
+            );
+        }
+
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+        const newPage = await designQuestionnairePage.openPreview();
+
+        nextPreviewPage = await QuestionnaireNextPreviewPage.create(newPage);
+        await nextPreviewPage.assertMultiSelectQuestion();
+
+        await nextPreviewPage.selectAllCheckboxOptions();
+        
+        await nextPreviewPage.unselectLastCheckboxOption();
+
+        await nextPreviewPage.clickContinue();
+
+        await nextPreviewPage.assertSingleSelectQuestion();
+    })
 
     test.skip('Preview run reflects contributors and results pages configuration in related admin journeys', async ({ page }) => {
         contributorsPage = await goToQuestionnaireContributorsPageByUrl(page, questionnaireId);

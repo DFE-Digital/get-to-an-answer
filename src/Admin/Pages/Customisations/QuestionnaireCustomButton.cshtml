@@ -5,7 +5,7 @@
 @{
     Layout = "Shared/_Layout";
     
-    ViewData["Title"] = "Questionnaire look and feel";
+    ViewData["Title"] = "Edit text on 'continue' buttons";
 
     const string continueButtonTextId = "continue-button-text";
 }
@@ -24,7 +24,7 @@
     <div class="govuk-grid-column-full">
         <h1 class="govuk-heading-l govuk-!-margin-0">
             <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-            Edit text on 'continue' buttons
+            @ViewData["Title"]
         </h1>
 
         <div class="govuk-hint govuk-!-margin-bottom-8 govuk-!-margin-top-4">

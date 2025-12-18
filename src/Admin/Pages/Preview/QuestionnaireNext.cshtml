@@ -8,7 +8,7 @@
 }
 
 @{
-  ViewData["Title"] = Model.Questionnaire.DisplayTitle ?? "Questionnaire run preview";
+  ViewData["Title"] = Model.Questionnaire.DisplayTitle ?? Model?.Destination.Content ?? "Preview questionnaire start page";
   
   var hasErrors = Model != null && !ViewData.ModelState.IsValid;
 }
@@ -16,10 +16,6 @@
 @if (hasErrors)
 {
   @await Html.PartialAsync("_ErrorSummary", Model)
-}
-
-@{
-  ViewData["Title"] = "Create a new questionnaire";
 }
 
 @section BeforeContainer
