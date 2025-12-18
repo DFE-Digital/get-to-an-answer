@@ -4,7 +4,7 @@
 
 @{
   Layout = "Shared/_Layout";
-  ViewData["Title"] = "Create new questionnaire";
+  ViewData["Title"] = "Add a questionnaire name";
 
   const string inputId = "Title";
 }
@@ -25,7 +25,9 @@
       <input type="hidden" asp-for="@Model.BackLinkSlug" />
       <govuk-form-group asp-for="@Model.Title">
         <h1 class="govuk-label-wrapper">
-          <label for="@inputId" class="govuk-label govuk-label--l">Add a questionnaire name</label>
+          <label for="@inputId" class="govuk-label govuk-label--l">
+            @ViewData["Title"]
+          </label>
         </h1>
 
         <div class="govuk-hint" id="@inputId-hint">

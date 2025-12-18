@@ -2,7 +2,7 @@
 @model Admin.Pages.Questionnaire.QuestionnaireBranchingMap
 
 @{
-    ViewData["Title"] = "Branching map";
+    ViewData["Title"] = "View branching map";
 }
 
 @section BeforeContent
@@ -14,7 +14,7 @@
     <div class="govuk-grid-column-full">
         <h1 class="govuk-heading-l govuk-!-margin-0">
             <span class="govuk-caption-l">@Model.QuestionnaireBranchingMapDto?.QuestionnaireTitle</span>
-            View branching map
+            @ViewData["Title"]
         </h1>
 
         <div class="govuk-hint govuk-!-margin-bottom-8">
