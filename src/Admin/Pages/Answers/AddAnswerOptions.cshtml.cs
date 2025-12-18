@@ -44,6 +44,8 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
     // Handler for "Continue"
     public async Task<IActionResult> OnPostContinue()
     {
+        ValidateForDuplicateAnswers();
+
         ValidateSelectedQuestionsIfAny();
 
         if (!ModelState.IsValid)
@@ -88,7 +90,7 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
             return RedirectToErrorPage();
         }
     }
-
+    
     public async Task<IActionResult> OnPostRemoveOption(int index)
     {
         Options.RemoveAt(index);
