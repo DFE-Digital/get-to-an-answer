@@ -18,8 +18,12 @@ public partial class BulkAnswerOptions(IApiClient apiClient, ILogger<BulkAnswerO
 
     [BindProperty] public string? BulkAnswerOptionsRawText { get; set; }
     
+    [BindProperty(SupportsGet = true, Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+    
     public async Task<IActionResult> OnGet(string? returnUrl)
     {
+        ReturnUrl = returnUrl;
         BackLinkSlug = returnUrl ?? Routes.QuestionnairesManage;
 
         if (!ModelState.IsValid)
@@ -103,10 +107,11 @@ public partial class BulkAnswerOptions(IApiClient apiClient, ILogger<BulkAnswerO
                     await apiClient.DeleteAnswerAsync(existingAnswer.Id);
                 }
             }
-
-            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            
+            var target = ReturnUrl ?? returnUrl;
+            if (!string.IsNullOrEmpty(target) && Url.IsLocalUrl(target))
             {
-                return Redirect(returnUrl);
+                return Redirect(target);
             }
 
             return Page();

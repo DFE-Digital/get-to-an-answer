@@ -15,7 +15,6 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 {
     private readonly IApiClient _apiClient = apiClient;
 
-    [BindProperty] public List<Guid> DeletedAnswerIds { get; set; } = [];
 
     public async Task<IActionResult> OnGet()
     {
@@ -25,7 +24,6 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         if (Options.Count == 0)
         {
-            // if no options were found in temp data, add two blank options
             Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
             Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
         }
@@ -37,6 +35,8 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
     public async Task<IActionResult> OnPostSaveAnswerOptions()
     {
+        ValidateForDuplicateAnswers();
+        
         ValidateSelectedQuestionsIfAny();
 
         if (!ModelState.IsValid)
@@ -47,26 +47,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         try
         {
-            foreach (var option in Options)
-            {
-                if (option.AnswerId != Guid.Empty)
-                {
-                    await UpdateAnswer(option);
-                }
-                else
-                {
-                    await CreateAnswer(option);
-                }
-            }
-
-            if (DeletedAnswerIds.Count > 0)
-            {
-                foreach (var answerId in DeletedAnswerIds.Where(x => x != Guid.Empty).Distinct().ToList())
-                {
-                    await _apiClient.DeleteAnswerAsync(answerId);
-                    DeletedAnswerIds.Remove(answerId);
-                }
-            }
+            await UpdateOrCreateAnswers();
         }
         catch (Exception e)
         {
@@ -87,7 +68,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             DeletedAnswerIds.Add(removedOption.AnswerId);
 
         Options.RemoveAt(index);
-
+ 
         RemoveModelStateEntriesForOption(index);
         RemoveModelStateErrorsForFields();
 
@@ -109,42 +90,6 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
         foreach (var key in keysToRemove)
         {
             ModelState.Remove(key);
-        }
-    }
-
-    private async Task PopulateFieldWithExistingValues()
-    {
-        var existingStoredAnswers = await _apiClient.GetAnswersAsync(QuestionId);
-        var existingAnswerOptionIds = Options.Select(o => o.AnswerId).ToHashSet();
-        
-        var (
-            questionForSelection,
-            _,
-            questionSelectionList,
-            resultsPagesForSelection
-            ) = await GetPopulatePrerequisites();
-
-        var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
-        
-        foreach (var existingAnswer in existingStoredAnswers)
-        {
-            if (existingAnswerOptionIds.Contains(existingAnswer.Id))
-                continue;
-            
-            Options.Add(new AnswerOptionsViewModel
-            {
-                AnswerId = existingAnswer.Id,
-                QuestionSelectList = questionSelectionList,
-                AnswerDestination = MapAnswerDestination(existingAnswer.DestinationType),
-                OptionContent = existingAnswer.Content,
-                OptionHint = existingAnswer.Description,
-                SelectedDestinationQuestion = existingAnswer.DestinationQuestionId?.ToString(),
-                QuestionType = currentQuestion?.Type,
-                RankPriority = existingAnswer.Priority.ToString(CultureInfo.InvariantCulture),
-                ExternalLink = existingAnswer.DestinationUrl,
-                ResultsPageSelectList = resultsPagesForSelection,
-                SelectedResultsPage = existingAnswer.DestinationContentId.ToString()
-            });
         }
     }
 

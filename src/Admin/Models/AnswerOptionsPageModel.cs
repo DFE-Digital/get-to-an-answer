@@ -1,3 +1,4 @@
+using System.Globalization;
 using Common.Client;
 using Common.Domain;
 using Common.Domain.Request.Create;
@@ -16,22 +17,23 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
     [FromRoute(Name = "questionId")] public Guid QuestionId { get; set; }
 
-    [BindProperty]
-    public string? QuestionNumber { get; set; } = "1";
+    [BindProperty] public string? QuestionNumber { get; set; } = "1";
 
     // Bind a collection of options
     [BindProperty] public List<AnswerOptionsViewModel> Options { get; set; } = [];
 
     [TempData(Key = "OptionNumber")] public int OptionNumber { get; set; }
+
+    [BindProperty] public List<Guid> DeletedAnswerIds { get; set; } = [];
     
     // Handler for clicking "Add another option"
     public async Task<IActionResult> OnPostAddOption()
     {
+        ValidateForDuplicateAnswers();
         ValidateSelectedQuestionsIfAny();
 
         if (!ModelState.IsValid)
         {
-            // RemoveGenericOptionErrors();
             await HydrateOptionListsAsync();
             return Page();
         }
@@ -49,7 +51,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         // Re-render page with the extra option
         return Page();
     }
-    
+
     protected void RemoveModelStateErrorsForFields()
     {
         foreach (var key in ModelState.Keys)
@@ -57,7 +59,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             ModelState[key]?.Errors.Clear();
         }
     }
-    
+
     protected void ReassignOptionNumbers()
     {
         for (var index = 0; index < Options.Count; index++)
@@ -100,11 +102,11 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             ModelState.AddModelError(selectKey, string.Empty);
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
         }
-        
+
         var optionsWithExternalLinkNoSelection = Options.Where(o =>
             o.AnswerDestination == AnswerDestination.ExternalResultsPage &&
             string.IsNullOrEmpty(o.ExternalLink));
-        
+
         foreach (var externalLink in optionsWithExternalLinkNoSelection)
         {
             var index = externalLink.OptionNumber - 1;
@@ -117,17 +119,18 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
         }
     }
-    
-    private SelectListItem ToResultsPageSelectListItem(ContentDto content) => 
-        new(!string.IsNullOrWhiteSpace(content.ReferenceName) ? content.ReferenceName : content.Title, content.Id.ToString());
-    
+
+    private SelectListItem ToResultsPageSelectListItem(ContentDto content) =>
+        new(!string.IsNullOrWhiteSpace(content.ReferenceName) ? content.ReferenceName : content.Title,
+            content.Id.ToString());
+
     protected async Task HydrateOptionListsAsync()
     {
         var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
         var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
-        
+
         QuestionNumber = questions.Max(x => x.Order.ToString());
-        
+
         var questionSelect = questions.Where(x => x.Id != QuestionId)
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
         var resultsSelect = resultsPages.Select(ToResultsPageSelectListItem).ToList();
@@ -139,17 +142,20 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             option.ResultsPageSelectList = resultsSelect;
         }
     }
-    
+
     public async Task<IActionResult> OnPostRedirectToBulkEntry(string? returnUrl)
     {
+        ValidateForDuplicateAnswers();
         ValidateSelectedQuestionsIfAny();
-
+        
         if (!ModelState.IsValid)
         {
             await PopulateOptionSelectionLists();
             return Page();
         }
 
+        await UpdateOrCreateAnswers();
+        
         var targetUrl = Url.Page("/Answers/BulkAnswerOptions", null, new
         {
             questionnaireId = QuestionnaireId,
@@ -158,6 +164,42 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         });
 
         return Redirect(targetUrl ?? string.Empty);
+    }
+
+    protected async Task PopulateFieldWithExistingValues()
+    {
+        var existingStoredAnswers = await apiClient.GetAnswersAsync(QuestionId);
+        var existingAnswerOptionIds = Options.Select(o => o.AnswerId).ToHashSet();
+
+        var (
+            questionForSelection,
+            _,
+            questionSelectionList,
+            resultsPagesForSelection
+            ) = await GetPopulatePrerequisites();
+
+        var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
+
+        foreach (var existingAnswer in existingStoredAnswers)
+        {
+            if (existingAnswerOptionIds.Contains(existingAnswer.Id))
+                continue;
+
+            Options.Add(new AnswerOptionsViewModel
+            {
+                AnswerId = existingAnswer.Id,
+                QuestionSelectList = questionSelectionList,
+                AnswerDestination = MapStoredAnswerDestination(existingAnswer.DestinationType),
+                OptionContent = existingAnswer.Content,
+                OptionHint = existingAnswer.Description,
+                SelectedDestinationQuestion = existingAnswer.DestinationQuestionId?.ToString(),
+                QuestionType = currentQuestion?.Type,
+                RankPriority = existingAnswer.Priority.ToString(CultureInfo.InvariantCulture),
+                ExternalLink = existingAnswer.DestinationUrl,
+                ResultsPageSelectList = resultsPagesForSelection,
+                SelectedResultsPage = existingAnswer.DestinationContentId.ToString()
+            });
+        }
     }
 
     protected async Task<(
@@ -177,7 +219,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         return (questionForSelection, resultsPages, questionSelectionList, resultsPagesForSelection);
     }
-    
+
     protected async Task PopulateOptionSelectionLists()
     {
         var (
@@ -185,8 +227,8 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             _,
             questionSelectionList,
             resultsPagesForSelection
-        ) = await GetPopulatePrerequisites();
-        
+            ) = await GetPopulatePrerequisites();
+
         foreach (var option in Options)
         {
             option.QuestionSelectList = questionSelectionList;
@@ -231,7 +273,59 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             Description = option.OptionHint
         });
     }
+
+    protected void ValidateForDuplicateAnswers()
+    {
+        var duplicates = Options
+            .Select((o, index) => new { o.OptionContent, index })
+            .Where(x => !string.IsNullOrWhiteSpace(x.OptionContent))
+            .GroupBy(x => x.OptionContent?.Trim(), StringComparer.OrdinalIgnoreCase)
+            .Where(g => g.Count() > 1);
+
+        foreach (var group in duplicates)
+        {
+            foreach (var item in group)
+            {
+                ModelState.AddModelError($"Options[{item.index}].OptionContent", $"Option {item.index + 1} content is duplicated");
+            }
+        }
+    }
     
+    protected async Task UpdateOrCreateAnswers()
+    {
+        foreach (var option in Options)
+        {
+            if (option.AnswerId != Guid.Empty)
+            {
+                await UpdateAnswer(option);
+            }
+            else
+            {
+                await CreateAnswer(option);
+            }
+        }
+
+        if (DeletedAnswerIds.Count > 0)
+        {
+            foreach (var answerId in DeletedAnswerIds.Where(x => x != Guid.Empty).Distinct().ToList())
+            {
+                await apiClient.DeleteAnswerAsync(answerId);
+                DeletedAnswerIds.Remove(answerId);
+            }
+        }
+    }
+
+
+    protected static AnswerDestination MapStoredAnswerDestination(DestinationType? destinationType) =>
+        destinationType switch
+        {
+            DestinationType.Question => AnswerDestination.NextQuestion,
+            DestinationType.CustomContent => AnswerDestination.InternalResultsPage,
+            DestinationType.ExternalLink => AnswerDestination.ExternalResultsPage,
+            null => AnswerDestination.NextQuestion,
+            _ => throw new ArgumentOutOfRangeException(nameof(destinationType), destinationType, null)
+        };
+
     protected static DestinationType MapDestination(AnswerDestination answerDestination) =>
         answerDestination switch
         {

@@ -21,9 +21,14 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
 
         try
         {
-            Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
-            Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
-
+            await PopulateFieldWithExistingValues();
+            
+            if (Options.Count == 0)
+            {
+                Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
+                Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
+            }
+            
             await HydrateOptionListsAsync();
             ReassignOptionNumbers();
 
@@ -39,6 +44,8 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
     // Handler for "Continue"
     public async Task<IActionResult> OnPostContinue()
     {
+        ValidateForDuplicateAnswers();
+
         ValidateSelectedQuestionsIfAny();
 
         if (!ModelState.IsValid)
@@ -50,7 +57,7 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
 
         try
         {
-            foreach (var option in Options)
+            foreach (var option in Options.Where(o => o.AnswerId == Guid.Empty))
             {
                 await _apiClient.CreateAnswerAsync(new CreateAnswerRequestDto
                 {
@@ -83,7 +90,7 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
             return RedirectToErrorPage();
         }
     }
-
+    
     public async Task<IActionResult> OnPostRemoveOption(int index)
     {
         Options.RemoveAt(index);
