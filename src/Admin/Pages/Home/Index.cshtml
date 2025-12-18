@@ -3,10 +3,12 @@
 @model Admin.Pages.Home.Index
 
 @{
-  ViewData["Title"] = "Create a new questionnaire";
+  ViewData["Title"] = "Help users to get to an answer";
 }
 
-<h1 class="govuk-heading-l">Help users to get to an answer</h1>
+<h1 class="govuk-heading-l">
+  @ViewData["Title"]
+</h1>
 <div class="govuk-body">
   <p>Guide users to relevant information they need using a questionnaire.</p>
 

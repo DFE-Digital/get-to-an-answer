@@ -469,7 +469,6 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             StateColor = original.StateColor,
             ErrorMessageColor = original.ErrorMessageColor,
             ContinueButtonText = original.ContinueButtonText,
-            CompletionTrackingMap = original.CompletionTrackingMap,
             DecorativeImage = original.DecorativeImage,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
