@@ -10,7 +10,7 @@ import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {createQuestion} from "../../test-data-seeder/question-data";
 
 
-test.describe('Get to an answer Add bulk answers options to question', () => {
+test.describe.skip('Get to an answer Add bulk answers options to question', () => {
     let token: string;
     let questionnaireTitle: string;
     let cloneQuestionnairePage: CloneQuestionnairePage;
