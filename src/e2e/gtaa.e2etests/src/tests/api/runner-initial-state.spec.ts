@@ -43,7 +43,7 @@ test.describe('GET /api/questionnaires/{questionnaireId}/initial-state', () => {
         // Ensure not published
         await updateQuestionnaire(request, questionnaire.id, { title: 'Remain Draft' });
         const { questionnaireGetBody } = await getQuestionnaire(request, questionnaire.id);
-        expect([EntityStatus.Draft, EntityStatus.Private]).toContain(questionnaireGetBody.status);
+        expect(questionnaireGetBody.status).toBe(EntityStatus.Draft);
 
         const { response: res } = await getInitialState(request, questionnaire.id, true)
         expect(res.status()).toBe(200);

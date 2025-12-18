@@ -11,7 +11,7 @@ import { createQuestion } from '../../test-data-seeder/question-data';
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 
 test.describe('PATCH Unpublish questionnaire api request', () => {
-    test('unpublishes a published questionnaire (204) and status becomes Private', async ({ request }) => {
+    test('unpublishes a published questionnaire (204) and status becomes Draft but flagged IsUnpublished', async ({ request }) => {
         const { questionnaire } = await createQuestionnaire(request);
         
         await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
@@ -38,7 +38,8 @@ test.describe('PATCH Unpublish questionnaire api request', () => {
         expect(response.status()).toBe(204);
 
         const { questionnaireGetBody } = await getQuestionnaire(request, questionnaire.id);
-        expect(questionnaireGetBody.status).toBe(EntityStatus.Private);
+        expect(questionnaireGetBody.status).toBe(EntityStatus.Draft);
+        expect(questionnaireGetBody.isUnpublished).toBeTruthy();
     });
 
     test('unpublishing a draft questionnaire returns 400 and in the same status', async ({ request }) => {

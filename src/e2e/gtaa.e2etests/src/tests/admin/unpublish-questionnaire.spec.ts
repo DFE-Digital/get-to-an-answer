@@ -77,7 +77,8 @@ test.describe('Get to an answer unpublish questionnaire', () => {
         body = refreshed.questionnaireGetBody;
 
         // Adjust the assertion here if your API uses a different property for the unpublish state
-        expect(body.status === EntityStatus.Private).toBeTruthy();
+        expect(body.status === EntityStatus.Draft).toBeTruthy();
+        expect(body.isUnpublished).toBeTruthy();
         
         // Display as draft, straight after unpublishing
         const designQuestionnairePage = await DesignQuestionnairePage.create(page);

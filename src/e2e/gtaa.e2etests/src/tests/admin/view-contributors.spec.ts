@@ -40,7 +40,7 @@ test.describe('Manage questionnaire contributors', () => {
         await contributorsPage.clickBackLink();
 
         designQuestionnairePage = await DesignQuestionnairePage.create(page);
-        await designQuestionnairePage.validateHeading(PageHeadings.EDIT_QUESTIONNAIRE_PAGE_HEADING);
+        await designQuestionnairePage.validateHeading(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
     });
 
     test('Add person button navigates to Add contributor page', async ({ page }) => {
