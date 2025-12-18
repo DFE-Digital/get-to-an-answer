@@ -328,6 +328,10 @@ test.describe('Get to an answer publish questionnaire', () => {
         await confirmPublishPage.clickContinue();
 
         await editQuestionnairePage.assertQuestionnaireStatus('Published');
+
+        const { questionnaireGetBody } = await getQuestionnaire(request, questionnaire.id, token)
+        expect(questionnaireGetBody.status).toBe(EntityStatus.Published);
+        expect(questionnaireGetBody.isUnpublished).toBeFalsy();
     })
     
     // CARE-1601 Test

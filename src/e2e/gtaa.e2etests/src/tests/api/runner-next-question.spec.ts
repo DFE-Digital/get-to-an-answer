@@ -83,7 +83,7 @@ test.describe('POST /api/questionnaires/{questionnaireId}/next-state', () => {
         // Ensure draft
         await updateQuestionnaire(request, questionnaire.id, { title: 'Keep Draft' });
         const { questionnaireGetBody } = await getQuestionnaire(request, questionnaire.id);
-        expect([EntityStatus.Draft, EntityStatus.Private]).toContain(questionnaireGetBody.status);
+        expect(questionnaireGetBody.status).toBe(EntityStatus.Draft);
         
         const { response: res } = await getNextState(request, questionnaire.id, { 
             currentQuestionId: q1.id, selectedAnswerId: null, selectedAnswerIds: [answer.id] 

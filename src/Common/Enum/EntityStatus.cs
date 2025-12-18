@@ -6,5 +6,9 @@ public enum EntityStatus
     Published = 2,
     Deleted = 3,
     Archived = 4,
+    
+    /**
+     * Replaced with "boolean IsUnpublished" for future changes 
+     */
     Private = 5,
 }

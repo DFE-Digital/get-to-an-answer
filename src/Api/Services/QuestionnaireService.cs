@@ -453,6 +453,115 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
         }
     }
 
+    private QuestionnaireEntity CreateCopy(string userId, string newTitle, QuestionnaireEntity original)
+    {
+        return new QuestionnaireEntity
+        {
+            Title = newTitle,
+            DisplayTitle = original.DisplayTitle,
+            Description = original.Description,
+            Status = EntityStatus.Draft,
+            Contributors = original.Contributors,
+            TextColor = original.TextColor,
+            BackgroundColor = original.BackgroundColor,
+            PrimaryButtonColor = original.PrimaryButtonColor,
+            SecondaryButtonColor = original.SecondaryButtonColor,
+            StateColor = original.StateColor,
+            ErrorMessageColor = original.ErrorMessageColor,
+            ContinueButtonText = original.ContinueButtonText,
+            CompletionTrackingMap = original.CompletionTrackingMap,
+            DecorativeImage = original.DecorativeImage,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            CreatedBy = userId,
+        };
+    }
+
+    private AnswerEntity CreateCopy(string userId, 
+        Guid cloneQuestionnaireId, 
+        Guid cloneQuestionId, 
+        Guid? newDestinationQuestionId, 
+        Guid? newDestinationContentId, 
+        AnswerEntity original)
+    {
+        return new AnswerEntity
+        {
+            QuestionId = cloneQuestionId,
+            QuestionnaireId = cloneQuestionnaireId,
+            Content = original.Content,
+            Description = original.Description,
+            DestinationUrl = original.DestinationUrl,
+            DestinationQuestionId = newDestinationQuestionId,
+            DestinationContentId = newDestinationContentId,
+            DestinationType = original.DestinationType,
+            Priority = original.Priority,
+            CreatedBy = userId,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+    }
+
+    private (
+        Dictionary<int, QuestionEntity>, 
+        Dictionary<Guid, QuestionEntity>,
+        Dictionary<int, ICollection<AnswerEntity>>
+        ) GetQuestionClonePrerequisites(string userId, Guid cloneQuestionnaireId, QuestionnaireEntity questionnaire)
+    {
+        var cloneQuestions = new Dictionary<int, QuestionEntity>();
+        var oldIdCloneQuestions = new Dictionary<Guid, QuestionEntity>();
+        var orderAnswers = new Dictionary<int, ICollection<AnswerEntity>>();
+            
+        foreach (var question in questionnaire.Questions)
+        {
+            var cloneQuestion = new QuestionEntity
+            {
+                QuestionnaireId = cloneQuestionnaireId,
+                Content = question.Content,
+                Description = question.Description,
+                Type = question.Type,
+                Order = question.Order,
+                CreatedBy = userId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            };
+                    
+            oldIdCloneQuestions.Add(question.Id, cloneQuestion);
+            cloneQuestions.Add(question.Order, cloneQuestion);
+            orderAnswers.Add(question.Order, question.Answers);
+        }
+
+        return (cloneQuestions, oldIdCloneQuestions, orderAnswers);
+    }
+    
+    
+
+    private (
+        Dictionary<string, ContentEntity>, 
+        Dictionary<Guid, ContentEntity>
+        ) GetContentClonePrerequisites(string userId, Guid cloneQuestionnaireId, QuestionnaireEntity questionnaire)
+    {
+        var cloneContents = new Dictionary<string, ContentEntity>();
+        var oldIdCloneContents = new Dictionary<Guid, ContentEntity>();
+            
+        foreach (var content in questionnaire.Contents)
+        {
+            var cloneContent = new ContentEntity
+            {
+                QuestionnaireId = cloneQuestionnaireId,
+                Title = content.Title,
+                Content = content.Content,
+                ReferenceName = content.ReferenceName,
+                CreatedBy = userId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            };
+            oldIdCloneContents.Add(content.Id, cloneContent);
+            cloneContents.Add(content.ReferenceName!, cloneContent);
+        }
+
+        return (cloneContents, oldIdCloneContents);
+    }
+
     public async Task<ServiceResult> CloneQuestionnaire(string userId, Guid id, CloneQuestionnaireRequestDto request)
     {
         try
@@ -476,43 +585,15 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (questionnaire == null)
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
 
-            var cloneQuestionnaire = new QuestionnaireEntity
-            {
-                Title = request.Title,
-                Status = EntityStatus.Draft,
-                Contributors = questionnaire.Contributors,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                CreatedBy = userId
-            };
+            var cloneQuestionnaire = CreateCopy(userId, request.Title, questionnaire);
 
             db.Questionnaires.Add(cloneQuestionnaire);
             await db.SaveChangesAsync();
             
             var cloneQuestionnaireId = cloneQuestionnaire.Id;
             
-            var cloneQuestions = new Dictionary<int, QuestionEntity>();
-            var oldIdCloneQuestions = new Dictionary<Guid, QuestionEntity>();
-            var orderAnswers = new Dictionary<int, ICollection<AnswerEntity>>();
-            
-            foreach (var question in questionnaire.Questions)
-            {
-                var cloneQuestion = new QuestionEntity
-                {
-                    QuestionnaireId = cloneQuestionnaireId,
-                    Content = question.Content,
-                    Description = question.Description,
-                    Type = question.Type,
-                    Order = question.Order,
-                    CreatedBy = userId,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                };
-                    
-                oldIdCloneQuestions.Add(question.Id, cloneQuestion);
-                cloneQuestions.Add(question.Order, cloneQuestion);
-                orderAnswers.Add(question.Order, question.Answers);
-            }
+            var (cloneQuestions, oldIdCloneQuestions, orderAnswers) = 
+                GetQuestionClonePrerequisites(userId, cloneQuestionnaireId, questionnaire);
             
             await db.Questions.AddRangeAsync(cloneQuestions.Values);
             await db.SaveChangesAsync();
@@ -521,24 +602,8 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             foreach (var (originalId, cloneQuestion) in oldIdCloneQuestions)
                 questionOldToNewIds.Add(originalId, cloneQuestion.Id);
             
-            var cloneContents = new Dictionary<string, ContentEntity>();
-            var oldIdCloneContents = new Dictionary<Guid, ContentEntity>();
-            
-            foreach (var content in questionnaire.Contents)
-            {
-                var cloneContent = new ContentEntity
-                {
-                    QuestionnaireId = cloneQuestionnaireId,
-                    Title = content.Title,
-                    Content = content.Content,
-                    ReferenceName = content.ReferenceName,
-                    CreatedBy = userId,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                };
-                oldIdCloneContents.Add(content.Id, cloneContent);
-                cloneContents.Add(content.ReferenceName!, cloneContent);
-            }
+            var (cloneContents, oldIdCloneContents) = 
+                GetContentClonePrerequisites(userId, cloneQuestionnaireId, questionnaire);
             
             await db.Contents.AddRangeAsync(cloneContents.Values);
             await db.SaveChangesAsync();
@@ -580,21 +645,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                         newDestinationContentId = mappedDestinationContentId;
                     }
                     
-                    var cloneAnswer = new AnswerEntity
-                    {
-                        QuestionId = cloneQuestionId,
-                        QuestionnaireId = cloneQuestionnaireId,
-                        Content = answer.Content,
-                        Description = answer.Description,
-                        DestinationUrl = answer.DestinationUrl,
-                        DestinationQuestionId = newDestinationQuestionId,
-                        DestinationContentId = newDestinationContentId,
-                        DestinationType = answer.DestinationType,
-                        Priority = answer.Priority,
-                        CreatedBy = userId,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow,
-                    };
+                    var cloneAnswer = CreateCopy(userId, cloneQuestionnaireId, cloneQuestionId, newDestinationQuestionId, newDestinationContentId, answer);
                     
                     cloneAnswers.Add(cloneAnswer);
                 }
@@ -604,7 +655,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             await db.SaveChangesAsync();
             
             logger.LogInformation("CloneQuestionnaire succeeded OriginalId={OriginalId} NewId={NewId}", id, cloneQuestionnaireId);
-            return Created(ToNestedDto(cloneQuestionnaire));
+            return Created(ToDto(cloneQuestionnaire));
         }
         catch (Exception ex)
         {
@@ -790,14 +841,21 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             
             var versionNumber = 1;
 
-            questionnaire.Status = status;
+            questionnaire.Status = status == EntityStatus.Private ? EntityStatus.Draft : status;
+            
             if (status == EntityStatus.Published) 
             {
                 versionNumber = ++questionnaire.Version;
+                
+                questionnaire.IsUnpublished = false;
             }
             else if (status == EntityStatus.Draft)
             {
                 versionNumber = questionnaire.Version--;
+            }
+            else if (status == EntityStatus.Private)
+            {
+                questionnaire.IsUnpublished = true;
             }
             
             preUpdateAction?.Invoke(questionnaire);
@@ -822,47 +880,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
     }
-    
-    private QuestionnaireDto ToNestedDto(QuestionnaireEntity entity)
-    {
-        return new QuestionnaireDto
-        {
-            Id = entity.Id,
-            Title = entity.Title,
-            Description = entity.Description,
-            Slug = entity.Slug,
-            Status = entity.Status,
-            Version = entity.Version,
-            CreatedAt = entity.CreatedAt,
-            UpdatedAt = entity.UpdatedAt,
-            Questions = entity.Questions.Select(q => new QuestionDto
-            {
-                Id = q.Id,
-                Content = q.Content,
-                Description = q.Description,
-                Type = q.Type,
-                Order = q.Order,
-                QuestionnaireId = q.QuestionnaireId,
-                CreatedAt = q.CreatedAt,
-                UpdatedAt = q.UpdatedAt,
-                Answers = q.Answers.Select(a => new AnswerDto
-                {
-                    Id = a.Id,
-                    Content = a.Content,
-                    Description = a.Description,
-                    DestinationUrl = a.DestinationUrl,
-                    DestinationQuestionId = a.DestinationQuestionId,
-                    DestinationType = a.DestinationType,
-                    Priority = a.Priority,
-                    QuestionId = a.QuestionId,
-                    QuestionnaireId = a.QuestionnaireId,
-                    CreatedAt = a.CreatedAt,
-                    UpdatedAt = a.UpdatedAt
-                }).ToList()
-            }).ToList()
-        };
-    }
-    
+
     public async Task<ServiceResult> GetBranchingMap(string userId, Guid questionnaireId)
     {
         try
@@ -948,7 +966,8 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             DisplayTitle = q.DisplayTitle,
             Description = q.Description,
             Slug = q.Slug,
-            Status = q.Status,
+            Status = q.Status == EntityStatus.Private ? EntityStatus.Draft : q.Status,
+            IsUnpublished = q.IsUnpublished,
             Version = q.Version,
             CreatedAt = q.CreatedAt,
             UpdatedAt = q.UpdatedAt,

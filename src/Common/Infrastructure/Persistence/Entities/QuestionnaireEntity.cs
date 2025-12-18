@@ -32,7 +32,7 @@ public class QuestionnaireEntity
 
     [Required]
     [MaxLength(500)]
-    public string Title { get; set; }
+    public required string Title { get; set; }
     
     [MaxLength(10000)]
     public string? Description { get; set; }
@@ -47,7 +47,7 @@ public class QuestionnaireEntity
     
     [Required]
     [MaxLength(500)]
-    public string CreatedBy { get; set; }
+    public required string CreatedBy { get; set; }
     
     [MaxLength(500)]
     public string? PublishedBy { get; set; }
@@ -77,5 +77,5 @@ public class QuestionnaireEntity
     [MaxLength(50)] public string? ContinueButtonText { get; set; } = "Continue";
     public bool IsAccessibilityAgreementAccepted { get; set; }
     
-    [MaxLength(250)] public string? ContactEmailId { get; set; }
+    public bool IsUnpublished { get; set; }
 }
