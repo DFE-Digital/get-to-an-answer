@@ -17,6 +17,7 @@ export class AddAnswerPage extends BasePage {
     private readonly saveAnswersButton: Locator;
     private readonly removeButton: Locator;
     private readonly enterAllOptionsButton: Locator;
+    private readonly addBulkQuestionsButton: Locator;
     private readonly errorSummary: Locator;
     private readonly errorList: Locator;
     private readonly errorLinks: Locator;
@@ -50,6 +51,7 @@ export class AddAnswerPage extends BasePage {
         this.enterAllOptionsButton = page.locator(
             'button[formaction*="RedirectToBulkEntry"]'
         ).first();
+        this.addBulkQuestionsButton = this.page.locator('button.govuk-button[type="submit"][formaction*="handler=RedirectToBulkEntry"]');
 
         this.optionNumber = (index: number) =>
             this.page.locator(`label[for="Options-${index}-OptionContent"]`);
@@ -355,7 +357,7 @@ export class AddAnswerPage extends BasePage {
     async clickSaveAnswersButton() {
         await this.saveAnswersButton.click();
     }
-    async openBulkOptions() {
+    async clickEnterAllOptionsButton() {
         await this.enterAllOptionsButton.click();
     }
 

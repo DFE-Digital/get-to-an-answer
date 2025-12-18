@@ -148,6 +148,16 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         ValidateForDuplicateAnswers();
         ValidateSelectedQuestionsIfAny();
         
+        var targetUrl = Url.Page("/Answers/BulkAnswerOptions", null, new
+        {
+            questionnaireId = QuestionnaireId,
+            questionId = QuestionId,
+            returnUrl
+        });
+
+        if (Options.All(o => string.IsNullOrWhiteSpace(o.OptionContent)))
+            return Redirect(targetUrl ?? string.Empty);
+        
         if (!ModelState.IsValid)
         {
             await PopulateOptionSelectionLists();
@@ -155,13 +165,6 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         }
 
         await UpdateOrCreateAnswers();
-        
-        var targetUrl = Url.Page("/Answers/BulkAnswerOptions", null, new
-        {
-            questionnaireId = QuestionnaireId,
-            questionId = QuestionId,
-            returnUrl
-        });
 
         return Redirect(targetUrl ?? string.Empty);
     }
