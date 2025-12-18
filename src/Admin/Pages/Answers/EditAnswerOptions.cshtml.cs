@@ -25,7 +25,6 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         if (Options.Count == 0)
         {
-            // if no options were found in temp data, add two blank options
             Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
             Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
         }
