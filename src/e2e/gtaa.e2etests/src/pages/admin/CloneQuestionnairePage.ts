@@ -8,6 +8,7 @@ export class CloneQuestionnairePage extends BasePage {
     private readonly caption: Locator;
     private readonly titleInput: Locator;
     private readonly saveButton: Locator;
+    private readonly backLink: Locator;
 
     private readonly titleFormGroup: Locator;
 
@@ -38,6 +39,9 @@ export class CloneQuestionnairePage extends BasePage {
         this.errorList = this.errorSummary.locator(
             'ul.govuk-error-summary__list'
         );
+        this.backLink = this.page.locator(
+            '#main-content-container a.govuk-back-link'
+        );
     }
 
     async expectOnPage(): Promise<void> {
@@ -62,6 +66,13 @@ export class CloneQuestionnairePage extends BasePage {
         ]);
     }
 
+    async clickBackLink(): Promise<void> {
+        await Promise.all([
+            this.waitForPageLoad(),
+            this.backLink.click()
+        ]);
+    }
+
     async validateMissingTitleMessageSummary(browserName: string) {
         await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
         await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
@@ -75,6 +86,10 @@ export class CloneQuestionnairePage extends BasePage {
             await this.errorLink.waitFor({state: 'visible', timeout: Timeouts.LONG});
             await expect(this.errorSummary, '❌ Error summary text mismatch').toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_QUESTIONNAIRE_TITLE);
         }
+    }
+
+    async validateInlineTitleError() {
+        await expect(this.inlineTitleError, '❌ Inline title error not visible').toBeVisible();
     }
 
     async validateErrorLinkBehaviour(link: Locator, expectedMessage: string, browserName: string) {
