@@ -4,7 +4,7 @@
 @model Admin.Pages.Home.TermsOfServiceAgreement
 
 @{
-  ViewData["Title"] = "Create a new questionnaire";
+  ViewData["Title"] = "Terms of use";
 }
 
 @if (Model.HasErrors())
@@ -16,7 +16,7 @@
   <div class="govuk-grid-column-two-thirds">
 
     <h1 class="govuk-heading-l">
-      <span class="translation_missing" title="translation missing: en.page_titles.terms_of_use">Terms Of Use</span>
+      <span class="translation_missing" title="translation missing: en.page_titles.terms_of_use">@ViewData["Title"]</span>
     </h1>
 
     <p>

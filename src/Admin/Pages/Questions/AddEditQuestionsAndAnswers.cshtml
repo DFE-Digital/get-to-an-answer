@@ -52,7 +52,7 @@
 
                 <h1 class="govuk-heading-l  govuk-!-margin-bottom-8">
                     <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-                    Add and edit your questions
+                    @ViewData["Title"]
                 </h1>
 
                 <div class="govuk-button-group">
@@ -68,7 +68,7 @@
 
                     @foreach (var question in Model.Questions)
                     {
-                        <div id="page_1050713" class="govuk-summary-list__row">
+                        <div id="question-row-@question.Order" class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key app-page-list__key govuk-summary-list__key-s">
                                 @question.Order
                             </dt>
