@@ -97,6 +97,23 @@ export class AddAnswerPage extends BasePage {
     }
 
     // ===== Validations =====
+    async validateAllOptionContents(expectedValues: string[]): Promise<void> {
+        // Locates all the input fields for option content
+        const inputs = this.page.locator('input[name*="OptionContent"]');
+
+        // Get the actual values currently in the browser
+        const actualValues = await inputs.all();
+        const actualTexts = await Promise.all(actualValues.map(input => input.inputValue()));
+
+        // Verify the counts match first
+        expect(actualTexts.length, '❌ Number of answer options does not match expected count').toBe(expectedValues.length);
+
+        // Verify each individual string
+        for (let i = 0; i < expectedValues.length; i++) {
+            expect(actualTexts[i], `❌ Answer option at index ${i} mismatch`).toBe(expectedValues[i]);
+        }
+    }
+
     async assertAllOptionNumberLabelsInOrder(): Promise<void> {
         const labels = this.page.locator('label.govuk-label.govuk-label--s[for*="OptionContent"]');
         const count = await labels.count();
