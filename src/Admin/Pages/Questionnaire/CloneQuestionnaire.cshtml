@@ -3,7 +3,7 @@
 @model Admin.Pages.Questionnaire.CloneQuestionnaire
 
 @{
-  const string title = "Make a copy of your questionnaire";
+  const string title = "Make a copy";
   ViewData["Title"] = title;
 
   const string inputId = nameof(Model.Title);
@@ -23,19 +23,21 @@
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l govuk-!-margin-0">
       <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-      Make a copy
+      @ViewData["Title"]
     </h1>
-    <div class="govuk-hint govuk-!-margin-bottom-8 govuk-!-margin-top-4">
+    <div id="@inputId-hint" class="govuk-hint govuk-!-margin-bottom-8 govuk-!-margin-top-4">
       <p>Give the copy of your questionnaire a name to help you find it later. This name will not be visible to users.</p>
       <p>Next, you will be sent to the 'Design a questionnaire' page for this copy.</p>
     </div>
     <form accept-charset="UTF-8" method="post">
       <input type="hidden" asp-for="@Model.BackLinkSlug"/>
       <govuk-form-group asp-for="@Model.Title">
-        <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
+        <fieldset class="govuk-fieldset" aria-describedby="clone-questionnaire-hint">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
             <h2 class="govuk-fieldset__heading">
-              Questionnaire name
+              <label class="govuk-label govuk-label--m" for="@inputId">
+                Questionnaire name
+              </label>
             </h2>
           </legend>
 

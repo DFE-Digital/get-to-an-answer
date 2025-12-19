@@ -40,6 +40,7 @@ public class QuestionnaireDto
     public bool IsAccessibilityAgreementAccepted { get; set; } = false;
     public string? ContinueButtonText { get; set; }
     public Dictionary<CompletableTask, CompletionStatus>? CompletionTrackingMap { get; set; }
+    public bool IsUnpublished { get; set; }
 }
 
 public class QuestionnaireInfoDto

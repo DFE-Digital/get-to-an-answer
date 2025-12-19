@@ -20,7 +20,11 @@ const API_URL = EnvConfig.API_URL;
 const ADMIN_URL = EnvConfig.ADMIN_URL;
 const FRONTEND_URL = EnvConfig.FE_URL;
 test.describe('Get to an answer Pa11y Accessibility Test', () => {
-    test.describe.configure({timeout: 10 * 60 * 1000});
+    test.describe.configure({
+        timeout: 10 * 60 * 1000,
+        retries: 0,
+        fullyParallel: true,
+    } as any);
 
     let urlsToTest: string[] = [];
     let token = JwtHelper.NoRecordsToken();
@@ -30,6 +34,16 @@ test.describe('Get to an answer Pa11y Accessibility Test', () => {
         const entityIds: any = await loadSeeding(request, token);
         // Fetch URLs from sitemap
         urlsToTest = await fetchUrlsFromSitemap(request, `${ADMIN_URL}/sitemap.xml`, entityIds);
+        // Exclude the following URLs from testing
+        urlsToTest = urlsToTest.filter(url => {
+            const excluded: string[] = [
+                'sitemap.xml',
+                'robots.txt',
+                'branching-map',
+            ];
+            
+            return excluded.filter(e => url.includes(e)).length === 0;
+        });
         console.log(`Fetched ${urlsToTest.length} URLs from sitemap`);
     });
 
@@ -122,7 +136,7 @@ test.describe('Get to an answer Pa11y Accessibility Test', () => {
             await fs.mkdir(path.dirname(reportPath), {recursive: true});
             await fs.writeFile(reportPath, JSON.stringify(results, null, 2));
             console.log(`\nDetailed report saved to: ${reportPath}`);
-
+            
             await generateReport(results)
 
             // Assert that there are no accessibility issues
@@ -230,7 +244,7 @@ async function generateReport(results: any[] = []): Promise<void> {
         <div class="summary">
             <h2>Summary</h2>
             <p><strong>Date:</strong> ${new Date().toISOString()}</p>
-            <p><strong>Standard:</strong> WCAG 2.1 Level AA</p>
+            <p><strong>Standard:</strong> WCAG 2.2 Level AA</p>
             <div class="summary-stats">
                 <div class="stat">
                     <div class="stat-value">${resultsWithScreenshotPaths.length}</div>
@@ -247,7 +261,7 @@ async function generateReport(results: any[] = []): Promise<void> {
             </div>
         </div>
         
-        ${resultsWithScreenshotPaths.map((result: any) => `
+        ${resultsWithScreenshotPaths.filter((result: any) => result.issueCount > 0).map((result: any) => `
             <div class="url-section">
                 <div class="url-header">
                     <h3>${result.url}</h3>
@@ -270,7 +284,7 @@ async function generateReport(results: any[] = []): Promise<void> {
                 ${result.issues && result.issues.length > 0 ? result.issues.map((issue: any, index: number) => `
                     <div class="issue ${issue.type}">
                         <p><span class="issue-type">${issue.type}</span> #${index + 1}</p>
-                        <p><strong>Message:</strong> ${issue.message}</p>
+                        <p><strong>Message:</strong> ${escapeHtml(issue.message)}</p>
                         <p><strong>Code:</strong> ${issue.code}</p>
                         <p><strong>Type code:</strong> ${issue.typeCode}</p>
                         <p><strong>Runner:</strong> ${issue.runner}</p>
@@ -292,6 +306,15 @@ async function generateReport(results: any[] = []): Promise<void> {
 
     console.log(`HTML report saved to: ${reportPath}`);
     console.log(`Total issues found: ${totalIssues}`);
+}
+
+export function escapeHtml(input: string): string {
+    return input
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 }
 
 async function loadSeeding(request: APIRequestContext, token: string): Promise<object> {

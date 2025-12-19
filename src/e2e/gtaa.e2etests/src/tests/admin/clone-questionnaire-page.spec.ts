@@ -6,6 +6,7 @@ import {CloneQuestionnairePage} from '../../pages/admin/CloneQuestionnairePage';
 import {ErrorMessages} from "../../constants/test-data-constants";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
+import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
 
 test.describe('Clone questionnaire page', () => {
     let token: string;
@@ -21,7 +22,6 @@ test.describe('Clone questionnaire page', () => {
         questionnaireTitle = questionnaire.title;
 
         viewQuestionnairePage = await signIn(page, token);
-
     });
 
     test('Make a copy/Clone questionnaire page render with original title', async ({page}) => {
@@ -93,8 +93,7 @@ test.describe('Clone questionnaire page', () => {
     
     test('Cloning questionnaire with invalid title to validate aria-describedby', async ({page}) => {
         await viewQuestionnairePage.table.clickFirstQuestionnaireTitle();
-
-
+        
         designQuestionnairePage = await DesignQuestionnairePage.create(page);
         await designQuestionnairePage.validateHeadingAndStatus();
 
@@ -105,9 +104,38 @@ test.describe('Clone questionnaire page', () => {
         await cloneQuestionnairePage.expectPrefilledTitle(questionnaireTitle);
 
         await cloneQuestionnairePage.clearTitle();
-
         await cloneQuestionnairePage.clickMakeCopy();
         
         await cloneQuestionnairePage.validateTitleFieldAriaDescribedBy();
     })
+
+    test('click back on clone questionnaire page', async ({page}) => {
+        await viewQuestionnairePage.table.clickFirstQuestionnaireTitle();
+
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        await designQuestionnairePage.validateHeadingAndStatus();
+
+        await designQuestionnairePage.openMakeACopyPage();
+
+        cloneQuestionnairePage = await CloneQuestionnairePage.create(page);
+        await cloneQuestionnairePage.clickBackLink();
+        
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        await designQuestionnairePage.validateHeadingAndStatus();
+    });
+
+    test('Validate inline error message missing title', async ({page, browserName}) => {
+        await viewQuestionnairePage.table.clickFirstQuestionnaireTitle();
+
+        designQuestionnairePage = await DesignQuestionnairePage.create(page);
+        await designQuestionnairePage.validateHeadingAndStatus();
+
+        await designQuestionnairePage.openMakeACopyPage();
+        cloneQuestionnairePage = await CloneQuestionnairePage.create(page);
+        
+        await cloneQuestionnairePage.clearTitle();
+        await cloneQuestionnairePage.clickMakeCopy();
+        
+        await cloneQuestionnairePage.validateInlineTitleError();
+    });
 });

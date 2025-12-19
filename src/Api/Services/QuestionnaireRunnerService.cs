@@ -301,7 +301,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             .Where(qv => db.Questionnaires
                 .Any(q => (q.Id == qv.QuestionnaireId && (questionnaireId == null || q.Id == questionnaireId)) &&
                           (questionnaireSlug == null || q.Slug == questionnaireSlug) &&
-                          !new[] {EntityStatus.Deleted, EntityStatus.Private}.Contains(q.Status)))
+                          q.Status != EntityStatus.Deleted && !q.IsUnpublished))
             .OrderByDescending(qv => qv.Version)
             .Select(qv => qv.QuestionnaireJson)
             .FirstOrDefaultAsync();

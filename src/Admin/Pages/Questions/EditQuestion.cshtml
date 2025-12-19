@@ -70,7 +70,7 @@
 
         <h1 class="govuk-heading-l govuk-!-margin-bottom-8">
             <span class="govuk-caption-l">Question @Model.QuestionNumber</span>
-            Edit question
+            @ViewData["Title"]
         </h1>
         <form method="post">
             <input type="hidden" asp-for="@Model.BackLinkSlug" />
@@ -118,6 +118,7 @@
                         <div class="govuk-radios__item">
                             <govuk-input class="govuk-radios__input"
                                          asp-for="QuestionType"
+                                         name="QuestionType"
                                          type="radio"
                                          value="@(option)"
                                          id="@($"{option}-radio")"/>
@@ -132,7 +133,7 @@
                             }
                             else if (option == QuestionType.DropdownSelect)
                             {
-                                <label class="govuk-label govuk-radios__label" for="QuestionType-Dropdown">
+                                <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
                                     One option only (using a <a href="https://design-system.service.gov.uk/components/select/">drop-down</a>)
                                 </label>
                                 <div class="govuk-hint govuk-radios__hint">
@@ -141,7 +142,7 @@
                             }
                             else if (option == QuestionType.MultiSelect)
                             {
-                                <label class="govuk-label govuk-radios__label" for="QuestionType-MultiSelect">
+                                <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
                                     One or more options (using <a href="https://design-system.service.gov.uk/components/checkboxes/">checkboxes</a>)
                                 </label>
                                 <div class="govuk-hint govuk-radios__hint">

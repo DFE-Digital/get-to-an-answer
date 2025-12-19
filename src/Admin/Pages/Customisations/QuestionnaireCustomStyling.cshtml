@@ -5,7 +5,7 @@
 @{
     Layout = "Shared/_Layout";
     
-    ViewData["Title"] = "Customise questionnaire styling";
+    ViewData["Title"] = "Customise styling";
 
     const string textColorId = "text-color";
     const string backgroundColorId = "background-color";
@@ -29,7 +29,8 @@
     <div class="govuk-grid-column-full">
         <h1 class="govuk-heading-l govuk-!-margin-0">
             <span class="govuk-caption-l">@Model.QuestionnaireTitle</span>
-            Customise styling
+            
+            @ViewData["Title"]
         </h1>
 
         <div class="govuk-hint govuk-!-margin-bottom-8">
@@ -221,7 +222,7 @@
             <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
 
             <div class="govuk-form-group">
-                <label class="govuk-label govuk-label--m" for="file-upload">
+                <label class="govuk-label govuk-label--m" for="reset-styling">
                     Reset to DfE styling
                 </label>
                 <p class="govuk-hint">
@@ -259,9 +260,9 @@
                                          type="checkbox"
                                          name="UpdateRequest.IsAccessibilityAgreementAccepted"
                                          value="true"
-                                         aria-describedby="agreed-checkbox-item-hint"
+                                         aria-describedby="accessibility-accepted-hint"
                                          govuk-error-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted"/>
-                            <label class="govuk-label govuk-checkboxes__label" for="Agreed">
+                            <label class="govuk-label govuk-checkboxes__label" for="UpdateRequest-IsAccessibilityAgreementAccepted">
                                 I agree to confirm the customised styling meets accessibility standards
                             </label>
                             <div id="agreed-checkbox-item-hint" class="govuk-hint govuk-checkboxes__hint">

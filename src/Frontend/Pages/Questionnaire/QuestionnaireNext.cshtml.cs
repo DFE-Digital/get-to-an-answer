@@ -69,7 +69,9 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 
             if (NextStateRequest.SelectedAnswerIds.Count > 1)
             {
-                var selectedAnswerId = finalPriorities.OrderBy(kv => kv.Value).First().Key;
+                var selectedAnswerId = finalPriorities
+                    .Where(kv => NextStateRequest.SelectedAnswerIds.Contains(kv.Key))
+                    .OrderBy(kv => kv.Value).First().Key;
                 NextStateRequest.SelectedAnswerIds = [selectedAnswerId];
             }
         

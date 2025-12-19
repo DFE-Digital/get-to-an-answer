@@ -3,7 +3,7 @@ import {
     addContributor,
     createQuestionnaire, deleteQuestionnaire,
     getQuestionnaire,
-    publishQuestionnaire,
+    publishQuestionnaire, unpublishQuestionnaire,
     updateQuestionnaire,
 } from "../../test-data-seeder/questionnaire-data";
 import {AnswerDestinationType, EntityStatus, QuestionType} from "../../constants/test-data-constants";
@@ -39,14 +39,54 @@ test.describe('PUT Publish questionnaire api request', () => {
     test('Validate PUT republish published questionnaire', async ({request}) => {
         const { questionnaire } = await createQuestionnaire(request);
 
-        await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
 
-        await publishQuestionnaire(request, questionnaire.id);
+        await addContributor(request, questionnaire.id, 'user-1')
+
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
+
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
+            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+        })
+
+        const { response: publishResponse } = await publishQuestionnaire(request, questionnaire.id);
+        expect(publishResponse.status()).toBe(204);
         
         // Republish
         const { response } = await publishQuestionnaire(request, questionnaire.id);
 
         expect(response.status()).toBe(400);
+    });
+
+    test('Validate PUT republish unpublished questionnaire', async ({request}) => {
+        const { questionnaire } = await createQuestionnaire(request);
+
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
+
+        await addContributor(request, questionnaire.id, 'user-1')
+
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
+
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
+            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+        })
+        
+        const { response: publishResponse } = await publishQuestionnaire(request, questionnaire.id);
+        expect(publishResponse.status()).toBe(204);
+
+        // Unpublish
+        const { response: response2 } = await unpublishQuestionnaire(request, questionnaire.id)
+        expect(response2.status()).toBe(204);
+
+        // Republish
+        const { response } = await publishQuestionnaire(request, questionnaire.id);
+        expect(response.status()).toBe(204);
+        
+        const { questionnaireGetBody } = await getQuestionnaire(request, questionnaire.id)
+        expect(questionnaireGetBody.status).toBe(EntityStatus.Published);
+        expect(questionnaireGetBody.isUnpublished).toBeFalsy();
     });
 
     test('Validate PUT invalid questionnaire id format', async ({request}) => {

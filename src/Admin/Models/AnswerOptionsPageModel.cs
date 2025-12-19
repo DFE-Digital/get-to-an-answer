@@ -34,6 +34,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         if (!ModelState.IsValid)
         {
+            // RemoveGenericOptionErrors();
             await HydrateOptionListsAsync();
             return Page();
         }
@@ -51,7 +52,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         // Re-render page with the extra option
         return Page();
     }
-
+    
     protected void RemoveModelStateErrorsForFields()
     {
         foreach (var key in ModelState.Keys)
@@ -59,7 +60,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             ModelState[key]?.Errors.Clear();
         }
     }
-
+    
     protected void ReassignOptionNumbers()
     {
         for (var index = 0; index < Options.Count; index++)
@@ -102,11 +103,11 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             ModelState.AddModelError(selectKey, string.Empty);
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
         }
-
+        
         var optionsWithExternalLinkNoSelection = Options.Where(o =>
             o.AnswerDestination == AnswerDestination.ExternalResultsPage &&
             string.IsNullOrEmpty(o.ExternalLink));
-
+        
         foreach (var externalLink in optionsWithExternalLinkNoSelection)
         {
             var index = externalLink.OptionNumber - 1;
@@ -119,18 +120,17 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
         }
     }
-
-    private SelectListItem ToResultsPageSelectListItem(ContentDto content) =>
-        new(!string.IsNullOrWhiteSpace(content.ReferenceName) ? content.ReferenceName : content.Title,
-            content.Id.ToString());
-
+    
+    private SelectListItem ToResultsPageSelectListItem(ContentDto content) => 
+        new(!string.IsNullOrWhiteSpace(content.ReferenceName) ? content.ReferenceName : content.Title, content.Id.ToString());
+    
     protected async Task HydrateOptionListsAsync()
     {
         var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
         var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
-
+        
         QuestionNumber = questions.Max(x => x.Order.ToString());
-
+        
         var questionSelect = questions.Where(x => x.Id != QuestionId)
             .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
         var resultsSelect = resultsPages.Select(ToResultsPageSelectListItem).ToList();
@@ -142,10 +142,9 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             option.ResultsPageSelectList = resultsSelect;
         }
     }
-
+    
     public async Task<IActionResult> OnPostRedirectToBulkEntry(string? returnUrl)
     {
-        ValidateForDuplicateAnswers();
         ValidateSelectedQuestionsIfAny();
         
         var targetUrl = Url.Page("/Answers/BulkAnswerOptions", null, new
@@ -222,7 +221,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         return (questionForSelection, resultsPages, questionSelectionList, resultsPagesForSelection);
     }
-
+    
     protected async Task PopulateOptionSelectionLists()
     {
         var (
@@ -230,8 +229,8 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             _,
             questionSelectionList,
             resultsPagesForSelection
-            ) = await GetPopulatePrerequisites();
-
+        ) = await GetPopulatePrerequisites();
+        
         foreach (var option in Options)
         {
             option.QuestionSelectList = questionSelectionList;

@@ -6,7 +6,7 @@
 
 @{
   Layout = "_Layout";
-  ViewData["Title"] = "Edit your start page";
+  ViewData["Title"] = "Add and edit a start page";
 }
 
 @section BeforeContent
@@ -23,7 +23,7 @@
   <div class="govuk-grid-column-two-thirds">
     <h1 id="questionnaire-start-page-heading" class="govuk-heading-l govuk-!-margin-0">
       <p id="current-questionnaire-title" class="govuk-caption-l">@Model.QuestionnaireTitle</p>
-      Add and edit a start page
+      @ViewData["Title"]
     </h1>
     <div class="govuk-hint govuk-!-margin-top-4">
       <p>You can add a start page to appear before the questions.</p> 

@@ -43,5 +43,7 @@ public class Error(ILogger<Error> logger) : BasePageModel
                 Console.WriteLine($"Exception: {exceptionHandlerPathFeature.Error}");
             }
         }
+        
+        ViewData["Title"] = $"{ErrorMessage}({ErrorCode})";
     }
 }
