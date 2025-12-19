@@ -17,7 +17,10 @@
   var priorityHintIdSuffix = "PriorityHint";
   var destinationIdSuffix = "AnswerDestination";
   var destinationSpecificSelectErrorId = $"{destinationIdSuffix}-specific-error";
+  
+  var destinationInternalSelectErrorId = $"{destinationIdSuffix}-internal-error";
 
+  
   var destinationFormGroupErrorId = Id(destinationIdSuffix);
 }
 
@@ -102,9 +105,9 @@
           @* <govuk-field-error asp-for="SelectedQuestion" error-id="@Id(destinationSpecificSelectErrorId)"> *@
           @* </govuk-field-error> *@
 
-          @if (ViewData.ModelState.TryGetValue($"{prefix}-destination-specific", out var specificEntry) && specificEntry?.Errors.Count > 0)
+          @if (ViewData.ModelState.TryGetValue($"{prefix}-destination-specific", out var destinationSpecificEntry) && destinationSpecificEntry?.Errors.Count > 0)
           {
-            <p id="@Id($"{destinationIdSuffix}-specific-error")" class="govuk-error-message">
+          <p id="@Id($"{destinationIdSuffix}-specific-error")" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> Please select a question
             </p>
           }
@@ -115,7 +118,7 @@
                   asp-items="Model.QuestionSelectList"
                   govuk-error-for="@Id(destinationSpecificSelectErrorId)">
             <option value="">Select a question</option>
-          </select>
+          </select>  
         </div>
       </div>
 
@@ -125,7 +128,8 @@
                      asp-for="AnswerDestination"
                      type="radio"
                      value="@AnswerDestination.InternalResultsPage"
-                     data-aria-controls="@Id("destination-internal-reveal")"/>
+                     data-aria-controls="@Id("destination-internal-reveal")" 
+                     govuk-error-for="@Id(destinationSpecificSelectErrorId)" />
         <label class="govuk-label govuk-radios__label" for="@Id("destination-internal")">
           Results page
         </label>
@@ -135,6 +139,14 @@
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-internal-select")">
             Select a results page
           </label>
+          
+          @if (ViewData.ModelState.TryGetValue($"{prefix}-destination-internal", out var specificEntry) && specificEntry?.Errors.Count > 0)
+          {
+            <p id="@Id($"{destinationIdSuffix}-internal-error")" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> Please select a results page
+            </p>
+          }
+          
           <select class="govuk-select equal-input-width"
                   id="@Id("destination-internal-select")"
                   asp-for="SelectedResultsPage"
@@ -161,6 +173,15 @@
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-external-link")">
             Enter a link
           </label>
+          
+            
+          @if (ViewData.ModelState.TryGetValue($"{prefix}-destination-external", out var externalLinkEntry) && externalLinkEntry?.Errors.Count > 0)
+          {
+            <p id="@Id($"{destinationIdSuffix}-external-error")" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> Please enter an external link
+            </p>
+          }
+          
           <input class="govuk-input equal-input-width"
                  id="@Id("destination-external-link")"
                  asp-for="ExternalLink"/>
