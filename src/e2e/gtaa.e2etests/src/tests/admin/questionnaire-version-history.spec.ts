@@ -322,6 +322,7 @@ test.describe('Get to an answer questionnaire versions history', () => {
     });
     
     test('Questionnaire version history text changes validation after first publish - add question answers', async ({page, request}) => {
+        const externalDestinationUrl = 'https://www.example.com';
         const {questionnaire} = await createQuestionnaire(request, token);
         await updateQuestionnaire(request, questionnaire.id, {slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}`}, token);
         
@@ -331,7 +332,7 @@ test.describe('Get to an answer questionnaire versions history', () => {
 
         await createSingleAnswer(request, {
             questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
-            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: externalDestinationUrl
         }, token)
 
         await signIn(page, token);
@@ -366,11 +367,11 @@ test.describe('Get to an answer questionnaire versions history', () => {
 
         await addAnswerPage.setOptionContent(0, 'First Answer Option');
         await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
-        await addAnswerPage.setExternalLink(0, 'https://www.example.com');
+        await addAnswerPage.setExternalLink(0, externalDestinationUrl);
 
         await addAnswerPage.setOptionContent(1, 'Second Answer Option');
         await addAnswerPage.setOptionHint(1, 'This is the second answer hint');
-        await addAnswerPage.setExternalLink(1, 'https://www.example.com');
+        await addAnswerPage.setExternalLink(1, externalDestinationUrl);
 
         await addAnswerPage.clickSaveAndContinueButton();
 
@@ -405,100 +406,99 @@ test.describe('Get to an answer questionnaire versions history', () => {
             "'This is the first answer hint' was added to the description of answer 1 of question 2",
             "'0' was added to the priority of answer 1 of question 2",
             "'ExternalLink' was added to the destination type of answer 1 of question 2",
-            "'https://www.example.com' was added to the destination url of answer 1 of question 2",
+            `${externalDestinationUrl} was added to the destination url of answer 1 of question 2`,
             "'Second Answer Option' was added to the content of answer 2 of question 2",
             "'This is the second answer hint' was added to the description of answer 2 of question 2",
             "'0' was added to the priority of answer 2 of question 2",
             "'ExternalLink' was added to the destination type of answer 2 of question 2",
-            "'https://www.example.com' was added to the destination url of answer 2 of question 2"
+            `${externalDestinationUrl} was added to the destination url of answer 2 of question 2`
         ];
         await questionnaireVersionHistoryPage.expectChangeTexts(2, expectedList);
     });
+    
+    test('Questionnaire version history text changes validation after first publish - delete question answers', async ({page, request}) => {
+        const questionContent = `Test Question - ${Date.now()}`;
+        const questionDescription = `Test question description - ${Date.now()}`;
+        const answerContent = `Test answer option content - ${Date.now()}`;
+        const answerDescription = `Test Answer description - ${Date.now()}`;
+        const externalDestinationUrl = 'https://www.example.com';
+        
+        const {questionnaire} = await createQuestionnaire(request, token);
+        await updateQuestionnaire(request, questionnaire.id, {slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}`}, token);
 
-    // CARE-1648 bug raised, incorrect version history when deleting items
-    // test('Questionnaire version history text changes validation after first publish - delete question answers', async ({page, request}) => {
-    //     const {questionnaire} = await createQuestionnaire(request, token);
-    //     await updateQuestionnaire(request, questionnaire.id, {slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}`}, token);
-    //
-    //     await addContributor(request, questionnaire.id, 'user-1', token)
-    //     const {question} = await createQuestion(request, questionnaire.id, token, 'Custom test question content',
-    //         QuestionType.SingleSelect, 'Custom test question hint text');
-    //
-    //     await createSingleAnswer(request, {
-    //         questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
-    //         destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
-    //     }, token)
-    //
-    //     await signIn(page, token);
-    //
-    //     // Go to Edit a Questionnaire page and trigger publish flow
-    //     designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaire.id);
-    //
-    //     await designQuestionnairePage.publishQuestionnaire();
-    //     const confirmPublishPage = new PublishQuestionnaireConfirmationPage(page);
-    //     await confirmPublishPage.expectTwoRadiosPresent();
-    //     await confirmPublishPage.chooseYes();
-    //     await confirmPublishPage.clickContinue();
-    //
-    //     // Should land back on the tracking page for this questionnaire
-    //     await expect(page).toHaveURL(new RegExp(`/admin/questionnaires/${questionnaire.id}.*/track`));
-    //
-    //     // Delete an answer
-    //     addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaire.id, question.id);
-    //     await addAnswerPage.expectAnswerHeadingOnPage();
-    //
-    //     await addAnswerPage.removeOption(0);
-    //     await addAnswerPage.clickSaveAnswersButton();
-    //
-    //     // Delete the question
-    //     addQuestionPage = await AddQuestionPage.create(page);
-    //     await addQuestionPage.clickDeleteQuestion();
-    //
-    //     const deleteConfirmationPage = new DeleteQuestionConfirmationPage(page);
-    //     await deleteConfirmationPage.validateOnPage();
-    //     await deleteConfirmationPage.selectYes();
-    //     await deleteConfirmationPage.clickContinue();
-    //
-    //     viewQuestionPage = new ViewQuestionPage(page);
-    //     await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
-    //     await viewQuestionPage.assertQuestionDeletionSuccessBanner();
-    //     await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
-    //     await viewQuestionPage.markFinishedEditing(true);
-    //     await viewQuestionPage.saveAndContinue();
-    //
-    //     // Open questionnaire version history
-    //     await designQuestionnairePage.openVersionHistory();
-    //     questionnaireVersionHistoryPage = new QuestionnaireVersionHistoryPage(page);
-    //
-    //     const lisQuestionnaireResponse = await listQuestionnaires(request, token);
-    //     const list: any[] = lisQuestionnaireResponse.questionnaireGetBody
-    //     expect(list.length).toBeGreaterThan(0);
-    //     const firstQuestionnaire = list[0];
-    //
-    //     await questionnaireVersionHistoryPage.clickShowChanges(2);
-    //
-    //     // Expected text values
-    //     const expectedList = [
-    //         "the status was changed from 'Published' to 'Draft'",
-    //         "'Completed' was added to the add questions and answers",
-    //         //`${questionContent} was added to the content of question 2`,
-    //         //`${questionHintText} was added to the description of question 2`,
-    //         "'2' was added to the order of question 2",
-    //         "'0' was added to the status of question 2",
-    //         "'DropdownSelect' was added to the type of question 2",
-    //         "'First Answer Option' was added to the content of answer 1 of question 2",
-    //         "'This is the first answer hint' was added to the description of answer 1 of question 2",
-    //         "'0' was added to the priority of answer 1 of question 2",
-    //         "'ExternalLink' was added to the destination type of answer 1 of question 2",
-    //         "'https://www.example.com' was added to the destination url of answer 1 of question 2",
-    //         "'Second Answer Option' was added to the content of answer 2 of question 2",
-    //         "'This is the second answer hint' was added to the description of answer 2 of question 2",
-    //         "'0' was added to the priority of answer 2 of question 2",
-    //         "'ExternalLink' was added to the destination type of answer 2 of question 2",
-    //         "'https://www.example.com' was added to the destination url of answer 2 of question 2"
-    //     ];
-    //     await questionnaireVersionHistoryPage.expectChangeTexts(2, expectedList);
-    // });
+        await addContributor(request, questionnaire.id, 'user-1', token)
+        const {question} = await createQuestion(request, questionnaire.id, token, questionContent,
+            QuestionType.SingleSelect, questionDescription);
+
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id, questionId: question.id, content: answerContent, description: answerDescription,
+            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: externalDestinationUrl
+        }, token)
+
+        await signIn(page, token);
+
+        // Go to Edit a Questionnaire page and trigger publish flow
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaire.id);
+
+        await designQuestionnairePage.publishQuestionnaire();
+        const confirmPublishPage = new PublishQuestionnaireConfirmationPage(page);
+        await confirmPublishPage.expectTwoRadiosPresent();
+        await confirmPublishPage.chooseYes();
+        await confirmPublishPage.clickContinue();
+
+        // Should land back on the tracking page for this questionnaire
+        await expect(page).toHaveURL(new RegExp(`/admin/questionnaires/${questionnaire.id}.*/track`));
+
+        // Delete an answer
+        addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaire.id, question.id);
+        await addAnswerPage.expectAnswerHeadingOnPage();
+
+        await addAnswerPage.removeOption(0);
+        await addAnswerPage.clickSaveAnswersButton();
+
+        // Delete the question
+        addQuestionPage = await AddQuestionPage.create(page);
+        await addQuestionPage.clickDeleteQuestion();
+
+        const deleteConfirmationPage = new DeleteQuestionConfirmationPage(page);
+        await deleteConfirmationPage.validateOnPage();
+        await deleteConfirmationPage.selectYes();
+        await deleteConfirmationPage.clickContinue();
+
+        viewQuestionPage = new ViewQuestionPage(page);
+        await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
+        await viewQuestionPage.assertQuestionDeletionSuccessBanner();
+        await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
+        await viewQuestionPage.markFinishedEditing(true);
+        await viewQuestionPage.saveAndContinue();
+
+        // Open questionnaire version history
+        await designQuestionnairePage.openVersionHistory();
+        questionnaireVersionHistoryPage = new QuestionnaireVersionHistoryPage(page);
+
+        const lisQuestionnaireResponse = await listQuestionnaires(request, token);
+        const list: any[] = lisQuestionnaireResponse.questionnaireGetBody
+        expect(list.length).toBeGreaterThan(0);
+        const firstQuestionnaire = list[0];
+
+        await questionnaireVersionHistoryPage.clickShowChanges(2);
+
+        // Expected text values
+        const expectedList = [
+            "the status was changed from 'Published' to 'Draft",
+            "'Completed' was added to the add questions and answers",
+            `${questionContent} was deleted from the content of question 1`,
+            `${questionDescription} was deleted from the description of question 1`,
+            "'1' was deleted from the order of question 1",
+            "'SingleSelect' was deleted from the type of question 1",
+            `${answerContent} was deleted from the content of answer 1 of question 1`,
+            `${answerDescription} was deleted from the description of answer 1 of question 1`,
+            "'0' was deleted from the priority of answer 1 of question 1",
+            "'ExternalLink' was deleted from the destination type of answer 1 of question 1",
+            `${externalDestinationUrl} was deleted from the destination url of answer 1 of question 1`
+        ];
+        await questionnaireVersionHistoryPage.expectChangeTexts(2, expectedList);
+    });
     
     async function validateVersionHistoryLevel(
         questionnaireVersionHistoryPage: QuestionnaireVersionHistoryPage,
