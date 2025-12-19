@@ -47,7 +47,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         try
         {
-            await UpdateOrCreateAnswers();
+                await UpdateOrCreateAnswers();
         }
         catch (Exception e)
         {

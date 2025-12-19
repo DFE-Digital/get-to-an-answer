@@ -196,7 +196,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
 
-        foreach (var existingAnswer in existingStoredAnswers)
+        foreach (var existingAnswer in existingStoredAnswers.Where(a => !DeletedAnswerIds.Contains(a.Id)))
         {
             if (existingAnswerOptionIds.Contains(existingAnswer.Id))
                 continue;
