@@ -91,13 +91,20 @@ test.describe('Get to an answer update questionnaire', () => {
     
     test('Successful submit updates title and validation', async ({request, page}) => {
         viewQuestionnairePage = await signIn(page, token);
-        addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
+        
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);
+        await designQuestionnairePage.openEditQuestionnaireName();
 
+        addQuestionnairePage = await AddQuestionnairePage.create(page);
+        
         // Capture the original title before updating
         const originalTitle = questionnaireGetResponse.questionnaireGetBody.title;
         expect(originalTitle).toBeDefined();
 
         const newTitle = `Updated questionnaire title - ${Date.now()}`;
+        const currentTitle = await addQuestionnairePage.getCurrentTitle();
+        expect(currentTitle).toBe(originalTitle);
+
         await addQuestionnairePage.enterTitle(newTitle);
         await addQuestionnairePage.clickSaveAndContinue();
 
