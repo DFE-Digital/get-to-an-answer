@@ -10,6 +10,7 @@ import {AddBulkAnswerOptionsPage} from "../../pages/admin/AddBulkAnswerOptionsPa
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
 import {AddQuestionPage, QuestionRadioLabel} from "../../pages/admin/AddQuestionPage";
 import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
+import {EditAnswerTable} from "../../pages/admin/components/EditAnswerTable";
 
 
 test.describe('Get to an answer Add bulk answers options to question', () => {
@@ -19,6 +20,7 @@ test.describe('Get to an answer Add bulk answers options to question', () => {
     let addQuestionPage : AddQuestionPage;
     let viewQuestionsPage : ViewQuestionPage;
     let addAnswerPage : AddAnswerPage;
+    let editAnswersTable : EditAnswerTable;
     
     test.beforeEach(async ({request, page}) => {
         token = JwtHelper.NoRecordsToken();
@@ -68,6 +70,6 @@ test.describe('Get to an answer Add bulk answers options to question', () => {
         
         await viewQuestionsPage.clickFirstEditQuestionLink();
         
-        await addQuestionPage
+        await addQuestionPage.table.validateAnswerTableRows(bulkAddAnswersPage.getEnteredBulkOptions);
     })
 })
