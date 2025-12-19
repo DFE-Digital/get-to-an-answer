@@ -1,15 +1,14 @@
-import {Page, Locator, expect, BrowserContext, Cookie} from '@playwright/test';
-
+import {Page, Locator, expect} from '@playwright/test';
 type LoadState = 'domcontentloaded' | 'load' | 'networkidle';
 
 export class BasePage {
     protected readonly page: Page;
 
     //Locators for web page Header
-    public readonly dfeWebsiteLink: Locator;
-    public readonly WebsiteAdminName: Locator;
-    public readonly WebsiteNameLink: Locator;
-    public readonly SignOutLink: Locator;
+    public readonly loggedInUserName: Locator;
+    public readonly websiteNameLink: Locator;
+    public readonly supportLink: Locator;
+    public readonly signOutLink: Locator;
     public readonly defaultLogo: Locator;
     public readonly logoLink: Locator;
 
@@ -38,10 +37,16 @@ export class BasePage {
         // ===== Locators for web page header =====
         this.logoLink = page.locator('a.govuk-header__link--homepage');
         this.defaultLogo = page.locator('img.govuk-header__logotype');
-        this.dfeWebsiteLink = page.locator('header.dfe-header a.dfe-header__link--service');
-        this.WebsiteAdminName = page.locator('nav .govuk-service-navigation__text');
-        this.WebsiteNameLink = page.locator('nav .govuk-service-navigation__link');
-        this.SignOutLink = page.getByRole('link', {name: /sign out/i});
+        this.loggedInUserName = page.locator('span.govuk-service-navigation__text');
+        this.websiteNameLink = page.locator(
+            'a.govuk-service-navigation__link',
+            {hasText: 'Get to an answer'}
+        );
+        this.supportLink = page.locator(
+            'a.govuk-service-navigation__link',
+            {hasText: 'Support'}
+        );
+        this.signOutLink = page.getByRole('link', {name: /sign out/i});
 
         // ===== Locators for web page Footers =====
         this.footer = page.locator('footer.govuk-footer');
@@ -53,7 +58,7 @@ export class BasePage {
     async navigateTo(url: string, waitUntil: LoadState = 'networkidle'): Promise<void> {
         await this.page.goto(url, {waitUntil});
     }
-    
+
     // ===== Actions =====
     // Wait for the page to load
     async waitForPageLoad() {
@@ -74,26 +79,20 @@ export class BasePage {
             await expect(this.cookieBanner).toBeHidden();
         }
     }
-    
+
     // ===== Verify header Links are visible =====
     async verifyPublicHeaderLinks() {
-        //await expect(this.WebsiteNameLink).toHaveText(/Support for/i); //TBC
-        await expect(this.WebsiteNameLink, '❌ Website name link is not visible on the page').toBeVisible();
-
-        await expect(this.logoLink,'❌ Logo link is not visible on the page').toBeVisible();
+        await expect(this.websiteNameLink, '❌ Website name link is not visible on the page').toBeVisible();
+        await expect(this.logoLink, '❌ Logo link is not visible on the page').toBeVisible();
         await expect(this.defaultLogo, '❌ Default logo is not visible on the page').toBeVisible();
     }
+
     async verifyHeaderLinks() {
-        //await expect(this.WebsiteNameLink).toHaveText(/Support for/i); //TBC
-        //await expect(this.WebsiteNameLink, '❌ Website name link is not visible on the page').toBeVisible();
-
-        await expect(this.WebsiteAdminName, '❌ Admin name is not visible on the page').toBeVisible();
-
-        await expect(this.logoLink,'❌ Logo link is not visible on the page').toBeVisible();
+        await expect(this.websiteNameLink, '❌ Website name link is not visible on the page').toBeVisible();
+        await expect(this.loggedInUserName, '❌ Logged in username is not visible on the page').toBeVisible();
+        await expect(this.logoLink, '❌ Logo link is not visible on the page').toBeVisible();
         await expect(this.defaultLogo, '❌ Default logo is not visible on the page').toBeVisible();
-
-        //await expect(this.SignOutLink).toHaveText(/Support for/i); TBC
-        await expect(this.SignOutLink, '❌ Sign out link is not visible on the page').toBeVisible();
+        await expect(this.signOutLink, '❌ Sign out link is not visible on the page').toBeVisible();
     }
 
     // ===== Verify footer Links are visible =====
@@ -104,7 +103,7 @@ export class BasePage {
         // Verify the "Cookie policy" link(in Footer)
         await expect(this.cookiePolicyLinkInFooter).toBeVisible();
         await expect(this.cookiePolicyLinkInFooter).toContainText('Cookie policy');
-        //await expect(this.cookiePolicyLinkInFooter).toHaveAttribute('href', 'Cookie policy'); //TBC
+        await expect(this.cookiePolicyLinkInFooter).toHaveAttribute('href', '/cookie-policy');
 
         // Verify the footer logo and licence description
         await expect(this.licenceLogo).toBeVisible();

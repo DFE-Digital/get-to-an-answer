@@ -85,6 +85,11 @@ export class AddQuestionnairePage extends BasePage {
         await this.titleInput.fill(title);
     }
 
+    async getCurrentTitle(): Promise<string> {
+        const currentTitle = await this.titleInput.inputValue();
+        return currentTitle.trim();
+    }
+
     async enterInvalidTitle(): Promise<void> {
         await this.titleInput.fill(`${' '.repeat(10)}`);
     }

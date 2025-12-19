@@ -4,6 +4,8 @@ import {AddQuestionPage} from "../../pages/admin/AddQuestionPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {
+    goToAddAnswerPageByUrl,
+    goToAddResultPagePageByUrl,
     goToUpdateAnswerPageByUrl,
     goToUpdateQuestionPageByUrl,
     signIn
@@ -11,6 +13,8 @@ import {
 import {AnswerDestinationType, PageHeadings, QuestionType} from "../../constants/test-data-constants";
 import {createQuestion} from "../../test-data-seeder/question-data";
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";
+import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
+import {AddResultsPagePage} from "../../pages/admin/AddResultsPagePage";
 
 test.describe('Update answers to a question', () => {
     let token: string;
@@ -21,7 +25,8 @@ test.describe('Update answers to a question', () => {
 
     let addQuestionPage: AddQuestionPage;
     let addAnswerPage: AddAnswerPage;
-
+    let addResultsPagePage: AddResultsPagePage;
+    
     test.beforeEach(async ({request, page}) => {
         token = JwtHelper.NoRecordsToken();
         const {questionnaire} = await createQuestionnaire(request, token);
@@ -109,31 +114,81 @@ test.describe('Update answers to a question', () => {
         await addAnswerPage.asserPageElementsUponLanding(0, 3);
     });
 
-    // TBC, CARE-1579 bug raised to be covered later during accessibility testing
-    // test('Accessible ids and aria-describedby for multiple options with hint', async ({page}) => {
-    //     await signIn(page, token);
-    //
-    //     addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
-    //     await addAnswerPage.expectAnswerHeadingOnPage();
-    //    
-    //     // Verify aria-describedby includes hint ids (no errors present)
-    //     await addAnswerPage.validateAriaDescribedByWithHintOnly(0);
-    //     await addAnswerPage.validateAriaDescribedByWithHintOnly(1);
-    //     await addAnswerPage.validateAriaDescribedByWithHintOnly(2);
-    // })
+    test('Validate reference name is selected when answer destination is internal results page - edit answer', async ({page}) => {
+        await signIn(page, token);
 
-    // TBC, CARE-1579 bug raised to be covered later during accessibility testing
+        // Add a new results page
+        addResultsPagePage = await goToAddResultPagePageByUrl(page, questionnaireId);
+        await addResultsPagePage.expectAddResultsPageHeadingOnPage(PageHeadings.ADD_RESULTS_PAGE_PAGE_HEADING);
+
+        const resultsPageTitleInput = `Test title - ${Date.now()}`;
+        await addResultsPagePage.enterResultsPageTitleInput(resultsPageTitleInput);
+        const resultsPageDetailsText = `Test details text - ${Date.now()}`;
+        await addResultsPagePage.enterResultsPageDetailsText(resultsPageDetailsText);
+        const resultsPageRefNameInput = `Test ref name - ${Date.now()}`;
+        await addResultsPagePage.enterResultsPageRefNameInput(resultsPageRefNameInput);
+        await addResultsPagePage.clickSaveAndContinue();
+
+        addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
+
+        // Update answers destination
+        await addAnswerPage.setInternalLink(0, resultsPageRefNameInput);
+        await addAnswerPage.setInternalLink(1, resultsPageRefNameInput);
+        await addAnswerPage.clickSaveAnswersButton();
+        
+        addQuestionPage = await AddQuestionPage.create(page);
+        await addQuestionPage.expectAddQuestionHeadingOnPage(PageHeadings.EDIT_QUESTION_PAGE_HEADING);
+    })
+
+    test('Validate results page title is selected when answer destination is internal results page - edit answer', async ({page}) => {
+        await signIn(page, token);
+
+        // Add a new results page
+        addResultsPagePage = await goToAddResultPagePageByUrl(page, questionnaireId);
+        await addResultsPagePage.expectAddResultsPageHeadingOnPage(PageHeadings.ADD_RESULTS_PAGE_PAGE_HEADING);
+
+        const resultsPageTitleInput = `Test title - ${Date.now()}`;
+        await addResultsPagePage.enterResultsPageTitleInput(resultsPageTitleInput);
+        const resultsPageDetailsText = `Test details text - ${Date.now()}`;
+        await addResultsPagePage.enterResultsPageDetailsText(resultsPageDetailsText);
+        await addResultsPagePage.clickSaveAndContinue();
+
+        addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
+
+        // Update answers destination
+        await addAnswerPage.setInternalLink(0, resultsPageTitleInput);
+        await addAnswerPage.setInternalLink(1, resultsPageTitleInput);
+        await addAnswerPage.clickSaveAnswersButton();
+
+        addQuestionPage = await AddQuestionPage.create(page);
+        await addQuestionPage.expectAddQuestionHeadingOnPage(PageHeadings.EDIT_QUESTION_PAGE_HEADING);
+    })
+    
+    test('Accessible ids and aria-describedby for multiple options with hint', async ({page}) => {
+        await signIn(page, token);
+
+        addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
+        await addAnswerPage.expectAnswerHeadingOnPage();
+
+        await addAnswerPage.validateUniqueIdsForMultipleOptions(2);
+        
+        // Verify aria-describedby includes hint ids (no errors present)
+        await addAnswerPage.validateAriaDescribedByForHintOnly(0);
+        await addAnswerPage.validateAriaDescribedByForHintOnly(1);
+    })
+
+    // TBC, CARE-1579 bug raised
     // test('Accessible ids and aria-describedby for multiple options with error', async ({page}) => {
     //     await signIn(page, token);
     //
     //     addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
     //     await addAnswerPage.expectAnswerHeadingOnPage();
-    //    
+    //
     //     await addAnswerPage.clickSaveAnswersButton();
     //     await addAnswerPage.validateUniqueIdsForMultipleOptions(2);
     //
     //     // Verify aria-describedby includes both hint id and error id when error is present
-    //     await addAnswerPage.validateAriaDescribedByWithHintAndError(0);
-    //     await addAnswerPage.validateAriaDescribedByWithHintAndError(1);
+    //     await addAnswerPage.validateAriaDescribedByWithError(0);
+    //     await addAnswerPage.validateAriaDescribedByWithError(1);
     // })
 });
