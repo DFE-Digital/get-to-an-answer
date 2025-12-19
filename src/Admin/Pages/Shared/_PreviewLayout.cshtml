@@ -16,7 +16,8 @@
         languageCode = "en";
     }
 
-    ViewBag.FullName = User.FindFirst(ClaimTypes.Name)?.Value;
+    ViewBag.FullName = User.FindFirst(ClaimTypes.Name)?.Value ??
+                       User.FindFirst("name")?.Value;
 
     var configViewModel = new ConfigViewModel();
     
@@ -152,10 +153,11 @@
                         <li class="govuk-service-navigation__item app-service-navigation__item--featured">
                             <span class="govuk-service-navigation__text">@ViewBag.FullName</span>
                         </li>
+                        
                         @if (User?.Identity?.IsAuthenticated == true)
                         {
                             <li class="govuk-service-navigation__item">
-                                <a class="govuk-service-navigation__link" aria-current="true" href="/sign-out">Sign out</a>
+                                <a class="govuk-service-navigation__link" aria-current="true" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignOut">Sign out</a>
                             </li>
                         }
                     </ul>

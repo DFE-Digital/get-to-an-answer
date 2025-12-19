@@ -11,5 +11,6 @@ public enum CompletableTask
     CustomiseStyling = 7,
     AddCustomButton = 8,
     AddQuestionnaireSlug = 9,
-    PublishQuestionnaire = 10
+    PublishQuestionnaire = 10,
+    AddContributors = 11
 }

@@ -70,6 +70,12 @@ public class AddQuestionnaireStart(IApiClient apiClient, ILogger<AddQuestionnair
                 DisplayTitle = DisplayTitle ?? string.Empty,
                 Description = Description ?? string.Empty,
             });
+                
+            await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+            {
+                Task = CompletableTask.AddStartPage,
+                Status = CompletionStatus.Completed
+            });
             
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustAddedStartPage = true });
             

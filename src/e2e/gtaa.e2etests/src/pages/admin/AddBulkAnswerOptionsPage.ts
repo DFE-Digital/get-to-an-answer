@@ -15,6 +15,16 @@ export class AddBulkAnswerOptionsPage extends BasePage {
     private readonly inlineError: Locator;
     private readonly formGroup: Locator;
 
+    private readonly enteredBulkOptions: string[] = [];
+    
+    public get getEnteredBulkOptions(): string[] {
+        return this.enteredBulkOptions;
+    }
+
+     public clearEnterBulkOptions(): void {
+        this.enteredBulkOptions.length = 0;
+    }
+    
     constructor(page: Page) {
         super(page);
 
@@ -39,6 +49,18 @@ export class AddBulkAnswerOptionsPage extends BasePage {
 
     async enterBulkOptions(text: string): Promise<void> {
         await this.bulkTextArea.fill(text);
+    }
+
+    async enterNumberOfValidBulkOptions(numberOfOptions : number): Promise<void> {
+        let bulkText = '';
+        
+        for (let i = 0; i < numberOfOptions; i++) {
+            const randomString = Math.random().toString(36).substring(2, 8);
+            const inputString = `Option ${randomString}`;
+            this.enteredBulkOptions.push(inputString);
+            bulkText += `${inputString}\n`;
+        }
+        await this.bulkTextArea.fill(bulkText);
     }
 
     async clearBulkOptions(): Promise<void> {

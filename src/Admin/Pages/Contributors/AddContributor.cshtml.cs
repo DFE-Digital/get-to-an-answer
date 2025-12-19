@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Common.Client;
 using Common.Domain.Request.Add;
 using Common.Domain.Request.Create;
+using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
@@ -42,6 +43,12 @@ public class AddContributor(ILogger<AddContributor> logger,
             await apiClient.AddQuestionnaireContributor(QuestionnaireId, new AddContributorRequestDto()
             {
                 Id = graphUser.Id
+            });
+            
+            await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+            {
+                Task = CompletableTask.AddContributors,
+                Status = CompletionStatus.Completed
             });
 
             TempData[nameof(QuestionnaireState)] =

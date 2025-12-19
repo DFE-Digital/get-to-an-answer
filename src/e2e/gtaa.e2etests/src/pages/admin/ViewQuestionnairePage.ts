@@ -11,6 +11,10 @@ export class ViewQuestionnairePage extends BasePage {
     private readonly questionnaireHeading: Locator;
     private readonly createNewQuestionnaireButton: Locator;
     private readonly tableHeaders: Locator;
+    
+    // ===== Banner =====
+    private readonly justDeletedBannerText: Locator;
+    private readonly justDeletedBannerSubText: Locator;
 
     // ===== Embedded component =====
     readonly table: ViewQuestionnaireTable;
@@ -32,6 +36,9 @@ export class ViewQuestionnairePage extends BasePage {
         this.tableHeaders = this.page.locator('table th');
 
         this.table = new ViewQuestionnaireTable(page);
+
+        this.justDeletedBannerText = this.page.locator('#just-deleted-banner-text');
+        this.justDeletedBannerSubText = this.page.locator('#just-deleted-banner-sub-text');
     }
 
     // ===== Actions =====
@@ -89,5 +96,18 @@ export class ViewQuestionnairePage extends BasePage {
         
         const tabIndex = await this.section.getAttribute('tabindex');
         expect(tabIndex, '❌ Region is not focusable - missing tabindex').not.toBeNull();
+    }
+    
+    async assertQuestionnaireDeletionSuccessBanner(expectedText: string, expectedSubtext: string): Promise<void> {
+        await expect(this.justDeletedBannerText).toBeVisible();
+        await expect(this.justDeletedBannerText).toHaveText(expectedText);
+        
+        await expect(this.justDeletedBannerSubText).toBeVisible();
+        await expect(this.justDeletedBannerSubText).toHaveText(expectedSubtext);
+    }
+
+    async assertNoQuestionnaireDeletionSuccessBanner(): Promise<void> {
+        await expect(this.justDeletedBannerText).toBeVisible();
+        await expect(this.justDeletedBannerSubText).toBeVisible();
     }
 }

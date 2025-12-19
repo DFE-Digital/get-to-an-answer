@@ -2,6 +2,7 @@ using Common.Client;
 using Common.Domain;
 using Common.Domain.Admin;
 using Common.Domain.Request.Update;
+using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
@@ -59,6 +60,13 @@ public class QuestionnaireCustomStyling(
 
             await apiClient.UpdateQuestionnaireStylingAsync(QuestionnaireId, UpdateRequest);
             
+            await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+            {
+                Task = CompletableTask.CustomiseStyling,
+                Status = imageName is null ? 
+                    CompletionStatus.Optional : CompletionStatus.Completed
+            });
+            
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustResetStyling = true });
             
             return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
@@ -71,6 +79,13 @@ public class QuestionnaireCustomStyling(
                 await imageStorageClient.DeleteImageAsync($"{QuestionnaireId}/{questionnaire.DecorativeImage}");
                 
                 await apiClient.DeleteQuestionnaireDecorativeImageAsync(QuestionnaireId);
+                
+                await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+                {
+                    Task = CompletableTask.CustomiseStyling,
+                    Status = IsStylingDefault(UpdateRequest) ? 
+                        CompletionStatus.Optional : CompletionStatus.Completed
+                });
                 
                 TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustRemovedStartPageImage = true });
                 
@@ -104,8 +119,28 @@ public class QuestionnaireCustomStyling(
 
         await apiClient.UpdateQuestionnaireStylingAsync(QuestionnaireId, UpdateRequest);
         
+        await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+        {
+            Task = CompletableTask.CustomiseStyling,
+            Status = IsStylingDefault(UpdateRequest) ? 
+                CompletionStatus.Optional : CompletionStatus.Completed
+        });
+        
         TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustCustomisedStyling = true });
 
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
+    }
+
+    private bool IsStylingDefault(UpdateCustomStylingRequestDto request)
+    {
+        var defaultStyling = new UpdateCustomStylingRequestDto();
+        
+        return request.TextColor == defaultStyling.TextColor && 
+               request.BackgroundColor == defaultStyling.BackgroundColor && 
+               request.PrimaryButtonColor == defaultStyling.PrimaryButtonColor && 
+               request.SecondaryButtonColor == defaultStyling.SecondaryButtonColor && 
+               request.StateColor == defaultStyling.StateColor && 
+               request.ErrorMessageColor == defaultStyling.ErrorMessageColor &&
+               request.DecorativeImage == defaultStyling.DecorativeImage;
     }
 }

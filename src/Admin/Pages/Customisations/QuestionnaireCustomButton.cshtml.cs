@@ -2,6 +2,7 @@ using Common.Client;
 using Common.Domain;
 using Common.Domain.Admin;
 using Common.Domain.Request.Update;
+using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
@@ -35,6 +36,13 @@ public class QuestionnaireCustomButton(
     {
         await apiClient.UpdateContinueButtonAsync(QuestionnaireId, UpdateRequest);
 
+        await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+        {
+            Task = CompletableTask.AddCustomButton,
+            Status = UpdateRequest.ContinueButtonText != "Continue" ? 
+                CompletionStatus.Completed : CompletionStatus.Optional
+        });
+        
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
     }
 }

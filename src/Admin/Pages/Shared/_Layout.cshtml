@@ -2,6 +2,8 @@
 @using System.Security.Claims
 @using Common.Models.ViewModels
 @using Common.Configuration
+@using Common.Models.PageModels
+@using Microsoft.Identity.Web
 
 @inject IWebHostEnvironment WebHostEnvironment
 
@@ -12,7 +14,8 @@
         languageCode = "en";
     }
 
-    ViewBag.FullName = User.FindFirst(ClaimTypes.Name)?.Value;
+    ViewBag.FullName = User.FindFirst(ClaimTypes.Name)?.Value ??
+                       User.FindFirst("name")?.Value;
 
     var configViewModel = new ConfigViewModel();
 }
@@ -98,7 +101,7 @@
                     @if (User?.Identity?.IsAuthenticated == true)
                     {
                         <li class="govuk-service-navigation__item">
-                            <a class="govuk-service-navigation__link" aria-current="true" href="/sign-out">Sign out</a>
+                            <a class="govuk-service-navigation__link" aria-current="true" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignOut">Sign out</a>
                         </li>
                     }
                 </ul>
@@ -123,7 +126,7 @@
 <div class="govuk-width-container @ViewBag.ContainerClasses" id="main-content-container">
     @await RenderSectionAsync("BeforeContent", required: false)
     <main class="govuk-main-wrapper @ViewBag.MainClasses" id="main-content" role="main" lang="@ViewBag.MainLang">
-        @if (Model.GtaaApiErrorMessage != null)
+        @if (Model is BasePageModel && Model.GtaaApiErrorMessage != null)
         {
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
