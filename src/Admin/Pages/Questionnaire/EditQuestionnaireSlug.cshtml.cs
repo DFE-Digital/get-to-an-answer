@@ -47,6 +47,13 @@ public class EditQuestionnaireSlug(IApiClient apiClient, ILogger<EditQuestionnai
             try
             {
                 await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, updateQuestionnaireRequest);
+                
+                await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+                {
+                    Task = CompletableTask.AddQuestionnaireSlug,
+                    Status = string.IsNullOrWhiteSpace(Slug) ? 
+                        CompletionStatus.NotStarted : CompletionStatus.Completed
+                });
             }
             catch (GetToAnAnswerApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
             {

@@ -39,6 +39,7 @@
                      type="text"
                      name="@nameof(Model.Title)"
                      asp-for="@Model.Title"
+                     value="@(Model.Title ?? Model.QuestionnaireTitle)"
                      govuk-error-for="@Model?.Title"/>
       </govuk-form-group>
       <button type="submit" formnovalidate="formnovalidate" class="govuk-button" data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">Save and continue</button>

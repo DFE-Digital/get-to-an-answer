@@ -111,13 +111,13 @@
       <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="edit-start-page-status"
+            <a class="govuk-link govuk-task-list__link" aria-describedby="edit-start-page-completion-status"
                id="edit-start-page"
                href="/admin/questionnaires/@questionnaire?.Id/start-page/edit">
               Add or edit start page
             </a>
           </div>
-          <div class="govuk-task-list__status" id="edit-start-page-status">
+          <div class="govuk-task-list__status" id="edit-start-page-completion-status">
             @OptionalStatusTag(CompletableTask.AddStartPage)
           </div>
         </li>
@@ -126,22 +126,22 @@
             
             <a class="govuk-link govuk-task-list__link"
                id="edit-questions"
-               aria-describedby="create-your-questionnaire-2-status"
+               aria-describedby="edit-questions-completion-status"
                href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">
               Add or edit questions and answers
             </a>
           </div>
-          <div class="govuk-task-list__status" id="create-your-questionnaire-2-status">
+          <div class="govuk-task-list__status" id="edit-questions-completion-status">
             @TaskStatusTag(CompletableTask.AddQuestionsAndAnswers)
           </div>
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status"
+            <a class="govuk-link govuk-task-list__link" aria-describedby="results-page-completion-status"
                id="edit-results-pages"
                href="/admin/questionnaires/@questionnaire?.Id/contents">Add or edit results pages</a>
           </div>
-          <div class="govuk-task-list__status" id="edit-results-pages-status">
+          <div class="govuk-task-list__status" id="results-page-completion-status">
             @OptionalStatusTag(CompletableTask.AddContents)
           </div>
         </li>
@@ -150,24 +150,24 @@
       <ul class="govuk-task-list">
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status"
+            <a class="govuk-link govuk-task-list__link" aria-describedby="edit-button-completion-status"
                id="edit-button-text"
                href="/admin/questionnaires/@questionnaire?.Id/edit-continue-button">Edit button text</a>
           </div>
-          <div class="govuk-task-list__status" id="create-your-questionnaire-1-status">
+          <div class="govuk-task-list__status" id="edit-button-completion-status">
             @OptionalStatusTag(CompletableTask.AddCustomButton)
           </div>
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
           <div class="govuk-task-list__name-and-hint">
-            <a class="govuk-link govuk-task-list__link" aria-describedby="create-your-questionnaire-1-status"
+            <a class="govuk-link govuk-task-list__link" aria-describedby="customise-styling-completion-status"
                id="customise-styling"
                href="/admin/questionnaires/@questionnaire?.Id/styling">
               Customise styling
             </a>
           </div>
-          <div class="govuk-task-list__status">
-            @OptionalStatusTag(CompletableTask.AddContents)
+          <div class="govuk-task-list__status" id="customise-styling-completion-status">
+            @OptionalStatusTag(CompletableTask.CustomiseStyling)
           </div>
         </li>
       </ul>

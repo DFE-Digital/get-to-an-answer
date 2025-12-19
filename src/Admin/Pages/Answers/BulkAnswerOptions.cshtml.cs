@@ -4,10 +4,12 @@ using Common.Domain.Request.Create;
 using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Admin.Pages.Answers;
 
+[Authorize]
 public partial class BulkAnswerOptions(IApiClient apiClient, ILogger<BulkAnswerOptions> logger) : BasePageModel
 {
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }

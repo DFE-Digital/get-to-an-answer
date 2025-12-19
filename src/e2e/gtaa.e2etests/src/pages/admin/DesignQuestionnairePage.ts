@@ -145,20 +145,20 @@ export class DesignQuestionnairePage extends BasePage {
         this.publish_integrationGuide = this.publishSection.locator('#integration-guide');
 
         // ----- Status locators (relative to link) -----
-        this.edit_startPage_status = this.edit_startPage.locator(
-            'xpath=../../div[contains(@class,"govuk-task-list__status")]'
+        this.edit_startPage_status = page.locator(
+            '#edit-start-page-completion-status'
         );
-        this.edit_questionsAnswers_status = this.edit_questionsAnswers.locator(
-            'xpath=../../div[contains(@class,"govuk-task-list__status")]'
+        this.edit_questionsAnswers_status = page.locator(
+            '#edit-questions-completion-status'
         );
-        this.edit_resultsPages_status = this.edit_resultsPages.locator(
-            'xpath=../../div[contains(@class,"govuk-task-list__status")]'
+        this.edit_resultsPages_status = page.locator(
+            '#results-page-completion-status'
         );
-        this.customise_styling_status = this.customise_styling.locator(
-            'xpath=../../div[contains(@class,"govuk-task-list__status")]'
+        this.customise_styling_status = page.locator(
+            '#customise-styling-completion-status'
         );
-        this.customise_buttonText_status = this.customise_buttonText.locator(
-            'xpath=../../div[contains(@class,"govuk-task-list__status")]'
+        this.customise_buttonText_status = page.locator(
+            '#edit-button-completion-status'
         );
         this.publish_questionnaireId_status = this.publish_questionnaireId.locator(
             'xpath=../../div[contains(@class,"govuk-task-list__status")]'

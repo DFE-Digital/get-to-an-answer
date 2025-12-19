@@ -119,10 +119,10 @@ public static class MermaidExtensions
             }
         }
 
-        // Legend and styles
+        // Key and styles
         sb.AppendLine();
-        sb.AppendLine("  %% Legend");
-        sb.AppendLine("  subgraph Legend");
+        sb.AppendLine("  %% Key");
+        sb.AppendLine("  subgraph Key");
         sb.AppendLine("    L1[Solid arrows = branching via destination fields]");
         sb.AppendLine("    L3[\"Answer '(priority: n)' = prioritisation only\"]");
         sb.AppendLine("    L4[[Results Page]]:::info");
