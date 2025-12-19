@@ -18,6 +18,11 @@ export class ViewQuestionPage extends BasePage {
     private readonly saveAndContinueButton: Locator;
     private readonly errorSummary: Locator;
     private readonly errorList: Locator;
+    private readonly editQuestionLink: (questionId: string) => Locator = (questionId: string) => this.page.locator(
+        `a[href*="/questions/${questionId}/edit"]`
+    );
+
+    private readonly editQuestionLinks: Locator = this.page.locator('a[href*="/questions/"][href$="/edit"]');
 
     // ===== Embedded component =====
     readonly table: ViewQuestionTable;
@@ -53,6 +58,14 @@ export class ViewQuestionPage extends BasePage {
     }
 
     // ===== Actions =====
+    async clickFirstEditQuestionLink(): Promise<void> {
+        await this.editQuestionLinks.first().click();
+    }
+    
+    async clickEditQuestionLink(questionId: string): Promise<void> {
+        await this.editQuestionLink(questionId).click();
+    }
+    
     async ClickBackToEditQuestionnaireLink(): Promise<void> {
         await Promise.all([
             this.page.waitForLoadState('networkidle'),

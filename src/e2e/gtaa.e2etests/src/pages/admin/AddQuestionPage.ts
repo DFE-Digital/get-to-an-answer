@@ -212,7 +212,7 @@ export class AddQuestionPage extends BasePage {
         await expect(this.successBannerHeading, '❌ Banner heading incorrect').toBeVisible();
         await expect(this.successBannerHeading).toHaveText(/your changes have been saved/i);
     }
-
+    
     // Accessibility
     async validateQuestionContentFieldAriaDescribedBy() {
         const errorElement = this.mode === 'update'

@@ -15,6 +15,13 @@ export class EditAnswerTable {
     }
 
     // ===== Validations =====
+    async validateAnswerTableRows(expectedAnswers: string[]): Promise<void> {
+        const actualAnswers = await this.getAllAnswerContents();
+
+        expect(actualAnswers, '❌ Answer table rows do not match expected values')
+            .toEqual(expectedAnswers);
+    }
+    
     async assertLoaded(): Promise<void> {
         await expect(this.card).toBeVisible();
         await expect(this.table).toBeVisible();
