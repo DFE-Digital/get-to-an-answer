@@ -79,8 +79,7 @@ test.describe('Get to an answer update questionnaire', () => {
         await addQuestionnairePage.validateInlineTitleError();
         await addQuestionnairePage.validateTitleFormGroup();
     });
-
-    // TBC, CARE-1546 bug raised
+    
     test('Accessible aria-describedby includes hint id and error message id', async ({page}) => {
         viewQuestionnairePage = await signIn(page, token);
         addQuestionnairePage = await goToUpdateQuestionnairePageByUrl(page, questionnaireGetResponse.questionnaireGetBody.id);

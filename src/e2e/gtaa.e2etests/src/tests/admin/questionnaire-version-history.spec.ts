@@ -320,8 +320,7 @@ test.describe('Get to an answer questionnaire versions history', () => {
         ];
         await questionnaireVersionHistoryPage.expectChangeTexts(2, expectedList);
     });
-
-    // CARE-1609 bug raise to remove a line from the validation
+    
     test('Questionnaire version history text changes validation after first publish - add question answers', async ({page, request}) => {
         const {questionnaire} = await createQuestionnaire(request, token);
         await updateQuestionnaire(request, questionnaire.id, {slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}`}, token);
@@ -450,7 +449,7 @@ test.describe('Get to an answer questionnaire versions history', () => {
     //
     //     await addAnswerPage.removeOption(0);
     //     await addAnswerPage.clickSaveAnswersButton();
-    //    
+    //
     //     // Delete the question
     //     addQuestionPage = await AddQuestionPage.create(page);
     //     await addQuestionPage.clickDeleteQuestion();

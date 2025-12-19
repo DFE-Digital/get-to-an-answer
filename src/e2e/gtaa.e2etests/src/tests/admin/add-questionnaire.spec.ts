@@ -73,7 +73,6 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await addQuestionnairePage.validateTitleFormGroup();
     });
     
-    //TBC, CARE-1546 bug raised
     test('Submit a new questionnaire with invalid title to validate aria-describedby', async ({page}) => {
         await viewQuestionnairePage.clickCreateNewQuestionnaire();
 

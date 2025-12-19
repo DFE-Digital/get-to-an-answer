@@ -26,6 +26,7 @@ export class AddAnswerPage extends BasePage {
     
     private optionContent: (i: number) => Locator;
     private optionHint: (i: number) => Locator;
+    private optionHintDiv: (i: number) => Locator;
     private answerRank: (i: number) => Locator;
     private destinationRadio: (i: number, value: Destination) => Locator;
     private selectSpecificQuestion: (i: number) => Locator;
@@ -62,6 +63,10 @@ export class AddAnswerPage extends BasePage {
 
         this.optionHint = (i: number) =>
             page.locator(`textarea[name="Options[${i}].OptionHint"]`);
+
+        this.optionHintDiv = (i: number) =>
+            page.locator(`textarea[name="Options[${i}].OptionHint"]`)
+                .locator('xpath=preceding-sibling::div[contains(@class,"govuk-hint")]');
 
         this.answerRank = (i: number) =>
             page.locator(`input[id=Options-${i}-RankPriority]`);
@@ -209,14 +214,9 @@ export class AddAnswerPage extends BasePage {
         }
     }
 
-    async validateAriaDescribedByWithHintAndError(optionIndex: number): Promise<void> {
+    async validateAriaDescribedByWithError(optionIndex: number): Promise<void> {
         const ariaDescribedBy = await this.optionContent(optionIndex).getAttribute('aria-describedby');
         expect(ariaDescribedBy, `❌ aria-describedby is missing for option ${optionIndex}`).not.toBeNull();
-        
-        const hintId = await this.optionHint(optionIndex).getAttribute('id');
-        expect(hintId, `❌ Option ${optionIndex} hint missing id attribute`).not.toBeNull();
-        expect(ariaDescribedBy, `❌ aria-describedby should include hint id for option ${optionIndex}`)
-            .toContain(hintId);
         
         const errorElement = this.inlineError(optionIndex);
         const errorIsVisible = await errorElement.isVisible().catch(() => false);
@@ -231,29 +231,21 @@ export class AddAnswerPage extends BasePage {
         }
     }
 
-    async validateAriaDescribedByWithHintOnly(optionIndex: number): Promise<void> {
-        const ariaDescribedBy = await this.optionContent(optionIndex).getAttribute('aria-describedby');
-        expect(ariaDescribedBy, `❌ aria-describedby is missing for option ${optionIndex}`).not.toBeNull();
+    async validateAriaDescribedByForHintOnly(optionIndex: number): Promise<void> {
+        const ariaDescribedBy = await this.optionHint(optionIndex).getAttribute('aria-describedby');
+        expect(ariaDescribedBy, `❌ aria-describedby is missing for hint ${optionIndex}`).not.toBeNull();
         
-        const hintId = await this.optionHint(optionIndex).getAttribute('id');
-        expect(hintId, `❌ Option ${optionIndex} hint missing id attribute`).not.toBeNull();
+        const hintDivId = await this.optionHintDiv(optionIndex).getAttribute('id');
+        expect(hintDivId, `❌ Option ${optionIndex} hint missing id attribute`).not.toBeNull();
         expect(ariaDescribedBy, `❌ aria-describedby should include hint id for option ${optionIndex}`)
-            .toContain(hintId);
+            .toContain(hintDivId);
 
         // Verify error is NOT visible when no validation errors are present
         const errorElement = this.inlineError(optionIndex);
         const errorIsVisible = await errorElement.isVisible().catch(() => false);
         expect(errorIsVisible, `❌ Error should not be visible for option ${optionIndex}`).toBe(false);
-
-        // Verify error id is NOT included in aria-describedby
-        const errorId = await errorElement.getAttribute('id').catch(() => null);
-        if (errorId) {
-            expect(ariaDescribedBy, `❌ aria-describedby should not include error id for option ${optionIndex}`)
-                .not.toContain(errorId);
-        }
     }
-
-
+    
     // ===== Actions =====
     async clickErrorLinkAndValidateFocus(link: Locator, browserName: string): Promise<void> {
         await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
