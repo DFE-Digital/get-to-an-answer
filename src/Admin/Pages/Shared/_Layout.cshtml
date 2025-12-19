@@ -3,11 +3,17 @@
 @using Common.Models.ViewModels
 @using Common.Configuration
 @using Common.Models.PageModels
+@using Joonasw.AspNetCore.SecurityHeaders.Csp
+@using Microsoft.Extensions.Options
 @using Microsoft.Identity.Web
 
 @inject IWebHostEnvironment WebHostEnvironment
+@inject ICspNonceService CspNonceService
+@inject IOptions<ScriptOptions> ScriptOptions
 
 @{
+    var scriptConfig = ScriptOptions.Value;
+    
     var languageCode = Context.Request.RouteValues["languageCode"]?.ToString();
     if (string.IsNullOrEmpty(languageCode))
     {
@@ -24,6 +30,42 @@
 <html class="@(SiteConfiguration.Rebrand ? "govuk-template--rebranded" : "govuk-template")" lang="@languageCode">
 
 <head>
+    <script asp-add-nonce="true" type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "ueriupdhuw");
+    </script>
+    
+    @if (WebHostEnvironment.IsProduction() && !string.IsNullOrEmpty(scriptConfig.GTM))
+    {
+        <script asp-add-nonce="true">
+            // Define dataLayer and the gtag function.
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+
+            // Set default consent to 'denied' as a placeholder
+            // Determine actual values based on your own requirements
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'analytics_storage': 'denied',
+            });
+        </script>
+
+        <!-- Google Tag Manager -->
+        <script asp-add-nonce="true">
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0],
+                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                j.setAttribute('nonce','@CspNonceService.GetNonce()');
+                f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','@scriptConfig.GTM');</script>
+        <!-- End Google Tag Manager -->
+    }
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"]</title>
     <style asp-add-nonce="true">
@@ -68,6 +110,11 @@
 </head>
 
 <body class="govuk-template__body">
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+    <iframe title="GTM" src="https://www.googletagmanager.com/ns.html?id=@scriptConfig.GTM"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 <script asp-add-nonce="true">
     document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');
 </script>
