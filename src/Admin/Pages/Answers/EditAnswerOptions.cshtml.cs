@@ -13,9 +13,6 @@ namespace Admin.Pages.Answers;
 public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IApiClient apiClient) :
     AnswerOptionsPageModel(apiClient)
 {
-    private readonly IApiClient _apiClient = apiClient;
-
-
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId);
@@ -36,7 +33,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
     public async Task<IActionResult> OnPostSaveAnswerOptions()
     {
         ValidateForDuplicateAnswers();
-        
+
         ValidateSelectedQuestionsIfAny();
 
         if (!ModelState.IsValid)
@@ -47,7 +44,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         try
         {
-                await UpdateOrCreateAnswers();
+            await UpdateOrCreateAnswers();
         }
         catch (Exception e)
         {
@@ -68,7 +65,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             DeletedAnswerIds.Add(removedOption.AnswerId);
 
         Options.RemoveAt(index);
- 
+
         RemoveModelStateEntriesForOption(index);
         RemoveModelStateErrorsForFields();
 

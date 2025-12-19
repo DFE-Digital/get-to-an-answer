@@ -184,23 +184,26 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
     protected async Task PopulateFieldWithExistingValues()
     {
+        
+        //TODO: Create a deep copy/store a copy of the options list and then readd the existing answers to the list on top of any new enter answers
+        
         var existingStoredAnswers = await apiClient.GetAnswersAsync(QuestionId);
         var existingAnswerOptionIds = Options.Select(o => o.AnswerId).ToHashSet();
-
+        
         var (
             questionForSelection,
             _,
             questionSelectionList,
             resultsPagesForSelection
             ) = await GetPopulatePrerequisites();
-
+        
         var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
-
+        
         foreach (var existingAnswer in existingStoredAnswers.Where(a => !DeletedAnswerIds.Contains(a.Id)))
         {
             if (existingAnswerOptionIds.Contains(existingAnswer.Id))
                 continue;
-
+            
             Options.Add(new AnswerOptionsViewModel
             {
                 AnswerId = existingAnswer.Id,
