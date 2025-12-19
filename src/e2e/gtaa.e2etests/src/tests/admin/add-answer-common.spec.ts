@@ -3,9 +3,10 @@ import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
 import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
-import {goToAddAnswerPageByUrl, signIn} from "../../helpers/admin-test-helper";
+import {goToAddAnswerPageByUrl, goToAddResultPagePageByUrl, signIn} from "../../helpers/admin-test-helper";
 import {PageHeadings} from "../../constants/test-data-constants";
 import {createQuestion} from "../../test-data-seeder/question-data";
+import {AddResultsPagePage} from "../../pages/admin/AddResultsPagePage";
 
 test.describe('Get to an answer add an answer to a question', () => {
     let token: string;
@@ -15,7 +16,8 @@ test.describe('Get to an answer add an answer to a question', () => {
     let question2Id: string;
 
     let addAnswerPage: AddAnswerPage;
-
+    let addResultsPagePage: AddResultsPagePage;
+    
     test.beforeEach(async ({request, page}) => {
         token = JwtHelper.NoRecordsToken();
         const {questionnaire} = await createQuestionnaire(request, token);
@@ -124,6 +126,72 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.assertAllOptionNumberLabelsInOrder();
         
         await addAnswerPage.asserPageElementsUponLanding(2, 3);
+    })
+
+    test('Validate reference name is selected when selecting answer destination as internal results page', async ({page}) => {
+        await signIn(page, token);
+
+        // Add a new results page
+        addResultsPagePage = await goToAddResultPagePageByUrl(page, questionnaireId);
+        await addResultsPagePage.expectAddResultsPageHeadingOnPage(PageHeadings.ADD_RESULTS_PAGE_PAGE_HEADING);
+        
+        const resultsPageTitleInput = `Test title - ${Date.now()}`;
+        await addResultsPagePage.enterResultsPageTitleInput(resultsPageTitleInput);
+        const resultsPageDetailsText = `Test details text - ${Date.now()}`;
+        await addResultsPagePage.enterResultsPageDetailsText(resultsPageDetailsText);
+        const resultsPageRefNameInput = `Test ref name - ${Date.now()}`;
+        await addResultsPagePage.enterResultsPageRefNameInput(resultsPageRefNameInput);
+        await addResultsPagePage.clickSaveAndContinue();
+        
+        addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+
+        //Fill out initial options
+        await addAnswerPage.expectAnswerHeadingOnPage();
+        await addAnswerPage.setOptionContent(0, 'First Answer Option');
+        await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
+        await addAnswerPage.setInternalLink(0, resultsPageRefNameInput);
+
+        await addAnswerPage.expectAnswerHeadingOnPage();
+        await addAnswerPage.setOptionContent(1, 'Second Answer Option');
+        await addAnswerPage.setOptionHint(1, 'This is the first answer hint');
+        await addAnswerPage.setInternalLink(1, resultsPageRefNameInput);
+
+        await addAnswerPage.clickSaveAndContinueButton();
+
+        const viewQuestionPage = await ViewQuestionPage.create(page);
+        await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
+    })
+
+    test('Validate results page title is selected when selecting answer destination as internal results page', async ({page}) => {
+        await signIn(page, token);
+
+        // Add a new results page
+        addResultsPagePage = await goToAddResultPagePageByUrl(page, questionnaireId);
+        await addResultsPagePage.expectAddResultsPageHeadingOnPage(PageHeadings.ADD_RESULTS_PAGE_PAGE_HEADING);
+
+        const resultsPageTitleInput = `Test title - ${Date.now()}`;
+        await addResultsPagePage.enterResultsPageTitleInput(resultsPageTitleInput);
+        const resultsPageDetailsText = `Test details text - ${Date.now()}`;
+        await addResultsPagePage.enterResultsPageDetailsText(resultsPageDetailsText);
+        await addResultsPagePage.clickSaveAndContinue();
+
+        addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+
+        //Fill out initial options
+        await addAnswerPage.expectAnswerHeadingOnPage();
+        await addAnswerPage.setOptionContent(0, 'First Answer Option');
+        await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
+        await addAnswerPage.setInternalLink(0, resultsPageTitleInput);
+
+        await addAnswerPage.expectAnswerHeadingOnPage();
+        await addAnswerPage.setOptionContent(1, 'Second Answer Option');
+        await addAnswerPage.setOptionHint(1, 'This is the first answer hint');
+        await addAnswerPage.setInternalLink(1, resultsPageTitleInput);
+
+        await addAnswerPage.clickSaveAndContinueButton();
+
+        const viewQuestionPage = await ViewQuestionPage.create(page);
+        await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
     })
     
     test('Accessible ids and aria-describedby for multiple options with hint', async ({page}) => {
