@@ -415,7 +415,7 @@ test.describe('Get to an answer questionnaire versions history', () => {
         await questionnaireVersionHistoryPage.expectChangeTexts(2, expectedList);
     });
 
-    // CARE-1607 bug raised
+    // CARE-1648 bug raised, incorrect version history when deleting items
     // test('Questionnaire version history text changes validation after first publish - delete question answers', async ({page, request}) => {
     //     const {questionnaire} = await createQuestionnaire(request, token);
     //     await updateQuestionnaire(request, questionnaire.id, {slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}`}, token);
