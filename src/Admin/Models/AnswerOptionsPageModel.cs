@@ -219,6 +219,8 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
                 SelectedResultsPage = existingAnswer.DestinationContentId.ToString()
             });
         }
+        
+        await PopulateOptionSelectionLists();
     }
 
     protected async Task<(
