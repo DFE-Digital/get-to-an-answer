@@ -324,3 +324,22 @@ export async function updateQuestionnaireContinueButton(request: any, questionna
         }
     });
 }
+
+class QuestionnaireStyling {
+    textColor: string = "#0b0c0c";
+    backgroundColor : string = "#ffffff";
+    primaryButtonColor: string = "#00703c";
+    secondaryButtonColor: string = "#1d70b8";
+    stateColor: string = "#ffdd00";
+    errorMessageColor: string = "#c3432b";
+}
+
+export async function updateQuestionnaireStyling(request: any, questionnaireId: string, body: QuestionnaireStyling, token = JwtHelper.ValidToken) {
+    return request.patch(`${BASE_URL}/api/questionnaires/${questionnaireId}/styling`, {
+        data: body,
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        }
+    });
+}

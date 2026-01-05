@@ -1,6 +1,6 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from '../BasePage';
-import {convertColorToHex} from "../../helpers/utils";
+import {convertColorToHex, getElementInfo} from "../../helpers/utils";
 
 export class QuestionnaireStartPreviewPage extends BasePage {
     // ===== Locators =====
@@ -123,7 +123,14 @@ export class QuestionnaireStartPreviewPage extends BasePage {
                 window.getComputedStyle(el).getPropertyValue('color')
             );
             expect(color.length).toBeGreaterThan(0);
-            expect(convertColorToHex(color)).toBe(expectedHexColor);
+
+            // generate locator for each element to make debugging easier
+            const info = await getElementInfo(element);
+
+            const actualHexColor = convertColorToHex(color);
+            expect(actualHexColor,
+                `For ${info.selector} [tag=${info.tagName}${info.id ? ' id=' + info.id : ''}${info.classes ? ' classes=' + info.classes : ''}], expected: ${expectedHexColor} but actual: ${actualHexColor}`)
+                .toBe(expectedHexColor);
         }
     }
 }
