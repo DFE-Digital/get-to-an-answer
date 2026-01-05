@@ -185,7 +185,7 @@ export class DesignQuestionnairePage extends BasePage {
         this.linkViewVersions = this.page.locator('#view-version-history');
         this.linkPreviewQuestionnaire = this.page.locator('#preview-questionnaire');
         this.linkClone = this.page.locator('#make-copy');
-        this.resultsPagesTaskStatus = page.locator('#edit-results-pages-status');
+        this.resultsPagesTaskStatus = page.locator('#results-page-completion-status');
     }
 
     // =====================================================
@@ -316,7 +316,7 @@ export class DesignQuestionnairePage extends BasePage {
 
         const text = (await statusLocator.innerText()).trim();
 
-        await expect(
+        expect(
             text,
             `❌ Expected status for "${taskName}" to be "${expectedStatus}" but got "${text}"`
         ).toBe(expectedStatus);
@@ -523,6 +523,14 @@ export class DesignQuestionnairePage extends BasePage {
         );
     }
 
+    async taskStatusAddEditResultsPage(taskStatus: string, taskName: string): Promise<void> {
+        await this.assertTaskStatus(
+            this.resultsPagesTaskStatus,
+            taskStatus,
+            taskName
+        );
+    }
+
     async validateAnswerContentSection(): Promise<void> {
         await expect(
             this.edit_resultsPages,
@@ -546,7 +554,7 @@ export class DesignQuestionnairePage extends BasePage {
         await expect(this.heading, '❌ Success banner heading should be visible').toBeVisible();
 
         const text = (await this.heading.textContent()) ?? '';
-        await expect(
+        expect(
             text.trim().length,
             '❌ Success banner heading text should not be empty',
         ).toBeGreaterThan(0);
@@ -810,6 +818,6 @@ export class DesignQuestionnairePage extends BasePage {
     async assertQuestionnaireStatus(status: string) {
         await expect(this.questionnaireStatus).toBeVisible();
         const statusText = await this.questionnaireStatus.textContent();
-        await expect(statusText?.trim()).toBe(status)
+        expect(statusText?.trim()).toBe(status)
     }
 }
