@@ -33,7 +33,7 @@
         <div class="govuk-width-container" id="main-header-container">
           <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-              <h1 class="govuk-heading-xl">
+              <h1 id="results-page-title" class="govuk-heading-xl">
                 @Model?.Destination.Title
               </h1>
             </div>
@@ -49,7 +49,7 @@
     
     @if (Model?.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
     {
-      <form action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
+      <form id="question-form" action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
         @Html.AntiForgeryToken()
         <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id" autocomplete="off">
         <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order" autocomplete="off">
@@ -79,7 +79,7 @@
         <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
           <fieldset class="govuk-fieldset" aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-              <h1 class="govuk-fieldset__heading">
+              <h1 id="question-content" class="govuk-fieldset__heading">
                 @Model.Destination.Question.Content
               </h1>
             </legend>
@@ -219,16 +219,16 @@
       {
         <fieldset class="govuk-fieldset" aria-describedby="@Model.Destination.Title">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-            <h1 class="govuk-fieldset__heading">
+            <h1 id="results-page-title" class="govuk-fieldset__heading">
               @Model.Destination.Title
             </h1>
           </legend>
-          <p>@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</p>
+          <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
         </fieldset>
       }
       else
       {
-        <p>@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</p>
+        <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
       }
     }
     else if (Model?.Destination?.Type == DestinationType.ExternalLink)

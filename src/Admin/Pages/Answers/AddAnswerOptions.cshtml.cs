@@ -21,15 +21,15 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
 
         try
         {
-            await PopulateFieldWithExistingValues();
+            await PopulateFieldsWithExistingValues();
             
             if (Options.Count == 0)
             {
-                Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
-                Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
+                Options.Add(new AnswerOptionsViewModel { OptionNumber = 0, QuestionType = QuestionType });
+                Options.Add(new AnswerOptionsViewModel { OptionNumber = 1, QuestionType = QuestionType });
             }
             
-            await HydrateOptionListsAsync();
+            await PopulateOptionSelectionLists();
             ReassignOptionNumbers();
 
             return Page();
@@ -50,7 +50,7 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
 
         if (!ModelState.IsValid)
         {
-            await HydrateOptionListsAsync();
+            await PopulateFieldsWithExistingValues();
             ReassignOptionNumbers();
             return Page();
         }
@@ -97,8 +97,9 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
         RemoveModelStateEntriesForOption(index);
         RemoveModelStateErrorsForFields();
 
-        await HydrateOptionListsAsync();
+        await PopulateFieldsWithExistingValues();
         ReassignOptionNumbers();
+        
         return Page();
     }
 

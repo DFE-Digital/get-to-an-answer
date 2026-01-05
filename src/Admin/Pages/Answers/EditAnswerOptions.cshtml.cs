@@ -13,19 +13,16 @@ namespace Admin.Pages.Answers;
 public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IApiClient apiClient) :
     AnswerOptionsPageModel(apiClient)
 {
-    private readonly IApiClient _apiClient = apiClient;
-
-
     public async Task<IActionResult> OnGet()
     {
         BackLinkSlug = string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId);
 
-        await PopulateFieldWithExistingValues();
+        await PopulateFieldsWithExistingValues();
 
         if (Options.Count == 0)
         {
-            Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
-            Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
+            Options.Add(new AnswerOptionsViewModel { OptionNumber = 0, QuestionType = QuestionType });
+            Options.Add(new AnswerOptionsViewModel { OptionNumber = 1, QuestionType = QuestionType });
         }
 
         ReassignOptionNumbers();
@@ -36,12 +33,12 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
     public async Task<IActionResult> OnPostSaveAnswerOptions()
     {
         ValidateForDuplicateAnswers();
-        
+
         ValidateSelectedQuestionsIfAny();
 
         if (!ModelState.IsValid)
         {
-            await PopulateFieldWithExistingValues();
+            await PopulateFieldsWithExistingValues();
             return Page();
         }
 
@@ -68,11 +65,12 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             DeletedAnswerIds.Add(removedOption.AnswerId);
 
         Options.RemoveAt(index);
- 
+
         RemoveModelStateEntriesForOption(index);
         RemoveModelStateErrorsForFields();
+        
+        await PopulateFieldsWithExistingValues();
 
-        await HydrateOptionListsAsync();
         ReassignOptionNumbers();
         return Page();
     }
