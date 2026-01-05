@@ -50,7 +50,6 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
 
         if (!ModelState.IsValid)
         {
-            // await HydrateOptionListsAsync();
             await PopulateFieldsWithExistingValues();
             ReassignOptionNumbers();
             return Page();
@@ -98,7 +97,6 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
         RemoveModelStateEntriesForOption(index);
         RemoveModelStateErrorsForFields();
 
-        // await HydrateOptionListsAsync();
         await PopulateFieldsWithExistingValues();
         ReassignOptionNumbers();
         

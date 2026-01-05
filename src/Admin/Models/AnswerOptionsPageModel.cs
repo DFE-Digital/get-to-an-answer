@@ -36,9 +36,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         if (!ModelState.IsValid)
         {
-            // await HydrateOptionListsAsync();
             await PopulateFieldsWithExistingValues();
-
             return Page();
         }
 
@@ -49,7 +47,6 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             OptionNumber = OptionNumber
         });
 
-        // await HydrateOptionListsAsync();
         await PopulateFieldsWithExistingValues();
 
         ReassignOptionNumbers();

@@ -68,8 +68,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         RemoveModelStateEntriesForOption(index);
         RemoveModelStateErrorsForFields();
-
-        // await HydrateOptionListsAsync();
+        
         await PopulateFieldsWithExistingValues();
 
         ReassignOptionNumbers();
