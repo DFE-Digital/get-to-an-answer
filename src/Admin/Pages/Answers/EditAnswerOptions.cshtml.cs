@@ -17,7 +17,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
     {
         BackLinkSlug = string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId);
 
-        await PopulateFieldWithExistingValues();
+        await PopulateFieldsWithExistingValues();
 
         if (Options.Count == 0)
         {
@@ -38,7 +38,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         if (!ModelState.IsValid)
         {
-            await PopulateFieldWithExistingValues();
+            await PopulateFieldsWithExistingValues();
             return Page();
         }
 
@@ -69,7 +69,9 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
         RemoveModelStateEntriesForOption(index);
         RemoveModelStateErrorsForFields();
 
-        await HydrateOptionListsAsync();
+        // await HydrateOptionListsAsync();
+        await PopulateFieldsWithExistingValues();
+        
         ReassignOptionNumbers();
         return Page();
     }

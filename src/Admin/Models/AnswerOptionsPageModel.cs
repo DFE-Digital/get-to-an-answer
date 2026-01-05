@@ -34,8 +34,9 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         if (!ModelState.IsValid)
         {
-            // RemoveGenericOptionErrors();
-            await HydrateOptionListsAsync();
+            // await HydrateOptionListsAsync();
+            await PopulateFieldsWithExistingValues();
+
             return Page();
         }
 
@@ -46,7 +47,9 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             OptionNumber = OptionNumber
         });
 
-        await HydrateOptionListsAsync();
+        // await HydrateOptionListsAsync();
+        await PopulateFieldsWithExistingValues();
+
         ReassignOptionNumbers();
 
         // Re-render page with the extra option
@@ -102,13 +105,12 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
             var resultsPageErrorId = $"Options-{index}-AnswerDestination-internal-error";
             ModelState.AddModelError(resultsPageErrorId, errorMessage);
-            
+
             var selectKey = $"Options[{index}].SelectedResultsPage";
             var resultsPageRadioInputId = $"Options-{index}-destination-internal";
-            
+
             ModelState.AddModelError(selectKey, string.Empty);
             ModelState.AddModelError(resultsPageRadioInputId, string.Empty);
-
         }
 
         var optionsWithExternalLinkNoSelection = Options.Where(o =>
@@ -125,7 +127,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
             ModelState.AddModelError(selectKey, string.Empty);
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
-            
+
             var destinationKey = $"Options[{index}].AnswerDestination";
             ModelState.AddModelError(destinationKey, string.Empty);
 
@@ -182,33 +184,30 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         return Redirect(targetUrl ?? string.Empty);
     }
 
-    protected async Task PopulateFieldWithExistingValues()
+    protected async Task PopulateFieldsWithExistingValues()
     {
-        
-        //TODO: Create a deep copy/store a copy of the options list and then readd the existing answers to the list on top of any new enter answers
-        
         var existingStoredAnswers = await apiClient.GetAnswersAsync(QuestionId);
         var existingAnswerOptionIds = Options.Select(o => o.AnswerId).ToHashSet();
-        
+
         var (
             questionForSelection,
             _,
             questionSelectionList,
             resultsPagesForSelection
             ) = await GetPopulatePrerequisites();
-        
+
         var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
-        
+
         foreach (var existingAnswer in existingStoredAnswers.Where(a => !DeletedAnswerIds.Contains(a.Id)))
         {
             if (existingAnswerOptionIds.Contains(existingAnswer.Id))
                 continue;
-            
+
             Options.Add(new AnswerOptionsViewModel
             {
                 AnswerId = existingAnswer.Id,
                 QuestionSelectList = questionSelectionList,
-                AnswerDestination = MapStoredAnswerDestination(existingAnswer.DestinationType),
+                AnswerDestination = MapStoredAnswerDestination(existingAnswer),
                 OptionContent = existingAnswer.Content,
                 OptionHint = existingAnswer.Description,
                 SelectedDestinationQuestion = existingAnswer.DestinationQuestionId?.ToString(),
@@ -219,7 +218,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
                 SelectedResultsPage = existingAnswer.DestinationContentId.ToString()
             });
         }
-        
+
         await PopulateOptionSelectionLists();
     }
 
@@ -338,14 +337,16 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
     }
 
 
-    protected static AnswerDestination MapStoredAnswerDestination(DestinationType? destinationType) =>
-        destinationType switch
+    protected static AnswerDestination MapStoredAnswerDestination(AnswerDto existingAnswer) =>
+        existingAnswer.DestinationType switch
         {
-            DestinationType.Question => AnswerDestination.NextQuestion,
+            DestinationType.Question when existingAnswer.DestinationQuestionId is null
+                                          || existingAnswer.DestinationQuestionId == Guid.Empty => AnswerDestination.NextQuestion,
+            DestinationType.Question => AnswerDestination.SpecificQuestion,
             DestinationType.CustomContent => AnswerDestination.InternalResultsPage,
             DestinationType.ExternalLink => AnswerDestination.ExternalResultsPage,
             null => AnswerDestination.NextQuestion,
-            _ => throw new ArgumentOutOfRangeException(nameof(destinationType), destinationType, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(existingAnswer.DestinationType), existingAnswer.DestinationType , null)
         };
 
     protected static DestinationType MapDestination(AnswerDestination answerDestination) =>
