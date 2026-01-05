@@ -6,9 +6,7 @@
     ViewData["Title"] = "How to add a questionnaire to your service";
 
     var questionnaireSlug = Model.Questionnaire?.Slug;
-    var requestScheme = Request.Scheme;
-    var requestHost = Request.Host;
-    var gtaaBaseUrl = $"{requestScheme}://{requestHost}";
+    var gtaaBaseUrl = Model.FrontEndUrl;
 }
 
 @section BeforeContent
@@ -66,11 +64,11 @@
 <div class="govuk-body govuk-!-margin-bottom-8">
   <p>You can embed the following iframe into your page:</p>
 
-  <div class="govuk-code-example">
-    <button type="button" class="govuk-code-example__copy">
+  <div id="embed-iframe-code-container" class="govuk-code-example">
+    <button id="embed-iframe-code-copy-btn" type="button" class="govuk-code-example__copy">
       Copy code
     </button>
-    <pre><code>
+    <pre><code id="embed-iframe-code">
 &lt;div class="gtaa-wrapper" style="margin:0 auto; max-width:100%; width:100%;"&gt;
   &lt;iframe id="gtaaFrame"
           title="@Model.Questionnaire?.Title"
