@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 public interface IImageStorageClient
 {
+    Task<bool> CheckImageExistsAsync(string blobFileName);
     Task UploadImageAsync(Stream fileStream, string blobFileName, string contentType);
     Task<Stream> DownloadImageAsync(string blobFileName);
     Task DeleteImageAsync(string blobFileName);
@@ -32,6 +33,13 @@ public class ImageStorageClient : IImageStorageClient
         
         // 1. Get a reference to the container client
         _containerClient = new BlobContainerClient(connectionString, _containerName);
+    }
+
+    public async Task<bool> CheckImageExistsAsync(string blobFileName)
+    {
+        await CheckContainerExists();
+        var blobClient = _containerClient.GetBlobClient(blobFileName);
+        return await blobClient.ExistsAsync();
     }
 
     /// <summary>
