@@ -20,6 +20,8 @@ import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaire
 import {AddQuestionnaireStartPage} from "../../pages/admin/AddQuestionnaireStartPage";
 import {EditContinueButtonTextPage} from "../../pages/admin/EditContinueButtonTextPage";
 import {QuestionnaireStylingPage} from "../../pages/admin/QuestionnaireStylingPage";
+import {AddResultsPagePage} from "../../pages/admin/AddResultsPagePage";
+import {ViewResultsPagesPage} from "../../pages/admin/ViewResultsPagesPage";
 
 test.describe('Get to an answer create a new questionnaire', () => {
     let token: string;
@@ -35,6 +37,9 @@ test.describe('Get to an answer create a new questionnaire', () => {
     let addQuestionnaireStartPage: AddQuestionnaireStartPage;
     let editContinueButtonTextPage: EditContinueButtonTextPage;
     let questionnaireStylingPage: QuestionnaireStylingPage;
+    let addResultsPagePage: AddResultsPagePage;
+    let viewResultsPagesPage: ViewResultsPagesPage;
+    
     
 
     test.beforeEach(async ({page, request}) => {
@@ -241,5 +246,34 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await questionnaireStylingPage.saveAndContinue();
 
         await designQuestionnairePage.taskStatusCustomiseStylingPage('Completed', 'Customise styling');
+    });
+
+    test('Validate add edit results page link status as Completed', async ({page}) => {
+        await signIn(page, token);
+
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+        await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
+
+        await designQuestionnairePage.taskStatusAddEditResultsPage('Optional', 'Add or edit results pages');
+
+        await designQuestionnairePage.openAddEditResultsPage();
+
+        viewResultsPagesPage = await ViewResultsPagesPage.create(page);
+        await viewResultsPagesPage.expectResultsPagesHeadingOnPage(PageHeadings.VIEW_RESULTS_PAGES_PAGE_HEADING);
+        await viewResultsPagesPage.clickAddResultsPage();
+        
+        addResultsPagePage = await AddResultsPagePage.create(page);
+        
+        const resultsPageTitleInput = `Test title - ${Date.now()}`;
+        await addResultsPagePage.enterResultsPageTitleInput(resultsPageTitleInput);
+        const resultsPageDetailsText = `Test details text - ${Date.now()}`;
+        await addResultsPagePage.enterResultsPageDetailsText(resultsPageDetailsText);
+        await addResultsPagePage.clickSaveAndContinue();
+        
+        await viewResultsPagesPage.expectResultsPagesHeadingOnPage(PageHeadings.VIEW_RESULTS_PAGES_PAGE_HEADING);
+        await viewResultsPagesPage.markFinishedEditing(true);
+        await viewResultsPagesPage.saveAndContinue();
+        
+        await designQuestionnairePage.taskStatusAddEditResultsPage('Completed', 'Add or edit results page');
     });
 });

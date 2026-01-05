@@ -36,33 +36,11 @@ export class SignInPage extends BasePage {
         await expect(this.signInButton).toBeFocused();
         await this.signInButton.press('Enter');
     }
-
-    async headingHierarchyIsCorrect() {
-        const headings = await this.page.locator('h1, h2').all();
-
-        let foundH1 = false;
-        for (const heading of headings) {
-            const tagName = await heading.evaluate(el => el.tagName);
-
-            if (tagName === 'H1') {
-                foundH1 = true;
-            } else if (tagName === 'H2' && !foundH1) {
-                // H2 found before H1 - hierarchy is broken
-                throw new Error('H2 heading found before H1 heading');
-            }
-        }
-
-        await expect(foundH1).toBeTruthy();
-    }
-
+    
     async verifyOnSignInPage(): Promise<void> {
         await expect(this.signInButton).toBeVisible();
     }
-
-    // async verifyErrorMessage(expectedMessage: string): Promise<void> {
-    //     await expect(this.errorMessage).toHaveText(expectedMessage);
-    // }
-
+    
     async assertPageElements() {
         await this.verifyPublicHeaderLinks()
         await this.verifyFooterLinks();
