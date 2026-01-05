@@ -25,11 +25,10 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
             
             if (Options.Count == 0)
             {
-                Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
-                Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
+                Options.Add(new AnswerOptionsViewModel { OptionNumber = 0, QuestionType = QuestionType });
+                Options.Add(new AnswerOptionsViewModel { OptionNumber = 1, QuestionType = QuestionType });
             }
-
-
+            
             await PopulateOptionSelectionLists();
             ReassignOptionNumbers();
 

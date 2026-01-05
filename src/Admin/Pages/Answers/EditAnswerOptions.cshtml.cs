@@ -21,8 +21,8 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         if (Options.Count == 0)
         {
-            Options.Add(new AnswerOptionsViewModel { OptionNumber = 0 });
-            Options.Add(new AnswerOptionsViewModel { OptionNumber = 1 });
+            Options.Add(new AnswerOptionsViewModel { OptionNumber = 0, QuestionType = QuestionType });
+            Options.Add(new AnswerOptionsViewModel { OptionNumber = 1, QuestionType = QuestionType });
         }
 
         ReassignOptionNumbers();
@@ -71,7 +71,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
 
         // await HydrateOptionListsAsync();
         await PopulateFieldsWithExistingValues();
-        
+
         ReassignOptionNumbers();
         return Page();
     }

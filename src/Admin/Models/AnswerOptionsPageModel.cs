@@ -26,6 +26,8 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
     [BindProperty] public List<Guid> DeletedAnswerIds { get; set; } = [];
 
+    [BindProperty] public QuestionType? QuestionType { get; set; } = null;
+    
     // Handler for clicking "Add another option"
     public async Task<IActionResult> OnPostAddOption()
     {
@@ -198,6 +200,8 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         var currentQuestion = questionForSelection.SingleOrDefault(q => q.Id == QuestionId);
 
+        QuestionType = currentQuestion?.Type;
+        
         foreach (var existingAnswer in existingStoredAnswers.Where(a => !DeletedAnswerIds.Contains(a.Id)))
         {
             if (existingAnswerOptionIds.Contains(existingAnswer.Id))
@@ -243,7 +247,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
     protected async Task PopulateOptionSelectionLists()
     {
         var (
-            _,
+            questions,
             _,
             questionSelectionList,
             resultsPagesForSelection
@@ -251,6 +255,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
         foreach (var option in Options)
         {
+            option.QuestionType = questions.Where(q => q.Id == QuestionId).Select(q => q.Type).FirstOrDefault();
             option.QuestionSelectList = questionSelectionList;
             option.ResultsPageSelectList = resultsPagesForSelection;
         }
@@ -341,12 +346,14 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         existingAnswer.DestinationType switch
         {
             DestinationType.Question when existingAnswer.DestinationQuestionId is null
-                                          || existingAnswer.DestinationQuestionId == Guid.Empty => AnswerDestination.NextQuestion,
+                                          || existingAnswer.DestinationQuestionId == Guid.Empty => AnswerDestination
+                .NextQuestion,
             DestinationType.Question => AnswerDestination.SpecificQuestion,
             DestinationType.CustomContent => AnswerDestination.InternalResultsPage,
             DestinationType.ExternalLink => AnswerDestination.ExternalResultsPage,
             null => AnswerDestination.NextQuestion,
-            _ => throw new ArgumentOutOfRangeException(nameof(existingAnswer.DestinationType), existingAnswer.DestinationType , null)
+            _ => throw new ArgumentOutOfRangeException(nameof(existingAnswer.DestinationType),
+                existingAnswer.DestinationType, null)
         };
 
     protected static DestinationType MapDestination(AnswerDestination answerDestination) =>
