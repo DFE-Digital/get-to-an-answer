@@ -32,10 +32,8 @@ test.describe('Get to an answer Add bulk answers options to question', () => {
 
         viewQuestionsPage = await goToViewQuestionsPageByUrl(page, questionnaire.id);
     });
-
     
     test('Add bulk answers options from Add answers to question successfully lands on Add Questionnaire Page with entered answer options', async ({ page }) => {
-        
         await viewQuestionsPage.clickAddQuestion();
         
         addQuestionPage = await AddQuestionPage.create(page);
@@ -47,29 +45,21 @@ test.describe('Get to an answer Add bulk answers options to question', () => {
 
         addAnswerPage = await AddAnswerPage.create(page);
         await addAnswerPage.expectAnswerHeadingOnPage();
-        
         await addAnswerPage.clickEnterAllOptionsButton();
         
         bulkAddAnswersPage = await AddBulkAnswerOptionsPage.create(page);
         await bulkAddAnswersPage.expectOnPage();
-        
         await bulkAddAnswersPage.enterNumberOfValidBulkOptions(5);
-        
         await bulkAddAnswersPage.clickContinue();
-        
         await expect(page).toHaveURL(/\/answers\/add$/);
+        
         await addAnswerPage.expectAnswerHeadingOnPage();
-        
         await addAnswerPage.assertAllOptionNumberLabelsInOrder();
-        
         await addAnswerPage.validateAllOptionContents(bulkAddAnswersPage.getEnteredBulkOptions);
-        
         await addAnswerPage.clickSaveAndContinueButton();
         
         await viewQuestionsPage.expectQuestionHeadingOnPage();
-        
         await viewQuestionsPage.clickFirstEditQuestionLink();
-        
         await addQuestionPage.table.validateAnswerTableRows(bulkAddAnswersPage.getEnteredBulkOptions);
     })
 })

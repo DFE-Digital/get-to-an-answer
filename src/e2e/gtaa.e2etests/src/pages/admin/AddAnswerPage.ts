@@ -86,9 +86,7 @@ export class AddAnswerPage extends BasePage {
             page.locator(
                 `select#Options-${i}-destination-internal-select`
             );
-
-
-       
+            
         this.externalLinkInput = (i: number) =>
             page.locator(`input[id="Options-${i}-destination-external-link"]`);
 
@@ -203,6 +201,18 @@ export class AddAnswerPage extends BasePage {
 
         await this.clickAllLinksAndValidateFocus(browserName);
     }
+    
+    async validateDuplicateAnswerOptionsErrorMessageSummary(browserName: string) {
+        await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
+        await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
+        await expect(this.errorSummary, '❌ Attribute tabIndex is missing').toHaveAttribute('tabindex', '-1');
+        await expect(this.errorSummary, '❌ Error summary not focused').toBeFocused();
+
+        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION1_CONTENT);
+        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION2_CONTENT);
+
+        await this.clickAllLinksAndValidateFocus(browserName);
+    }
 
     async validateInlineQuestionContentError(i: number): Promise<void> {
         await expect(this.inlineError(i), '❌ Inline option content error not visible').toBeVisible();
@@ -212,6 +222,15 @@ export class AddAnswerPage extends BasePage {
             await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT);
         }
     }
+
+    async validateInlineDuplicatedQuestionContentError(i: number): Promise<void> {
+        await expect(this.inlineError(i), '❌ Inline option content error not visible').toBeVisible();
+        if (i == 0) {
+            await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION1_CONTENT);
+        } else {
+            await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION2_CONTENT);
+        }
+    }
     
     async validateInlineErrorNotVisible(i: number): Promise<void> {
         const errorElement = this.inlineError(i);
@@ -219,6 +238,37 @@ export class AddAnswerPage extends BasePage {
         expect(isVisible, `❌ Inline error should not be visible for option ${i}`).toBe(false);
     }
 
+    async expectDestinationRadioSelected(optionIndex: number, destination: Destination = 'NextQuestion'): Promise<void> {
+        const destinationRadioLocator = this.destinationRadio(optionIndex, destination);
+        await expect(destinationRadioLocator, `❌ Destination radio ${destination} for option ${optionIndex} not selected`).toBeChecked();
+    }
+
+    async expectSpecificQuestionDropdownSelected(optionIndex: number, expectedQuestionId: string): Promise<void> {
+        const specificQuestionDropdown = this.selectSpecificQuestion(optionIndex);
+        await expect(specificQuestionDropdown, `❌ Specific question dropdown for option ${optionIndex} not visible`).toBeVisible();
+        await expect(specificQuestionDropdown, `❌ Specific question dropdown for option ${optionIndex} does not have value ${expectedQuestionId}`).toHaveValue(expectedQuestionId);
+    }
+
+    async expectExternalLinkInputValue(optionIndex: number, expectedValue: string): Promise<void> {
+        const externalLinkInput = this.externalLinkInput(optionIndex);
+        await expect(externalLinkInput, `❌ External link input for option ${optionIndex} not visible`).toBeVisible();
+        await expect(externalLinkInput, `❌ External link input value for option ${optionIndex} does not match expected value`).toHaveValue(expectedValue);
+    }
+
+    async expectResultsPageDropdownSelected(optionIndex: number, expectedResultsPageId?: string): Promise<void> {
+        const internalResultsDropdown = this.selectInternalResultsPage(optionIndex);
+        await expect(internalResultsDropdown, `❌ Internal results dropdown for option ${optionIndex} not visible`).toBeVisible();
+
+        const actualValue = await internalResultsDropdown.inputValue();
+
+        if (expectedResultsPageId) {
+            // If an expected value is provided, you can do additional checks
+            expect(actualValue, `❌ Internal results dropdown for option ${optionIndex} does not match expected value`).toBeTruthy();
+        } else {
+            // If no expected value, just ensure something is selected
+            expect(actualValue, `❌ No results page selected for option ${optionIndex}`).not.toBe('0');
+        }
+    }
 
     // Accessibility
     async validateUniqueIdsForMultipleOptions(optionCount: number): Promise<void> {
