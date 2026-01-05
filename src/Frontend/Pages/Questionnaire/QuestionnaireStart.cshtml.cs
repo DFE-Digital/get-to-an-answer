@@ -6,7 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace Frontend.Pages.Questionnaire;
 
 [IgnoreAntiforgeryToken]
-public class QuestionnaireStart(IApiClient apiClient, ILogger<QuestionnaireStart> logger) : QuestionnairesPageModel
+public class QuestionnaireStart(
+    IApiClient apiClient, 
+    IImageStorageClient imageStorageClient,
+    ILogger<QuestionnaireStart> logger) : QuestionnairesPageModel
 {
     [BindProperty] public required bool IsEmbedded { get; set; }
     [BindProperty] public required QuestionnaireInfoDto Questionnaire { get; set; }
@@ -23,14 +26,14 @@ public class QuestionnaireStart(IApiClient apiClient, ILogger<QuestionnaireStart
         {
             if (QuestionnaireSlug == null)
                 return NotFound();
-            
+
             if (!ModelState.IsValid)
             {
                 return Page();
             }
-            
+
             var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireSlug);
-            
+
             if (questionnaire == null)
                 return NotFound();
 
@@ -39,10 +42,21 @@ public class QuestionnaireStart(IApiClient apiClient, ILogger<QuestionnaireStart
             {
                 return Redirect($"/questionnaires/{QuestionnaireSlug}/next?embed={Embed}");
             }
-            
+
             Questionnaire = questionnaire;
-            
+
+            if (!await imageStorageClient.CheckImageExistsAsync($"{questionnaire.Id}/published"))
+            {
+                logger.LogWarning("Questionnaire image not found: {QuestionnaireId}", questionnaire.Id);
+                questionnaire.DecorativeImage = null;
+            }
+
             IsEmbedded = Embed;
+        }
+        catch (GetToAnAnswerApiException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            logger.LogError(e, "Questionnaire not found: {QuestionnaireSlug}", QuestionnaireSlug);
+            return NotFound();
         }
         catch (Exception e)
         {
