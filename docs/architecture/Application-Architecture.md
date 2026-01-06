@@ -9,17 +9,18 @@
 
 ## Component Summary
 
-|      Component       | SLA                                               |
-|:--------------------:|:--------------------------------------------------|
-|  Azure App Service   | 99.95%                                            |
-|   Azure Front Door   | 99.95%                                            |
+|       Component       | SLA                                               |
+|:---------------------:|:--------------------------------------------------|
+|   Azure App Service   | 99.95%                                            |
+|   Azure Front Door    | 99.95%                                            |
+|    Azure Key Vault    | 99.90%                                            |
+| Azure Storage Account | 99.90%                                            |
+|       Azure WAF       | 99.90%                                            |
+|  Azure Relational DB  | 99.90%                                            |
 
 ## Availability
 
 The table shows the composite availability. All Services is for when the entire system is running.
-Because of the nature of how Redis caches the site, if either Redis or Contentful is down, the site would be able to
-effectively fail over and skip the cache/service from cache only respectively.
-
-|         Scenario         | Availability |
-|:------------------------:|:------------:|
-|      All Services        |    99.64%    |
+|   Scenario   | Availability |
+|:------------:|:------------:|
+| All Services |    99.90%    |
