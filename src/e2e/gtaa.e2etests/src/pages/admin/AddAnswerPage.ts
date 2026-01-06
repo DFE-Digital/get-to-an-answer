@@ -24,7 +24,7 @@ export class AddAnswerPage extends BasePage {
     private readonly errorLinkOptionContent: Locator;
     private readonly inlineOptionContentError: Locator;
     private readonly optionContentFormGroup: Locator;
-    
+
     private optionContent: (i: number) => Locator;
     private optionHint: (i: number) => Locator;
     private optionHintDiv: (i: number) => Locator;
@@ -56,7 +56,7 @@ export class AddAnswerPage extends BasePage {
 
         this.optionNumber = (index: number) =>
             this.page.locator(`label[for="Options-${index}-OptionContent"]`);
-        
+
         this.optionContent = (i: number) =>
             page.locator(`input[name="Options[${i}].OptionContent"]`)
 
@@ -82,11 +82,12 @@ export class AddAnswerPage extends BasePage {
         this.selectSpecificQuestion = (i: number) =>
             page.locator(
                 `select#Options-${i}-destination-specific-select`
-            ); this.selectInternalResultsPage = (i: number) =>
+            );
+        this.selectInternalResultsPage = (i: number) =>
             page.locator(
                 `select#Options-${i}-destination-internal-select`
             );
-            
+
         this.externalLinkInput = (i: number) =>
             page.locator(`input[id="Options-${i}-destination-external-link"]`);
 
@@ -126,10 +127,10 @@ export class AddAnswerPage extends BasePage {
         for (let i = 0; i < count; i++) {
             const label = labels.nth(i);
             const textContent = (await label.textContent())?.trim() ?? '';
-            
+
             if (!textContent.startsWith('Option '))
                 continue;
-            
+
             expectedTextIndex++;
             const expectedText = `Option ${expectedTextIndex}`;
 
@@ -138,10 +139,10 @@ export class AddAnswerPage extends BasePage {
             seenLabels.add(textContent);
         }
     }
-    
+
     async expectAnswerHeadingOnPage(expectedText?: string): Promise<void> {
         await expect(this.addAnswersHeading).toBeVisible({
-            timeout: Timeouts.MEDIUM,  
+            timeout: Timeouts.MEDIUM,
             visible: true   // Explicitly ensure visibility
         });
 
@@ -168,12 +169,12 @@ export class AddAnswerPage extends BasePage {
         }
         await expect(this.addAnotherOptionButton, '❌ Add another option button not visible').toBeVisible();
         await expect(this.enterAllOptionsButton, '❌ Enter all options link not visible').toBeVisible();
-        if(this.mode=='update') {
+        if (this.mode == 'update') {
             await expect(this.saveAnswersButton, '❌ Save answers button not visible').toBeVisible();
-        }else{
-            await expect(this.saveAndContinueButton, '❌ Save and continue button not visible').toBeVisible();    
+        } else {
+            await expect(this.saveAndContinueButton, '❌ Save and continue button not visible').toBeVisible();
         }
-        
+
     }
 
     async verifyAnswerOptionElements(i: number): Promise<void> {
@@ -201,7 +202,7 @@ export class AddAnswerPage extends BasePage {
 
         await this.clickAllLinksAndValidateFocus(browserName);
     }
-    
+
     async validateDuplicateAnswerOptionsErrorMessageSummary(browserName: string) {
         await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
         await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
@@ -231,7 +232,7 @@ export class AddAnswerPage extends BasePage {
             await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION2_CONTENT);
         }
     }
-    
+
     async validateInlineErrorNotVisible(i: number): Promise<void> {
         const errorElement = this.inlineError(i);
         const isVisible = await errorElement.isVisible().catch(() => false);
@@ -243,11 +244,25 @@ export class AddAnswerPage extends BasePage {
         await expect(destinationRadioLocator, `❌ Destination radio ${destination} for option ${optionIndex} not selected`).toBeChecked();
     }
 
-    async expectSpecificQuestionDropdownSelected(optionIndex: number, expectedQuestionId: string): Promise<void> {
+    async expectSpecificQuestionDropdownSelected(optionIndex: number, expectedQuestionContent: string): Promise<void> {
         const specificQuestionDropdown = this.selectSpecificQuestion(optionIndex);
-        await expect(specificQuestionDropdown, `❌ Specific question dropdown for option ${optionIndex} not visible`).toBeVisible();
-        await expect(specificQuestionDropdown, `❌ Specific question dropdown for option ${optionIndex} does not have value ${expectedQuestionId}`).toHaveValue(expectedQuestionId);
+
+        // Visibility check
+        await expect(
+            specificQuestionDropdown,
+            `❌ Specific question dropdown for option ${optionIndex} not visible`
+        ).toBeVisible();
+
+        // Get the actual value
+        const selectedOption = specificQuestionDropdown.locator('option:checked');
+        const actualValue = await selectedOption.textContent();
+
+        expect(
+            actualValue,
+            `❌ Specific question dropdown for option ${optionIndex} does not match expected question content. Expected: "${expectedQuestionContent}", Actual: "${actualValue}"`
+        ).toBe(expectedQuestionContent);
     }
+
 
     async expectExternalLinkInputValue(optionIndex: number, expectedValue: string): Promise<void> {
         const externalLinkInput = this.externalLinkInput(optionIndex);
@@ -255,19 +270,24 @@ export class AddAnswerPage extends BasePage {
         await expect(externalLinkInput, `❌ External link input value for option ${optionIndex} does not match expected value`).toHaveValue(expectedValue);
     }
 
-    async expectResultsPageDropdownSelected(optionIndex: number, expectedResultsPageId?: string): Promise<void> {
+    async expectResultsPageDropdownSelected(optionIndex: number, expectedResultsPageContent?: string): Promise<void> {
         const internalResultsDropdown = this.selectInternalResultsPage(optionIndex);
-        await expect(internalResultsDropdown, `❌ Internal results dropdown for option ${optionIndex} not visible`).toBeVisible();
 
-        const actualValue = await internalResultsDropdown.inputValue();
+        // Visibility check
+        await expect(
+            internalResultsDropdown,
+            `❌ Internal results dropdown for option ${optionIndex} not visible`
+        ).toBeVisible();
 
-        if (expectedResultsPageId) {
-            // If an expected value is provided, you can do additional checks
-            expect(actualValue, `❌ Internal results dropdown for option ${optionIndex} does not match expected value`).toBeTruthy();
-        } else {
-            // If no expected value, just ensure something is selected
-            expect(actualValue, `❌ No results page selected for option ${optionIndex}`).not.toBe('0');
-        }
+        // Get the text of the selected option
+        const selectedOption = internalResultsDropdown.locator('option:checked');
+        const actualValue = await selectedOption.textContent();
+        
+        expect(
+            actualValue?.trim(),
+            `❌ Internal results dropdown for option ${optionIndex} does not match expected results page content. Expected: "${expectedResultsPageContent}", Actual: "${actualValue}"`
+        ).toBe(expectedResultsPageContent);
+        
     }
 
     // Accessibility
@@ -276,7 +296,7 @@ export class AddAnswerPage extends BasePage {
             const optionContentId = await this.optionContent(i).getAttribute('id');
             expect(optionContentId, `❌ Option ${i} content input missing unique id`).not.toBeNull();
             expect(optionContentId, `❌ Option ${i} content id should incorporate index ${i}`).toContain(`Options-${i}`);
-            
+
             const optionHintId = await this.optionHint(i).getAttribute('id');
             expect(optionHintId, `❌ Option ${i} hint textarea missing unique id`).not.toBeNull();
             expect(optionHintId, `❌ Option ${i} hint id should incorporate index ${i}`).toContain(`Options-${i}`);
@@ -286,7 +306,7 @@ export class AddAnswerPage extends BasePage {
     async validateAriaDescribedByWithError(optionIndex: number): Promise<void> {
         const ariaDescribedBy = await this.optionContent(optionIndex).getAttribute('aria-describedby');
         expect(ariaDescribedBy, `❌ aria-describedby is missing for option ${optionIndex}`).not.toBeNull();
-        
+
         const errorElement = this.inlineError(optionIndex);
         const errorIsVisible = await errorElement.isVisible().catch(() => false);
 
@@ -303,7 +323,7 @@ export class AddAnswerPage extends BasePage {
     async validateAriaDescribedByForHintOnly(optionIndex: number): Promise<void> {
         const ariaDescribedBy = await this.optionHint(optionIndex).getAttribute('aria-describedby');
         expect(ariaDescribedBy, `❌ aria-describedby is missing for hint ${optionIndex}`).not.toBeNull();
-        
+
         const hintDivId = await this.optionHintDiv(optionIndex).getAttribute('id');
         expect(hintDivId, `❌ Option ${optionIndex} hint missing id attribute`).not.toBeNull();
         expect(ariaDescribedBy, `❌ aria-describedby should include hint id for option ${optionIndex}`)
@@ -314,7 +334,7 @@ export class AddAnswerPage extends BasePage {
         const errorIsVisible = await errorElement.isVisible().catch(() => false);
         expect(errorIsVisible, `❌ Error should not be visible for option ${optionIndex}`).toBe(false);
     }
-    
+
     // ===== Actions =====
     async clickErrorLinkAndValidateFocus(link: Locator, browserName: string): Promise<void> {
         await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
@@ -412,10 +432,11 @@ export class AddAnswerPage extends BasePage {
     async clickSaveAndContinueButton() {
         await this.saveAndContinueButton.click();
     }
-    
+
     async clickSaveAnswersButton() {
         await this.saveAnswersButton.click();
     }
+
     async clickEnterAllOptionsButton() {
         await this.enterAllOptionsButton.click();
     }

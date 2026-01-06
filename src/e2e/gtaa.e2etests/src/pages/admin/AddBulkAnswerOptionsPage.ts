@@ -14,6 +14,7 @@ export class AddBulkAnswerOptionsPage extends BasePage {
     private readonly errorLink: Locator;
     private readonly inlineError: Locator;
     private readonly formGroup: Locator;
+    private readonly backButton: Locator;
 
     private readonly enteredBulkOptions: string[] = [];
     
@@ -47,6 +48,7 @@ export class AddBulkAnswerOptionsPage extends BasePage {
         this.errorLink = page.locator('a[href="#BulkAnswerOptions"]');
         this.inlineError = page.locator('#bulk-options-error');
         this.formGroup = page.locator('.govuk-form-group:has(#BulkAnswerOptions)');
+        this.backButton = page.locator('a.govuk-back-link');
     }
     
     // ===== Actions =====
@@ -77,6 +79,15 @@ export class AddBulkAnswerOptionsPage extends BasePage {
             this.continueButton.click()
         ]);
     }
+
+    async clickBackButton(): Promise<void> {
+        await Promise.all([
+            this.page.waitForLoadState('networkidle'),
+            this.backButton.click()
+        ]);
+    }
+
+
 
     async moveBottomOptionToTop(): Promise<void> {
         // Get the current content of the textarea

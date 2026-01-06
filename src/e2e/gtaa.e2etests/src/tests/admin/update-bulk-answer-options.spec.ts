@@ -32,6 +32,7 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
     let viewQuestionnairePage: ViewQuestionnairePage;
     let designQuestionnairePage: DesignQuestionnairePage;
     let viewQuestionsPage: ViewQuestionPage;
+    let addQuestionPage: AddQuestionPage;
     let addAnswerPage: AddAnswerPage;
     let bulkAddAnswersPage: AddBulkAnswerOptionsPage;
 
@@ -83,8 +84,8 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
 
         await addAnswerPage.expectDestinationRadioSelected(0, 'NextQuestion');
 
-        //await addAnswerPage.expectDestinationRadioSelected(1, 'SpecificQuestion'); 
-        //await addAnswerPage.expectSpecificQuestionDropdownSelected(1, question2Content);
+        await addAnswerPage.expectDestinationRadioSelected(1, 'SpecificQuestion'); 
+        await addAnswerPage.expectSpecificQuestionDropdownSelected(1, question2Content);
 
         await addAnswerPage.clickEnterAllOptionsButton();
 
@@ -102,10 +103,14 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
         const reorderedOptions = moveToTopInExpectedBulkOptions(expectedBulkOptions);
         await addAnswerPage.validateAllOptionContents(reorderedOptions);
 
-        //await addAnswerPage.expectDestinationRadioSelected(0, 'SpecificQuestion'); 
-        //await addAnswerPage.expectSpecificQuestionDropdownSelected(0, question2Content);
+        await addAnswerPage.expectDestinationRadioSelected(0, 'SpecificQuestion'); 
+        await addAnswerPage.expectSpecificQuestionDropdownSelected(0, question2Content);
 
         await addAnswerPage.expectDestinationRadioSelected(1, 'NextQuestion');
+        await addAnswerPage.clickSaveAnswersButton();
+        
+        addQuestionPage = await AddQuestionPage.create(page);
+        await addQuestionPage.table.validateAnswerTableRows(expectedBulkOptions);
     })
     
     test('Update bulk answers and validate updated answers - External link', async ({
@@ -273,7 +278,7 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
         await addAnswerPage.expectDestinationRadioSelected(0, 'NextQuestion');
 
         await addAnswerPage.expectDestinationRadioSelected(1, 'InternalResultsPage');
-        await addAnswerPage.expectResultsPageDropdownSelected(1);
+        await addAnswerPage.expectResultsPageDropdownSelected(1, contentTitle);
 
         await addAnswerPage.expectDestinationRadioSelected(2, 'ExternalResultsPage');
         await addAnswerPage.expectExternalLinkInputValue(2, destinationUrl);
@@ -300,10 +305,10 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
         await addAnswerPage.expectDestinationRadioSelected(1, 'NextQuestion');
 
         await addAnswerPage.expectDestinationRadioSelected(2, 'InternalResultsPage');
-        await addAnswerPage.expectResultsPageDropdownSelected(2);
+        await addAnswerPage.expectResultsPageDropdownSelected(2, contentTitle);
     })
 
-    test('Update bulk answers and validate updated answers after removing an option', async ({
+    test('Update bulk answers by removing an option and validate updated answers', async ({
                                                                                       request,
                                                                                       page
                                                                                   }) => {
@@ -350,7 +355,7 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
         await addAnswerPage.expectDestinationRadioSelected(0, 'NextQuestion');
 
         await addAnswerPage.expectDestinationRadioSelected(1, 'InternalResultsPage');
-        await addAnswerPage.expectResultsPageDropdownSelected(1);
+        await addAnswerPage.expectResultsPageDropdownSelected(1,contentTitle);
 
         await addAnswerPage.expectDestinationRadioSelected(2, 'ExternalResultsPage');
         await addAnswerPage.expectExternalLinkInputValue(2, destinationUrl);
@@ -371,9 +376,76 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
         await addAnswerPage.expectAnswerHeadingOnPage();
         await addAnswerPage.assertAllOptionNumberLabelsInOrder();
         await addAnswerPage.validateAllOptionContents(currentOptions);
+
+        await addAnswerPage.clickSaveAnswersButton();
+
+        addQuestionPage = await AddQuestionPage.create(page);
+        await addQuestionPage.table.validateAnswerTableRows(currentOptions);
     })
 
-    test('Update bulk answers and validate updated answers after adding a new option', async ({
+    test('Remove an answer and validate add bulk answers options is updated', async ({request, page }) => {
+
+        const expectedBulkOptions = generateUniqueOptions(3);
+        const destinationUrl = 'https://example.com';
+
+        const {answer: answer1} = await createSingleAnswer(request, {
+            questionId: question1Id,
+            questionnaireId,
+            content: expectedBulkOptions[0]
+        }, token)
+
+        const contentTitle = 'test-content';
+        const apiContentResponse = await createContent(request, {
+            questionnaireId,
+            title: contentTitle,
+            content: 'This is a test content for the start page.',
+            referenceName: 'test-content'
+        }, token)
+
+        const {answer: answer2} = await createSingleAnswer(request, {
+            questionnaireId,
+            questionId: question1Id,
+            content: expectedBulkOptions[1],
+            destinationType: AnswerDestinationType.CustomContent,
+            destinationContentId: apiContentResponse.content.id
+        }, token)
+
+        const {answer: answer3} = await createSingleAnswer(request, {
+            questionnaireId,
+            questionId: question1Id,
+            content: expectedBulkOptions[2],
+            destinationType: AnswerDestinationType.ExternalLink,
+            destinationUrl
+        }, token)
+
+        viewQuestionnairePage = await signIn(page, token);
+
+        addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
+
+        await addAnswerPage.clickEnterAllOptionsButton();
+
+        bulkAddAnswersPage = await AddBulkAnswerOptionsPage.create(page);
+        await bulkAddAnswersPage.expectOnPage();
+        
+        await bulkAddAnswersPage.assertAllOptionNumberLabelsInOrder(3);
+        await bulkAddAnswersPage.validateAllOptionContents(expectedBulkOptions);
+
+        await bulkAddAnswersPage.clickBackButton();
+        await addAnswerPage.expectAnswerHeadingOnPage();
+
+        await addAnswerPage.removeOption(1);
+        expectedBulkOptions.splice(1, 1);
+
+        await addAnswerPage.clickEnterAllOptionsButton();
+        
+        bulkAddAnswersPage = await AddBulkAnswerOptionsPage.create(page);
+        await bulkAddAnswersPage.expectOnPage();
+
+        await bulkAddAnswersPage.assertAllOptionNumberLabelsInOrder(2);
+        await bulkAddAnswersPage.validateAllOptionContents(expectedBulkOptions);
+    })
+
+    test('Update bulk answers by adding a new option and validate updated answers', async ({
                                                                                                  request,
                                                                                                  page
                                                                                              }) => {
@@ -420,7 +492,7 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
         await addAnswerPage.expectDestinationRadioSelected(0, 'NextQuestion');
 
         await addAnswerPage.expectDestinationRadioSelected(1, 'InternalResultsPage');
-        await addAnswerPage.expectResultsPageDropdownSelected(1);
+        await addAnswerPage.expectResultsPageDropdownSelected(1,contentTitle);
 
         await addAnswerPage.expectDestinationRadioSelected(2, 'ExternalResultsPage');
         await addAnswerPage.expectExternalLinkInputValue(2, destinationUrl);
@@ -440,8 +512,80 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
         await addAnswerPage.expectAnswerHeadingOnPage();
         await addAnswerPage.assertAllOptionNumberLabelsInOrder();
         await addAnswerPage.validateAllOptionContents(currentOptions);
+
+        await addAnswerPage.clickSaveAnswersButton();
+
+        addQuestionPage = await AddQuestionPage.create(page);
+        await addQuestionPage.table.validateAnswerTableRows(currentOptions);
     })
 
+    test('Add a new answer option and validate bulk answers options is updated', async ({request, page }) => {
+
+        const expectedBulkOptions = generateUniqueOptions(3);
+        const destinationUrl = 'https://example.com';
+
+        const {answer: answer1} = await createSingleAnswer(request, {
+            questionId: question1Id,
+            questionnaireId,
+            content: expectedBulkOptions[0]
+        }, token)
+
+        const contentTitle = 'test-content';
+        const apiContentResponse = await createContent(request, {
+            questionnaireId,
+            title: contentTitle,
+            content: 'This is a test content for the start page.',
+            referenceName: 'test-content'
+        }, token)
+
+        const {answer: answer2} = await createSingleAnswer(request, {
+            questionnaireId,
+            questionId: question1Id,
+            content: expectedBulkOptions[1],
+            destinationType: AnswerDestinationType.CustomContent,
+            destinationContentId: apiContentResponse.content.id
+        }, token)
+
+        const {answer: answer3} = await createSingleAnswer(request, {
+            questionnaireId,
+            questionId: question1Id,
+            content: expectedBulkOptions[2],
+            destinationType: AnswerDestinationType.ExternalLink,
+            destinationUrl
+        }, token)
+
+        viewQuestionnairePage = await signIn(page, token);
+
+        addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
+
+        await addAnswerPage.clickEnterAllOptionsButton();
+
+        bulkAddAnswersPage = await AddBulkAnswerOptionsPage.create(page);
+        await bulkAddAnswersPage.expectOnPage();
+
+        await bulkAddAnswersPage.assertAllOptionNumberLabelsInOrder(3);
+        await bulkAddAnswersPage.validateAllOptionContents(expectedBulkOptions);
+
+        await bulkAddAnswersPage.clickBackButton();
+        await addAnswerPage.expectAnswerHeadingOnPage();
+
+        const newUniqueOption = generateUniqueOptions(1)[0];
+        expectedBulkOptions.push(newUniqueOption);
+
+        await addAnswerPage.clickAddAnotherOptionButton();
+        await addAnswerPage.setOptionContent(3, newUniqueOption);
+        await addAnswerPage.setOptionHint(3, 'This is the fourth answer hint');
+        await addAnswerPage.chooseDestination(3, 'NextQuestion');
+        
+        await addAnswerPage.clickEnterAllOptionsButton();
+
+        bulkAddAnswersPage = await AddBulkAnswerOptionsPage.create(page);
+        await bulkAddAnswersPage.expectOnPage();
+
+        await bulkAddAnswersPage.assertAllOptionNumberLabelsInOrder(4);
+        await bulkAddAnswersPage.validateAllOptionContents(expectedBulkOptions);
+    })
+    
     //TODO: CARE-1654 bug reported
     test('Update bulk answers and validate error message after adding a duplicate option', async ({
                                                                                                   request,
@@ -490,7 +634,7 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
         await addAnswerPage.expectDestinationRadioSelected(0, 'NextQuestion');
 
         await addAnswerPage.expectDestinationRadioSelected(1, 'InternalResultsPage');
-        await addAnswerPage.expectResultsPageDropdownSelected(1);
+        await addAnswerPage.expectResultsPageDropdownSelected(1, contentTitle);
 
         await addAnswerPage.expectDestinationRadioSelected(2, 'ExternalResultsPage');
         await addAnswerPage.expectExternalLinkInputValue(2, destinationUrl);
