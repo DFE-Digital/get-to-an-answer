@@ -16,8 +16,9 @@ import {ViewContributorPage} from "../pages/admin/ViewContributorPage";
 import {QuestionnaireStartPreviewPage} from "../pages/admin/QuestionnaireStartPreviewPage";
 import {QuestionnaireNextPreviewPage} from "../pages/admin/QuestionnaireNextPreviewPage";
 import {QuestionnaireStylingPage} from "../pages/admin/QuestionnaireStylingPage";
+import {QuestionnaireIntegrationPage} from "../pages/admin/QuestionnaireIntegrationPage";
 
-type LoadState = 'domcontentloaded' | 'load' | 'networkidle';
+export type LoadState = 'domcontentloaded' | 'load' | 'networkidle';
 
 export async function landing(page: Page, bearerToken?: string): Promise<SignInPage> {
     const signInPage = new SignInPage(page);
@@ -301,10 +302,22 @@ export async function goToQuestionnaireNextPreviewByUrl(
 // Navigate to questionnaire styling page
 export async function goToQuestionnaireStylingPageByUrl(
     page: Page,
-    questionnaireId: string
+    questionnaireId: string,
+    baseUrlOverride?: string
 ): Promise<QuestionnaireStylingPage> {
-    await page.goto(`/admin/questionnaires/${questionnaireId}/styling`, {
+    await page.goto(`${baseUrlOverride ?? ''}/admin/questionnaires/${questionnaireId}/styling`, {
         waitUntil: 'networkidle',
     });
     return QuestionnaireStylingPage.create(page);
+}
+
+export async function goToQuestionnaireIntegrationPage (
+    page: Page,
+    questionnaireId: string,
+    baseUrlOverride?: string
+): Promise<QuestionnaireIntegrationPage> {
+    await page.goto(`${baseUrlOverride ?? ''}/admin/questionnaires/${questionnaireId}/integration-guide`, {
+        waitUntil: 'networkidle',
+    });
+    return QuestionnaireIntegrationPage.create(page);
 }

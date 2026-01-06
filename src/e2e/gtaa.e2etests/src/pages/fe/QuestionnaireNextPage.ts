@@ -1,317 +1,306 @@
-import {Page, Locator, expect} from '@playwright/test';
+import {Page, Locator, expect, FrameLocator} from '@playwright/test';
 import {BasePage} from "../BasePage";
-import {QuestionType} from "../admin/AddQuestionPage";
+import {convertColorToHex, getElementInfo} from "../../helpers/utils";
+import {RunBasePage} from "./RunBasePage";
 
 type DestinationType = 'Question' | 'CustomContent' | 'ExternalLink';
 
-export class QuestionnaireNextPage extends BasePage {
-    // ===== Locators =====
-    private pageHeading(): Locator {
-        return this.page.locator('#main-content-header h1.govuk-heading-xl');
+export class QuestionnaireNextPage extends RunBasePage {
+    // ===== Common Locators =====
+
+    // Error state
+    readonly errorSummary: Locator;
+    readonly errorFormGroup: Locator;
+    readonly errorFieldMessage: Locator;
+    readonly errorSummaryListLink: Locator;
+
+    // Question mode
+    readonly questionForm: Locator;
+    readonly questionFieldset: Locator;
+    readonly questionHeading: Locator;
+    readonly questionHint: Locator;
+
+    readonly singleSelectRadios: Locator;
+    readonly multiSelectCheckboxes: Locator;
+    readonly dropdownSelect: Locator;
+
+    readonly continueButton: Locator;
+
+    // Results page mode
+    readonly resultsPageFieldset: Locator;           // Fieldset when decorative image or embedded
+    readonly resultsPageHeading: Locator;            // Inner H1 inside fieldset
+    readonly resultsPageDescription: Locator;
+
+    // External link mode
+    readonly externalLinkHiddenInput: Locator;
+
+    // ===== Constructor =====
+    constructor(page: Page, frame?: FrameLocator) {
+        super(page, frame);
+
+        this.errorSummary = this.pageOrFrame.locator('.govuk-error-summary[role="alert"][tabindex="-1"]');
+        this.errorFormGroup = this.pageOrFrame.locator('.govuk-form-group--error');
+        this.errorFieldMessage = this.errorFormGroup.locator('.govuk-error-message');
+        this.errorSummaryListLink = this.errorSummary.locator('a[href^="#"]');
+
+        this.questionForm = this.pageOrFrame.locator('#question-form');
+        this.questionFieldset = this.questionForm.locator('fieldset.govuk-fieldset');
+        this.questionHeading = this.questionFieldset.locator('h1.govuk-fieldset__heading');
+        this.questionHint = this.questionFieldset.locator('.govuk-hint').first();
+
+        this.singleSelectRadios = this.questionFieldset.locator('.govuk-radios');
+        this.multiSelectCheckboxes = this.questionFieldset.locator('.govuk-checkboxes');
+        this.dropdownSelect = this.questionFieldset.locator('select.govuk-select');
+
+        this.continueButton = this.questionForm.locator(
+            'button.govuk-button[type="submit"]'
+        );
+
+        this.externalLinkHiddenInput = this.pageOrFrame.locator('#external-link-dest');
+
+        this.resultsPageFieldset = this.pageOrFrame.locator('fieldset.govuk-fieldset');
+        this.resultsPageHeading = this.pageOrFrame.locator('#results-page-title');
+        this.resultsPageDescription = this.pageOrFrame.locator('#results-page-details').first();
     }
 
-    private questionHeading(): Locator {
-        return this.page.locator('fieldset.govuk-fieldset h1.govuk-fieldset__heading');
+    // ===== Type detection helpers =====
+
+    async isQuestionMode(): Promise<boolean> {
+        return this.questionForm.isVisible();
     }
 
-    private questionDescription(): Locator {
-        return this.page.locator('.govuk-hint');
+    async isResultsPageMode(): Promise<boolean> {
+        const isResultsPageTitleVisible = await this.resultsPageHeading.isVisible();
+        const isResultsPageDescVisible = await this.resultsPageDescription.isVisible();
+        
+        return isResultsPageTitleVisible && isResultsPageDescVisible;
     }
 
-    private radioOption(answerId: string): Locator {
-        return this.page.locator(`input[type="radio"][value="${answerId}"]`);
+    async isExternalLinkMode(): Promise<boolean> {
+        return this.externalLinkHiddenInput.isVisible();
     }
 
-    private checkboxOption(answerId: string): Locator {
-        return this.page.locator(`input[type="checkbox"][value="${answerId}"]`);
-    }
+    // ===== Assertions =====
 
-    private dropdownSelect(): Locator {
-        return this.page.locator('select.govuk-select[name="NextStateRequest.SelectedAnswerIds"]');
-    }
-
-    private answerLabel(answerId: string): Locator {
-        return this.page.locator(`label[for*="${answerId}"]`);
-    }
-
-    private answerHint(answerId: string): Locator {
-        return this.page.locator(`#q-*-a-${answerId}-hint`);
-    }
-
-    private continueButton(): Locator {
-        return this.page.locator('button[type="submit"].govuk-button');
-    }
-
-    private errorSummary(): Locator {
-        return this.page.locator('.govuk-error-summary');
-    }
-
-    private fieldError(): Locator {
-        return this.page.locator('.govuk-error-message');
-    }
-
-    private formGroupError(): Locator {
-        return this.page.locator('.govuk-form-group--error');
-    }
-
-    private customContent(): Locator {
-        return this.page.locator('.govuk-grid-column-full p');
-    }
-
-    private externalLinkInput(): Locator {
-        return this.page.locator('#external-link-dest');
-    }
-
-    private hiddenField(name: string): Locator {
-        return this.page.locator(`input[type="hidden"][name="${name}"]`);
-    }
-
-    constructor(page: Page) {
-        super(page);
-    }
-
-    // ===== Navigation Actions =====
-    async goto(questionnaireSlug: string, embed?: boolean) {
-        const embedParam = embed ? `?embed=${embed}` : '';
-        await this.page.goto(`/questionnaires/${questionnaireSlug}/next${embedParam}`);
-    }
-
-    async expectOnPage() {
-        await expect(this.pageHeading()).toBeVisible();
-    }
-
-    async expectQuestionPage(expectedQuestion?: string) {
-        if (expectedQuestion) {
-            await expect(this.questionHeading()).toHaveText(expectedQuestion);
-        } else {
-            await expect(this.questionHeading()).toBeVisible();
+    async assertQuestionStructure(embed: boolean = false): Promise<void> {
+        if (!embed) {
+            await this.verifyHeaderLinks();
+            await this.verifyFooterLinks();
         }
-    }
 
-    // ===== Question Content Actions =====
-    async getPageHeading(): Promise<string> {
-        return await this.pageHeading().textContent() || '';
-    }
+        await expect(this.questionForm, '❌ Question form missing').toBeVisible();
+        await expect(this.questionFieldset, '❌ Question fieldset missing').toBeVisible();
+        await expect(this.questionHeading, '❌ Question heading missing').toBeVisible();
 
-    async getQuestionText(): Promise<string> {
-        return await this.questionHeading().textContent() || '';
-    }
+        const headingText = (await this.questionHeading.textContent())?.trim() ?? '';
+        expect(headingText.length).toBeGreaterThan(0);
 
-    async getQuestionDescription(): Promise<string> {
-        return await this.questionDescription().textContent() || '';
-    }
-
-    async expectQuestionDescription() {
-        await expect(this.questionDescription()).toBeVisible();
-    }
-
-    // ===== Single Select Actions =====
-    async selectRadioOption(answerId: string) {
-        await this.radioOption(answerId).check();
-    }
-
-    async expectRadioOptionSelected(answerId: string) {
-        await expect(this.radioOption(answerId)).toBeChecked();
-    }
-
-    async expectRadioOptionNotSelected(answerId: string) {
-        await expect(this.radioOption(answerId)).not.toBeChecked();
-    }
-
-    async isRadioOptionVisible(answerId: string): Promise<boolean> {
-        return await this.radioOption(answerId).isVisible();
-    }
-
-    // ===== Multi Select Actions =====
-    async checkCheckboxOption(answerId: string) {
-        await this.checkboxOption(answerId).check();
-    }
-
-    async uncheckCheckboxOption(answerId: string) {
-        await this.checkboxOption(answerId).uncheck();
-    }
-
-    async expectCheckboxOptionChecked(answerId: string) {
-        await expect(this.checkboxOption(answerId)).toBeChecked();
-    }
-
-    async expectCheckboxOptionNotChecked(answerId: string) {
-        await expect(this.checkboxOption(answerId)).not.toBeChecked();
-    }
-
-    async checkMultipleCheckboxes(answerIds: string[]) {
-        for (const answerId of answerIds) {
-            await this.checkCheckboxOption(answerId);
+        const hasHint = await this.questionHint.isVisible().catch(() => false);
+        if (hasHint) {
+            const hintText = (await this.questionHint.textContent())?.trim() ?? '';
+            expect(hintText.length).toBeGreaterThan(0);
         }
+
+        await expect(this.continueButton).toBeVisible();
+        await expect(this.continueButton).toHaveText(/Continue/i);
     }
 
-    // ===== Dropdown Select Actions =====
-    async selectDropdownOption(answerId: string) {
-        await this.dropdownSelect().selectOption(answerId);
+    async assertSingleSelectQuestion(embed: boolean = false): Promise<void> {
+        await this.assertQuestionStructure(embed);
+        await expect(this.singleSelectRadios, '❌ Radios container missing for single-select question').toBeVisible();
+
+        const radioInputs = this.singleSelectRadios.locator('input.govuk-radios__input[type="radio"]');
+        const count = await radioInputs.count();
+        expect(count).toBeGreaterThan(0);
     }
 
-    async selectDropdownOptionByText(text: string) {
-        await this.dropdownSelect().selectOption({label: text});
+    async assertMultiSelectQuestion(): Promise<void> {
+        await this.assertQuestionStructure();
+        await expect(this.multiSelectCheckboxes, '❌ Checkboxes container missing for multi-select question').toBeVisible();
+
+        const checkboxInputs = this.multiSelectCheckboxes.locator('input.govuk-checkboxes__input[type="checkbox"]');
+        const count = await checkboxInputs.count();
+        expect(count).toBeGreaterThan(0);
     }
 
-    async getSelectedDropdownValue(): Promise<string> {
-        return await this.dropdownSelect().inputValue();
+    async assertDropdownQuestion(): Promise<void> {
+        await this.assertQuestionStructure();
+        await expect(this.dropdownSelect, '❌ Dropdown select missing for dropdown question').toBeVisible();
+
+        const options = this.dropdownSelect.locator('option');
+        const count = await options.count();
+        expect(count).toBeGreaterThan(1); // includes placeholder + at least one answer
     }
 
-    async expectDropdownOptionSelected(answerId: string) {
-        await expect(this.dropdownSelect()).toHaveValue(answerId);
+    async assertResultsPage(title: string, description: string): Promise<void> {
+        await this.verifyHeaderLinks();
+        await this.verifyFooterLinks();
+
+        await expect(this.resultsPageHeading).toBeVisible();
+        const headingText = (await this.resultsPageHeading.textContent())?.trim() ?? '';
+        expect(headingText).toBe(title);
+
+        await expect(this.resultsPageDescription).toBeVisible();
+        const text = (await this.resultsPageDescription.textContent())?.trim() ?? '';
+        expect(text).toBe(description);
     }
 
-    async getDropdownOptions(): Promise<string[]> {
-        const options = await this.dropdownSelect().locator('option').all();
-        const optionTexts: string[] = [];
-        for (const option of options) {
-            const text = await option.textContent();
-            if (text) optionTexts.push(text);
-        }
-        return optionTexts;
+    async assertExternalLinkModeHasHiddenDestination(): Promise<void> {
+        await expect(this.externalLinkHiddenInput).toBeVisible();
+        const value = await this.externalLinkHiddenInput.getAttribute('value');
+        expect(value).not.toBeNull();
+        expect(value!.length).toBeGreaterThan(0);
     }
 
-    // ===== Answer Label & Hint Actions =====
-    async getAnswerLabelText(answerId: string): Promise<string> {
-        return await this.answerLabel(answerId).textContent() || '';
+    async expectErrorSummary(): Promise<void> {
+        await expect(this.errorSummary).toBeVisible();
+        await expect(this.errorSummary).toHaveAttribute('role', 'alert');
+        await expect(this.errorSummary).toHaveAttribute('tabindex', '-1');
     }
 
-    async expectAnswerLabel(answerId: string) {
-        await expect(this.answerLabel(answerId)).toBeVisible();
+    // ===== Actions =====
+
+    async selectFirstRadioOption(): Promise<void> {
+        const firstRadio = this.singleSelectRadios
+            .locator('input.govuk-radios__input[type="radio"]')
+            .first();
+
+        await firstRadio.check();
+        await expect(firstRadio).toBeChecked();
     }
 
-    async getAnswerHintText(answerId: string): Promise<string> {
-        return await this.answerHint(answerId).textContent() || '';
+    async selectFirstCheckboxOption(): Promise<void> {
+        const firstCheckbox = this.multiSelectCheckboxes
+            .locator('input.govuk-checkboxes__input[type="checkbox"]')
+            .first();
+
+        await firstCheckbox.check();
+        await expect(firstCheckbox).toBeChecked();
     }
 
-    async expectAnswerHint(answerId: string) {
-        await expect(this.answerHint(answerId)).toBeVisible();
+    async unselectLastCheckboxOption(): Promise<void> {
+        const firstCheckbox = this.multiSelectCheckboxes
+            .locator('input.govuk-checkboxes__input[type="checkbox"]')
+            .last();
+
+        await firstCheckbox.uncheck();
+        await expect(firstCheckbox).not.toBeChecked();
     }
 
-    // ===== Form Submission Actions =====
-    async clickContinue() {
-        await this.continueButton().click();
-    }
+    async selectAllCheckboxOptions(): Promise<void> {
+        const checkboxes = await this.multiSelectCheckboxes
+            .locator('input.govuk-checkboxes__input[type="checkbox"]')
+            .all()
 
-    async submitForm() {
-        await this.clickContinue();
-    }
-
-    // ===== Error Handling Actions =====
-    async expectErrorSummary() {
-        await expect(this.errorSummary()).toBeVisible();
-    }
-
-    async expectNoErrors() {
-        await expect(this.errorSummary()).not.toBeVisible();
-    }
-
-    async expectFieldError() {
-        await expect(this.fieldError()).toBeVisible();
-    }
-
-    async getFieldErrorMessage(): Promise<string> {
-        return await this.fieldError().textContent() || '';
-    }
-
-    async expectFormGroupError() {
-        await expect(this.formGroupError()).toBeVisible();
-    }
-
-    async getErrorSummaryMessages(): Promise<string[]> {
-        const errorLinks = await this.errorSummary().locator('a').all();
-        const messages: string[] = [];
-        for (const link of errorLinks) {
-            const text = await link.textContent();
-            if (text) messages.push(text);
-        }
-        return messages;
-    }
-
-    // ===== Custom Content Actions =====
-    async expectCustomContent() {
-        await expect(this.customContent()).toBeVisible();
-    }
-
-    async getCustomContentText(): Promise<string> {
-        return await this.customContent().textContent() || '';
-    }
-
-    // ===== External Link Actions =====
-    async getExternalLinkDestination(): Promise<string> {
-        return await this.externalLinkInput().inputValue();
-    }
-
-    async expectExternalLinkDestination() {
-        await expect(this.externalLinkInput()).toBeVisible();
-    }
-
-    // ===== Hidden Field Actions =====
-    async getHiddenFieldValue(name: string): Promise<string> {
-        return await this.hiddenField(name).inputValue();
-    }
-
-    async expectHiddenField(name: string, expectedValue: string) {
-        await expect(this.hiddenField(name)).toHaveValue(expectedValue);
-    }
-
-    // ===== Combined Workflow Actions =====
-    async answerSingleSelectQuestion(answerId: string) {
-        await this.selectRadioOption(answerId);
-        await this.clickContinue();
-    }
-
-    async answerMultiSelectQuestion(answerIds: string[]) {
-        await this.checkMultipleCheckboxes(answerIds);
-        await this.clickContinue();
-    }
-
-    async answerDropdownQuestion(answerId: string) {
-        await this.selectDropdownOption(answerId);
-        await this.clickContinue();
-    }
-
-    // ===== Validation Actions =====
-    async expectQuestionType(type: QuestionType) {
-        switch (type) {
-            case 'SingleSelect':
-                await expect(this.page.locator('.govuk-radios')).toBeVisible();
-                break;
-            case 'MultiSelect':
-                await expect(this.page.locator('.govuk-checkboxes')).toBeVisible();
-                break;
-            case 'DropdownSelect':
-                await expect(this.dropdownSelect()).toBeVisible();
-                break;
-        }
-    }
-
-    async countRadioOptions(): Promise<number> {
-        return await this.page.locator('.govuk-radios__item').count();
-    }
-
-    async countCheckboxOptions(): Promise<number> {
-        return await this.page.locator('.govuk-checkboxes__item').count();
-    }
-
-    async getAllRadioOptionIds(): Promise<string[]> {
-        const radios = await this.page.locator('input[type="radio"][name="NextStateRequest.SelectedAnswerIds"]').all();
-        const ids: string[] = [];
-        for (const radio of radios) {
-            const value = await radio.getAttribute('value');
-            if (value) ids.push(value);
-        }
-        return ids;
-    }
-
-    async getAllCheckboxOptionIds(): Promise<string[]> {
-        const checkboxes = await this.page.locator('input[type="checkbox"][name="NextStateRequest.SelectedAnswerIds"]').all();
-        const ids: string[] = [];
         for (const checkbox of checkboxes) {
-            const value = await checkbox.getAttribute('value');
-            if (value) ids.push(value);
+            await checkbox.check();
+            await expect(checkbox).toBeChecked();
         }
-        return ids;
+    }
+
+    async selectDropdownByIndex(index: number): Promise<void> {
+        // index is 0-based including placeholder; callers should pass >=1 to skip placeholder
+        await this.dropdownSelect.selectOption({ index });
+    }
+
+    async clickContinue(): Promise<void> {
+        await this.continueButton.click();
+        await this.waitForPageLoad();
+    }
+
+    async assertContinueButtonTextAndColor(
+        expectedText: string, 
+        expectedHexColor: string,
+        expectedHexHoverColor?: string
+    ): Promise<void> {
+        const continueButtonColor = await this.continueButton.evaluate((el) =>
+            window.getComputedStyle(el).getPropertyValue('background-color')
+        );
+        expect(continueButtonColor.length).toBeGreaterThan(0);
+        expect(convertColorToHex(continueButtonColor)).toBe(expectedHexColor);
+
+        if (expectedHexHoverColor) {
+            await this.continueButton.focus();
+            const hoveredButtonColor = await this.continueButton.evaluate((el) =>
+                window.getComputedStyle(el).getPropertyValue('background-color')
+            );
+            expect(hoveredButtonColor.length).toBeGreaterThan(0);
+            expect(convertColorToHex(hoveredButtonColor)).toBe(expectedHexHoverColor);
+        }
+
+        await expect(this.continueButton).toHaveText(expectedText);
+    }
+
+    async assertTextColor(expectedHexColor: string): Promise<void> {
+        // get all text (h1, h2, h3, h4, h5, h6, label, .govuk-body) 
+        // and check they match the expected hex color
+        // exclude error messages, as they are rendered in a different colour
+        const textElements = this.pageOrFrame.locator('h1, h2, h3, h4, h5, h6, label, .govuk-body');
+
+        const count = await textElements.count();
+        expect(count).toBeGreaterThan(0);
+
+        for (let i = 0; i < count; i++) {
+            const element = textElements.nth(i);
+
+            const isErrorText = await element.evaluate((el) =>
+                el.closest('.govuk-error-message, .govuk-error-summary, .govuk-hint') !== null
+            );
+
+            if (isErrorText) {
+                continue;
+            }
+
+            const color = await element.evaluate((el) =>
+                window.getComputedStyle(el).getPropertyValue('color')
+            );
+            expect(color.length).toBeGreaterThan(0);
+
+            // generate locator for each element to make debugging easier
+            const info = await getElementInfo(element);
+
+            const actualHexColor = convertColorToHex(color);
+            expect(actualHexColor,
+                `For ${info.selector} [tag=${info.tagName}${info.id ? ' id=' + info.id : ''}${info.classes ? ' classes=' + info.classes : ''}], expected: ${expectedHexColor} but actual: ${actualHexColor}`)
+                .toBe(expectedHexColor);
+        }
+    }
+
+    async assertErrorComponentsColor(expectedHexColor: string): Promise<void> {
+        // Error summary should have same color as border of error field group
+        const errorSummaryColor = await this.errorSummary.evaluate((el) =>
+            window.getComputedStyle(el).getPropertyValue('border-color')
+        );
+        expect(errorSummaryColor.length).toBeGreaterThan(0);
+        expect(convertColorToHex(errorSummaryColor)).toBe(expectedHexColor);
+
+        // Error field group should have same color as summary
+        const errorFormGroupColor = await this.errorFormGroup.evaluate((el) =>
+            window.getComputedStyle(el).getPropertyValue('border-left-color')
+        );
+        expect(errorFormGroupColor.length).toBeGreaterThan(0);
+        expect(convertColorToHex(errorFormGroupColor)).toBe(expectedHexColor);
+
+        // Error field message should have same color as summary
+        const errorFieldMessageColor = await this.errorFieldMessage.evaluate((el) =>
+            window.getComputedStyle(el).getPropertyValue('color')
+        );
+        expect(errorFieldMessageColor.length).toBeGreaterThan(0);
+        expect(convertColorToHex(errorFieldMessageColor)).toBe(expectedHexColor);
+
+        // Error summary list link should have same color as summary
+        const errorSummaryListLinkColor = await this.errorSummaryListLink.evaluate((el) =>
+            window.getComputedStyle(el).getPropertyValue('color')
+        );
+        expect(errorSummaryListLinkColor.length).toBeGreaterThan(0);
+        expect(convertColorToHex(errorSummaryListLinkColor)).toBe(expectedHexColor);
+    }
+
+    async waitForResultsPageLoad() {
+        await this.resultsPageHeading.waitFor({ state: 'visible' });
+    }
+
+    async waitForErrorStatePresent() {
+        await this.errorSummary.waitFor({ state: 'visible' });
     }
 }

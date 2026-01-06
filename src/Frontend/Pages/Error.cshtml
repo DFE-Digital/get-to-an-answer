@@ -14,7 +14,7 @@
 {
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl">
+            <h1 id="error-page-title" class="govuk-heading-xl">
                 @ViewBag.Title
             </h1>
         </div>
@@ -23,7 +23,7 @@
 
 
 <div class="govuk-grid-row" data-last-fetched="2025-09-25T15:45:38">
-    <div class="govuk-grid-column-full" id="primary-content">
+    <div class="govuk-grid-column-full" id="error-page-details">
         @switch (Model.ErrorCode)
         {
             case 404:
