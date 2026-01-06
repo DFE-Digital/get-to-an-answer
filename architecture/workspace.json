@@ -1,0 +1,663 @@
+{
+  "configuration": {
+    "scope": "SoftwareSystem"
+  },
+  "description": "CxD - Get To An Answer (GTAA)",
+  "documentation": {},
+  "id": 4,
+  "lastModifiedAgent": "structurizr-onpremises/dsl-editor/af11f069-dd3c-4496-90a6-05921788b2c3",
+  "lastModifiedDate": "2025-12-05T13:32:28Z",
+  "lastModifiedUser": "stuart",
+  "model": {
+    "deploymentNodes": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "environment": "Service",
+                "id": "10",
+                "infrastructureNodes": [
+                  {
+                    "description": "Automatically distributes and secures incoming application traffic",
+                    "environment": "Service",
+                    "id": "12",
+                    "name": "Azure Front Door (Dev/Test/Prod)",
+                    "properties": {
+                      "structurizr.dsl.identifier": "fd"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Fowards requests to",
+                        "destinationId": "21",
+                        "id": "23",
+                        "sourceId": "12",
+                        "tags": "Relationship",
+                        "technology": "HTTPS"
+                      },
+                      {
+                        "description": "Fowards requests to",
+                        "destinationId": "26",
+                        "id": "31",
+                        "sourceId": "12",
+                        "tags": "Relationship",
+                        "technology": "HTTPS"
+                      },
+                      {
+                        "description": "Fowards requests to",
+                        "destinationId": "33",
+                        "id": "37",
+                        "sourceId": "12",
+                        "tags": "Relationship",
+                        "technology": "HTTPS"
+                      }
+                    ],
+                    "tags": "Element,Infrastructure Node,Microsoft Azure - Firewalls",
+                    "technology": "Azure Front Door and Firewalls"
+                  }
+                ],
+                "instances": "1",
+                "name": "Public Internet",
+                "properties": {
+                  "structurizr.dsl.identifier": "internet"
+                },
+                "tags": "Element,Deployment Node,Microsoft Azure - Entra Internet Access"
+              },
+              {
+                "environment": "Service",
+                "id": "13",
+                "infrastructureNodes": [
+                  {
+                    "environment": "Service",
+                    "id": "14",
+                    "name": "DfE Users",
+                    "properties": {
+                      "structurizr.dsl.identifier": "login"
+                    },
+                    "tags": "Element,Infrastructure Node,Microsoft Azure - Entra Identity Roles and Administrators",
+                    "technology": "Microsoft Entra"
+                  }
+                ],
+                "instances": "1",
+                "name": "DfE Entra",
+                "properties": {
+                  "structurizr.dsl.identifier": "entra"
+                },
+                "tags": "Element,Deployment Node,Microsoft Azure - Entra Privleged Identity Management"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "containerInstances": [
+                          {
+                            "containerId": "3",
+                            "deploymentGroups": [
+                              "Default"
+                            ],
+                            "environment": "Service",
+                            "id": "21",
+                            "instanceId": 1,
+                            "properties": {
+                              "structurizr.dsl.identifier": "webInstance"
+                            },
+                            "tags": "Container Instance"
+                          }
+                        ],
+                        "environment": "Service",
+                        "id": "20",
+                        "instances": "1",
+                        "name": "Web - App Service",
+                        "properties": {
+                          "structurizr.dsl.identifier": "webAppService"
+                        },
+                        "tags": "Element,Deployment Node,Microsoft Azure - App Services"
+                      },
+                      {
+                        "containerInstances": [
+                          {
+                            "containerId": "2",
+                            "deploymentGroups": [
+                              "Default"
+                            ],
+                            "environment": "Service",
+                            "id": "26",
+                            "instanceId": 1,
+                            "properties": {
+                              "structurizr.dsl.identifier": "apiInstance"
+                            },
+                            "relationships": [
+                              {
+                                "description": "Fetches information from",
+                                "destinationId": "21",
+                                "id": "27",
+                                "linkedRelationshipId": "4",
+                                "sourceId": "26"
+                              },
+                              {
+                                "description": "Writes data",
+                                "destinationId": "16",
+                                "id": "29",
+                                "sourceId": "26",
+                                "tags": "Relationship"
+                              },
+                              {
+                                "description": "Authenticates against",
+                                "destinationId": "14",
+                                "id": "38",
+                                "sourceId": "33",
+                                "tags": "Relationship",
+                                "technology": "@education.gov.uk"
+                              },
+                              {
+                                "description": "Reads from",
+                                "destinationId": "33",
+                                "id": "35",
+                                "linkedRelationshipId": "7",
+                                "sourceId": "26"
+                              }
+                            ],
+                            "tags": "Container Instance"
+                          }
+                        ],
+                        "environment": "Service",
+                        "id": "25",
+                        "instances": "1",
+                        "name": "API - App Service",
+                        "properties": {
+                          "structurizr.dsl.identifier": "apiAppService"
+                        },
+                        "tags": "Element,Deployment Node,Microsoft Azure - App Services"
+                      },
+                      {
+                        "containerInstances": [
+                          {
+                            "containerId": "5",
+                            "deploymentGroups": [
+                              "Default"
+                            ],
+                            "environment": "Service",
+                            "id": "33",
+                            "instanceId": 1,
+                            "properties": {
+                              "structurizr.dsl.identifier": "adminInstance"
+                            },
+                            "relationships": [
+                              {
+                                "description": "Writes to",
+                                "destinationId": "26",
+                                "id": "34",
+                                "linkedRelationshipId": "6",
+                                "sourceId": "33"
+                              },
+                              {
+                                "description": "Authenticates against",
+                                "destinationId": "14",
+                                "id": "38",
+                                "sourceId": "33",
+                                "tags": "Relationship",
+                                "technology": "@education.gov.uk"
+                              },
+                              {
+                                "description": "Writes images to",
+                                "destinationId": "17",
+                                "id": "40",
+                                "sourceId": "33",
+                                "tags": "Relationship"
+                              }
+                            ],
+                            "tags": "Container Instance"
+                          }
+                        ],
+                        "environment": "Service",
+                        "id": "32",
+                        "instances": "1",
+                        "name": "Admin - App Service",
+                        "properties": {
+                          "structurizr.dsl.identifier": "adminAppService"
+                        },
+                        "tags": "Element,Deployment Node,Microsoft Azure - App Services"
+                      }
+                    ],
+                    "environment": "Service",
+                    "id": "19",
+                    "instances": "1",
+                    "name": "Auto-Scaling App Service Plan",
+                    "properties": {
+                      "structurizr.dsl.identifier": "webContainer"
+                    },
+                    "tags": "Element,Deployment Node,Microsoft Azure - App Service Plans"
+                  }
+                ],
+                "environment": "Service",
+                "id": "15",
+                "infrastructureNodes": [
+                  {
+                    "description": "SQL Server for storing Flows and Authentication",
+                    "environment": "Service",
+                    "id": "16",
+                    "name": "Relational DB",
+                    "properties": {
+                      "structurizr.dsl.identifier": "db"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Reads data",
+                        "destinationId": "26",
+                        "id": "28",
+                        "sourceId": "16",
+                        "tags": "Relationship"
+                      }
+                    ],
+                    "tags": "Element,Infrastructure Node,Microsoft Azure - SQL Server"
+                  },
+                  {
+                    "description": "Storage for uploaded images",
+                    "environment": "Service",
+                    "id": "17",
+                    "name": "Azure Storage",
+                    "properties": {
+                      "structurizr.dsl.identifier": "storage"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Reads images from",
+                        "destinationId": "21",
+                        "id": "24",
+                        "sourceId": "17",
+                        "tags": "Relationship"
+                      },
+                      {
+                        "description": "Reads images from",
+                        "destinationId": "33",
+                        "id": "39",
+                        "sourceId": "17",
+                        "tags": "Relationship"
+                      }
+                    ],
+                    "tags": "Element,Infrastructure Node,Microsoft Azure - Storage Accounts"
+                  },
+                  {
+                    "description": "Secrets (Connection Strings, API Keys, etc)",
+                    "environment": "Service",
+                    "id": "18",
+                    "name": "Key Vault",
+                    "properties": {
+                      "structurizr.dsl.identifier": "keyvault"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Provides secrets to",
+                        "destinationId": "19",
+                        "id": "41",
+                        "sourceId": "18",
+                        "tags": "Relationship"
+                      }
+                    ],
+                    "tags": "Element,Infrastructure Node,Microsoft Azure - Key Vaults"
+                  }
+                ],
+                "instances": "1",
+                "name": "GTAA Vnet",
+                "properties": {
+                  "structurizr.dsl.identifier": "vnet"
+                },
+                "tags": "Element,Deployment Node,Microsoft Azure - Virtual Networks"
+              }
+            ],
+            "environment": "Service",
+            "id": "9",
+            "instances": "1",
+            "name": "UK South",
+            "properties": {
+              "structurizr.dsl.identifier": "6ab446e4-b011-429f-b4a6-741aca83bddb"
+            },
+            "tags": "Element,Deployment Node,Microsoft Azure - Region Management"
+          }
+        ],
+        "environment": "Service",
+        "id": "8",
+        "instances": "1",
+        "name": "Enterprise Landing Zone (ELZ)",
+        "properties": {
+          "structurizr.dsl.identifier": "2f694aed-0f88-4dd3-915e-f1c1d9884c89"
+        },
+        "tags": "Element,Deployment Node,Microsoft Azure - Azure A"
+      }
+    ],
+    "softwareSystems": [
+      {
+        "containers": [
+          {
+            "description": "API for admin system and front end communication",
+            "documentation": {},
+            "id": "2",
+            "name": "API Service",
+            "properties": {
+              "structurizr.dsl.identifier": "api"
+            },
+            "relationships": [
+              {
+                "description": "Fetches information from",
+                "destinationId": "3",
+                "id": "4",
+                "sourceId": "2",
+                "tags": "Relationship"
+              },
+              {
+                "description": "Reads from",
+                "destinationId": "5",
+                "id": "7",
+                "sourceId": "2",
+                "tags": "Relationship"
+              }
+            ],
+            "tags": "Element,Container,Microsoft Azure - API Management Services",
+            "technology": "dotnet 9.0 web api"
+          },
+          {
+            "description": "Front end for hosting various versions of the site",
+            "documentation": {},
+            "id": "3",
+            "name": "Front-End Web Application",
+            "properties": {
+              "structurizr.dsl.identifier": "webapp"
+            },
+            "tags": "Element,Container,Microsoft Azure - Website Staging",
+            "technology": "dotnet 9.0"
+          },
+          {
+            "description": "Admin interface for the site",
+            "documentation": {},
+            "id": "5",
+            "name": "Admin Web Application",
+            "properties": {
+              "structurizr.dsl.identifier": "admin"
+            },
+            "relationships": [
+              {
+                "description": "Writes to",
+                "destinationId": "2",
+                "id": "6",
+                "sourceId": "5",
+                "tags": "Relationship"
+              }
+            ],
+            "tags": "Element,Container,Microsoft Azure - Website Staging",
+            "technology": "dotnet 9.0"
+          }
+        ],
+        "documentation": {},
+        "id": "1",
+        "name": "Guided Content Flow",
+        "properties": {
+          "structurizr.dsl.identifier": "gtaa"
+        },
+        "tags": "Element,Software System"
+      }
+    ]
+  },
+  "name": "CxD - GTAA",
+  "properties": {
+    "structurizr.inspection.info": "0",
+    "structurizr.inspection.ignore": "0",
+    "structurizr.inspection.error": "44",
+    "structurizr.inspection.warning": "0",
+    "structurizr.dsl": "d29ya3NwYWNlICJDeEQgLSBHVEFBIiAiQ3hEIC0gR2V0IFRvIEFuIEFuc3dlciAoR1RBQSkiIHsKCiAgICBtb2RlbCB7CiAgICAKICAgICAgICBndGFhID0gc29mdHdhcmVTeXN0ZW0gIkd1aWRlZCBDb250ZW50IEZsb3ciIHsKICAgICAgICAgICAgYXBpID0gY29udGFpbmVyICJBUEkgU2VydmljZSIgewogICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkFQSSBmb3IgYWRtaW4gc3lzdGVtIGFuZCBmcm9udCBlbmQgY29tbXVuaWNhdGlvbiIKICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgImRvdG5ldCA5LjAgd2ViIGFwaSIKICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEFQSSBNYW5hZ2VtZW50IFNlcnZpY2VzIgogICAgICAgICAgICB9CiAgICAgICAgICAgIAogICAgICAgICAgICB3ZWJhcHAgPSBjb250YWluZXIgIkZyb250LUVuZCBXZWIgQXBwbGljYXRpb24iIHsKICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJGcm9udCBlbmQgZm9yIGhvc3RpbmcgdmFyaW91cyB2ZXJzaW9ucyBvZiB0aGUgc2l0ZSIKICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgImRvdG5ldCA5LjAiCiAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBXZWJzaXRlIFN0YWdpbmciCiAgICAgICAgICAgICAgICBhcGkgLT4gdGhpcyAiRmV0Y2hlcyBpbmZvcm1hdGlvbiBmcm9tIgogICAgICAgICAgICB9CiAgICAgICAgICAgIAogICAgICAgICAgICAKICAgICAgICAgICAgCiAgICAgICAgICAgIGFkbWluID0gY29udGFpbmVyICJBZG1pbiBXZWIgQXBwbGljYXRpb24iIHsKICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJBZG1pbiBpbnRlcmZhY2UgZm9yIHRoZSBzaXRlIgogICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiZG90bmV0IDkuMCIKICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIFdlYnNpdGUgU3RhZ2luZyIKICAgICAgICAgICAgICAgIHRoaXMgLT4gYXBpICJXcml0ZXMgdG8iCiAgICAgICAgICAgICAgICBhcGkgLT4gdGhpcyAiUmVhZHMgZnJvbSIKICAgICAgICAgICAgfQoKICAgICAgICB9CiAgICAgICAgCiAgICAgICAgc2VydmljZSA9IGRlcGxveW1lbnRFbnZpcm9ubWVudCAiU2VydmljZSIgewoKICAgICAgICAgICAgZGVwbG95bWVudE5vZGUgIkVudGVycHJpc2UgTGFuZGluZyBab25lIChFTFopIiB7CiAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBBenVyZSBBIgoKICAgICAgICAgICAgICAgIGRlcGxveW1lbnROb2RlICJVSyBTb3V0aCIgewogICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIFJlZ2lvbiBNYW5hZ2VtZW50IgogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIGludGVybmV0ID0gZGVwbG95bWVudE5vZGUgIlB1YmxpYyBJbnRlcm5ldCIgewogICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBFbnRyYSBJbnRlcm5ldCBBY2Nlc3MiCiAgICAgICAgICAgICAgICAgICAgICAgIGdhdGV3YXkgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIlNoYXJlZCBEZkUgV0FGIChQcm9kKSIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiQmFyYWNjdWRhIEZpcmV3YWxsIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkF1dG9tYXRpY2FsbHkgZGlzdHJpYnV0ZXMgYW5kIHNlY3VyZXMgaW5jb21pbmcgYXBwbGljYXRpb24gdHJhZmZpYyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEF6dXJlIEZpcmV3YWxsIE1hbmFnZXIiCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGZkID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJBenVyZSBGcm9udCBEb29yIChEZXYvVGVzdCkiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIkF6dXJlIEZyb250IERvb3IgYW5kIEZpcmV3YWxscyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJBdXRvbWF0aWNhbGx5IGRpc3RyaWJ1dGVzIGFuZCBzZWN1cmVzIGluY29taW5nIGFwcGxpY2F0aW9uIHRyYWZmaWMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBGaXJld2FsbHMiCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgZW50cmEgPSBkZXBsb3ltZW50Tm9kZSAiRGZFIEVudHJhIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEVudHJhIFByaXZsZWdlZCBJZGVudGl0eSBNYW5hZ2VtZW50IgogICAgICAgICAgICAgICAgICAgICAgICBsb2dpbiA9IGluZnJhc3RydWN0dXJlTm9kZSAiRGZFIFVzZXJzIiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBFbnRyYSBJZGVudGl0eSBSb2xlcyBhbmQgQWRtaW5pc3RyYXRvcnMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJNaWNyb3NvZnQgRW50cmEiCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgdm5ldCA9IGRlcGxveW1lbnROb2RlICJHVEFBIFZuZXQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gVmlydHVhbCBOZXR3b3JrcyIKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGRiID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJSZWxhdGlvbmFsIERCIiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiU1FMIFNlcnZlciBmb3Igc3RvcmluZyBGbG93cyBhbmQgQXV0aGVudGljYXRpb24iCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBTUUwgU2VydmVyIgogICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICBzdG9yYWdlID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJBenVyZSBTdG9yYWdlIiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiU3RvcmFnZSBmb3IgdXBsb2FkZWQgaW1hZ2VzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gU3RvcmFnZSBBY2NvdW50cyIKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAga2V5dmF1bHQgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIktleSBWYXVsdCIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlNlY3JldHMgKENvbm5lY3Rpb24gU3RyaW5ncywgQVBJIEtleXMsIGV0YykiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBLZXkgVmF1bHRzIgogICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICB3ZWJDb250YWluZXIgPSBkZXBsb3ltZW50Tm9kZSAiQXV0by1TY2FsaW5nIEFwcCBTZXJ2aWNlIFBsYW4iIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEFwcCBTZXJ2aWNlIFBsYW5zIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB3ZWJBcHBTZXJ2aWNlID0gZGVwbG95bWVudE5vZGUgIldlYiAtIEFwcCBTZXJ2aWNlIiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQXBwIFNlcnZpY2VzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHdlYkluc3RhbmNlID0gY29udGFpbmVySW5zdGFuY2Ugd2ViYXBwIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ2F0ZXdheSAtPiB0aGlzICJGb3dhcmRzIHJlcXVlc3RzIHRvIiAiSFRUUFMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZkIC0+IHRoaXMgIkZvd2FyZHMgcmVxdWVzdHMgdG8iICJIVFRQUyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RvcmFnZSAtPiB0aGlzICJSZWFkcyBpbWFnZXMgZnJvbSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFwaUFwcFNlcnZpY2UgPSBkZXBsb3ltZW50Tm9kZSAiQVBJIC0gQXBwIFNlcnZpY2UiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBBcHAgU2VydmljZXMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYXBpSW5zdGFuY2UgPSBjb250YWluZXJJbnN0YW5jZSBhcGkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkYiAtPiB0aGlzICJSZWFkcyBkYXRhIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGRiICJXcml0ZXMgZGF0YSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ2F0ZXdheSAtPiB0aGlzICJGb3dhcmRzIHJlcXVlc3RzIHRvIiAiSFRUUFMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZkIC0+IHRoaXMgIkZvd2FyZHMgcmVxdWVzdHMgdG8iICJIVFRQUyIKCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBhZG1pbkFwcFNlcnZpY2UgPSBkZXBsb3ltZW50Tm9kZSAiQWRtaW4gLSBBcHAgU2VydmljZSIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEFwcCBTZXJ2aWNlcyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBhZG1pbkluc3RhbmNlID0gY29udGFpbmVySW5zdGFuY2UgYWRtaW4gewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBnYXRld2F5IC0+IHRoaXMgIkZvd2FyZHMgcmVxdWVzdHMgdG8iICJIVFRQUyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZmQgLT4gdGhpcyAiRm93YXJkcyByZXF1ZXN0cyB0byIgIkhUVFBTIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGxvZ2luICJBdXRoZW50aWNhdGVzIGFnYWluc3QiICJAZWR1Y2F0aW9uLmdvdi51ayIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RvcmFnZSAtPiB0aGlzICJSZWFkcyBpbWFnZXMgZnJvbSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiBzdG9yYWdlICJXcml0ZXMgaW1hZ2VzIHRvIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICBrZXl2YXVsdCAtPiB0aGlzICJQcm92aWRlcyBzZWNyZXRzIHRvIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIGNvbmZpZ3VyYXRpb24gewogICAgICAgIHNjb3BlIHNvZnR3YXJlc3lzdGVtCiAgICB9CiAgICAKICAgIHZpZXdzIHsKICAgICAgICB0aGVtZXMgaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3N0cnVjdHVyaXpyL3RoZW1lcy9yZWZzL2hlYWRzL21hc3Rlci9taWNyb3NvZnQtYXp1cmUtMjAyNC4wNy4xNS9pY29ucy5qc29uCiAgICAKICAgICAgICAKICAgICAgICBkZXBsb3ltZW50ICogU2VydmljZSB7CiAgICAgICAgICAgIHRpdGxlICJTZXJ2aWNlIFZpZXciCiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgIH0KICAgICAgICAKICAgICAgICAKICAgICAgICAKICAgIH0KCn0="
+  },
+  "views": {
+    "configuration": {
+      "branding": {},
+      "lastSavedView": "Deployment-001",
+      "metadataSymbols": "SquareBrackets",
+      "styles": {},
+      "terminology": {},
+      "themes": [
+        "https://raw.githubusercontent.com/structurizr/themes/refs/heads/master/microsoft-azure-2024.07.15/icons.json"
+      ]
+    },
+    "deploymentViews": [
+      {
+        "dimensions": {
+          "height": 2380,
+          "width": 3090
+        },
+        "elements": [
+          {
+            "id": "8",
+            "x": 875,
+            "y": 875
+          },
+          {
+            "id": "9",
+            "x": 875,
+            "y": 875
+          },
+          {
+            "id": "10",
+            "x": 875,
+            "y": 875
+          },
+          {
+            "id": "11",
+            "x": 2380,
+            "y": 860
+          },
+          {
+            "id": "12",
+            "x": 2380,
+            "y": 455
+          },
+          {
+            "id": "13",
+            "x": 700,
+            "y": 700
+          },
+          {
+            "id": "14",
+            "x": 2385,
+            "y": 1390
+          },
+          {
+            "id": "15",
+            "x": 700,
+            "y": 700
+          },
+          {
+            "id": "16",
+            "x": 280,
+            "y": 265
+          },
+          {
+            "id": "17",
+            "x": 280,
+            "y": 1050
+          },
+          {
+            "id": "18",
+            "x": 280,
+            "y": 665
+          },
+          {
+            "id": "19",
+            "x": 700,
+            "y": 700
+          },
+          {
+            "id": "20",
+            "x": 700,
+            "y": 700
+          },
+          {
+            "id": "21",
+            "x": 1510,
+            "y": 845
+          },
+          {
+            "id": "25",
+            "x": 700,
+            "y": 700
+          },
+          {
+            "id": "26",
+            "x": 1050,
+            "y": 265
+          },
+          {
+            "id": "32",
+            "x": 175,
+            "y": 175
+          },
+          {
+            "id": "33",
+            "x": 1300,
+            "y": 1390
+          }
+        ],
+        "environment": "Service",
+        "generatedKey": true,
+        "key": "Deployment-001",
+        "name": "Deployment View: Service",
+        "order": 1,
+        "relationships": [
+          {
+            "id": "22"
+          },
+          {
+            "id": "23"
+          },
+          {
+            "id": "24",
+            "vertices": [
+              {
+                "x": 1145,
+                "y": 1215
+              }
+            ]
+          },
+          {
+            "id": "27",
+            "vertices": [
+              {
+                "x": 1465,
+                "y": 695
+              }
+            ]
+          },
+          {
+            "id": "28",
+            "vertices": [
+              {
+                "x": 835,
+                "y": 530
+              }
+            ]
+          },
+          {
+            "id": "29",
+            "vertices": [
+              {
+                "x": 845,
+                "y": 310
+              }
+            ]
+          },
+          {
+            "id": "30",
+            "vertices": [
+              {
+                "x": 2100,
+                "y": 580
+              }
+            ]
+          },
+          {
+            "id": "31",
+            "vertices": [
+              {
+                "x": 2170,
+                "y": 435
+              }
+            ]
+          },
+          {
+            "id": "34",
+            "vertices": [
+              {
+                "x": 1170,
+                "y": 1045
+              }
+            ]
+          },
+          {
+            "id": "35",
+            "vertices": [
+              {
+                "x": 1360,
+                "y": 1085
+              }
+            ]
+          },
+          {
+            "id": "36",
+            "vertices": [
+              {
+                "x": 2280,
+                "y": 1385
+              }
+            ]
+          },
+          {
+            "id": "37",
+            "vertices": [
+              {
+                "x": 2315,
+                "y": 770
+              },
+              {
+                "x": 2290,
+                "y": 1140
+              },
+              {
+                "x": 2120,
+                "y": 1310
+              }
+            ]
+          },
+          {
+            "id": "38"
+          },
+          {
+            "id": "39",
+            "vertices": [
+              {
+                "x": 1100,
+                "y": 1470
+              }
+            ]
+          },
+          {
+            "id": "40",
+            "vertices": [
+              {
+                "x": 1080,
+                "y": 1335
+              }
+            ]
+          },
+          {
+            "id": "41",
+            "vertices": [
+              {
+                "x": 840,
+                "y": 805
+              }
+            ]
+          }
+        ],
+        "title": "Service View"
+      }
+    ]
+  }
+}
