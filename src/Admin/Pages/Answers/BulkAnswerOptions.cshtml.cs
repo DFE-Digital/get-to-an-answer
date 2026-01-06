@@ -57,6 +57,7 @@ public partial class BulkAnswerOptions(IApiClient apiClient, ILogger<BulkAnswerO
             if (bulkOptions.Count != bulkOptions.Distinct().Count())
             {
                 ModelState.AddModelError("BulkAnswerOptionsRawText", "Duplicate entries found");
+
                 return Page();
             }
 
