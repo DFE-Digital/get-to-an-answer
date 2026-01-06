@@ -1,10 +1,10 @@
 # Development Process
 
-These are the preliminary development processes for developers and QAs. These processes are subject to continuous changes so it's advice to frequently review it for changes.
+These are the development processes for developers and QAs. These processes are subject to continuous changes so it's advice to frequently review it.
 
 ## Developer Development Process
 
-1. Pick up ticket (3 amigos; optional)
+1. Pick up ticket (3 amigos; optional, but necessary for changes to user experience, content, etc.)
 2. Define branch.
    ```
    Format:
@@ -16,11 +16,13 @@ These are the preliminary development processes for developers and QAs. These pr
    ```
 3. Run tests to make sure you know everything is working before you start.
 4. Implement the necessary changes
-    1. Content wise via Contentful development environment
-    2. Content type wise via migration scripts. File name format: `00XX-description.cjs`
-    3. Html changes via .cshtml
-    4. Css class attachment to content types via .cshtml or ContentRenderer classes
-5. Implement playwright tests and fix broken tests
+    1. C# .NET changes
+    2. Html changes via .cshtml
+    3. Css class attachment to content types via .cshtml or ContentRenderer classes
+    4. Terraform changes
+    5. Etc. 
+5. Implement xUnit tests and/or fix broken tests
+6. Implement playwright tests and/or fix broken tests
 6. Commit changes
     1. Message format: 
       ```
@@ -28,21 +30,15 @@ These are the preliminary development processes for developers and QAs. These pr
       
       {details}
       ```
-7. Create pull request
-8. Update e2e contentful environment
-    1. Use `Deploy - Contentful Migrations` to run the new script in the e2e environment, use your branch as the source code
-    2. Use `Deploy - Environment` to deploy the code changes made outside of the migration scripts
-    3. Manually update content added in development to e2e
-9. Rerun the checks in pull request, if failed due content differences in e2e environment
-10. When pull request has been approved and merged, do step 8 for the test environment
-11. Move the ticket to the Jira `Test` column and inform Imran
-12. Imran manual tests to see if the acceptance criteria was met.
-13. Once Imran has signed off.
-14. Update `production` contentful environment
-    1. Use `Deploy - Contentful Migrations` to run the new script in the production environment, use your branch as the source code
-    2. Use `Deploy - Environment` to deploy the code changes made outside of the migration scripts to the `staging` azure instance (staging uses published/draft pages in contentful)
-    3. Use `Deploy - Environment` to deploy the code changes made outside of the migration scripts to the `production` azure instance (potentially; only uses published pages in contentful)
-15. Inform Amy Leak in the Care Leavers MS Teams group chat, that the code changes have been deployed ready for her to apply the content changes.
+7. Create pull request, white and black box tests should be passing.
+8. Another developer reviews the pull request, and adds comments if necessary.
+9. Another developer approves the pull request.
+10. Then the pull request is merged.
+11. Move the ticket to the Jira `Test` column and inform QA.
+12. Deploy to Development/Test environments.
+13. QA manually/automation tests to see if the acceptance criteria were met, then signs it off (if no bugs occur).
+14. Deploy to Production environment.
+    1. Use `Deploy - Apps` to deploy the code changes to the `production` azure instance.
 
 ## QA Test Suite Development Process
 
@@ -61,4 +57,4 @@ These are the preliminary development processes for developers and QAs. These pr
 6. Create pull request
 7. Move Jira ticket the 'Ready for Review (Tech)'.
 8. Pull request approved and merged, by at least a Dev, QA or Technical Architecture
-9. Mark ticket as 'Done'.site. Pass or fail. (In development)
+9. Mark ticket as 'Done'.

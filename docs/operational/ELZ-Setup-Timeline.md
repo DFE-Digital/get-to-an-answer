@@ -10,12 +10,18 @@ This document details our process/experience being one of the first to deploy to
 
 ## DfE Azure Setup
 
-When you first get your Dev and Test Azure Subscription details, it will have the service principal access credentials sent in a secure email.
+When you first get your Dev and Test Azure Subscription details, it will have the service principal access credentials sent in a secure email (you'll have to manually copy the details).
 
-TODO:
-- Registering resource providers.
+### Setup the terraform state management
+[Terraform state setup](../architecture/Terraform-State-Setup.md)
+
+### Steps to setup the new ELZ Dev/Test environment(s)
+1. Registering resource providers.
+```bash
+az provider register --namespace Microsoft.AlertsManagement
+```
+
 - Challenges around setting up the subnet due to a ELZ policy, denying the creation.
-- Setting up the terraform backend and storing the terraform state in blob storage.
 - Challenges around storing user email in plain text in the database.
 - Challenges around Dev Shared WAF and Shared App Registration ServiceNow tickets.
 - Setting up frontdoor and custom domains.

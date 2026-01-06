@@ -2,13 +2,7 @@
 
 Azure Front Door Premium with Web Application Firewall (WAF) provides edge security, TLS termination, routing, and request filtering for this service.
 
-## Geoblocking
-
-Access is intended for UK users. Enforce via WAF custom rules:
-- Default policy: allow GB traffic; challenge or block non‑GB traffic.
-- Minimal exceptions: allow specific workplace preview/embeds where needed (see below).
-
-### Workplace tools (previews/embeds)
+## Workplace tools (previews/embeds)
 
 Permit selected user agents that perform link previews or embeds for internal collaboration:
 ```
@@ -17,9 +11,8 @@ js
 ```
 ## Threat protection
 
-### Managed rules
-- Enable OWASP managed rules (latest available).
-- Configure anomaly scoring/blocking as appropriate for environment.
+### Custom rules
+- TODO
 
 ### Rate limiting and high‑cost route protection
 For routes that can trigger heavier processing (e.g., file generation, translations, or similar):
