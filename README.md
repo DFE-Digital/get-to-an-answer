@@ -18,9 +18,9 @@ The site is made up of various components, each with their own README files deta
 ### Infrastructure & Testing
 
 - Infrastructure: [README](./src/Infrastructure/README.md)
-- End-to-end tests: [README](./src/e2e/gtaa.e2etests/README.md)
+- End-to-end tests: [README](./src/e2e/README.md)
 
 ### Developers
 
-- Devevlopment Process: TODO
+- Devevlopment Process: [README](./docs/developers/Development-Process.md)
 - Release Process: [README](./docs/developers/Release-Process.md)
