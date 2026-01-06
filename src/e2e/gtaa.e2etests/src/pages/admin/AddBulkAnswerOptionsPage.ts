@@ -39,15 +39,15 @@ export class AddBulkAnswerOptionsPage extends BasePage {
 
         this.heading = page.locator('h1.govuk-heading-l');
         this.caption = page.locator('.govuk-caption-l');
-        this.bulkTextArea = page.locator('textarea#BulkAnswerOptions');
+        this.bulkTextArea = page.locator('textarea#BulkAnswerOptionsRawText');
         this.continueButton = page.getByRole('button', {name: 'Continue'});
         this.hint = page.locator('#BulksAnswerOptions-hint');
 
         this.errorSummary = page.locator('.govuk-error-summary[role="alert"][tabindex="-1"]');
         this.errorList = this.errorSummary.locator('ul.govuk-error-summary__list');
-        this.errorLink = page.locator('a[href="#BulkAnswerOptions"]');
+        this.errorLink = page.locator('a[href="#BulkAnswerOptionsRawText"]');
         this.inlineError = page.locator('#bulk-options-error');
-        this.formGroup = page.locator('.govuk-form-group:has(#BulkAnswerOptions)');
+        this.formGroup = page.locator('.govuk-form-group:has(#BulkAnswerOptionsRawText)');
         this.backButton = page.locator('a.govuk-back-link');
     }
     
@@ -228,9 +228,8 @@ export class AddBulkAnswerOptionsPage extends BasePage {
         opts?: { stripSuffix?: boolean }
     ): Promise<void> {
         const { stripSuffix = false } = opts ?? {};
-
-        const bulkTextarea = this.page.locator('#BulkAnswerOptions');
-        const raw = (await bulkTextarea.inputValue()).trim();
+        
+        const raw = (await this.bulkTextArea.inputValue()).trim();
 
         const lines = raw
             .split(/\r?\n/)
@@ -258,10 +257,8 @@ export class AddBulkAnswerOptionsPage extends BasePage {
     }
     
     async assertAllOptionNumberLabelsInOrder(expectedOptionCount?: number): Promise<void> {
-        // If bulk textarea exists, validate by line count instead of labels.
-        const bulkTextarea = this.page.locator('#BulkAnswerOptions');
-        if (await bulkTextarea.count()) {
-            const raw = (await bulkTextarea.inputValue()).trim();
+        if (await this.bulkTextArea.count()) {
+            const raw = (await this.bulkTextArea.inputValue()).trim();
 
             const lines = raw
                 .split(/\r?\n/)

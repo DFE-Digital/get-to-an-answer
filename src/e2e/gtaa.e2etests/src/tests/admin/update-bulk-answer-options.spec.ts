@@ -1,11 +1,5 @@
 import {test, expect} from "@playwright/test";
-import {AddQuestionnairePage} from "../../pages/admin/AddQuestionnairePage";
-import {
-    goToAddQuestionnairePage, goToUpdateAnswerPageByUrl,
-    goToUpdateQuestionPageByUrl,
-    goToViewQuestionsPageByUrl,
-    signIn
-} from '../../helpers/admin-test-helper';
+import {goToUpdateAnswerPageByUrl, signIn} from '../../helpers/admin-test-helper';
 import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage";
 import {ViewQuestionnairePage} from "../../pages/admin/ViewQuestionnairePage";
 import {JwtHelper} from "../../helpers/JwtHelper";
@@ -15,7 +9,7 @@ import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {createQuestion} from "../../test-data-seeder/question-data";
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
-import {AddQuestionPage} from "../../pages/admin/AddQuestionPage";
+import {AddQuestionPage, QuestionRadioLabel} from "../../pages/admin/AddQuestionPage";
 import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
 import {AddBulkAnswerOptionsPage} from "../../pages/admin/AddBulkAnswerOptionsPage";
 import {createContent} from "../../test-data-seeder/content-data";
@@ -53,8 +47,7 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
         question2Id = question2.id;
         question2Content = question2.content;
     });
-
-    //TODO: Bug raised CARE-1651
+    
     test('Update bulk answers and validate updated answers - specific question', async ({
                                                                                             request,
                                                                                             page
@@ -586,7 +579,6 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
         await bulkAddAnswersPage.validateAllOptionContents(expectedBulkOptions);
     })
     
-    //TODO: CARE-1654 bug reported
     test('Update bulk answers and validate error message after adding a duplicate option', async ({
                                                                                                   request,
                                                                                                   page, browserName
@@ -651,7 +643,7 @@ test.describe('Get to an answer Edit bulk answers options to question', () => {
         const currentOptions = await bulkAddAnswersPage.getCurrentBulkOptions();
         await bulkAddAnswersPage.clickContinue();
 
-        //await bulkAddAnswersPage.validateDuplicateEntriesError(browserName);
+        await bulkAddAnswersPage.validateDuplicateEntriesError(browserName);
     })
 
     function generateUniqueOptions(count: number, prefix: string = 'Answer', separator: string = ' - '): string[] {
