@@ -114,18 +114,22 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         {
             var index = externalLink.OptionNumber - 1;
             var errorMessage = $"Please enter an external link for option {externalLink.OptionNumber}";
-
-            var selectKey = $"Options[{index}].ExternalLink";
+            
+            var destinationKey = $"Options-{index}-AnswerDestination";
             var resultsPageRadioInputId = $"Options-{index}-destination-external";
 
-            ModelState.AddModelError(selectKey, string.Empty);
-            ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
-
-            var destinationKey = $"Options[{index}].AnswerDestination";
+            
             ModelState.AddModelError(destinationKey, string.Empty);
-
-            var externalLinkErrorId = $"Options-{index}-AnswerDestination-external-error";
-            ModelState.AddModelError(externalLinkErrorId, string.Empty);
+            ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
+            
+            // ModelState.AddModelError(selectKey, string.Empty);
+            // ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
+            //
+            // var destinationKey = $"Options[{index}].AnswerDestination";
+            // ModelState.AddModelError(destinationKey, string.Empty);
+            //
+            // var externalLinkErrorId = $"Options-{index}-AnswerDestination-external-error";
+            // ModelState.AddModelError(externalLinkErrorId, string.Empty);
         }
     }
 

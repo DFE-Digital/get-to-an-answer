@@ -19,6 +19,7 @@
   
   var destinationSpecificSelectErrorId = $"{destinationIdSuffix}-specific-error";
   var destinationInternalSelectErrorId = $"{destinationIdSuffix}-internal-error";
+  var destinationExternalSelectErrorId = $"{destinationIdSuffix}-external-error";
   
   var destinationFormGroupErrorId = Id(destinationIdSuffix);
 }
@@ -183,14 +184,15 @@
           
           @if (hasExternalError)
           {
-            <p id="@Id($"{destinationIdSuffix}-external-error")" class="govuk-error-message">
+            <p id="@Id(destinationExternalSelectErrorId)" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> Please enter an external link
             </p>
           }
           
           <input class="govuk-input equal-input-width @(hasExternalError ? "govuk-input--error" : "")"
                  id="@Id("destination-external-link")"
-                 asp-for="ExternalLink"/>
+                 asp-for="ExternalLink"
+                 govuk-error-for="@Id(destinationExternalSelectErrorId)"/>
         </div>
       </div>
     </div>
