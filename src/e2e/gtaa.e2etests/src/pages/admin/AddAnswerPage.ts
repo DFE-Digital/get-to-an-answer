@@ -34,6 +34,7 @@ export class AddAnswerPage extends BasePage {
     private selectInternalResultsPage: (i: number) => Locator;
     private externalLinkInput: (i: number) => Locator;
     private inlineError: (i: number) => Locator;
+    private inlineErrorAnswerDestination: (i: number) => Locator;
     private optionNumber: (index: number) => Locator;
 
     constructor(page: Page, mode: Mode = 'create') {
@@ -62,6 +63,9 @@ export class AddAnswerPage extends BasePage {
 
         this.inlineError = (i: number) =>
             page.locator(`#Options-${i}-OptionContent-error`)
+
+        this.inlineErrorAnswerDestination = (i: number) =>
+            page.locator(`#Options-${i}-AnswerDestination-internal-error`)
 
         this.optionHint = (i: number) =>
             page.locator(`textarea[name="Options[${i}].OptionHint"]`);
@@ -215,6 +219,17 @@ export class AddAnswerPage extends BasePage {
         await this.clickAllLinksAndValidateFocus(browserName);
     }
 
+    async validateMissingResultsPageErrorMessageSummary(browserName: string) {
+        await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
+        await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
+        await expect(this.errorSummary, '❌ Attribute tabIndex is missing').toHaveAttribute('tabindex', '-1');
+        await expect(this.errorSummary, '❌ Error summary not focused').toBeFocused();
+
+        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_RESULTS_PAGE_ANSWER_OPTION1_SUMMARY);
+
+        await this.clickAllVisibleLinksAndValidateFocus(browserName);
+    }
+
     async validateInlineQuestionContentError(i: number): Promise<void> {
         await expect(this.inlineError(i), '❌ Inline option content error not visible').toBeVisible();
         if (i == 0) {
@@ -231,6 +246,11 @@ export class AddAnswerPage extends BasePage {
         } else {
             await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION2_CONTENT);
         }
+    }
+
+    async validateInlineMissingResultsPageError(i: number): Promise<void> {
+        await expect(this.inlineErrorAnswerDestination(i), '❌ Inline missing results page error not visible').toBeVisible();
+        await expect(this.inlineErrorAnswerDestination(i)).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_RESULTS_PAGE_ANSWER_INLINE);
     }
 
     async validateInlineErrorNotVisible(i: number): Promise<void> {
@@ -282,12 +302,12 @@ export class AddAnswerPage extends BasePage {
         // Get the text of the selected option
         const selectedOption = internalResultsDropdown.locator('option:checked');
         const actualValue = await selectedOption.textContent();
-        
+
         expect(
             actualValue?.trim(),
             `❌ Internal results dropdown for option ${optionIndex} does not match expected results page content. Expected: "${expectedResultsPageContent}", Actual: "${actualValue}"`
         ).toBe(expectedResultsPageContent);
-        
+
     }
 
     // Accessibility
@@ -358,6 +378,24 @@ export class AddAnswerPage extends BasePage {
 
         for (let i = 0; i < linkCount; i++) {
             const link = this.errorLinks.nth(i);
+            const href = await link.getAttribute('href');
+            const targetId = href?.replace('#', '');
+
+            await link.click();
+
+            if (browserName !== 'webkit' && targetId) {
+                const targetInput = this.page.locator(`#${targetId}`);
+                await expect(targetInput, `❌ Target input for link ${i + 1} not focused`).toBeFocused();
+            }
+        }
+    }
+
+    async clickAllVisibleLinksAndValidateFocus(browserName: string): Promise<void> {
+        const visibleErrorLinks = this.errorLinks.filter({hasText: /\S/});
+        const linkCount = await visibleErrorLinks.count();
+
+        for (let i = 0; i < linkCount; i++) {
+            const link = visibleErrorLinks.nth(i);
             const href = await link.getAttribute('href');
             const targetId = href?.replace('#', '');
 

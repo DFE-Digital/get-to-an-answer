@@ -60,8 +60,11 @@ export const ErrorMessages = {
     ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT: 'Option 2 content is required',
 
     ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION1_CONTENT: 'Option 1 content is duplicated',
-    ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION2_CONTENT: 'Option 2 content is duplicated'
+    ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION2_CONTENT: 'Option 2 content is duplicated',
 
+    ERROR_MESSAGE_MISSING_RESULTS_PAGE_ANSWER_OPTION1_SUMMARY: 'Please select a results page for option 1',
+    ERROR_MESSAGE_MISSING_RESULTS_PAGE_ANSWER_OPTION2_SUMMARY: 'Please select a results page for option 2',
+    ERROR_MESSAGE_MISSING_RESULTS_PAGE_ANSWER_INLINE: 'Please select a results page',
 }
 
 export const PageHeadings = {

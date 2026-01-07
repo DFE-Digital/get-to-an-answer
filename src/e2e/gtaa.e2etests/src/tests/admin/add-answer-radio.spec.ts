@@ -174,4 +174,59 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.validateInlineDuplicatedQuestionContentError(0);
         await addAnswerPage.validateInlineDuplicatedQuestionContentError(1);
     })
+
+    //TODO: CARE-1667 bug raised.
+    test("Validate error message when results page is not selected from dropdown", async ({request, page, browserName}) => {
+        const title = 'Test Content';
+        await createContent(request, {
+            questionnaireId,
+            title,
+            content: 'This is a test content for the start page.',
+            referenceName: 'test-reference'
+        }, token)
+
+        await signIn(page, token);
+        addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+
+        await addAnswerPage.expectAnswerHeadingOnPage();
+
+        await addAnswerPage.setOptionContent(0, 'First Answer Option');
+        await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
+        await addAnswerPage.chooseDestination(0, 'InternalResultsPage');
+
+        await addAnswerPage.setOptionContent(1, 'Second Answer Option');
+        await addAnswerPage.setOptionHint(1, 'This is the second answer hint');
+        await addAnswerPage.chooseDestination(1, 'NextQuestion');
+        
+        await addAnswerPage.clickSaveAndContinueButton();
+
+        //await addAnswerPage.validateMissingResultsPageErrorMessageSummary(browserName);
+    });
+
+    test("Inline error message when results page not selected from dropdown", async ({request, page}) => {
+        const title = 'Test Content';
+        await createContent(request, {
+            questionnaireId,
+            title,
+            content: 'This is a test content for the start page.',
+            referenceName: 'test-reference'
+        }, token)
+
+        await signIn(page, token);
+        addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+
+        await addAnswerPage.expectAnswerHeadingOnPage();
+
+        await addAnswerPage.setOptionContent(0, 'First Answer Option');
+        await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
+        await addAnswerPage.chooseDestination(0, 'InternalResultsPage');
+
+        await addAnswerPage.setOptionContent(1, 'Second Answer Option');
+        await addAnswerPage.setOptionHint(1, 'This is the second answer hint');
+        await addAnswerPage.chooseDestination(1, 'NextQuestion');
+
+        await addAnswerPage.clickSaveAndContinueButton();
+        
+        await addAnswerPage.validateInlineMissingResultsPageError(0);
+    })
 });
