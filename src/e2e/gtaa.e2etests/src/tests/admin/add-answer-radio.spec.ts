@@ -175,7 +175,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.validateInlineDuplicatedQuestionContentError(1);
     })
 
-    //TODO: CARE-1667 bug raised.
+    //TODO: CARE-1655 bug raised.
     test("Validate error message when results page is not selected from dropdown", async ({request, page, browserName}) => {
         const title = 'Test Content';
         await createContent(request, {
