@@ -127,25 +127,33 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
 
         if (hasError)
         {
-            var errorId = $"{simpleName.ToLower()}-field-error";
+            var overrideAriaDescribedBy = context.AllAttributes.ContainsName("custom-override-aria-describedby") &&
+                                          context.AllAttributes["custom-override-aria-describedby"].Value.ToString() == "true";
 
-            // Ensure aria-describedby includes the error id (and keep any existing describedby)
-            if (output.Attributes.TryGetAttribute("aria-describedby", out var describedByAttr)
-                && !string.IsNullOrWhiteSpace(GetAttributeStringValue(describedByAttr)))
+            if (!overrideAriaDescribedBy)
             {
-                var existing = GetAttributeStringValue(describedByAttr);
-                var parts = existing.Split(' ', System.StringSplitOptions.RemoveEmptyEntries).ToList();
-                if (!parts.Contains(errorId))
+                var errorId = $"{simpleName.ToLower()}-field-error";
+
+                // Ensure aria-describedby includes the error id (and keep any existing describedby)
+                if (output.Attributes.TryGetAttribute("aria-describedby", out var describedByAttr)
+                    && !string.IsNullOrWhiteSpace(GetAttributeStringValue(describedByAttr)))
                 {
-                    parts.Insert(0, errorId);
-                }
+                    var existing = GetAttributeStringValue(describedByAttr);
+                    var parts = existing.Split(' ', System.StringSplitOptions.RemoveEmptyEntries).ToList();
+                    if (!parts.Contains(errorId))
+                    {
+                        parts.Insert(0, errorId);
+                    }
 
-                output.Attributes.SetAttribute("aria-describedby", string.Join(" ", parts));
+                    output.Attributes.SetAttribute("aria-describedby", string.Join(" ", parts));
+                }
+                else
+                {
+                    output.Attributes.SetAttribute("aria-describedby", errorId);
+                }
             }
-            else
-            {
-                output.Attributes.SetAttribute("aria-describedby", errorId);
-            }
+
+            output.Attributes.RemoveAll("custom-override-aria-describedby");
 
             // Add an error-specific CSS class if not present
             if (output.Attributes.TryGetAttribute("class", out var errClassAttr))
@@ -171,7 +179,8 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
             return false;
 
         var modelType = modelValue.GetType();
-        if (modelType.IsEnum && System.Enum.TryParse(modelType, modelValue.ToString(), out var enumValue) && enumValue is int)
+        if (modelType.IsEnum && System.Enum.TryParse(modelType, modelValue.ToString(), out var enumValue) &&
+            enumValue is int)
         {
             var numericValue = Convert.ToInt32(enumValue);
             return numericValue == Convert.ToInt32(radioValue);

@@ -218,21 +218,20 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.validateAriaDescribedByForHintOnly(2);
     })
 
-    //TBC, CARE-1579 bug raised to be covered later during accessibility testing
-    // test('Accessible ids and aria-describedby for multiple options with error', async ({page}) => {
-    //     await signIn(page, token);
-    //     addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
-    //
-    //     await addAnswerPage.expectAnswerHeadingOnPage();
-    //
-    //     await addAnswerPage.setOptionHint(0, 'First answer hint');
-    //     await addAnswerPage.setOptionHint(1, 'Second answer hint');
-    //
-    //     await addAnswerPage.clickSaveAndContinueButton();
-    //     await addAnswerPage.validateUniqueIdsForMultipleOptions(2);
-    //
-    //     // Verify aria-describedby includes both hint id and error id when error is present
-    //     await addAnswerPage.validateAriaDescribedByWithError(0);
-    //     await addAnswerPage.validateAriaDescribedByWithError(1);
-    // })
+    test('Accessible ids and aria-describedby for multiple options with error', async ({page}) => {
+        await signIn(page, token);
+        addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+
+        await addAnswerPage.expectAnswerHeadingOnPage();
+
+        await addAnswerPage.setOptionHint(0, 'First answer hint');
+        await addAnswerPage.setOptionHint(1, 'Second answer hint');
+
+        await addAnswerPage.clickSaveAndContinueButton();
+        await addAnswerPage.validateUniqueIdsForMultipleOptions(2);
+
+        // Verify aria-describedby includes both hint id and error id when error is present
+        await addAnswerPage.validateAriaDescribedByWithError(0);
+        await addAnswerPage.validateAriaDescribedByWithError(1);
+    })
 });
