@@ -55,7 +55,7 @@
             aria-describedby="@Id(contentHintHintIdSuffix)"></textarea>
 </govuk-form-group>
 
-<govuk-form-group asp-for="AnswerDestination" specific-id-for-form-group-error="@destinationFormGroupErrorId">
+<govuk-form-group asp-for="AnswerDestination">
   <fieldset class="govuk-fieldset"
             aria-describedby="@($"{Id($"{destinationIdSuffix}-hint")}")">
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
@@ -94,22 +94,22 @@
       </div>
 
       <div id="@Id("destination-specific-reveal")" class="govuk-radios__conditional">
-        <div class="govuk-form-group">
+        @{
+          var hasSpecificError = ViewData.ModelState.TryGetValue($"{prefix}-destination-specific", out var destinationSpecificEntry) && destinationSpecificEntry?.Errors.Count > 0;
+        }
+        <div class="govuk-form-group @(hasSpecificError ? "govuk-form-group--error" : "")">
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-specific-select")">
             Select a question
           </label>
 
-          @* <govuk-field-error asp-for="SelectedQuestion" error-id="@Id(destinationSpecificSelectErrorId)"> *@
-          @* </govuk-field-error> *@
-
-          @if (ViewData.ModelState.TryGetValue($"{prefix}-destination-specific", out var destinationSpecificEntry) && destinationSpecificEntry?.Errors.Count > 0)
+          @if (hasSpecificError)
           {
           <p id="@Id($"{destinationIdSuffix}-specific-error")" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> Please select a question
             </p>
           }
 
-          <select class="govuk-select equal-input-width"
+          <select class="govuk-select equal-input-width @(hasSpecificError ? "govuk-select--error" : "")"
                   id="@Id("destination-specific-select")"
                   asp-for="SelectedDestinationQuestion"
                   asp-items="Model.QuestionSelectList"
@@ -132,19 +132,22 @@
         </label>
       </div>
       <div id="@Id("destination-internal-reveal")" class="govuk-radios__conditional">
-        <div class="govuk-form-group">
+        @{
+          var hasInternalError = ViewData.ModelState.TryGetValue($"{prefix}-destination-internal", out var internalEntry) && internalEntry?.Errors.Count > 0;
+        }
+        <div class="govuk-form-group @(hasInternalError ? "govuk-form-group--error" : "")">
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-internal-select")">
             Select a results page
           </label>
           
-          @if (ViewData.ModelState.TryGetValue($"{prefix}-destination-internal", out var specificEntry) && specificEntry?.Errors.Count > 0)
+          @if (hasInternalError)
           {
             <p id="@Id($"{destinationIdSuffix}-internal-error")" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> Please select a results page
             </p>
           }
           
-          <select class="govuk-select equal-input-width"
+          <select class="govuk-select equal-input-width @(hasInternalError ? "govuk-select--error" : "")"
                   id="@Id("destination-internal-select")"
                   asp-for="SelectedResultsPage"
                   asp-items="Model.ResultsPageSelectList">
@@ -166,31 +169,35 @@
       </div>
 
       <div id="@Id("destination-external-reveal")" class="govuk-radios__conditional">
-        <div class="govuk-form-group">
+        @{
+          var hasExternalError = ViewData.ModelState.TryGetValue($"{prefix}-destination-external", out var externalLinkEntry) && externalLinkEntry?.Errors.Count > 0;
+        }
+        <div class="govuk-form-group @(hasExternalError ? "govuk-form-group--error" : "")">
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-external-link")">
             Enter a link
           </label>
           
-            
-          @if (ViewData.ModelState.TryGetValue($"{prefix}-destination-external", out var externalLinkEntry) && externalLinkEntry?.Errors.Count > 0)
+          @if (hasExternalError)
           {
             <p id="@Id($"{destinationIdSuffix}-external-error")" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> Please enter an external link
             </p>
           }
           
-          <input class="govuk-input equal-input-width"
+          <input class="govuk-input equal-input-width @(hasExternalError ? "govuk-input--error" : "")"
                  id="@Id("destination-external-link")"
                  asp-for="ExternalLink"/>
         </div>
       </div>
     </div>
   </fieldset>
+</govuk-form-group>
   
-  @{
-    if (Model.QuestionType == QuestionType.MultiSelect)
-    {
-      <label class="govuk-label govuk-label--s govuk-!-margin-top-5" for="@Id("RankPriority")">
+@{
+  if (Model.QuestionType == QuestionType.MultiSelect)
+  {
+    <govuk-form-group asp-for="RankPriority">
+      <label class="govuk-label govuk-label--s" for="@Id("RankPriority")">
         Rank priority (optional)
       </label>
 
@@ -201,12 +208,10 @@
       </div>
 
       <govuk-input id="@Id("RankPriority")"
-                   class="govuk-input"
-                   type="number"
-                   asp-for="@Model.RankPriority"
-                   govuk-error-for="@Id("RankPriority-error")"/>
-    }
+                 class="govuk-input"
+                 type="number"
+                 asp-for="@Model.RankPriority"
+                 govuk-error-for="@Id("RankPriority-error")"/>
+    </govuk-form-group>
   }
-
-
-</govuk-form-group>
+}
