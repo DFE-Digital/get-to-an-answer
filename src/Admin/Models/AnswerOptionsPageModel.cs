@@ -99,17 +99,11 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             var index = resultsPage.OptionNumber - 1;
             var errorMessage = $"Please select a results page for option {resultsPage.OptionNumber}";
 
-            var destinationKey = $"Options[{index}].AnswerDestination";
-            ModelState.AddModelError(destinationKey, string.Empty);
-
-            var resultsPageErrorId = $"Options-{index}-AnswerDestination-internal-error";
-            ModelState.AddModelError(resultsPageErrorId, errorMessage);
-
-            var selectKey = $"Options[{index}].SelectedResultsPage";
+            var destinationKey = $"Options-{index}-AnswerDestination";
             var resultsPageRadioInputId = $"Options-{index}-destination-internal";
-
-            ModelState.AddModelError(selectKey, string.Empty);
-            ModelState.AddModelError(resultsPageRadioInputId, string.Empty);
+            
+            ModelState.AddModelError(destinationKey, string.Empty);
+            ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
         }
 
         var optionsWithExternalLinkNoSelection = Options.Where(o =>
@@ -138,26 +132,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
     private SelectListItem ToResultsPageSelectListItem(ContentDto content) =>
         new(!string.IsNullOrWhiteSpace(content.ReferenceName) ? content.ReferenceName : content.Title,
             content.Id.ToString());
-
-    protected async Task HydrateOptionListsAsync()
-    {
-        var questions = await apiClient.GetQuestionsAsync(QuestionnaireId);
-        var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
-
-        QuestionNumber = questions.Max(x => x.Order.ToString());
-
-        var questionSelect = questions.Where(x => x.Id != QuestionId)
-            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
-        var resultsSelect = resultsPages.Select(ToResultsPageSelectListItem).ToList();
-
-        foreach (var option in Options)
-        {
-            option.QuestionType = questions.Where(q => q.Id == QuestionId).Select(q => q.Type).FirstOrDefault();
-            option.QuestionSelectList = questionSelect;
-            option.ResultsPageSelectList = resultsSelect;
-        }
-    }
-
+    
     public async Task<IActionResult> OnPostRedirectToBulkEntry(string? returnUrl)
     {
         ValidateSelectedQuestionsIfAny();
