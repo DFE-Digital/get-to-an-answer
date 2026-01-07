@@ -127,6 +127,26 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.validateMissingAllFieldsErrorMessageSummary(browserName);
     })
 
+    test("Validate error message when adding duplicate answer options", async ({page, browserName}) => {
+        await signIn(page, token);
+        addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+
+        await addAnswerPage.expectAnswerHeadingOnPage();
+
+        await addAnswerPage.setOptionContent(0, 'First Answer Option');
+        await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
+        await addAnswerPage.chooseDestination(0, 'NextQuestion');
+
+        await addAnswerPage.setOptionContent(1, 'First Answer Option');
+        await addAnswerPage.setOptionHint(1, 'This is the second answer hint');
+        await addAnswerPage.chooseDestination(1, 'NextQuestion');
+
+        await addAnswerPage.clickSaveAndContinueButton();
+
+        await addAnswerPage.validateDuplicateAnswerOptionsErrorMessageSummary(browserName);
+    });
+
+
     test("Inline error and styling for missing option content", async ({page}) => {
         await signIn(page, token);
         addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
@@ -135,5 +155,23 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.clickSaveAndContinueButton();
         await addAnswerPage.validateInlineQuestionContentError(0);
         await addAnswerPage.validateInlineQuestionContentError(1);
+    })
+
+    test("Inline error and styling for duplicate option content", async ({page}) => {
+        await signIn(page, token);
+        addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+
+        await addAnswerPage.expectAnswerHeadingOnPage();
+        await addAnswerPage.setOptionContent(0, 'First Answer Option');
+        await addAnswerPage.setOptionHint(0, 'This is the first answer hint');
+        await addAnswerPage.chooseDestination(0, 'NextQuestion');
+
+        await addAnswerPage.setOptionContent(1, 'First Answer Option');
+        await addAnswerPage.setOptionHint(1, 'This is the second answer hint');
+        await addAnswerPage.chooseDestination(1, 'NextQuestion');
+
+        await addAnswerPage.clickSaveAndContinueButton();
+        await addAnswerPage.validateInlineDuplicatedQuestionContentError(0);
+        await addAnswerPage.validateInlineDuplicatedQuestionContentError(1);
     })
 });

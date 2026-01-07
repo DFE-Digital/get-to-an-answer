@@ -161,6 +161,18 @@ test.describe('Update answer for single select question', () => {
         await addAnswerPage.validateMissingAllFieldsErrorMessageSummary(browserName);
     });
 
+    test('Error summary displays for duplicate answer content on update', async ({browserName, page}) => {
+        await signIn(page, token);
+        addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
+        await addAnswerPage.expectAnswerHeadingOnPage();
+        
+        await addAnswerPage.clearOptionContent(1);
+        await addAnswerPage.setOptionContent(1, "Answer A") //adding duplicate content
+        await addAnswerPage.clickSaveAnswersButton();
+
+        await addAnswerPage.validateDuplicateAnswerOptionsErrorMessageSummary(browserName);
+    });
+
     // ===== Inline Error Tests =====
     test('Inline error displays for invalid answer content on update', async ({page}) => {
         await signIn(page, token);
@@ -174,5 +186,20 @@ test.describe('Update answer for single select question', () => {
 
         // Verify inline error is visible
         await addAnswerPage.validateInlineQuestionContentError(0);
+    });
+
+    test('Inline error displays for duplicate answer content on update', async ({page}) => {
+        await signIn(page, token);
+        addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
+        await addAnswerPage.expectAnswerHeadingOnPage();
+
+        // Clear first answer content
+        await addAnswerPage.clearOptionContent(1);
+        await addAnswerPage.setOptionContent(1, "Answer A") //adding duplicate content
+        await addAnswerPage.clickSaveAnswersButton();
+
+        // Verify inline error is visible
+        await addAnswerPage.validateInlineDuplicatedQuestionContentError(0);
+        await addAnswerPage.validateInlineDuplicatedQuestionContentError(1);
     });
 });

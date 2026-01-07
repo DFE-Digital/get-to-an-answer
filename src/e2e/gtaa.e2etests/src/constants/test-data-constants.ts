@@ -57,7 +57,10 @@ export const ErrorMessages = {
     ERROR_MESSAGE_QUESTIONNAIRE_DESCRIPTION_REQUIRED: 'Description is required when you save',
 
     ERROR_MESSAGE_MISSING_ANSWER_OPTION1_CONTENT: 'Option 1 content is required',
-    ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT: 'Option 2 content is required'
+    ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT: 'Option 2 content is required',
+
+    ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION1_CONTENT: 'Option 1 content is duplicated',
+    ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION2_CONTENT: 'Option 2 content is duplicated'
 
 }
 
