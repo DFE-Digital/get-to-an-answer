@@ -28,6 +28,11 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 
     public async Task<IActionResult> OnGet()
     {
+        HttpContext.Features.Set(new QuestionnaireRunFeature
+        {
+            IsEmbedded = Embed
+        });
+        
         if (QuestionnaireSlug == null)
             return NotFound();
         
@@ -52,6 +57,11 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
     {
         try
         {
+            HttpContext.Features.Set(new QuestionnaireRunFeature
+            {
+                IsEmbedded = Embed
+            });
+        
             if (QuestionnaireSlug == null)
                 return NotFound();
             

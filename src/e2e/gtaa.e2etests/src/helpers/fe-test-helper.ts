@@ -5,6 +5,15 @@ import {LoadState} from "./admin-test-helper";
 import {QuestionnaireStartPage} from "../pages/fe/QuestionnaireStartPage";
 import {QuestionnaireNextPage} from "../pages/fe/QuestionnaireNextPage";
 
+export async function goToPublishedQuestionnairePageByUrlNoWait(
+    page: Page,
+    questionnaireSlug: string): Promise<void> {
+
+    const feUrl = EnvConfig.FE_URL;
+    const startPageUrl = `${feUrl}/questionnaires/${questionnaireSlug}/start?embed=false`;
+
+    await page.goto(startPageUrl);
+}
 
 export async function goToPublishedQuestionnairePageByUrl(
     page: Page,

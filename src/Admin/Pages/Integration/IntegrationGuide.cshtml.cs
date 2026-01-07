@@ -41,8 +41,8 @@ public class IntegrationGuide(IApiClient apiClient, IMsGraphClient graphClient, 
 
             return $"{scheme}://{host.Host}:{port}";
         }
-        var adminSubdomain = ToEnvFrontendSubdomain(env);
-        var frontendSubdomain = ToEnvAdminSubdomain(env);
+        var adminSubdomain = ToEnvAdminSubdomain(env);
+        var frontendSubdomain = ToEnvFrontendSubdomain(env);
 
         return $"{scheme}://{host.Value?.Replace(adminSubdomain, frontendSubdomain)}";
     }

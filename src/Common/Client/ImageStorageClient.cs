@@ -37,9 +37,17 @@ public class ImageStorageClient : IImageStorageClient
 
     public async Task<bool> CheckImageExistsAsync(string blobFileName)
     {
-        await CheckContainerExists();
-        var blobClient = _containerClient.GetBlobClient(blobFileName);
-        return await blobClient.ExistsAsync();
+        try
+        {
+            await CheckContainerExists();
+            var blobClient = _containerClient.GetBlobClient(blobFileName);
+            return await blobClient.ExistsAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error checking if image exists");
+            return false;
+        }
     }
 
     /// <summary>

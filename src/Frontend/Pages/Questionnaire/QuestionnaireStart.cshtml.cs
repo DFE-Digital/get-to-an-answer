@@ -1,6 +1,7 @@
 using Common.Models.PageModels;
 using Common.Client;
 using Common.Domain;
+using Frontend.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Frontend.Pages.Questionnaire;
@@ -24,6 +25,11 @@ public class QuestionnaireStart(
     {
         try
         {
+            HttpContext.Features.Set(new QuestionnaireRunFeature
+            {
+                IsEmbedded = Embed
+            });
+        
             if (QuestionnaireSlug == null)
                 return NotFound();
 

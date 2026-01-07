@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
+import {JwtHelper} from "../../helpers/JwtHelper";
 
 test.describe.configure({ retries: 5 });
 
 test.describe('Health checks', () => {
-  test('GET /health should return 200 and a non-empty body', async ({ request }) => {
+  test('[API] GET /health should return 200 and a non-empty body', async ({ request }) => {
     const base = getApiBaseUrl();
     if (!base) {
       // Skip this test when the API URL is not provided in the environment.
@@ -18,10 +19,51 @@ test.describe('Health checks', () => {
 
     await assertResponseHasBody(res, url);
   });
+    test('[ADMIN] GET /dev/login should return 200 and a non-empty body', async ({ request }) => {
+        const base = getAdminBaseUrl();
+        if (!base) {
+            // Skip this test when the API URL is not provided in the environment.
+            test.skip(true, 'ADMIN base URL not set in environment (ADMIN_URL)');
+            return;
+        }
+
+        const url = `${base}/dev/login?jt=${JwtHelper.NoRecordsToken()}`;
+
+        const res = await request.get(url);
+        expect(res.status(), `Expected 200 from ${url}, got ${res.status()}`).toBe(200);
+
+        await assertResponseHasBody(res, url);
+    });
+
+    test('[FE] GET / should return 200 and a non-empty body', async ({ request }) => {
+        const base = getAdminBaseUrl();
+        if (!base) {
+            // Skip this test when the API URL is not provided in the environment.
+            test.skip(true, 'ADMIN base URL not set in environment (FE_URL)');
+            return;
+        }
+
+        const url = `${base}/`;
+
+        const res = await request.get(url);
+        expect(res.status(), `Expected 200 from ${url}, got ${res.status()}`).toBe(200);
+
+        await assertResponseHasBody(res, url);
+    });
 });
 
 function getApiBaseUrl(): string | null {
     const raw = process.env.API_URL;
+    return raw ? raw.replace(/\/+$/, '') : null;
+}
+
+function getAdminBaseUrl(): string | null {
+    const raw = process.env.ADMIN_URL;
+    return raw ? raw.replace(/\/+$/, '') : null;
+}
+
+function getFrontendBaseUrl(): string | null {
+    const raw = process.env.FE_URL;
     return raw ? raw.replace(/\/+$/, '') : null;
 }
 
