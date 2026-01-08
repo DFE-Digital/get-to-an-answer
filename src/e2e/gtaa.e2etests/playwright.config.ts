@@ -5,8 +5,7 @@ import {defineConfig, devices} from '@playwright/test';
 import {loadEnvConfig, EnvType} from './src/config/environment-config';
 
 // Choose an environment: 'local' or 'test'
-const ENV_NAME: 'local' | 'test' = 'local'; // Set the environment here
-process.env.ENV_NAME = ENV_NAME as EnvType;
+process.env.ENV_NAME = (process.env.ENVIRONMENT?.toLowerCase() || 'local') as EnvType;
 
 const EnvConfig = loadEnvConfig(process.env.ENV_NAME as EnvType);
 
@@ -68,7 +67,7 @@ export default defineConfig({
     
     fullyParallel: true,
     retries: 1,
-    workers: 10,
+    workers: 4,
     reporter: [['list'], ['html', {open: 'never'}]],
     use: {
         headless: true,
