@@ -26,12 +26,13 @@ import {QuestionnaireStartPage} from "../../pages/fe/QuestionnaireStartPage";
 import {QuestionnaireNextPage} from "../../pages/fe/QuestionnaireNextPage";
 import {
     goToPublishedQuestionnaireNextPageByUrl,
-    goToPublishedQuestionnairePageByUrl,
+    goToPublishedQuestionnairePageByUrl, goToPublishedQuestionnairePageByUrlNoWait,
     goToPublishedQuestionnairePageForResponse, waitForRedirectTo
 } from "../../helpers/fe-test-helper";
 import {EnvConfig} from "../../config/environment-config";
 import {SignInPage} from "../../pages/admin/SignInPage";
 import {PublishQuestionnaireConfirmationPage} from "../../pages/admin/PublishQuestionnaireConfirmationPage";
+import {ErrorPage} from "../../pages/fe/ErrorPage";
 
 test.describe('Questionnaire run (start & next)', () => {
     // Limit parallelism to avoid race conditions
@@ -124,6 +125,20 @@ test.describe('Questionnaire run (start & next)', () => {
 
         await startPage.assertStructure();
         await expect(startPage.outerImage, '❌ Decorative image not shown on start preview').toBeVisible();
+    });
+
+    // doesn't work locally (unless you set the ASP env to Developer, etc.), 
+    // only in Azure environment because we set the developer debugging page to display locally
+    test.skip('404 Error Page for non-existing questionnaire', async ({ page }) => {
+        await goToPublishedQuestionnairePageByUrlNoWait(page, "fake-questionnaire-slug");
+
+        const errorPage = await ErrorPage.create(page);
+
+        await errorPage.assertErrorText(
+            'Page not found.', `
+            If you typed the web address, check it is correct.
+            If you pasted the web address, check you copied the entire address.
+        `)
     });
 
     test('Embedded questionnaire uses inner fieldset heading even without decorative image', async ({ request, page }) => {

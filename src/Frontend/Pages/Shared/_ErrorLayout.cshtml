@@ -65,9 +65,11 @@
 </script>
 <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
 @{
-    await Html.RenderPartialAsync("_Header", configViewModel);
+    if (!Model.IsEmbedded)
+    {
+        await Html.RenderPartialAsync("_Header", configViewModel);
+    }
 }
-
 
 @await RenderSectionAsync("BeforeContent", required: false)
 
@@ -99,7 +101,10 @@
 }
 
 @{
-    await Html.RenderPartialAsync("_Footer", configViewModel);
+    if (!Model.IsEmbedded)
+    {
+        await Html.RenderPartialAsync("_Footer", configViewModel);
+    }
 }
 
 @await RenderSectionAsync("Scripts", false)

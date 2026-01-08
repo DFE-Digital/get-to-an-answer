@@ -125,7 +125,7 @@ resource "azurerm_cdn_frontdoor_route" "frontdoor-api-route" {
   cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.frontdoor-api-endpoint.id
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.fd-api-origin-group.id
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.frontdoor-api-origin.id]
-  #  cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.security_redirects.id, azurerm_cdn_frontdoor_rule_set.security_headers.id]
+  cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.security_redirects.id, azurerm_cdn_frontdoor_rule_set.security_headers.id]
   enabled = true
 
   forwarding_protocol    = "MatchRequest"
@@ -142,7 +142,7 @@ resource "azurerm_cdn_frontdoor_route" "frontdoor-admin-route" {
   cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.frontdoor-admin-endpoint.id
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.fd-admin-origin-group.id
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.frontdoor-admin-origin.id]
-  #  cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.security_redirects.id, azurerm_cdn_frontdoor_rule_set.security_headers.id]
+  cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.security_redirects.id, azurerm_cdn_frontdoor_rule_set.security_headers.id]
   enabled = true
 
   forwarding_protocol    = "MatchRequest"
@@ -159,7 +159,7 @@ resource "azurerm_cdn_frontdoor_route" "frontdoor-frontend-route" {
   cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.frontdoor-frontend-endpoint.id
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.fd-frontend-origin-group.id
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.frontdoor-frontend-origin.id]
-  #  cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.security_redirects.id, azurerm_cdn_frontdoor_rule_set.security_headers.id]
+  cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.security_redirects.id, azurerm_cdn_frontdoor_rule_set.security_headers.id]
   enabled = true
 
   forwarding_protocol    = "MatchRequest"
@@ -169,6 +169,104 @@ resource "azurerm_cdn_frontdoor_route" "frontdoor-frontend-route" {
 
   cdn_frontdoor_custom_domain_ids = var.frontend_custom_domain != "" ? [azurerm_cdn_frontdoor_custom_domain.fd-frontend-custom-domain[0].id] : null
   link_to_default_domain          = false
+}
+
+// Custom domains (optional per variable)
+resource "azurerm_cdn_frontdoor_custom_domain" "fd-api-custom-domain" {
+  count                    = var.api_custom_domain != "" ? 1 : 0
+  name                     = "${var.prefix}fdd-uks-api"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
+  host_name                = var.api_custom_domain
+
+  tls {
+    certificate_type = "ManagedCertificate"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "azurerm_cdn_frontdoor_custom_domain" "fd-admin-custom-domain" {
+  count                    = var.admin_custom_domain != "" ? 1 : 0
+  name                     = "${var.prefix}fdd-uks-admin"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
+  host_name                = var.admin_custom_domain
+
+  tls {
+    certificate_type = "ManagedCertificate"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "azurerm_cdn_frontdoor_custom_domain" "fd-frontend-custom-domain" {
+  count                    = var.frontend_custom_domain != "" ? 1 : 0
+  name                     = "${var.prefix}fdd-uks-frontend"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
+  host_name                = var.frontend_custom_domain
+
+  tls {
+    certificate_type = "ManagedCertificate"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+// Associate custom domains to their routes
+resource "azurerm_cdn_frontdoor_custom_domain_association" "api-app-custom-domain" {
+  count                          = var.api_custom_domain != "" ? 1 : 0
+  cdn_frontdoor_custom_domain_id = azurerm_cdn_frontdoor_custom_domain.fd-api-custom-domain[0].id
+  cdn_frontdoor_route_ids        = [azurerm_cdn_frontdoor_route.frontdoor-api-route.id]
+}
+
+resource "azurerm_cdn_frontdoor_custom_domain_association" "admin-app-custom-domain" {
+  count                          = var.admin_custom_domain != "" ? 1 : 0
+  cdn_frontdoor_custom_domain_id = azurerm_cdn_frontdoor_custom_domain.fd-admin-custom-domain[0].id
+  cdn_frontdoor_route_ids        = [azurerm_cdn_frontdoor_route.frontdoor-admin-route.id]
+}
+
+resource "azurerm_cdn_frontdoor_custom_domain_association" "frontend-app-custom-domain" {
+  count                          = var.frontend_custom_domain != "" ? 1 : 0
+  cdn_frontdoor_custom_domain_id = azurerm_cdn_frontdoor_custom_domain.fd-frontend-custom-domain[0].id
+  cdn_frontdoor_route_ids        = [azurerm_cdn_frontdoor_route.frontdoor-frontend-route.id]
+}
+
+// WAF policy
+resource "azurerm_cdn_frontdoor_firewall_policy" "web_firewall_policy" {
+  name                = "webFirewallPolicy"
+  resource_group_name = azurerm_resource_group.gettoananswer-rg.name
+  tags                = local.common_tags
+  mode                = "Prevention"
+  sku_name            = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.sku_name
+  redirect_url = coalesce(
+    var.frontend_custom_domain != "" ? "https://${var.frontend_custom_domain}/error/503" : null,
+    var.admin_custom_domain != "" ? "https://${var.admin_custom_domain}/error/503" : null,
+    var.api_custom_domain != "" ? "https://${var.api_custom_domain}/error/503" : null,
+    null
+  )
+
+  custom_rule {
+    name     = "AllowAzureLoadTesting"
+    enabled  = true
+    priority = 6
+    type     = "MatchRule"
+    action   = "Allow"
+
+    match_condition {
+      match_variable     = "RemoteAddr"
+      operator           = "IPMatch"
+      negation_condition = false
+      match_values       = [
+        "51.143.160.0/23",
+        "51.143.162.0/24"
+      ]
+    }
+  }
 }
 
 // WAF attach to all three endpoints and optional custom domains
@@ -250,9 +348,16 @@ resource "azurerm_cdn_frontdoor_rule" "security_headers_rule" {
       header_name   = "X-Content-Type-Options"
       value         = "nosniff"
     }
+    response_header_action {
+      header_action = "Delete"
+      header_name   = "Server"
+    }
+    response_header_action {
+      header_action = "Delete"
+      header_name   = "X-Powered-By"
+    }
   }
 }
-
 
 resource "azurerm_cdn_frontdoor_rule_set" "security_redirects" {
   name                     = "${var.prefix}SecurityRedirects"
@@ -321,251 +426,6 @@ resource "azurerm_cdn_frontdoor_rule" "thanks_txt_rule" {
       redirect_protocol    = "Https"
       destination_hostname = "vdp.security.education.gov.uk"
       destination_path     = "/thanks.txt"
-    }
-  }
-}
-
-// Custom domains (optional per variable)
-resource "azurerm_cdn_frontdoor_custom_domain" "fd-api-custom-domain" {
-  count                    = var.api_custom_domain != "" ? 1 : 0
-  name                     = "${var.prefix}fdd-uks-api"
-  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
-  host_name                = var.api_custom_domain
-
-  tls {
-    certificate_type = "ManagedCertificate"
-  }
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "azurerm_cdn_frontdoor_custom_domain" "fd-admin-custom-domain" {
-  count                    = var.admin_custom_domain != "" ? 1 : 0
-  name                     = "${var.prefix}fdd-uks-admin"
-  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
-  host_name                = var.admin_custom_domain
-
-  tls {
-    certificate_type = "ManagedCertificate"
-  }
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "azurerm_cdn_frontdoor_custom_domain" "fd-frontend-custom-domain" {
-  count                    = var.frontend_custom_domain != "" ? 1 : 0
-  name                     = "${var.prefix}fdd-uks-frontend"
-  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.id
-  host_name                = var.frontend_custom_domain
-
-  tls {
-    certificate_type = "ManagedCertificate"
-  }
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-// Associate custom domains to their routes
-resource "azurerm_cdn_frontdoor_custom_domain_association" "api-app-custom-domain" {
-  count                          = var.api_custom_domain != "" ? 1 : 0
-  cdn_frontdoor_custom_domain_id = azurerm_cdn_frontdoor_custom_domain.fd-api-custom-domain[0].id
-  cdn_frontdoor_route_ids        = [azurerm_cdn_frontdoor_route.frontdoor-api-route.id]
-}
-
-resource "azurerm_cdn_frontdoor_custom_domain_association" "admin-app-custom-domain" {
-  count                          = var.admin_custom_domain != "" ? 1 : 0
-  cdn_frontdoor_custom_domain_id = azurerm_cdn_frontdoor_custom_domain.fd-admin-custom-domain[0].id
-  cdn_frontdoor_route_ids        = [azurerm_cdn_frontdoor_route.frontdoor-admin-route.id]
-}
-
-resource "azurerm_cdn_frontdoor_custom_domain_association" "frontend-app-custom-domain" {
-  count                          = var.frontend_custom_domain != "" ? 1 : 0
-  cdn_frontdoor_custom_domain_id = azurerm_cdn_frontdoor_custom_domain.fd-frontend-custom-domain[0].id
-  cdn_frontdoor_route_ids        = [azurerm_cdn_frontdoor_route.frontdoor-frontend-route.id]
-}
-
-// WAF policy
-resource "azurerm_cdn_frontdoor_firewall_policy" "web_firewall_policy" {
-  name                = "webFirewallPolicy"
-  resource_group_name = azurerm_resource_group.gettoananswer-rg.name
-  tags                = local.common_tags
-  mode                = "Prevention"
-  sku_name            = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.sku_name
-  redirect_url = coalesce(
-    var.frontend_custom_domain != "" ? "https://${var.frontend_custom_domain}/en/service-unavailable" : null,
-    var.admin_custom_domain != "" ? "https://${var.admin_custom_domain}/en/service-unavailable" : null,
-    var.api_custom_domain != "" ? "https://${var.api_custom_domain}/en/service-unavailable" : null,
-    null
-  )
-
-  dynamic "managed_rule" {
-    for_each = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.sku_name == "Premium_AzureFrontDoor" ? [0] : []
-    content {
-      type    = "Microsoft_DefaultRuleSet"
-      version = "2.1"
-      action  = "Block"
-
-      exclusion {
-        match_variable = "RequestCookieNames"
-        operator       = "Equals"
-        selector       = "_ScCbts"
-      }
-    }
-  }
-
-  dynamic "managed_rule" {
-    for_each = azurerm_cdn_frontdoor_profile.frontdoor-web-profile.sku_name == "Premium_AzureFrontDoor" ? [0] : []
-    content {
-      type    = "Microsoft_BotManagerRuleSet"
-      version = "1.1"
-      action  = "Block"
-    }
-  }
-
-  custom_rule {
-    name     = "allowcontentful"
-    enabled  = true
-    action   = "Allow"
-    type     = "MatchRule"
-    priority = 100
-
-    match_condition {
-      match_variable = "RequestHeader"
-      selector       = "X-Contentful-CRN"
-      operator       = "Contains"
-      match_values   = ["crn:contentful"]
-    }
-  }
-
-  custom_rule {
-    name     = "blockarchiving"
-    enabled  = true
-    action   = "Block"
-    type     = "MatchRule"
-    priority = 150
-
-    match_condition {
-      match_variable = "RequestHeader"
-      selector       = "User-Agent"
-      operator       = "Contains"
-      transforms     = ["Lowercase"]
-      match_values   = ["mirrorweb"]
-    }
-
-    match_condition {
-      match_variable = "RequestUri"
-      operator       = "Contains"
-      transforms     = ["Lowercase", "UrlDecode"]
-      match_values   = ["/pdf/", "/translate-this-website/"]
-    }
-  }
-
-  custom_rule {
-    name     = "allowsearchengines"
-    enabled  = true
-    action   = "Allow"
-    type     = "MatchRule"
-    priority = 200
-
-    match_condition {
-      match_variable = "RequestHeader"
-      selector       = "User-Agent"
-      operator       = "RegEx"
-      transforms     = ["Lowercase", "UrlDecode"]
-      match_values   = ["aolbuild|baidu|bingbot|bingpreview|msnbot|duckduckgo|-google|googlebot|google-|googleother|read-aloud|teoma|slurp|yandex|yahoo"]
-    }
-
-    match_condition {
-      match_variable     = "RequestUri"
-      operator           = "Contains"
-      negation_condition = true
-      transforms         = ["Lowercase", "UrlDecode"]
-      match_values       = ["/pdf/", "/translate-this-website/"]
-    }
-  }
-
-  custom_rule {
-    name     = "allowtools"
-    enabled  = true
-    action   = "Allow"
-    type     = "MatchRule"
-    priority = 210
-
-    match_condition {
-      match_variable = "RequestHeader"
-      selector       = "User-Agent"
-      operator       = "Contains"
-      transforms     = ["Lowercase", "UrlDecode"]
-      match_values   = ["slack", "embedly", "figma", "skype"]
-    }
-  }
-
-  custom_rule {
-    name     = "allowsocialmedia"
-    enabled  = true
-    action   = "Allow"
-    type     = "MatchRule"
-    priority = 220
-
-    match_condition {
-      match_variable = "RequestHeader"
-      selector       = "User-Agent"
-      operator       = "RegEx"
-      transforms     = ["Lowercase", "UrlDecode"]
-      match_values   = ["facebookbot|facebookexternalhit|facebookscraper|twitterbot|meta-externalagent|meta-externalfetcher|microsoftpreview|linkedinbot|pinterest|redditbot|telegrambot|mastadon|duckduckbot"]
-    }
-  }
-
-  custom_rule {
-    name     = "allowai"
-    enabled  = true
-    action   = "Allow"
-    type     = "MatchRule"
-    priority = 230
-
-    match_condition {
-      match_variable = "RequestHeader"
-      selector       = "User-Agent"
-      operator       = "RegEx"
-      transforms     = ["Lowercase", "UrlDecode"]
-      match_values   = ["oai-search|chatgpt|gptbot|cohere-ai|google-extended|amazonbot|applebot|duckassistbot"]
-    }
-
-    match_condition {
-      match_variable     = "RequestUri"
-      operator           = "Contains"
-      negation_condition = true
-      transforms         = ["Lowercase", "UrlDecode"]
-      match_values       = ["/pdf/", "/translate-this-website/"]
-    }
-  }
-
-  custom_rule {
-    name     = "blocknonuk"
-    enabled  = true
-    action   = "Redirect"
-    type     = "MatchRule"
-    priority = 400
-
-    match_condition {
-      match_variable     = "SocketAddr"
-      operator           = "GeoMatch"
-      negation_condition = true
-      match_values       = ["GB", "ZZ"]
-    }
-
-    match_condition {
-      match_variable     = "RequestUri"
-      operator           = "RegEx"
-      negation_condition = true
-      transforms         = ["Lowercase", "UrlDecode"]
-      match_values       = ["\\/(robots\\.txt|error|service-unavailable|accessibility-statement|page-not-found|cookie-policy|privacy-policies|assets\\/|css\\/|js\\/|sitemap)"]
     }
   }
 }
