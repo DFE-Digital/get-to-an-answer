@@ -23,6 +23,7 @@
   var destinationSpecificSelectErrorId = $"{destinationIdSuffix}-specific-error";
   var destinationInternalSelectErrorId = $"{destinationIdSuffix}-internal-error";
   var destinationExternalSelectErrorId = $"{destinationIdSuffix}-external-error";
+  
 }
 
 <input type="hidden" asp-for="OptionNumber"/>
@@ -201,7 +202,9 @@
           <input class="govuk-input equal-input-width @(hasExternalError ? "govuk-input--error" : "")"
                  id="@Id("destination-external-link")"
                  asp-for="ExternalLink"
-                 govuk-error-for="@Id(destinationExternalSelectErrorId)"/>
+                 govuk-error-for="@Id(destinationExternalSelectErrorId)"
+                 aria-describedby="@(hasExternalError ? Id(destinationExternalSelectErrorId) : $"{Id($"{destinationIdSuffix}-hint")}")"
+                 custom-override-aria-describedby="true"/>
         </div>
       </div>
     </div>

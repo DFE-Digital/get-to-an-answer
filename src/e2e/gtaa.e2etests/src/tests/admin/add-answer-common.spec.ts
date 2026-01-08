@@ -50,7 +50,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         await signIn(page, token);
         addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
 
-        await addAnswerPage.clickBackLInk();
+        await addAnswerPage.clickBackLink();
         const viewQuestionPage = await ViewQuestionPage.create(page);
         await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
     });
@@ -238,7 +238,25 @@ test.describe('Get to an answer add an answer to a question', () => {
         
         await addAnswerPage.validateAriaDescribedByWithError(0, AnswerFieldName.SpecificQuestionSelect);
         await addAnswerPage.validateAriaDescribedByWithError(1, AnswerFieldName.ResultsPageSelect);
-        
-        // await addAnswerPage.validateAriaDescribedByWithError(1);
     })
+    
+    test('Accessible ids and aria-describedby for multiple Option content, external link', async ({page}) => {
+        await signIn(page, token);
+        addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
+
+        await addAnswerPage.expectAnswerHeadingOnPage();
+
+        await addAnswerPage.setExternalLink(0, "");
+        await addAnswerPage.setExternalLink(1, "");
+        
+        await addAnswerPage.clickSaveAndContinueButton();
+        await addAnswerPage.validateUniqueIdsForMultipleOptions(2);
+
+
+        await addAnswerPage.validateAriaDescribedByWithError(0, AnswerFieldName.Content);
+        await addAnswerPage.validateAriaDescribedByWithError(1, AnswerFieldName.Content);
+        await addAnswerPage.validateAriaDescribedByWithError(0, AnswerFieldName.ExternalLinkInput);
+        await addAnswerPage.validateAriaDescribedByWithError(1, AnswerFieldName.ExternalLinkInput);
+    })
+    
 });

@@ -447,10 +447,12 @@ export class AddAnswerPage extends BasePage {
 
     async setExternalLink(i: number, url: string) {
         await this.chooseDestination(i, 'ExternalResultsPage');
-        await this.externalLinkInput(i).fill(url);
+        
+        if (url)
+            await this.externalLinkInput(i).fill(url);
     }
 
-    async clickBackLInk() {
+    async clickBackLink() {
         await this.backLink.click();
     }
 
