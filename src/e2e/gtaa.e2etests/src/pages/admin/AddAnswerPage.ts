@@ -303,8 +303,18 @@ export class AddAnswerPage extends BasePage {
         }
     }
 
-    async validateAriaDescribedByWithError(optionIndex: number): Promise<void> {
-        const ariaDescribedBy = await this.optionContent(optionIndex).getAttribute('aria-describedby');
+    async validateAriaDescribedByWithError(optionIndex: number, fieldName: string): Promise<void> {
+        let ariaDescribedBy;
+        
+        switch (fieldName.toLowerCase()) {
+            case 'content': ariaDescribedBy = await this.optionContent(optionIndex).getAttribute('aria-describedby'); break;
+            case 'hint': ariaDescribedBy = await this.optionHintDiv(optionIndex).getAttribute('aria-describedby'); break;
+            case 'specificQuestionSelect' : ariaDescribedBy = await this.selectSpecificQuestion(optionIndex).getAttribute('aria-describedby'); break;
+            case 'resultsPageSelect' : ariaDescribedBy = await this.selectInternalResultsPage(optionIndex).getAttribute('aria-describedby'); break;
+            case 'externalLinkInput' : ariaDescribedBy = await this.externalLinkInput(optionIndex).getAttribute('aria-describedby'); break;
+            
+            default: ariaDescribedBy = null;
+        }
         expect(ariaDescribedBy, `❌ aria-describedby is missing for option ${optionIndex}`).not.toBeNull();
 
         const errorElement = this.inlineError(optionIndex);
