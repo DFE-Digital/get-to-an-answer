@@ -46,7 +46,7 @@
                type="text"
                asp-for="@Model.OptionContent"
                govuk-error-for="@Id($"{contentIdSuffix}-error")"
-               aria-describedby="@(optionContentHasError ? $"{Id(contentIdSuffix)}-error": Id($"{contentHintIdSuffix}-hint"))" 
+               aria-describedby="@(optionContentHasError ? $"{Id(contentIdSuffix)}-error": string.Empty)" 
                custom-override-aria-describedby="true" />
 </govuk-form-group>
 

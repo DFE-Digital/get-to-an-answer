@@ -129,7 +129,7 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
         {
             var overrideAriaDescribedBy = context.AllAttributes.ContainsName("custom-override-aria-describedby") &&
                                           context.AllAttributes["custom-override-aria-describedby"].Value.ToString() == "true";
-
+            
             if (!overrideAriaDescribedBy)
             {
                 var errorId = $"{simpleName.ToLower()}-field-error";
@@ -152,9 +152,7 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
                     output.Attributes.SetAttribute("aria-describedby", errorId);
                 }
             }
-
-            output.Attributes.RemoveAll("custom-override-aria-describedby");
-
+            
             // Add an error-specific CSS class if not present
             if (output.Attributes.TryGetAttribute("class", out var errClassAttr))
             {
@@ -171,6 +169,7 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
                 output.Attributes.SetAttribute("class", "govuk-input govuk-input--error");
             }
         }
+        output.Attributes.RemoveAll("custom-override-aria-describedby");
     }
 
     private static bool IsEnumRadioValueChecked(object? modelValue, string radioValue)
