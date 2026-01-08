@@ -364,6 +364,18 @@ export class AddAnswerPage extends BasePage {
         expect(errorIsVisible, `❌ Error should not be visible for option ${optionIndex}`).toBe(false);
     }
 
+    async validateRankPriorityAriaDescribedBy(optionIndex: number): Promise<void> {
+        const rankInput = this.answerRank(optionIndex);
+        const ariaDescribedBy = await rankInput.getAttribute('aria-describedby');
+        const expectedHintId = `Options-${optionIndex}-PriorityHint`;
+
+        expect(ariaDescribedBy, `❌ aria-describedby missing for Rank Priority at index ${optionIndex}`).toContain(expectedHintId);
+
+        const hintVisible = await this.page.locator(`#${expectedHintId}`).isVisible();
+        expect(hintVisible, `❌ Priority hint with id ${expectedHintId} is not visible`).toBe(true);
+    }
+    
+
     // ===== Actions =====
     async clickErrorLinkAndValidateFocus(link: Locator, browserName: string): Promise<void> {
         await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();

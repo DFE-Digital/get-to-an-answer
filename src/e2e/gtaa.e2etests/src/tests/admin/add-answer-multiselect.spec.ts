@@ -178,4 +178,19 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.validateInlineQuestionContentError(0);
         await addAnswerPage.validateInlineQuestionContentError(1);
     })
+
+
+    test('Accessible Ids and aria-describedby for Option fields with mutli-select', async ({page}) => {
+        const questionContent = `Test Question - ${Date.now()}`;
+        await addQuestionPage.enterQuestionContent(questionContent);
+        await addQuestionPage.chooseQuestionType(QuestionRadioLabel.MultiSelect);
+        await addQuestionPage.clickSaveAndContinue();
+
+        addAnswerPage = await AddAnswerPage.create(page);
+        await addAnswerPage.expectAnswerHeadingOnPage();
+        
+        await addAnswerPage.validateRankPriorityAriaDescribedBy(0);
+        await addAnswerPage.validateRankPriorityAriaDescribedBy(1);
+    })
+
 });

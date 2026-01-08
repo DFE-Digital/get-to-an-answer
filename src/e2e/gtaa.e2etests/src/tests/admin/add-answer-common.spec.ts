@@ -218,7 +218,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.validateAriaDescribedByForHintOnly(2);
     })
 
-    test('Accessible ids and aria-describedby for multiple Option content, specific question, internal link', async ({page}) => {
+    test('Accessible Error Ids and aria-describedby for multiple Option content, specific question, internal link', async ({page}) => {
         await signIn(page, token);
         addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
 
@@ -234,13 +234,12 @@ test.describe('Get to an answer add an answer to a question', () => {
         // Verify aria-describedby includes both hint id and error id when error is present
         await addAnswerPage.validateAriaDescribedByWithError(0, AnswerFieldName.Content);
         await addAnswerPage.validateAriaDescribedByWithError(1, AnswerFieldName.Content);
-
         
         await addAnswerPage.validateAriaDescribedByWithError(0, AnswerFieldName.SpecificQuestionSelect);
         await addAnswerPage.validateAriaDescribedByWithError(1, AnswerFieldName.ResultsPageSelect);
     })
     
-    test('Accessible ids and aria-describedby for multiple Option content, external link', async ({page}) => {
+    test('Accessible Error Ids and aria-describedby for multiple Option content, external link', async ({page}) => {
         await signIn(page, token);
         addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
 
@@ -252,11 +251,9 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.clickSaveAndContinueButton();
         await addAnswerPage.validateUniqueIdsForMultipleOptions(2);
 
-
         await addAnswerPage.validateAriaDescribedByWithError(0, AnswerFieldName.Content);
         await addAnswerPage.validateAriaDescribedByWithError(1, AnswerFieldName.Content);
         await addAnswerPage.validateAriaDescribedByWithError(0, AnswerFieldName.ExternalLinkInput);
         await addAnswerPage.validateAriaDescribedByWithError(1, AnswerFieldName.ExternalLinkInput);
     })
-    
 });
