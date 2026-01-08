@@ -1,6 +1,6 @@
 import {expect, test} from "@playwright/test";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
-import {AddAnswerPage} from "../../pages/admin/AddAnswerPage";
+import {AddAnswerPage, AnswerFieldName} from "../../pages/admin/AddAnswerPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {goToAddAnswerPageByUrl, goToAddResultPagePageByUrl, signIn} from "../../helpers/admin-test-helper";
@@ -218,19 +218,27 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.validateAriaDescribedByForHintOnly(2);
     })
 
-    test('Accessible ids and aria-describedby for multiple options with error', async ({page}) => {
+    test('Accessible ids and aria-describedby for multiple Option content, specific question, internal link', async ({page}) => {
         await signIn(page, token);
         addAnswerPage = await goToAddAnswerPageByUrl(page, questionnaireId, question1Id);
 
         await addAnswerPage.expectAnswerHeadingOnPage();
 
+        //Select radios, but no values in drop-down selects
+        await addAnswerPage.setSpecificQuestion(0, "");
+        await addAnswerPage.setInternalLink(1, "")
+        
         await addAnswerPage.clickSaveAndContinueButton();
         await addAnswerPage.validateUniqueIdsForMultipleOptions(2);
 
         // Verify aria-describedby includes both hint id and error id when error is present
-        await addAnswerPage.validateAriaDescribedByWithError(0, 'content');
-        await addAnswerPage.validateAriaDescribedByWithError(1, 'content');
+        await addAnswerPage.validateAriaDescribedByWithError(0, AnswerFieldName.Content);
+        await addAnswerPage.validateAriaDescribedByWithError(1, AnswerFieldName.Content);
 
+        
+        await addAnswerPage.validateAriaDescribedByWithError(0, AnswerFieldName.SpecificQuestionSelect);
+        await addAnswerPage.validateAriaDescribedByWithError(1, AnswerFieldName.ResultsPageSelect);
+        
         // await addAnswerPage.validateAriaDescribedByWithError(1);
     })
 });
