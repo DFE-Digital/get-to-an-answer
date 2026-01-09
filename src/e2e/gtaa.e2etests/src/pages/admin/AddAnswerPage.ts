@@ -7,6 +7,14 @@ import {QuestionRadioLabel} from "./AddQuestionPage";
 type Mode = 'create' | 'update';
 type Destination = 'NextQuestion' | 'SpecificQuestion' | 'ExternalResultsPage' | 'InternalResultsPage' | '0';
 
+export enum AnswerFieldName {
+    Content = 'OptionContent',
+    Hint = 'OptionHint',
+    SpecificQuestionSelect = 'AnswerDestination-specific',
+    ResultsPageSelect = 'AnswerDestination-internal',
+    ExternalLinkInput = 'AnswerDestination-external'
+}
+
 export class AddAnswerPage extends BasePage {
     private readonly mode: string;
     private readonly backLink: Locator;
@@ -33,7 +41,7 @@ export class AddAnswerPage extends BasePage {
     private selectSpecificQuestion: (i: number) => Locator;
     private selectInternalResultsPage: (i: number) => Locator;
     private externalLinkInput: (i: number) => Locator;
-    private inlineError: (i: number) => Locator;
+    private inlineError: (i: number, fieldName: AnswerFieldName) => Locator;
     private optionNumber: (index: number) => Locator;
 
     constructor(page: Page, mode: Mode = 'create') {
@@ -60,8 +68,8 @@ export class AddAnswerPage extends BasePage {
         this.optionContent = (i: number) =>
             page.locator(`input[name="Options[${i}].OptionContent"]`)
 
-        this.inlineError = (i: number) =>
-            page.locator(`#Options-${i}-OptionContent-error`)
+        this.inlineError = (i: number, fieldName: string) =>
+            page.locator(`#Options-${i}-${fieldName}-error`)
 
         this.optionHint = (i: number) =>
             page.locator(`textarea[name="Options[${i}].OptionHint"]`);
@@ -216,25 +224,25 @@ export class AddAnswerPage extends BasePage {
     }
 
     async validateInlineQuestionContentError(i: number): Promise<void> {
-        await expect(this.inlineError(i), '❌ Inline option content error not visible').toBeVisible();
+        await expect(this.inlineError(i, AnswerFieldName.Content), '❌ Inline option content error not visible').toBeVisible();
         if (i == 0) {
-            await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_ANSWER_OPTION1_CONTENT);
+            await expect(this.inlineError(i, AnswerFieldName.Content)).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_ANSWER_OPTION1_CONTENT);
         } else {
-            await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT);
+            await expect(this.inlineError(i, AnswerFieldName.Content)).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT);
         }
     }
 
     async validateInlineDuplicatedQuestionContentError(i: number): Promise<void> {
-        await expect(this.inlineError(i), '❌ Inline option content error not visible').toBeVisible();
+        await expect(this.inlineError(i, AnswerFieldName.Content), '❌ Inline option content error not visible').toBeVisible();
         if (i == 0) {
-            await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION1_CONTENT);
+            await expect(this.inlineError(i, AnswerFieldName.Content)).toContainText(ErrorMessages.ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION1_CONTENT);
         } else {
-            await expect(this.inlineError(i)).toContainText(ErrorMessages.ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION2_CONTENT);
+            await expect(this.inlineError(i, AnswerFieldName.Content)).toContainText(ErrorMessages.ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION2_CONTENT);
         }
     }
 
     async validateInlineErrorNotVisible(i: number): Promise<void> {
-        const errorElement = this.inlineError(i);
+        const errorElement = this.inlineError(i, AnswerFieldName.Content);
         const isVisible = await errorElement.isVisible().catch(() => false);
         expect(isVisible, `❌ Inline error should not be visible for option ${i}`).toBe(false);
     }
@@ -282,12 +290,12 @@ export class AddAnswerPage extends BasePage {
         // Get the text of the selected option
         const selectedOption = internalResultsDropdown.locator('option:checked');
         const actualValue = await selectedOption.textContent();
-        
+
         expect(
             actualValue?.trim(),
             `❌ Internal results dropdown for option ${optionIndex} does not match expected results page content. Expected: "${expectedResultsPageContent}", Actual: "${actualValue}"`
         ).toBe(expectedResultsPageContent);
-        
+
     }
 
     // Accessibility
@@ -303,11 +311,32 @@ export class AddAnswerPage extends BasePage {
         }
     }
 
-    async validateAriaDescribedByWithError(optionIndex: number): Promise<void> {
-        const ariaDescribedBy = await this.optionContent(optionIndex).getAttribute('aria-describedby');
+    async validateAriaDescribedByWithError(optionIndex: number, fieldName: AnswerFieldName): Promise<void> {
+        let ariaDescribedBy;
+
+        switch (fieldName) {
+            case  AnswerFieldName.Content :
+                ariaDescribedBy = await this.optionContent(optionIndex).getAttribute('aria-describedby');
+                break;
+            case AnswerFieldName.Hint :
+                ariaDescribedBy = await this.optionHintDiv(optionIndex).getAttribute('aria-describedby');
+                break;
+            case AnswerFieldName.SpecificQuestionSelect :
+                ariaDescribedBy = await this.selectSpecificQuestion(optionIndex).getAttribute('aria-describedby');
+                break;
+            case AnswerFieldName.ResultsPageSelect :
+                ariaDescribedBy = await this.selectInternalResultsPage(optionIndex).getAttribute('aria-describedby');
+                break;
+            case AnswerFieldName.ExternalLinkInput :
+                ariaDescribedBy = await this.externalLinkInput(optionIndex).getAttribute('aria-describedby');
+                break;
+
+            default:
+                throw new Error(`Invalid field name: ${fieldName}`);
+        }
         expect(ariaDescribedBy, `❌ aria-describedby is missing for option ${optionIndex}`).not.toBeNull();
 
-        const errorElement = this.inlineError(optionIndex);
+        const errorElement = this.inlineError(optionIndex, fieldName);
         const errorIsVisible = await errorElement.isVisible().catch(() => false);
 
         if (errorIsVisible) {
@@ -330,10 +359,22 @@ export class AddAnswerPage extends BasePage {
             .toContain(hintDivId);
 
         // Verify error is NOT visible when no validation errors are present
-        const errorElement = this.inlineError(optionIndex);
+        const errorElement = this.inlineError(optionIndex, AnswerFieldName.Hint);
         const errorIsVisible = await errorElement.isVisible().catch(() => false);
         expect(errorIsVisible, `❌ Error should not be visible for option ${optionIndex}`).toBe(false);
     }
+
+    async validateRankPriorityAriaDescribedBy(optionIndex: number): Promise<void> {
+        const rankInput = this.answerRank(optionIndex);
+        const ariaDescribedBy = await rankInput.getAttribute('aria-describedby');
+        const expectedHintId = `Options-${optionIndex}-PriorityHint`;
+
+        expect(ariaDescribedBy, `❌ aria-describedby missing for Rank Priority at index ${optionIndex}`).toContain(expectedHintId);
+
+        const hintVisible = await this.page.locator(`#${expectedHintId}`).isVisible();
+        expect(hintVisible, `❌ Priority hint with id ${expectedHintId} is not visible`).toBe(true);
+    }
+    
 
     // ===== Actions =====
     async clickErrorLinkAndValidateFocus(link: Locator, browserName: string): Promise<void> {
@@ -404,20 +445,26 @@ export class AddAnswerPage extends BasePage {
 
     async setSpecificQuestion(i: number, optionText: string) {
         await this.chooseDestination(i, 'SpecificQuestion');
-        await this.selectSpecificQuestion(i).selectOption(optionText);
+
+        if (optionText)
+            await this.selectSpecificQuestion(i).selectOption(optionText);
     }
 
     async setInternalLink(i: number, optionText: string) {
         await this.chooseDestination(i, 'InternalResultsPage');
-        await this.selectInternalResultsPage(i).selectOption(optionText);
+
+        if (optionText)
+            await this.selectInternalResultsPage(i).selectOption(optionText);
     }
 
     async setExternalLink(i: number, url: string) {
         await this.chooseDestination(i, 'ExternalResultsPage');
-        await this.externalLinkInput(i).fill(url);
+        
+        if (url)
+            await this.externalLinkInput(i).fill(url);
     }
 
-    async clickBackLInk() {
+    async clickBackLink() {
         await this.backLink.click();
     }
 

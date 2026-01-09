@@ -80,7 +80,7 @@ test.describe('Update answers to a question', () => {
         addAnswerPage = await goToUpdateAnswerPageByUrl(page, questionnaireId, question1Id);
         await addAnswerPage.expectAnswerHeadingOnPage();
         
-        await addAnswerPage.clickBackLInk();
+        await addAnswerPage.clickBackLink();
         const addQuestionPage = await AddQuestionPage.create(page);
         await addQuestionPage.expectAddQuestionHeadingOnPage(PageHeadings.EDIT_QUESTION_PAGE_HEADING);
     });
