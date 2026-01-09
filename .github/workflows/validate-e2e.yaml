@@ -67,9 +67,9 @@ jobs:
         working-directory: ./src/e2e/gtaa.e2etests
         run: |
           echo "Running health project to validate API is up..."
-          ${{ env.ENVIRONMENT_UPPER }}_API_URL=${{ vars.QA_API_URL }}
-          ${{ env.ENVIRONMENT_UPPER }}_ADMIN_URL=${{ vars.QA_ADMIN_URL }}
-          ${{ env.ENVIRONMENT_UPPER }}_FE_URL=${{ vars.QA_FRONTEND_URL }}
+          export ${{ env.ENVIRONMENT_UPPER }}_API_URL=${{ vars.QA_API_URL }}
+          export ${{ env.ENVIRONMENT_UPPER }}_ADMIN_URL=${{ vars.QA_ADMIN_URL }}
+          export ${{ env.ENVIRONMENT_UPPER }}_FE_URL=${{ vars.QA_FRONTEND_URL }}
             yarn playwright test -c playwright.config.ts --project=health
 
 #     Run only API tests for now
