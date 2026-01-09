@@ -5,6 +5,13 @@ import {EnvConfig} from "../../config/environment-config";
 test.describe.configure({ retries: 5 });
 
 test.describe('Health checks', () => {
+    test.beforeEach(async ({}, testInfo) => {
+        // Add delay between retries (except for first attempt)
+        if (testInfo.retry > 0) {
+            await new Promise(resolve => setTimeout(resolve, 5000)); // 5 second delay
+        }
+    });
+    
   test('[API] GET /health should return 200 and a non-empty body', async ({ request }) => {
     const base = getApiBaseUrl();
     if (!base) {
