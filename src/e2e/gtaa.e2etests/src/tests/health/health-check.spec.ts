@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import {JwtHelper} from "../../helpers/JwtHelper";
+import {EnvConfig} from "../../config/environment-config";
 
 test.describe.configure({ retries: 5 });
 
@@ -53,17 +54,17 @@ test.describe('Health checks', () => {
 });
 
 function getApiBaseUrl(): string | null {
-    const raw = process.env.API_URL;
+    const raw = EnvConfig.API_URL;
     return raw ? raw.replace(/\/+$/, '') : null;
 }
 
 function getAdminBaseUrl(): string | null {
-    const raw = process.env.ADMIN_URL;
+    const raw = EnvConfig.ADMIN_URL;
     return raw ? raw.replace(/\/+$/, '') : null;
 }
 
 function getFrontendBaseUrl(): string | null {
-    const raw = process.env.FE_URL;
+    const raw = EnvConfig.FE_URL;
     return raw ? raw.replace(/\/+$/, '') : null;
 }
 
