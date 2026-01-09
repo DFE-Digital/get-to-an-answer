@@ -9,21 +9,20 @@
     .Replace("[", "-")
     .Replace("]", "")
     .Replace(".", "-");
-  
+
   string Id(string suffix) => $"{prefix}-{suffix}";
 
   string OptionIdWithIndex(string fieldName) => $"Options[{Model.OptionNumber - 1}].{fieldName}";
-  
+
   var contentIdSuffix = "OptionContent";
   var contentHintIdSuffix = "OptionHint";
   var contentHintHintIdSuffix = "OptionHintHint";
   var priorityHintIdSuffix = "PriorityHint";
   var destinationIdSuffix = "AnswerDestination";
-  
+
   var destinationSpecificSelectErrorId = $"{destinationIdSuffix}-specific-error";
   var destinationInternalSelectErrorId = $"{destinationIdSuffix}-internal-error";
   var destinationExternalSelectErrorId = $"{destinationIdSuffix}-external-error";
-  
 }
 
 <input type="hidden" asp-for="OptionNumber"/>
@@ -46,8 +45,8 @@
                type="text"
                asp-for="@Model.OptionContent"
                govuk-error-for="@Id($"{contentIdSuffix}-error")"
-               aria-describedby="@(optionContentHasError ? $"{Id(contentIdSuffix)}-error": string.Empty)" 
-               custom-override-aria-describedby="true" />
+               aria-describedby="@(optionContentHasError ? $"{Id(contentIdSuffix)}-error" : null)"
+               custom-override-aria-describedby="true"/>
 </govuk-form-group>
 
 <govuk-form-group asp-for="OptionHint">
@@ -56,9 +55,11 @@
   </label>
   <div class="govuk-hint" id="@Id(contentHintHintIdSuffix)">
     <p>You can add a short description to help people understand what this option is.</p>
-    <p>You can format your text using Markdown. For example, to add links. To find out more, <a href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/">read this guidance on how to write Markdown.</a></p>
+    <p>You can format your text using Markdown. For example, to add links. To find out more, <a
+        href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/">read this
+        guidance on how to write Markdown.</a></p>
   </div>
-  
+
   <textarea class="govuk-textarea"
             id="@Id(contentHintIdSuffix)"
             rows="4"
@@ -72,7 +73,7 @@
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
       Destination
     </legend>
-    
+
     <div class="govuk-hint" id="@($"{Id($"{destinationIdSuffix}-hint")}")">
       <p>Choose where people go next when they select this option.</p>
     </div>
@@ -87,7 +88,7 @@
                      asp-for="AnswerDestination"
                      type="radio"
                      value="@AnswerDestination.NextQuestion"
-                     aria-describedby="@Id($"{destinationIdSuffix}-hint")" />
+                     aria-describedby="@Id($"{destinationIdSuffix}-hint")"/>
         <label class="govuk-label govuk-radios__label" for="@Id("destination-next")">
           Next question
         </label>
@@ -116,19 +117,19 @@
 
           @if (hasSpecificError)
           {
-          <p id="@Id($"{destinationIdSuffix}-specific-error")" class="govuk-error-message">
+            <p id="@Id($"{destinationIdSuffix}-specific-error")" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> Please select a question
             </p>
           }
 
-          <select class="govuk-select equal-input-width @(hasSpecificError ? "govuk-select--error" : "")"
+          <select class="govuk-select equal-input-width @(hasSpecificError ? "govuk-select--error" : null)"
                   id="@Id("destination-specific-select")"
                   asp-for="SelectedDestinationQuestion"
                   asp-items="Model.QuestionSelectList"
                   govuk-error-for="@Id(destinationSpecificSelectErrorId)"
-                  aria-describedby="@(hasSpecificError ? Id(destinationSpecificSelectErrorId) : string.Empty) ">
+                  aria-describedby="@(hasSpecificError ? Id(destinationSpecificSelectErrorId) : null)">
             <option value="">Select a question</option>
-          </select>  
+          </select>
         </div>
       </div>
 
@@ -138,13 +139,13 @@
                      asp-for="AnswerDestination"
                      type="radio"
                      value="@AnswerDestination.InternalResultsPage"
-                     data-aria-controls="@Id("destination-internal-reveal")" 
+                     data-aria-controls="@Id("destination-internal-reveal")"
         />
         <label class="govuk-label govuk-radios__label" for="@Id("destination-internal")">
           Results page
         </label>
       </div>
-      
+
       <div id="@Id("destination-internal-reveal")" class="govuk-radios__conditional">
         @{
           var hasInternalError = ViewData.ModelState.TryGetValue($"{prefix}-destination-internal", out var internalEntry) && internalEntry?.Errors.Count > 0;
@@ -153,20 +154,20 @@
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-internal-select")">
             Select a results page
           </label>
-          
+
           @if (hasInternalError)
           {
             <p id="@Id($"{destinationIdSuffix}-internal-error")" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> Please select a results page
             </p>
           }
-          
+
           <select class="govuk-select equal-input-width @(hasInternalError ? "govuk-select--error" : "")"
                   id="@Id("destination-internal-select")"
                   asp-for="SelectedResultsPage"
                   asp-items="Model.ResultsPageSelectList"
                   govuk-error-for="@Id(destinationInternalSelectErrorId)"
-                  aria-describedby="@(hasInternalError ? Id(destinationInternalSelectErrorId) : string.Empty) ">
+                  aria-describedby="@(hasInternalError ? Id(destinationInternalSelectErrorId) : null)">
             <option value="">Select a results page</option>
           </select>
         </div>
@@ -192,25 +193,25 @@
           <label class="govuk-label govuk-!-margin-bottom-2" for="@Id("destination-external-link")">
             Enter a link
           </label>
-          
+
           @if (hasExternalError)
           {
             <p id="@Id(destinationExternalSelectErrorId)" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> Please enter an external link
             </p>
           }
-          
-          <input class="govuk-input equal-input-width @(hasExternalError ? "govuk-input--error" : "")"
-                 id="@Id("destination-external-link")"
-                 asp-for="ExternalLink"
-                 govuk-error-for="@Id(destinationExternalSelectErrorId)"
-                 aria-describedby="@(hasExternalError ? Id(destinationExternalSelectErrorId) : $"{Id($"{destinationIdSuffix}-hint")}")" />
+
+          <govuk-input class="govuk-input equal-input-width @(hasExternalError ? "govuk-input--error" : "")"
+                       id="@Id("destination-external-link")"
+                       asp-for="ExternalLink"
+                       govuk-error-for="@Id(destinationExternalSelectErrorId)"
+                       aria-describedby="@(hasExternalError ? Id(destinationExternalSelectErrorId) : $"{Id($"{destinationIdSuffix}-hint")}")"/>
         </div>
       </div>
     </div>
   </fieldset>
 </govuk-form-group>
-  
+
 @{
   if (Model.QuestionType == QuestionType.MultiSelect)
   {
@@ -226,11 +227,11 @@
       </div>
 
       <govuk-input id="@Id("RankPriority")"
-                 class="govuk-input"
-                 type="number"
-                 asp-for="@Model.RankPriority"
-                 govuk-error-for="@Id("RankPriority-error")"
-                 aria-describedby="@Id(priorityHintIdSuffix)" />
+                   class="govuk-input"
+                   type="number"
+                   asp-for="@Model.RankPriority"
+                   govuk-error-for="@Id("RankPriority-error")"
+                   aria-describedby="@Id(priorityHintIdSuffix)"/>
     </govuk-form-group>
   }
 }

@@ -124,7 +124,13 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
         {
             output.Attributes.RemoveAll("checked");
         }
-
+        
+        if (output.Attributes.TryGetAttribute("aria-describedby", out var describedBy)
+            && string.IsNullOrWhiteSpace(GetAttributeStringValue(describedBy)))
+        {
+            output.Attributes.RemoveAll("aria-describedby");
+        }
+        
         if (hasError)
         {
             var overrideAriaDescribedBy = context.AllAttributes.ContainsName("custom-override-aria-describedby") &&
@@ -152,6 +158,8 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
                     output.Attributes.SetAttribute("aria-describedby", errorId);
                 }
             }
+
+            
             
             // Add an error-specific CSS class if not present
             if (output.Attributes.TryGetAttribute("class", out var errClassAttr))

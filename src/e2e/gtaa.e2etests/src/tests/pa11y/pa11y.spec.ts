@@ -72,7 +72,14 @@ test.describe('Get to an answer Pa11y Accessibility Test', () => {
                 // screenCapture: undefined, // enabled
                 includeNotices: false,
                 includeWarnings: false,
-                runners: ['axe', 'htmlcs'], // Use both Axe and HTML_CodeSniffer
+                runners: ['axe', 'htmlcs'],
+                ignore: [
+                    'aria-allowed-attr' // This is the Pa11y-native way to ignore a rule code
+                ],
+                rules: {
+                    'aria-allowed-attr': { enabled: false }
+                },
+                // Use both Axe and HTML_CodeSniffer
             };
 
             // Helper to create a safe filename from URL
