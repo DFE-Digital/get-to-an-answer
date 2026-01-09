@@ -121,15 +121,6 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             
             ModelState.AddModelError(destinationKey, string.Empty);
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
-            
-            // ModelState.AddModelError(selectKey, string.Empty);
-            // ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
-            //
-            // var destinationKey = $"Options[{index}].AnswerDestination";
-            // ModelState.AddModelError(destinationKey, string.Empty);
-            //
-            // var externalLinkErrorId = $"Options-{index}-AnswerDestination-external-error";
-            // ModelState.AddModelError(externalLinkErrorId, string.Empty);
         }
     }
 
