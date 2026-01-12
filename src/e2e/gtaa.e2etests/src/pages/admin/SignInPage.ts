@@ -20,7 +20,7 @@ export class SignInPage extends BasePage {
 
     // ===== Actions =====
     async openSignInPage(bearerToken?: string) {
-        this.navigateTo(`/dev/login?jt=${bearerToken ?? JwtHelper.ValidToken}`)
+        await this.navigateTo(`/dev/login?jt=${bearerToken ?? JwtHelper.ValidToken}`)
             .catch(() => { /* ignore if it redirects instantly */
             });
         await this.waitForPageLoad();

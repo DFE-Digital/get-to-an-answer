@@ -41,6 +41,8 @@ export class AddAnswerPage extends BasePage {
     private selectSpecificQuestion: (i: number) => Locator;
     private selectInternalResultsPage: (i: number) => Locator;
     private externalLinkInput: (i: number) => Locator;
+    //private inlineError: (i: number) => Locator;
+    private inlineErrorAnswerDestination: (i: number) => Locator;
     private inlineError: (i: number, fieldName: AnswerFieldName) => Locator;
     private optionNumber: (index: number) => Locator;
 
@@ -68,8 +70,14 @@ export class AddAnswerPage extends BasePage {
         this.optionContent = (i: number) =>
             page.locator(`input[name="Options[${i}].OptionContent"]`)
 
+        //this.inlineError = (i: number) =>
+          //  page.locator(`#Options-${i}-OptionContent-error`)
+        
         this.inlineError = (i: number, fieldName: string) =>
             page.locator(`#Options-${i}-${fieldName}-error`)
+
+        this.inlineErrorAnswerDestination = (i: number) =>
+            page.locator(`#Options-${i}-AnswerDestination-internal-error`)
 
         this.optionHint = (i: number) =>
             page.locator(`textarea[name="Options[${i}].OptionHint"]`);
@@ -223,6 +231,17 @@ export class AddAnswerPage extends BasePage {
         await this.clickAllLinksAndValidateFocus(browserName);
     }
 
+    async validateMissingResultsPageErrorMessageSummary(browserName: string) {
+        await expect(this.errorSummary, '❌ Error summary missing').toBeVisible();
+        await expect(this.errorSummary, '❌ Attribute role is missing').toHaveAttribute('role', 'alert');
+        await expect(this.errorSummary, '❌ Attribute tabIndex is missing').toHaveAttribute('tabindex', '-1');
+        await expect(this.errorSummary, '❌ Error summary not focused').toBeFocused();
+
+        await expect(this.errorList).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_RESULTS_PAGE_ANSWER_OPTION1_SUMMARY);
+
+        await this.clickAllVisibleLinksAndValidateFocus(browserName);
+    }
+
     async validateInlineQuestionContentError(i: number): Promise<void> {
         await expect(this.inlineError(i, AnswerFieldName.Content), '❌ Inline option content error not visible').toBeVisible();
         if (i == 0) {
@@ -239,6 +258,11 @@ export class AddAnswerPage extends BasePage {
         } else {
             await expect(this.inlineError(i, AnswerFieldName.Content)).toContainText(ErrorMessages.ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION2_CONTENT);
         }
+    }
+
+    async validateInlineMissingResultsPageError(i: number): Promise<void> {
+        await expect(this.inlineErrorAnswerDestination(i), '❌ Inline missing results page error not visible').toBeVisible();
+        await expect(this.inlineErrorAnswerDestination(i)).toContainText(ErrorMessages.ERROR_MESSAGE_MISSING_RESULTS_PAGE_ANSWER_INLINE);
     }
 
     async validateInlineErrorNotVisible(i: number): Promise<void> {
@@ -411,6 +435,24 @@ export class AddAnswerPage extends BasePage {
         }
     }
 
+    async clickAllVisibleLinksAndValidateFocus(browserName: string): Promise<void> {
+        const visibleErrorLinks = this.errorLinks.filter({hasText: /\S/});
+        const linkCount = await visibleErrorLinks.count();
+
+        for (let i = 0; i < linkCount; i++) {
+            const link = visibleErrorLinks.nth(i);
+            const href = await link.getAttribute('href');
+            const targetId = href?.replace('#', '');
+
+            await link.click();
+
+            if (browserName !== 'webkit' && targetId) {
+                const targetInput = this.page.locator(`#${targetId}`);
+                await expect(targetInput, `❌ Target input for link ${i + 1} not focused`).toBeFocused();
+            }
+        }
+    }
+
     async clearOptionContent(i: number) {
         await this.optionContent(i).clear();
     }
@@ -440,8 +482,22 @@ export class AddAnswerPage extends BasePage {
      Results page (inside Get to an answer) - CustomContent (set to 3 in backend)
      Results page (outside Get to an answer) - ExternalLink (set to 2 in backend) */
     async chooseDestination(i: number, value: Destination = 'NextQuestion') {
-        await this.destinationRadio(i, value).check();
+        const radioLocator = this.destinationRadio(i, value);
+
+        // Wait for the radio button to be present and enabled
+        await radioLocator.waitFor({ state: 'attached' });
+
+        // Ensure the radio button is visible and enabled before clicking
+        await expect(radioLocator, `❌ Destination radio ${value} for option ${i} not interactable`).toBeVisible();
+        await expect(radioLocator, `❌ Destination radio ${value} for option ${i} is disabled`).toBeEnabled();
+
+        // Use force click to handle potential overlay or other interference
+        await radioLocator.click({ force: true });
+
+        // Verify the radio button is actually checked after clicking
+        await expect(radioLocator, `❌ Destination radio ${value} for option ${i} not selected`).toBeChecked();
     }
+
 
     async setSpecificQuestion(i: number, optionText: string) {
         await this.chooseDestination(i, 'SpecificQuestion');
@@ -451,17 +507,39 @@ export class AddAnswerPage extends BasePage {
     }
 
     async setInternalLink(i: number, optionText: string) {
+        // Add an explicit wait before choosing destination
+        await this.page.waitForFunction(() => document.readyState === 'complete');
+
         await this.chooseDestination(i, 'InternalResultsPage');
 
-        if (optionText)
+        // Add visibility and interaction wait
+        await this.selectInternalResultsPage(i).waitFor({state: 'visible'});
+
+        if (optionText) {
             await this.selectInternalResultsPage(i).selectOption(optionText);
+
+            // Additional assertion to ensure selection
+            const selectedOption = await this.selectInternalResultsPage(i).locator('option:checked').textContent();
+            expect(selectedOption?.trim()).toBe(optionText);
+        }
     }
 
     async setExternalLink(i: number, url: string) {
+        // Add an explicit wait before choosing destination
+        await this.page.waitForFunction(() => document.readyState === 'complete');
+
         await this.chooseDestination(i, 'ExternalResultsPage');
-        
-        if (url)
+
+        // Add visibility and interaction wait
+        await this.externalLinkInput(i).waitFor({state: 'visible'});
+
+        if (url) {
             await this.externalLinkInput(i).fill(url);
+
+            // Additional assertion to ensure input
+            const inputValue = await this.externalLinkInput(i).inputValue();
+            expect(inputValue).toBe(url);
+        }
     }
 
     async clickBackLink() {
