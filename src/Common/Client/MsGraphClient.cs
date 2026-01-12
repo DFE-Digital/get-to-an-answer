@@ -72,7 +72,7 @@ public class MsGraphClient : IMsGraphClient
                         DisplayName = id!,
                         GivenName = string.Empty,
                         Surname = string.Empty
-                    }).ToList()
+                    }).DistinctBy(user => user.Id).ToList()
                 };
             }
             

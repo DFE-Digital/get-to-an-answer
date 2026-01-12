@@ -1,9 +1,17 @@
 import { test, expect } from '@playwright/test';
 import {JwtHelper} from "../../helpers/JwtHelper";
+import {EnvConfig} from "../../config/environment-config";
 
 test.describe.configure({ retries: 5 });
 
 test.describe('Health checks', () => {
+    test.beforeEach(async ({}, testInfo) => {
+        // Add delay between retries (except for first attempt)
+        if (testInfo.retry > 0) {
+            await new Promise(resolve => setTimeout(resolve, 5000)); // 5 second delay
+        }
+    });
+    
   test('[API] GET /health should return 200 and a non-empty body', async ({ request }) => {
     const base = getApiBaseUrl();
     if (!base) {
@@ -53,17 +61,17 @@ test.describe('Health checks', () => {
 });
 
 function getApiBaseUrl(): string | null {
-    const raw = process.env.API_URL;
+    const raw = EnvConfig.API_URL;
     return raw ? raw.replace(/\/+$/, '') : null;
 }
 
 function getAdminBaseUrl(): string | null {
-    const raw = process.env.ADMIN_URL;
+    const raw = EnvConfig.ADMIN_URL;
     return raw ? raw.replace(/\/+$/, '') : null;
 }
 
 function getFrontendBaseUrl(): string | null {
-    const raw = process.env.FE_URL;
+    const raw = EnvConfig.FE_URL;
     return raw ? raw.replace(/\/+$/, '') : null;
 }
 
