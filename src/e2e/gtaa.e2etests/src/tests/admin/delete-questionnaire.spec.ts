@@ -49,8 +49,8 @@ test.describe('Get to an answer delete questionnaire', () => {
         await viewQuestionnairePage.expectQuestionnaireHeadingOnPage();
 
         await viewQuestionnairePage.assertQuestionnaireDeletionSuccessBanner(
-            SuccessBannerMessages.DELETED_QUESTIONNAIRE_SUCCESS_MESSAGE,
-            SuccessBannerMessages.DELETED_QUESTIONNAIRE_SUCCESS_SUB_MESSAGE
+            SuccessBannerMessages.DELETED_QUESTIONNAIRE_SUCCESS_MESSAGE
+                .replace('**name**', questionnaireGetResponse.questionnaireGetBody.title)
         )
     });
 
@@ -94,8 +94,8 @@ test.describe('Get to an answer delete questionnaire', () => {
 
         viewQuestionnairePage = await ViewQuestionnairePage.create(page);
         await viewQuestionnairePage.assertQuestionnaireDeletionSuccessBanner(
-            SuccessBannerMessages.DELETED_QUESTIONNAIRE_SUCCESS_MESSAGE,
-            SuccessBannerMessages.DELETED_QUESTIONNAIRE_SUCCESS_SUB_MESSAGE
+            SuccessBannerMessages.DELETED_QUESTIONNAIRE_SUCCESS_MESSAGE
+                .replace('**name**', questionnaireGetResponse.questionnaireGetBody.title)
         )
     });
 });

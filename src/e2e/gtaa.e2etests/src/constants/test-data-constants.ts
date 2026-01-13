@@ -88,8 +88,7 @@ export const SuccessBannerMessages = {
     UPDATED_RESULTS_PAGE_SUCCESS_MESSAGE: 'Your changes have been saved.',
     UPDATED_GENERIC_BANNER_SUCCESS_MESSAGE: 'Your changes have been saved.',
 
-    DELETED_QUESTIONNAIRE_SUCCESS_MESSAGE: 'Your questionnaire has been deleted.',
-    DELETED_QUESTIONNAIRE_SUCCESS_SUB_MESSAGE: 'Add new questionnaire.',
+    DELETED_QUESTIONNAIRE_SUCCESS_MESSAGE: "Your questionnaire '**name**' has been deleted.",
 }
 
 export const TaskStatus = {

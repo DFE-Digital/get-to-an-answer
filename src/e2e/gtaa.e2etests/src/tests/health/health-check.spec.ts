@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {EnvConfig} from "../../config/environment-config";
-
-test.describe.configure({ retries: 5 });
+import {fail} from "node:assert/strict";
 
 test.describe('Health checks', () => {
+    test.describe.configure({ retries: 10 });
+    
     test.beforeEach(async ({}, testInfo) => {
         // Add delay between retries (except for first attempt)
         if (testInfo.retry > 0) {
@@ -22,10 +23,15 @@ test.describe('Health checks', () => {
 
     const url = `${base}/health`;
 
-    const res = await request.get(url);
-    expect(res.status(), `Expected 200 from ${url}, got ${res.status()}`).toBe(200);
+    try {
+        const res = await request.get(url);
+        expect(res.status(), `Expected 200 from ${url}, got ${res.status()}`).toBe(200);
 
-    await assertResponseHasBody(res, url);
+        await assertResponseHasBody(res, url);
+    } catch (e) {
+        console.error(`Failed to GET ${url}: ${e}`);
+        fail(`Failed to GET ${url}: ${e}`)
+    }
   });
     test('[ADMIN] GET /dev/login should return 200 and a non-empty body', async ({ request }) => {
         const base = getAdminBaseUrl();
@@ -37,10 +43,15 @@ test.describe('Health checks', () => {
 
         const url = `${base}/dev/login?jt=${JwtHelper.NoRecordsToken()}`;
 
-        const res = await request.get(url);
-        expect(res.status(), `Expected 200 from ${url}, got ${res.status()}`).toBe(200);
+        try {
+            const res = await request.get(url);
+            expect(res.status(), `Expected 200 from ${url}, got ${res.status()}`).toBe(200);
 
-        await assertResponseHasBody(res, url);
+            await assertResponseHasBody(res, url);
+        } catch (e) {
+            console.error(`Failed to GET ${url}: ${e}`);
+            fail(`Failed to GET ${url}: ${e}`)
+        }
     });
 
     test('[FE] GET / should return 200 and a non-empty body', async ({ request }) => {
@@ -53,10 +64,15 @@ test.describe('Health checks', () => {
 
         const url = `${base}/`;
 
-        const res = await request.get(url);
-        expect(res.status(), `Expected 200 from ${url}, got ${res.status()}`).toBe(200);
-
-        await assertResponseHasBody(res, url);
+        try {
+            const res = await request.get(url);
+            expect(res.status(), `Expected 200 from ${url}, got ${res.status()}`).toBe(200);
+    
+            await assertResponseHasBody(res, url);
+        } catch (e) {
+            console.error(`Failed to GET ${url}: ${e}`);
+            fail(`Failed to GET ${url}: ${e}`)
+        }
     });
 });
 

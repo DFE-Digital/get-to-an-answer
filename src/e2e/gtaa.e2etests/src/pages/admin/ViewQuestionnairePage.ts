@@ -98,12 +98,9 @@ export class ViewQuestionnairePage extends BasePage {
         expect(tabIndex, '❌ Region is not focusable - missing tabindex').not.toBeNull();
     }
     
-    async assertQuestionnaireDeletionSuccessBanner(expectedText: string, expectedSubtext: string): Promise<void> {
+    async assertQuestionnaireDeletionSuccessBanner(expectedText: string): Promise<void> {
         await expect(this.justDeletedBannerText).toBeVisible();
         await expect(this.justDeletedBannerText).toHaveText(expectedText);
-        
-        await expect(this.justDeletedBannerSubText).toBeVisible();
-        await expect(this.justDeletedBannerSubText).toHaveText(expectedSubtext);
     }
 
     async assertNoQuestionnaireDeletionSuccessBanner(): Promise<void> {
