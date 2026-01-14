@@ -1,0 +1,61 @@
+name: Validate - Accessibility
+
+# TODO: Works locally, but still need to fix for the pipeline, but it currently low priority
+# can't be run on Staging or Production, because we need to create questionnaire items via the secure API,
+# and only dev has a workaround
+
+on:
+  workflow_dispatch:
+    
+run-name: Run Accessibility Tests against Development
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Run Playwright Tests
+    env:
+      ENVIRONMENT: 'Development'
+    environment: 'Development'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Lowercase the repo name and username
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
+      - name: Lowercase the env name and username
+        run: echo "ENVIRONMENT_UPPER=${ENVIRONMENT^^}" >>${GITHUB_ENV}
+
+      - name: Install dependencies
+        working-directory: ./src/e2e/gtaa.e2etests
+        run: yarn install
+
+      - name: Install Playwright Browsers
+        working-directory: ./src/e2e/gtaa.e2etests
+        run: yarn playwright install --with-deps
+
+      - name: Run Accessibility Tests
+        working-directory: ./src/e2e/gtaa.e2etests
+        run: |
+          export ENVIRONMENT=${{ env.ENVIRONMENT }}
+          export ${{ env.ENVIRONMENT_UPPER }}_API_URL=${{ vars.QA_API_URL }}
+          export ${{ env.ENVIRONMENT_UPPER }}_ADMIN_URL=${{ vars.QA_ADMIN_URL }}
+          export ${{ env.ENVIRONMENT_UPPER }}_FE_URL=${{ vars.QA_FRONTEND_URL }}
+          yarn playwright test -c playwright.config.ts --project=accessibility
+
+      - name: Upload Playwright Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: ./src/e2e/gtaa.e2etests/src/reports/
+          if-no-files-found: ignore
+
+      - name: Upload Screenshots on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-screenshots
+          path: ./src/e2e/gtaa.e2etests/src/reports/pa11y-screenshots/
