@@ -125,12 +125,12 @@ export class AddQuestionnairePage extends BasePage {
             expect(ariaValue, '❌ aria-describedby missing hint id')
                 .toContain('Title-hint');
             expect(ariaValue, '❌ aria-describedby missing error message id')
-                .toContain('title-field-error');
+                .toContain('title-error');
         } else {
             expect(ariaValue, '❌ aria-describedby missing hint id')
                 .toContain('Title-hint');
             expect(ariaValue, '❌ aria-describedby missing error message id')
-                .toContain('title-field-error');
+                .toContain('title-error');
         }
     }
 

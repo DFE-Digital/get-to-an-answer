@@ -132,7 +132,7 @@ public class GovUkInputTagHelper(IHtmlGenerator generator) : TagHelper
             
             if (!overrideAriaDescribedBy)
             {
-                var errorId = $"{simpleName.ToLower()}-field-error";
+                var errorId = $"{simpleName.ToLower()}-error";
 
                 // Ensure aria-describedby includes the error id (and keep any existing describedby)
                 if (output.Attributes.TryGetAttribute("aria-describedby", out var describedByAttr)
