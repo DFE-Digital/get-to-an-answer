@@ -72,16 +72,21 @@
         <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
           <fieldset class="govuk-fieldset" aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-              <h1 id="results-page-title" class="govuk-fieldset__heading">
-                @Model.Destination.Question.Content
-              </h1>
+              @if (Model.Destination.Question.Type == QuestionType.DropdownSelect)
+              {
+                <h1 id="question-content" class="govuk-fieldset__heading">
+                  <label class="govuk-label govuk-label--l" for="@inputGroupId-select">
+                    @Model.Destination.Question.Content
+                  </label>
+                </h1>
+              }
+              else
+              {
+                <h1 id="question-content" class="govuk-fieldset__heading">
+                  @Model.Destination.Question.Content
+                </h1>
+              }
             </legend>
-            @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
-            {
-              <p id="@inputGroupId-error" class="govuk-error-message">
-                <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
-              </p>
-            }
             @if (Model.Destination.Question.Description != null)
             {
               <div id="@($"{inputGroupId}-hint")" class="govuk-hint">
@@ -91,6 +96,13 @@
             @if (Model.Destination.Question.Type == QuestionType.SingleSelect)
             {
               var answers = Model.Destination.Question.Answers;
+              
+              @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
+              {
+                <p id="@inputGroupId-error" class="govuk-error-message">
+                  <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
+                </p>
+              }
 
               <div class="govuk-radios" data-module="govuk-radios">
                 @for (var a = 0; a < answers.Count; a++)
@@ -130,6 +142,13 @@
             else if (Model.Destination.Question.Type == QuestionType.MultiSelect)
             {
               var answers = Model.Destination.Question.Answers;
+              
+              @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
+              {
+                <p id="@inputGroupId-error" class="govuk-error-message">
+                  <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
+                </p>
+              }
 
               <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                 @for (var a = 0; a < answers.Count; a++)
@@ -169,34 +188,29 @@
             {
               var answers = Model.Destination.Question.Answers;
 
-              <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
-                @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
-                {
-                  <p id="@inputGroupId-error" class="govuk-error-message">
-                    <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
-                  </p>
-                }
-                <label class="govuk-label" for="@($"{inputGroupId}-select")">
-                  Select an option
-                </label>
-                @for (var a = 0; a < answers.Count; a++)
-                {
-                  var answer = Model?.Destination?.Question.Answers[a];
+              @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
+              {
+                <p id="@inputGroupId-error" class="govuk-error-message">
+                  <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
+                </p>
+              }
+              @for (var a = 0; a < answers.Count; a++)
+              {
+                var answer = Model?.Destination?.Question.Answers[a];
 
-                  <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer?.Id" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer?.Priority" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer?.Content" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer?.Description" autocomplete="off">
-                  <input type="hidden" name="Priorities.@answer?.Id" value="@answer?.Priority" autocomplete="off">
+                <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer?.Id" autocomplete="off">
+                <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer?.Priority" autocomplete="off">
+                <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer?.Content" autocomplete="off">
+                <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer?.Description" autocomplete="off">
+                <input type="hidden" name="Priorities.@answer?.Id" value="@answer?.Priority" autocomplete="off">
+              }
+              <select class="govuk-select" id="@($"{inputGroupId}-select")" name="NextStateRequest.SelectedAnswerIds">
+                <option value="choose" selected="selected">Select an answer</option>
+                @foreach (var answer in answers)
+                {
+                  <option value="@answer.Id">@answer.Content</option>
                 }
-                <select class="govuk-select" id="@($"{inputGroupId}-select")" name="NextStateRequest.SelectedAnswerIds">
-                  <option value="">Please select an answer</option>
-                  @foreach (var answer in answers)
-                  {
-                    <option value="@answer.Id">@answer.Content</option>
-                  }
-                </select>
-              </div>
+              </select>
             }
           </fieldset>
         </div>
