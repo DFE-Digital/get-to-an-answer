@@ -40,7 +40,7 @@
                     @if (Model.CurrentQuestionHasNextOne)
                     {
                         <p>
-                            <a href="@string.Format(Routes.EditQuestion, Model.QuestionnaireId, Model.NextQuestionId)">Continue
+                            <a class="govuk-link" href="@string.Format(Routes.EditQuestion, Model.QuestionnaireId, Model.NextQuestionId)">Continue
                                 to the next question</a>
                         </p>
                     }
@@ -56,7 +56,7 @@
                         
                     }
                     <p>
-                        <a href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to your questions</a>
+                        <a class="govuk-link" href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to your questions</a>
                     </p>
                 </div>
             </div>

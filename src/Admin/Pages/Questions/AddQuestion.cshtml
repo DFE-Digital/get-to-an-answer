@@ -60,7 +60,7 @@
           <p>You can add a short sentence to help people answer the question.
             For example, if someone can select one or more options, use 'Select all that apply'.
           </p>
-          <p>You can format your text using Markdown. For example, to add links. To find out more, <a href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/">read this guidance on how to write Markdown.</a></p>
+          <p>You can format your text using Markdown. For example, to add links. To find out more, <a class="govuk-link" href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/">read this guidance on how to write Markdown.</a></p>
 
         </div>
 
@@ -99,7 +99,7 @@
                            value="@((int)QuestionType.SingleSelect)"
                            govuk-error-for="@Model.QuestionType"/>
               <label class="govuk-label govuk-radios__label" for="QuestionType">
-                One option only (using <a href="https://design-system.service.gov.uk/components/radios/">radio buttons</a>)
+                One option only (using <a class="govuk-link" href="https://design-system.service.gov.uk/components/radios/">radio buttons</a>)
               </label>
               <div class="govuk-hint govuk-radios__hint">
                 Use for a small list of options
@@ -114,7 +114,7 @@
                            value="@((int)QuestionType.DropdownSelect)"
                            govuk-error-for="@Model.QuestionType"/>
               <label class="govuk-label govuk-radios__label" for="QuestionType-Dropdown">
-                One option only (using a <a href="https://design-system.service.gov.uk/components/select/">drop-down</a>)
+                One option only (using a <a class="govuk-link" href="https://design-system.service.gov.uk/components/select/">drop-down</a>)
               </label>
               <div class="govuk-hint govuk-radios__hint">
                 Use for selecting one or more options
@@ -129,7 +129,7 @@
                            value="@((int)QuestionType.MultiSelect)"
                            govuk-error-for="@Model.QuestionType"/>
               <label class="govuk-label govuk-radios__label" for="QuestionType-MultiSelect">
-                One or more options (using <a href="https://design-system.service.gov.uk/components/checkboxes/">checkboxes</a>)
+                One or more options (using <a class="govuk-link" href="https://design-system.service.gov.uk/components/checkboxes/">checkboxes</a>)
               </label>
               <div class="govuk-hint govuk-radios__hint">
                 Use this when people can select more than one option.
