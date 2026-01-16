@@ -225,7 +225,7 @@ export class AddQuestionPage extends BasePage {
         expect(ariaValue, '❌ aria-describedby is missing').not.toBeNull();
 
         expect(ariaValue, '❌ aria-describedby missing error id')
-            .toContain('questioncontent-field-error');
+            .toContain('questioncontent-error');
     }
 
     async validateQuestionTypeErrorAriaDescribedBy(): Promise<void> {
