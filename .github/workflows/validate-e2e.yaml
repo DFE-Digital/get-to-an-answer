@@ -92,7 +92,7 @@ jobs:
 
       - name: Upload Playwright Test Report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-report
           path: ./src/e2e/gtaa.e2etests/playwright-report/
@@ -100,7 +100,7 @@ jobs:
 
       - name: Upload Screenshots on Failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: playwright-screenshots
           path: ./src/e2e/gtaa.e2etests/test-results/screenshots/
