@@ -1,3 +1,36 @@
+@using System.Reflection
+@inject Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper Html
+
+@{
+    var modelState = ViewData.ModelState;
+    var errors = modelState?.Where(kv => kv.Value?.Errors.Count > 0).ToList() ?? [];
+
+    // Get the page model type to determine property order
+    var pageModel = ViewContext.ViewData.Model;
+    var propertyOrder = new List<string>();
+    
+    if (pageModel != null)
+    {
+        // Get all properties in declaration order (reflection preserves this order)
+        propertyOrder = pageModel.GetType()
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Select(p => p.Name)
+            .ToList();
+    }
+
+    // Sort errors based on property declaration order
+    if (propertyOrder.Any() && errors.Any())
+    {
+        errors = errors.OrderBy(e =>
+        {
+            var index = propertyOrder.IndexOf(e.Key);
+            return index == -1 ? int.MaxValue : index;
+        }).ToList();
+    }
+
+    var hasErrors = errors.Count > 0;
+}
+
 @functions{
     string BuildInputId(string fieldName)
     {
@@ -9,13 +42,13 @@
     }
 }
 
-@if (ViewData.ModelState.Any(ms => ms.Value?.Errors.Count > 0))
+@if (hasErrors)
 {
     <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
         <h2 id="error-summary-title" class="govuk-error-summary__title">There is a problem</h2>
         <div class="govuk-error-summary__body">
             <ul class="govuk-list govuk-error-summary__list">
-                @foreach (var entry in ViewData.ModelState.Where(ms => ms.Value?.Errors.Count > 0))
+                @foreach (var entry in errors)
                 {
                     var fieldId = BuildInputId(entry.Key);
                     var message = entry.Value?.Errors.First().ErrorMessage;

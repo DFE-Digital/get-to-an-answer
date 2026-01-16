@@ -49,17 +49,19 @@ public class AddQuestionnaireStart(IApiClient apiClient, ILogger<AddQuestionnair
     {
         try
         {
+            ModelState.Clear();
+            
             if (!ModelState.IsValid)
                 return Page();
 
             if (DisplayTitle == null)
             {
-                ModelState.AddModelError(nameof(DisplayTitle), "Display title is required when you save");
+                ModelState.AddModelError(nameof(DisplayTitle), "Enter a display title");
             }
             
             if (Description == null)
             {
-                ModelState.AddModelError(nameof(Description), "Description is required when you save");
+                ModelState.AddModelError(nameof(Description), "Enter a description");
             }
             
             if (!ModelState.IsValid)
