@@ -146,8 +146,7 @@
         .govuk-error-summary {
             border: 5px solid @Model?.Questionnaire.ErrorMessageColor;
         }
-        .govuk-error-summary__list a:link, 
-        .govuk-error-summary__list a:visited {
+        .govuk-error-summary__list a:link {
             color: @Model?.Questionnaire.ErrorMessageColor;
         }
         .govuk-form-group--error {
@@ -158,6 +157,9 @@
         }
         .govuk-error-summary__list a:hover {
             color: @errorHoverColor !important;
+        }
+        .govuk-error-summary__list a:focus {
+            color: @Model?.Questionnaire.TextColor !important;
         }
         </style>
     }
