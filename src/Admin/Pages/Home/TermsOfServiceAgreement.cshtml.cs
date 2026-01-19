@@ -49,6 +49,7 @@ public class TermsOfServiceAgreement : BasePageModel
     {
         var options = new CookieOptions
         {
+            IsEssential = true,
             Expires = DateTimeOffset.UtcNow.AddDays(TermsCookieDays),
             Secure = true,              // send only over HTTPS
             HttpOnly = false,           // allow client-side checks if needed
