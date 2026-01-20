@@ -40,7 +40,7 @@
                     @if (Model.CurrentQuestionHasNextOne)
                     {
                         <p>
-                            <a href="@string.Format(Routes.EditQuestion, Model.QuestionnaireId, Model.NextQuestionId)">Continue
+                            <a class="govuk-link" href="@string.Format(Routes.EditQuestion, Model.QuestionnaireId, Model.NextQuestionId)">Continue
                                 to the next question</a>
                         </p>
                     }
@@ -56,7 +56,7 @@
                         
                     }
                     <p>
-                        <a href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to your questions</a>
+                        <a class="govuk-link" href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to your questions</a>
                     </p>
                 </div>
             </div>
@@ -125,7 +125,7 @@
                             @if (option == QuestionType.SingleSelect)
                             {
                                 <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
-                                    One option only (using <a href="https://design-system.service.gov.uk/components/radios/">radio buttons</a>)
+                                    One option only (using <a class="govuk-link" href="https://design-system.service.gov.uk/components/radios/">radio buttons</a>)
                                 </label>
                                 <div class="govuk-hint govuk-radios__hint">
                                     Use for a small list of options
@@ -134,7 +134,7 @@
                             else if (option == QuestionType.DropdownSelect)
                             {
                                 <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
-                                    One option only (using a <a href="https://design-system.service.gov.uk/components/select/">drop-down</a>)
+                                    One option only (using a <a class="govuk-link" href="https://design-system.service.gov.uk/components/select/">drop-down</a>)
                                 </label>
                                 <div class="govuk-hint govuk-radios__hint">
                                     Use for a longer list of options
@@ -143,7 +143,7 @@
                             else if (option == QuestionType.MultiSelect)
                             {
                                 <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
-                                    One or more options (using <a href="https://design-system.service.gov.uk/components/checkboxes/">checkboxes</a>)
+                                    One or more options (using <a class="govuk-link" href="https://design-system.service.gov.uk/components/checkboxes/">checkboxes</a>)
                                 </label>
                                 <div class="govuk-hint govuk-radios__hint">
                                     Use for selecting one or more options

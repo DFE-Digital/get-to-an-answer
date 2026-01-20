@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Joonasw.AspNetCore.SecurityHeaders;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.UI;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -47,6 +48,11 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
     // disabled everything else because the Entra ID was failing to store cookies,
     // but when reconfigured the consent cookie was still not being stored
     options.MinimumSameSitePolicy = SameSiteMode.None;
+});
+
+builder.Services.Configure<CookieTempDataProviderOptions>(options =>
+{
+    options.Cookie.IsEssential = true; // Mark the cookie as essential
 });
 
 if (!builderIsLocalEnvironment)

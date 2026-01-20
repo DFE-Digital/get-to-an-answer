@@ -18,7 +18,7 @@
                 {
                     var fieldName = kvp.Key;
                     var message = kvp.Value!.Errors[0].ErrorMessage;
-                    <li><a href="#@fieldName">@message</a></li>
+                    <li><a class="govuk-link" href="#@fieldName">@message</a></li>
                 }
             </ul>
         </div>

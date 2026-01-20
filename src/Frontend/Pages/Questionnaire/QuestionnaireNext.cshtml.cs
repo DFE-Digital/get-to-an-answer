@@ -67,6 +67,24 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             
             if (!ModelState.IsValid)
             {
+                ModelState.Clear();
+                
+                if (Destination.Question is not null)
+                {
+                    switch (Destination.Question.Type)
+                    {
+                        case QuestionType.MultiSelect:
+                            ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select at least one answer");
+                            break;
+                        case QuestionType.SingleSelect:
+                            ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select an answer");
+                            break;
+                        case QuestionType.DropdownSelect:
+                            ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select an option");
+                            break;
+                    }
+                }
+                
                 return Page();
             }
             
