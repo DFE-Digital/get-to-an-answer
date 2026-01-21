@@ -46,7 +46,7 @@
                type="text"
                asp-for="@Model.OptionContent"
                govuk-error-for="@Id($"{contentIdSuffix}-error")"
-               aria-describedby="@(optionContentHasError ? $"{Id(contentIdSuffix)}-error": string.Empty)" 
+               aria-describedby="@(optionContentHasError ? $"{Id(contentIdSuffix).ToLower()}-error": string.Empty)" 
                custom-override-aria-describedby="true" />
 </govuk-form-group>
 
@@ -126,7 +126,7 @@
                   asp-for="SelectedDestinationQuestion"
                   asp-items="Model.QuestionSelectList"
                   govuk-error-for="@Id(destinationSpecificSelectErrorId)"
-                  aria-describedby="@(hasSpecificError ? Id(destinationSpecificSelectErrorId) : string.Empty) ">
+                  aria-describedby="@(hasSpecificError ? Id(destinationSpecificSelectErrorId).ToLower() : string.Empty) ">
             <option value="">Select a question</option>
           </select>  
         </div>
@@ -166,7 +166,7 @@
                   asp-for="SelectedResultsPage"
                   asp-items="Model.ResultsPageSelectList"
                   govuk-error-for="@Id(destinationInternalSelectErrorId)"
-                  aria-describedby="@(hasInternalError ? Id(destinationInternalSelectErrorId) : string.Empty) ">
+                  aria-describedby="@(hasInternalError ? Id(destinationInternalSelectErrorId).ToLower() : string.Empty) ">
             <option value="">Select a results page</option>
           </select>
         </div>
@@ -204,7 +204,7 @@
                  id="@Id("destination-external-link")"
                  asp-for="ExternalLink"
                  govuk-error-for="@Id(destinationExternalSelectErrorId)"
-                 aria-describedby="@(hasExternalError ? Id(destinationExternalSelectErrorId) : $"{Id($"{destinationIdSuffix}-hint")}")" />
+                 aria-describedby="@(hasExternalError ? Id(destinationExternalSelectErrorId).ToLower() : $"{Id($"{destinationIdSuffix}-hint")}")" />
         </div>
       </div>
     </div>
@@ -230,7 +230,7 @@
                  type="number"
                  asp-for="@Model.RankPriority"
                  govuk-error-for="@Id("RankPriority-error")"
-                 aria-describedby="@Id(priorityHintIdSuffix)" />
+                 aria-describedby="@Id(priorityHintIdSuffix).ToLower()" />
     </govuk-form-group>
   }
 }
