@@ -8,11 +8,11 @@ type Mode = 'create' | 'update';
 type Destination = 'NextQuestion' | 'SpecificQuestion' | 'ExternalResultsPage' | 'InternalResultsPage' | '0';
 
 export enum AnswerFieldName {
-    Content = 'OptionContent',
-    Hint = 'OptionHint',
-    SpecificQuestionSelect = 'AnswerDestination-specific',
-    ResultsPageSelect = 'AnswerDestination-internal',
-    ExternalLinkInput = 'AnswerDestination-external'
+    Content = 'optioncontent',
+    Hint = 'optionhint',
+    SpecificQuestionSelect = 'answerdestination-specific',
+    ResultsPageSelect = 'answerdestination-internal',
+    ExternalLinkInput = 'answerDestination-external'
 }
 
 export class AddAnswerPage extends BasePage {
@@ -74,7 +74,7 @@ export class AddAnswerPage extends BasePage {
           //  page.locator(`#Options-${i}-OptionContent-error`)
         
         this.inlineError = (i: number, fieldName: string) =>
-            page.locator(`#Options-${i}-${fieldName}-error`)
+            page.locator(`#options-${i}-${fieldName}-error`)
 
         this.inlineErrorAnswerDestination = (i: number) =>
             page.locator(`#Options-${i}-AnswerDestination-internal-error`)
@@ -105,7 +105,7 @@ export class AddAnswerPage extends BasePage {
             );
 
         this.externalLinkInput = (i: number) =>
-            page.locator(`input[id="Options-${i}-destination-external-link"]`);
+            page.locator(`input[id="options-${i}-destination-external-link"]`);
 
         this.addAnotherOptionButton = this.page.getByRole('button', {name: /add another option/i});
         this.errorSummary = this.page.locator('div.govuk-error-summary[role="alert"]');
