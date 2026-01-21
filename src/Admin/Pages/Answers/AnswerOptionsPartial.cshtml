@@ -116,7 +116,7 @@
 
           @if (hasSpecificError)
           {
-          <p id="@Id($"{destinationIdSuffix}-specific-error")" class="govuk-error-message">
+          <p id="@Id($"{destinationIdSuffix}-specific-error").ToLower()" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> Please select a question
             </p>
           }
@@ -156,7 +156,7 @@
           
           @if (hasInternalError)
           {
-            <p id="@Id($"{destinationIdSuffix}-internal-error")" class="govuk-error-message">
+            <p id="@Id($"{destinationIdSuffix}-internal-error").ToLower()" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> Please select a results page
             </p>
           }
@@ -195,7 +195,7 @@
           
           @if (hasExternalError)
           {
-            <p id="@Id(destinationExternalSelectErrorId)" class="govuk-error-message">
+            <p id="@Id(destinationExternalSelectErrorId).ToLower()" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> Please enter an external link
             </p>
           }
