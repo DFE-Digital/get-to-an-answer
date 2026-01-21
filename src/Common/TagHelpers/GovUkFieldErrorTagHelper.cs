@@ -40,7 +40,7 @@ public class GovUkFieldErrorTagHelper : TagHelper
 
         output.TagName = "p";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("id", id);
+        output.Attributes.SetAttribute("id", id.ToLower());
         output.Attributes.SetAttribute("class", "govuk-error-message");
         output.Content.SetHtmlContent($"""<span class="govuk-visually-hidden">Error:</span> {message}""");
     }

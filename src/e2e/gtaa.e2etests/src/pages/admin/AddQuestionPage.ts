@@ -84,7 +84,7 @@ export class AddQuestionPage extends BasePage {
 
         // Form group around the radios
         this.radiosFormGroup = this.form.locator(
-            '.govuk-form-group:has(#QuestionType-error)'
+            '.govuk-form-group:has(#questiontype-error)'
         );
 
         // Error summary
@@ -101,13 +101,13 @@ export class AddQuestionPage extends BasePage {
         this.questionInputError = this.questionInputFormGroup.locator('.govuk-error-message');
 
         this.inlineQuestionContentError = this.questionContentFormGroup.locator(
-            '#QuestionContent-error'
+            '#questioncontent-error'
         );
         this.inlineUpdateQuestionContentError = this.questionContentFormGroup.locator(
-            '#QuestionContent-error'
+            '#questioncontent-error'
         );
 
-        this.inlineQuestionTypeError = this.radiosFormGroup.locator('#QuestionType-error');
+        this.inlineQuestionTypeError = this.radiosFormGroup.locator('#questiontype-error');
         this.fieldset = this.form.locator('fieldset[aria-describedby*="QuestionType-hint"]');
 
         this.saveQuestionButton = page.getByRole('button', {name: /save question/i});
