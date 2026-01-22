@@ -22,6 +22,7 @@ import {EditContinueButtonTextPage} from "../../pages/admin/EditContinueButtonTe
 import {QuestionnaireStylingPage} from "../../pages/admin/QuestionnaireStylingPage";
 import {AddResultsPagePage} from "../../pages/admin/AddResultsPagePage";
 import {ViewResultsPagesPage} from "../../pages/admin/ViewResultsPagesPage";
+import {DeleteQuestionConfirmationPage} from "../../pages/admin/DeleteQuestionConfirmationPage";
 
 test.describe('Get to an answer create a new questionnaire', () => {
     let token: string;
@@ -40,8 +41,6 @@ test.describe('Get to an answer create a new questionnaire', () => {
     let addResultsPagePage: AddResultsPagePage;
     let viewResultsPagesPage: ViewResultsPagesPage;
     
-    
-
     test.beforeEach(async ({page, request}) => {
         token = JwtHelper.NoRecordsToken();
         const {questionnaire} = await createQuestionnaire(request, token);
@@ -275,5 +274,65 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await viewResultsPagesPage.saveAndContinue();
         
         await designQuestionnairePage.taskStatusAddEditResultsPage('Completed', 'Add or edit results page');
+    });
+
+    test('Add first question should set the questionnaire status to in progress', async ({page}) => {
+        await signIn(page, token);
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+        
+        await designQuestionnairePage.openAddEditQuestionsAnswers();
+        viewQuestionPage = await ViewQuestionPage.create(page);
+        await viewQuestionPage.clickAddQuestion();
+        
+        addQuestionPage = await AddQuestionPage.create(page);
+        
+        const questionContent = `Test Question - ${Date.now()}`;
+        const hintText = `Test Hint - ${Date.now()}`;
+
+        await addQuestionPage.enterQuestionContent(questionContent);
+        await addQuestionPage.enterQuestionHintText(hintText);
+        await addQuestionPage.chooseQuestionType(QuestionRadioLabel.MultiSelect);
+        await addQuestionPage.clickSaveAndContinue();
+
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+        await designQuestionnairePage.taskStatusAddEditQuestionsAnswers('In progress', 'Add or edit questions and answers');
+    });
+
+    test('Delete last question should set the questionnaire status to not started', async ({page}) => {
+        await signIn(page, token);
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+
+        await designQuestionnairePage.openAddEditQuestionsAnswers();
+        viewQuestionPage = await ViewQuestionPage.create(page);
+        await viewQuestionPage.clickAddQuestion();
+
+        addQuestionPage = await AddQuestionPage.create(page);
+
+        const questionContent = `Test Question - ${Date.now()}`;
+        const hintText = `Test Hint - ${Date.now()}`;
+
+        await addQuestionPage.enterQuestionContent(questionContent);
+        await addQuestionPage.enterQuestionHintText(hintText);
+        await addQuestionPage.chooseQuestionType(QuestionRadioLabel.MultiSelect);
+        await addQuestionPage.clickSaveAndContinue();
+
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+        await designQuestionnairePage.openAddEditQuestionsAnswers();
+
+        viewQuestionPage = await ViewQuestionPage.create(page);
+        await viewQuestionPage.clickFirstEditQuestionLink();
+        
+        await addQuestionPage.clickDeleteQuestion();
+
+        const deleteConfirmationPage = new DeleteQuestionConfirmationPage(page);
+        await deleteConfirmationPage.validateOnPage();
+        await deleteConfirmationPage.selectYes();
+        await deleteConfirmationPage.clickContinue();
+
+        viewQuestionPage = new ViewQuestionPage(page);
+        await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
+
+        designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
+        await designQuestionnairePage.taskStatusAddEditQuestionsAnswers('Not started', 'Add or edit questions and answers');
     });
 });

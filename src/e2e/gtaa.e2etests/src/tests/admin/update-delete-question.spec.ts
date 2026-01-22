@@ -4,7 +4,7 @@ import {DesignQuestionnairePage} from "../../pages/admin/DesignQuestionnairePage
 import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaireSlugPage";
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
-import {goToUpdateQuestionPageByUrl, signIn} from "../../helpers/admin-test-helper";
+import {goToDesignQuestionnairePageByUrl, goToUpdateQuestionPageByUrl, signIn} from "../../helpers/admin-test-helper";
 import {PageHeadings, QuestionType} from "../../constants/test-data-constants";
 import {createQuestion, getQuestion} from "../../test-data-seeder/question-data";
 import {AddQuestionPage, QuestionRadioLabel} from "../../pages/admin/AddQuestionPage";
@@ -22,6 +22,7 @@ test.describe('Get to an answer update question', () => {
     let addQuestionPage: AddQuestionPage;
     let editQuestionnairePage: DesignQuestionnairePage;
     let updateQuestionnaireSlugPage: UpdateQuestionnaireSlugPage;
+    let designQuestionnairePage: DesignQuestionnairePage;
 
     test.beforeEach(async ({request, page}) => {
         token = JwtHelper.NoRecordsToken();
