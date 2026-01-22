@@ -413,7 +413,7 @@ test.describe('Questionnaire run (start & next)', () => {
         const newTextColor = '#ff0000';
         const newBackgroundColor = '#222222';
         const newErrorMessageColor = '#00ff00';
-        const newStateColor = '#00ffff';
+        const newStateColor = '#ffdd00';
         
         await updateQuestionnaireStyling(request, questionnaireId, { 
             textColor: newTextColor, 
@@ -858,7 +858,7 @@ test.describe('Questionnaire run (start & next)', () => {
         const newTextColor = '#ff0000';
         const newBackgroundColor = '#222222';
         const newErrorMessageColor = '#00ff00';
-        const newStateColor = '#00ffff';
+        const newStateColor = '#ffdd00';
 
         await updateQuestionnaireStyling(request, questionnaireId, {
             textColor: newTextColor,
