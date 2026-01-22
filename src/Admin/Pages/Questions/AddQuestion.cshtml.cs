@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Common.Client;
 using Common.Domain.Request.Create;
+using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
@@ -67,6 +68,16 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
                 Type = QuestionType
             });
             
+            // if no question existed before this was created then mark status as in progress
+            if (TempData.Peek("QuestionCount") is 0)
+            {
+                await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+                {
+                    Task = CompletableTask.AddQuestionsAndAnswers,
+                    Status = CompletionStatus.InProgress
+                });
+            }
+
             return Redirect(string.Format(Routes.AddAnswerOptions, QuestionnaireId, response?.Id));
         }
         catch (Exception e)
