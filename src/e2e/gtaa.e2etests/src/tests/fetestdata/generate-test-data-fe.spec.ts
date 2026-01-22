@@ -1,8 +1,9 @@
-import {test} from '@playwright/test';
+import {expect, test} from '@playwright/test';
 import fs from 'fs/promises';
 import path from 'path';
 
 import {
+    addContributor,
     createQuestionnaire,
     getQuestionnaire,
     publishQuestionnaire,
@@ -45,7 +46,11 @@ test.describe('Get to an answer - fe test data generation', () => {
         const {questionnaireGetBody} = await getQuestionnaire(request, questionnaireId, token);
         console.log('Questionnaire updated slug:', questionnaireGetBody.slug);
 
-        await publishQuestionnaire(request, questionnaireId);
+        //await publishQuestionnaire(request, questionnaireId);
+
+        const putResp = await addContributor(request, questionnaireId, 'alice@example.com',token);
+        expect(putResp.ok()).toBeTruthy();
+        expect(putResp.status()).toBe(204);
 
         apiContentResponse = await createContent(request, {
             questionnaireId: questionnaireId,
