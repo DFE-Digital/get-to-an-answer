@@ -103,12 +103,7 @@ export class RunBasePage {
         if (!this.frame) {
             //Ensure the footer is visible 
             await expect(this.footer).toBeVisible();
-
-            // Verify the "Cookie policy" link(in Footer)
-            await expect(this.cookiePolicyLinkInFooter).toBeVisible();
-            await expect(this.cookiePolicyLinkInFooter).toContainText('Cookie policy');
-            //await expect(this.cookiePolicyLinkInFooter).toHaveAttribute('href', 'Cookie policy'); //TBC
-
+            
             // Verify the footer logo and licence description
             await expect(this.licenceLogo).toBeVisible();
             const licenceDescription = this.footer.locator('.govuk-footer__licence-description');

@@ -75,12 +75,13 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
 
     public async Task<IActionResult> OnPostSaveAndContinueAsync()
     {
+        var countObj = TempData.Peek("QuestionCount") ?? 0;
+        
         await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
         {
             Task = CompletableTask.AddQuestionsAndAnswers,
             Status = FinishedEditing ? CompletionStatus.Completed : 
-                TempData.TryGetValue("QuestionCount", out var countObj) && (countObj ?? 0) is > 0 ? 
-                    CompletionStatus.InProgress : CompletionStatus.NotStarted
+                countObj is > 0 ? CompletionStatus.InProgress : CompletionStatus.NotStarted
         });
         
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
