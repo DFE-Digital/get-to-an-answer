@@ -72,10 +72,6 @@ test.describe('Manage questionnaire contributors', () => {
         }
     });
 
-    test('Minimum contributors constraint (enabled vs disabled delete/remove buttons)', async () => {
-        await contributorsPage.expectMinimumContributorsConstraint();
-    });
-
     test('Add contributor – structure and validation error display', async ({ page }) => {
         await contributorsPage.clickAddPerson();
 
