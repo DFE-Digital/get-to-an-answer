@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Admin.Models;
 using Common.Client;
+using Common.Domain.Request.Update;
+using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
@@ -53,9 +55,25 @@ public class ConfirmDeleteQuestion(ILogger<ConfirmDeleteQuestion> logger, IApiCl
                 JsonConvert.SerializeObject(new QuestionNotificationSummary(IsDeleted: true,
                     QuestionTitle: questionTitle));
 
+            await UpdateStatusIfNotQuestionsLeft();
+
             return Redirect(string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId));
         }
         
         return Redirect(string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId));
+    }
+    
+    private async Task UpdateStatusIfNotQuestionsLeft()
+    {
+        // if one before deletion, then will be 0 after
+        // so, if so, 0 after deletion, mark as not started
+        if (TempData.Peek("QuestionCount") is 1)
+        {
+            await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+            {
+                Task = CompletableTask.AddQuestionsAndAnswers,
+                Status = CompletionStatus.NotStarted
+            });
+        }
     }
 }
