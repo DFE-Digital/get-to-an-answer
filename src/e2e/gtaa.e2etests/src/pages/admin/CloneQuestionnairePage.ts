@@ -27,7 +27,7 @@ export class CloneQuestionnairePage extends BasePage {
         this.errorSummary = this.page.locator(
             '.govuk-error-summary[role="alert"][tabindex="-1"]'
         );
-        this.inlineTitleError = page.locator('#Title-error');
+        this.inlineTitleError = page.locator('#title-error');
 
         this.titleFormGroup = page.locator(
             '.govuk-form-group:has(#Title)'

@@ -28,7 +28,7 @@ export class AddContributorPage extends BasePage {
         this.hint = this.page.locator('#add-person-hint');
 
         this.emailInput = this.form.locator('#ContributorEmail');
-        this.inlineError = this.form.locator('#ContributorEmail-error');
+        this.inlineError = this.form.locator('#contributoremail-error');
         this.errorSummary = this.page.locator('.govuk-error-summary[role="alert"][tabindex="-1"]');
 
         this.saveAndContinueBtn = this.form.locator(

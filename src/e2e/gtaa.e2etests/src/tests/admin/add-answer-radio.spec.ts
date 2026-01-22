@@ -174,8 +174,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         await addAnswerPage.validateInlineDuplicatedQuestionContentError(0);
         await addAnswerPage.validateInlineDuplicatedQuestionContentError(1);
     })
-
-    //TODO: CARE-1655 bug raised.
+    
     test("Validate error message when results page is not selected from dropdown", async ({request, page, browserName}) => {
         const title = 'Test Content';
         await createContent(request, {
@@ -200,7 +199,7 @@ test.describe('Get to an answer add an answer to a question', () => {
         
         await addAnswerPage.clickSaveAndContinueButton();
 
-        //await addAnswerPage.validateMissingResultsPageErrorMessageSummary(browserName);
+        await addAnswerPage.validateMissingResultsPageErrorMessageSummary(browserName);
     });
 
     test("Inline error message when results page not selected from dropdown", async ({request, page}) => {

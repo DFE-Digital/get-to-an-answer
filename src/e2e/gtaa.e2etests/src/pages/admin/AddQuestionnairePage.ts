@@ -57,10 +57,10 @@ export class AddQuestionnairePage extends BasePage {
         );
 
         this.inlineUpdateTitleError = this.titleFormGroup.locator(
-            '#Title-field-error'
+            '#title-field-error'
         );
         this.inlineTitleError = this.titleFormGroup.locator(
-            '#Title-error'
+            '#title-error'
         );
         this.error = this.page.locator(
             '#Title-error'

@@ -12,7 +12,7 @@ export enum AnswerFieldName {
     Hint = 'optionhint',
     SpecificQuestionSelect = 'answerdestination-specific',
     ResultsPageSelect = 'answerdestination-internal',
-    ExternalLinkInput = 'answerDestination-external'
+    ExternalLinkInput = 'answerdestination-external'
 }
 
 export class AddAnswerPage extends BasePage {
@@ -77,7 +77,7 @@ export class AddAnswerPage extends BasePage {
             page.locator(`#options-${i}-${fieldName}-error`)
 
         this.inlineErrorAnswerDestination = (i: number) =>
-            page.locator(`#Options-${i}-AnswerDestination-internal-error`)
+            page.locator(`#options-${i}-answerdestination-internal-error`)
 
         this.optionHint = (i: number) =>
             page.locator(`textarea[name="Options[${i}].OptionHint"]`);
@@ -105,7 +105,7 @@ export class AddAnswerPage extends BasePage {
             );
 
         this.externalLinkInput = (i: number) =>
-            page.locator(`input[id="options-${i}-destination-external-link"]`);
+            page.locator(`input[id="Options-${i}-destination-external-link"]`);
 
         this.addAnotherOptionButton = this.page.getByRole('button', {name: /add another option/i});
         this.errorSummary = this.page.locator('div.govuk-error-summary[role="alert"]');
@@ -391,7 +391,7 @@ export class AddAnswerPage extends BasePage {
     async validateRankPriorityAriaDescribedBy(optionIndex: number): Promise<void> {
         const rankInput = this.answerRank(optionIndex);
         const ariaDescribedBy = await rankInput.getAttribute('aria-describedby');
-        const expectedHintId = `Options-${optionIndex}-PriorityHint`;
+        const expectedHintId = `options-${optionIndex}-priorityhint`;
 
         expect(ariaDescribedBy, `❌ aria-describedby missing for Rank Priority at index ${optionIndex}`).toContain(expectedHintId);
 

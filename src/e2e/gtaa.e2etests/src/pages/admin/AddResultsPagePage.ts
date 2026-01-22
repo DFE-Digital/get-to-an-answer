@@ -52,8 +52,8 @@ export class AddResultsPagePage extends BasePage {
         this.errorSummaryReferenceName = this.errorSummaryLink('#ContentRefName');
         
         // Inline error messages
-        this.errorInlineContentTitle = this.inlineErrorLink('ContentTitle-error');
-        this.errorInlineContentValue = this.inlineErrorLink('ContentValue-error');
+        this.errorInlineContentTitle = this.inlineErrorLink('contenttitle-error');
+        this.errorInlineContentValue = this.inlineErrorLink('contentvalue-error');
         this.errorInlineReferenceName = this.inlineErrorLink('ContentRefName-error');
     }
     

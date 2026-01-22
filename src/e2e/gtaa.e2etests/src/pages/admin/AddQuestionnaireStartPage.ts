@@ -42,8 +42,8 @@ export class AddQuestionnaireStartPage extends BasePage {
         this.errorSummaryDescription = this.errorSummaryLink('#Description');
         
         // Inline error messages
-        this.errorInlineDisplayTitle = this.inlineErrorLink('DisplayTitle-error');
-        this.errorInlineDescription = this.inlineErrorLink('Description-error');
+        this.errorInlineDisplayTitle = this.inlineErrorLink('displaytitle-error');
+        this.errorInlineDescription = this.inlineErrorLink('description-error');
     }
     
     // ===== Validation =====
