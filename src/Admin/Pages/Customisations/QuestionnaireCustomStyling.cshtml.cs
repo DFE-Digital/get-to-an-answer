@@ -44,7 +44,7 @@ public class QuestionnaireCustomStyling(
         [FromForm(Name = "RemoveImage")] bool removeImage = false,
         [FromForm(Name = "UpdateRequest.DecorativeImage")] IFormFile? file = null)
     {
-        if (!ModelState.IsValid)
+        if (!ModelState.IsValid && !resetStyling)
             return Page();
         
         var questionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId);
