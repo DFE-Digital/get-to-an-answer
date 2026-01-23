@@ -85,6 +85,8 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
                     }
                 }
                 
+                IsEmbedded = Embed;
+                
                 return Page();
             }
             
