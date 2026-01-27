@@ -7,7 +7,6 @@ using Common.Enum;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
 
 namespace Admin.Models;
 
@@ -121,6 +120,20 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             
             ModelState.AddModelError(destinationKey, string.Empty);
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
+        }
+
+        if (QuestionType is Common.Enum.QuestionType.MultiSelect)
+        {
+            var optionsWithInvalidPriorities = Options.Where(o =>
+                int.TryParse(o.RankPriority, out var priority) && priority < 0);
+            
+            foreach (var invalidPriority in optionsWithInvalidPriorities)
+            {
+                var index = invalidPriority.OptionNumber - 1;
+                var errorMessage = $"Priority must be a positive number (0, 1, ...) for option {invalidPriority.OptionNumber}";
+                
+                ModelState.AddModelError($"Options-{index}-RankPriority", errorMessage);
+            }
         }
     }
 

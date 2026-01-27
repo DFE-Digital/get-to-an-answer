@@ -230,7 +230,8 @@
                  type="number"
                  asp-for="@Model.RankPriority"
                  govuk-error-for="@Id("RankPriority-error")"
-                 aria-describedby="@Id(priorityHintIdSuffix)" />
+                 aria-describedby="@Id(priorityHintIdSuffix)" 
+                 min="0"/>
     </govuk-form-group>
   }
 }

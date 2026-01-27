@@ -33,6 +33,7 @@
     </p>
     
     <form method="post" accept-charset="UTF-8">
+      <input type="hidden" name="QuestionType" value="@Model.QuestionType"/>
       <input type="hidden" asp-for="@Model.BackLinkSlug" />
       <input name="returnUrl" type="hidden" value="@($"{Request.Path}{Request.QueryString}")"/>
 
