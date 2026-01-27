@@ -225,7 +225,7 @@
       </ul>
     </div>
     <div class="govuk-button-group">
-      @if (questionnaire?.Status == EntityStatus.Published)
+      @if (!(questionnaire?.IsUnpublished ?? false) && questionnaire?.Version > 0)
       {
         <a class="govuk-button govuk-button--secondary" data-module="govuk-button"
            id="unpublish-questionnaire"
