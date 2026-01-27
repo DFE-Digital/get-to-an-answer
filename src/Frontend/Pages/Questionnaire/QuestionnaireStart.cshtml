@@ -17,10 +17,6 @@
   @await Html.PartialAsync("_ErrorSummary", Model)
 }
 
-@{
-  ViewData["Title"] = "Create a new questionnaire";
-}
-
 @section BeforeContainer
 {
   @if (Model?.Questionnaire.DecorativeImage is null && Model is { IsEmbedded: false })
