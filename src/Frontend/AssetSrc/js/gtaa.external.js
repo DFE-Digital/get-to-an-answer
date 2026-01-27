@@ -13,5 +13,8 @@ window.addEventListener('message', (e) => {
         frame.style.height = `${e.data.h}px`;
     } else if (e.data?.type === 'DEST-REDIRECT') {
         window.location.href = e.data.externalLinkDest;
+    } else if (e.data?.type === 'GA4_GTAA_IFRAME_EVENT' && typeof gtag === 'function') {
+        // Send to parent GA4
+        gtag('event', e.data.eventName, e.data.eventParams);
     }
 });

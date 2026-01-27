@@ -8,7 +8,27 @@
 }
 
 @{
-  ViewData["Title"] = Model.Questionnaire.DisplayTitle;
+  var dynamicTitle = Model.Questionnaire.DisplayTitle ?? "";
+  dynamicTitle = $"{(dynamicTitle.Any() ? " - " : "")}{dynamicTitle}";
+
+  var destination = Model.Destination;
+
+  if (destination.Type == DestinationType.Question)
+  {
+    var question = destination.Question;
+
+    dynamicTitle = $"Question {question?.Order}{dynamicTitle}";
+  }
+  else if (destination.Type == DestinationType.CustomContent)
+  {
+    dynamicTitle = $"{destination.Title} - Results page {dynamicTitle}";
+  }
+  else if (destination.Type == DestinationType.ExternalLink)
+  {
+    dynamicTitle = $"External link {dynamicTitle}";
+  }
+
+  ViewData["Title"] = dynamicTitle;
   
   var hasErrors = Model != null && !ViewData.ModelState.IsValid;
 }
@@ -17,11 +37,6 @@
 {
   @await Html.PartialAsync("_ErrorSummary", Model)
 }
-
-@{
-  ViewData["Title"] = "Create a new questionnaire";
-}
-
 @section BeforeContainer
 {
 
