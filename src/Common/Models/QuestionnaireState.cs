@@ -23,10 +23,14 @@ public class QuestionnaireState
     public bool JustUpdatedQuestionnaireName { get; set; }
     public bool JustAddedContributor { get; set; }
     public bool JustRemovedContributor { get; set; }
-
     public bool JustDeletedQuestion { get; set; }
+    public bool JustAddedResultsPage { get; set; }
+    public bool JustDeletedResultsPage { get; set; }
+    public bool JustUpdatedResultsPage { get; set; }
+
     
     public string? DeletedQuestionTitle { get; set; }
     public string? ContributorEmail { get; set; }
     public string? CopiedQuestionnaireTitle { get; set; }
+    public string? ResultsPageTitle { get; set; }
 }
