@@ -84,8 +84,8 @@ export const PageHeadings = {
 
 export const SuccessBannerMessages = {
     DELETED_RESULTS_PAGE_SUCCESS_MESSAGE: 'Your results page has been deleted.',
-    CREATED_RESULTS_PAGE_SUCCESS_MESSAGE: 'Your results page has been created.',
-    UPDATED_RESULTS_PAGE_SUCCESS_MESSAGE: 'Your changes have been saved.',
+    CREATED_RESULTS_PAGE_SUCCESS_MESSAGE: "The results page '**resultsPageTitle**' has been saved",
+    UPDATED_RESULTS_PAGE_SUCCESS_MESSAGE: "Your changes to the results page '**resultsPageTitle**' has been saved",
     UPDATED_GENERIC_BANNER_SUCCESS_MESSAGE: 'Your changes have been saved.',
 
     DELETED_QUESTIONNAIRE_SUCCESS_MESSAGE: "Your questionnaire '**name**' has been deleted.",

@@ -50,9 +50,9 @@
             { JustAddedContributor: true } => ("just-added-contributor-banner-text", $"{state.ContributorEmail ?? "Contributor"} has been given access"),
             { JustRemovedContributor: true } => ("just-removed-contributor-banner-text", $"{state.ContributorEmail ?? "Contributor"} has had their access removed"),
             { JustDeletedQuestion: true } => ("just-deleted-question-banner-text", $"The question '{state.DeletedQuestionTitle}' has been deleted"),
-            { JustAddedResultsPage: true } => ("just-added-results-page-banner-text", $"The results page '{state.ResultsPageTitle}' has been saved"),
-            { JustDeletedResultsPage: true } => ("just-added-results-page-banner-text", $"The results page '{state.ResultsPageTitle}' has been deleted"),
-            {JustUpdatedResultsPage: true} => ("just-updated-results-page", $"Your changes to the results page to '{state.ResultsPageTitle}' has been saved"),
+            { JustAddedResultsPage: true } => ("just-created-results-page-banner-text", $"The results page '{state.ResultsPageTitle}' has been saved"),
+            { JustDeletedResultsPage: true } => ("just-deleted-results-page-banner-text", $"The results page '{state.ResultsPageTitle}' has been deleted"),
+            { JustUpdatedResultsPage: true } => ("just-updated-results-page-text", $"Your changes to the results page '{state.ResultsPageTitle}' has been saved"),
             _ => null
         };
     }

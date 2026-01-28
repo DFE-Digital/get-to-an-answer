@@ -3,7 +3,7 @@ import {
     signIn, goToEditResultPagePageByUrl} from '../../helpers/admin-test-helper';
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
-import {PageHeadings} from "../../constants/test-data-constants";
+import {PageHeadings, SuccessBannerMessages} from "../../constants/test-data-constants";
 import {ViewResultsPagesPage} from "../../pages/admin/ViewResultsPagesPage";
 import {createContent} from "../../test-data-seeder/content-data";
 import {EditResultsPagePage} from "../../pages/admin/EditResultsPagePage";
@@ -91,9 +91,12 @@ test.describe('Get to an answer edit results-page to questionnaire', () => {
         await editResultsPagePage.clickSaveAndContinue();
 
         viewResultsPagesPage = await ViewResultsPagesPage.create(page);
+        
         await viewResultsPagesPage.expectResultsPagesHeadingOnPage(PageHeadings.VIEW_RESULTS_PAGES_PAGE_HEADING);
         await viewResultsPagesPage.expectSuccessBannerVisible();
-        await viewResultsPagesPage.assertUpdatedResultsPageSuccessBanner();
+        
+        await viewResultsPagesPage.assertUpdatedResultsPageSuccessBanner( SuccessBannerMessages.UPDATED_RESULTS_PAGE_SUCCESS_MESSAGE
+            .replace('**resultsPageTitle**', resultsPageTitleInput));
     });
 
     test('Inline error and styling for missing results-page title', async ({page}) => {

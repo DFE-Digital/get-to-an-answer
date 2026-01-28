@@ -32,8 +32,8 @@ export class ViewResultsPagesPage extends BasePage {
         this.banner = this.page.locator('div.govuk-notification-banner--success[role="alert"]');
         this.heading = this.banner.locator('.govuk-notification-banner__title');
         
-        this.justCreatedBannerText = this.page.locator('#just-created-banner-text');
-        this.justUpdatedBannerText = this.page.locator('#just-updated-banner-text');
+        this.justCreatedBannerText = this.page.locator('#just-created-results-page-banner-text');
+        this.justUpdatedBannerText = this.page.locator('#just-updated-results-page-text');
         this.justDeletedBannerText = this.page.locator('#just-deleted-banner-text');
         
         this.resultsPagesHeading = this.page.locator('main h1.govuk-heading-l');
@@ -147,14 +147,15 @@ export class ViewResultsPagesPage extends BasePage {
         expect(text?.trim().length).toBeGreaterThan(0);
     }
 
-    async assertCreatedResultsPageSuccessBanner() {
+    async assertCreatedResultsPageSuccessBanner(expectedText: string) {
         await expect(this.justCreatedBannerText).toBeVisible();
-        await expect(this.justCreatedBannerText).toHaveText(SuccessBannerMessages.CREATED_RESULTS_PAGE_SUCCESS_MESSAGE);
+        await expect(this.justCreatedBannerText).toHaveText(expectedText);
     }
 
-    async assertUpdatedResultsPageSuccessBanner() {
+    async assertUpdatedResultsPageSuccessBanner(expectedText: string) {
         await expect(this.justUpdatedBannerText).toBeVisible();
-        await expect(this.justUpdatedBannerText).toHaveText(SuccessBannerMessages.UPDATED_RESULTS_PAGE_SUCCESS_MESSAGE);
+        
+        await expect(this.justUpdatedBannerText).toHaveText(expectedText);
     }
 
     async assertDeletedResultsPageSuccessBanner() {
