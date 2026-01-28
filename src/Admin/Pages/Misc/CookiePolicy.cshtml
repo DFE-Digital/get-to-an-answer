@@ -100,7 +100,7 @@
             .AspNetCore.Cookies
         </td>
         <td class="govuk-table__cell">
-           Stores authentication cookie for Entra ID
+           Stores authentication cookie for Entra ID (additional cookie chunks e.g. '.AspNetCore.CookiesC?' may be stored if this cookie is too large)
         </td>
         <td class="govuk-table__cell">
             Same time as Jwt Token
@@ -206,6 +206,29 @@
         </td>
         <td class="govuk-table__cell">
             1 day
+        </td>
+    </tr>
+    <tr>
+        <td class="govuk-table__cell">
+            CLID
+        </td>
+        <td class="govuk-table__cell">
+            Identifies the first-time Clarity saw this user on any site using Clarity.
+        </td>
+        <td class="govuk-table__cell">
+            1 year
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="govuk-table__cell">
+            MUID
+        </td>
+        <td class="govuk-table__cell">
+            Identifies unique web browsers visiting Microsoft sites. These cookies are used for advertising, site analytics, and other operational purposes.
+        </td>
+        <td class="govuk-table__cell">
+            1 year
         </td>
     </tr>
     </tbody>
