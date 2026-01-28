@@ -31,7 +31,7 @@ public class ConfirmRemoveContributor(IApiClient apiClient) : QuestionnairesPage
         {
             await apiClient.RemoveQuestionnaireContributor(QuestionnaireId, ContributorId.ToString());
                 
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustRemovedContributor = true, ContributorEmail = ContributorEmail });
         }
         return Redirect(string.Format(Routes.AddAndEditQuestionnaireContributors, QuestionnaireId));
     }

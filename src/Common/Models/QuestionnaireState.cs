@@ -22,7 +22,8 @@ public class QuestionnaireState
     
     public bool JustUpdatedQuestionnaireName { get; set; }
     public bool JustAddedContributor { get; set; }
-    
+    public bool JustRemovedContributor { get; set; }
+
     
     public string? ContributorEmail { get; set; }
 }

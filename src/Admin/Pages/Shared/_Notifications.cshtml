@@ -1,0 +1,57 @@
+@model QuestionnaireState
+@using Common.Models
+
+@{
+    var notificationConfig = GetNotificationConfig(Model);
+}
+
+@if (notificationConfig != null)
+{
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-notification-banner govuk-notification-banner--success" role="alert"
+                 aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                        Success
+                    </h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <h3 id="@notificationConfig.Value.Id" class="govuk-notification-banner__heading">
+                        @notificationConfig.Value.Message
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@functions {
+
+    private static (string Id, string Message)? GetNotificationConfig(QuestionnaireState? state)
+    {
+        if (state == null)
+            return null;
+
+        return state switch
+        {
+            { JustCreated: true } => ("just-created-banner-text", "Your questionnaire name has been saved"),
+            { JustUpdated: true } => ("just-updated-banner-text", "Your changes have been saved."),
+            { JustCloned: true } => ("just-cloned-banner-text", "Your copy questionnaire has been created."),
+            { JustPublished: true } => ("just-published-banner-text", "Your questionnaire has been published."),
+            { JustUnpublished: true } => ("just-unpublished-banner-text", "Your questionnaire has been unpublished."),
+            { JustAddedStartPage: true } => ("just-added-start-page-banner-text", "Your start page has been saved"),
+            { JustRemovedStartPage: true } => ("just-removed-start-page-banner-text", "Your start page has been removed"),
+            { JustResetStyling: true } => ("just-reset-styling-banner-text", "Your customised styling has been reset"),
+            { JustCustomisedStyling: true } => ("just-updated-styling-banner-text", "Your customised styling has been saved"),
+            { JustAddedCustomButtonText: true } => ("just-modified-button-text-banner-text", "Your button text has been saved"),
+            { JustRemovedStartPageImage: true } => ("just-removed-start-page-image-banner-text", "Your start page image has been removed"),
+            { JustUpdatedQuestionnaireName: true } => ("just-updated-questionnaire-name-banner-text", "Your questionnaire name has been saved"),
+            { JustAddedContributor: true } => ("just-added-contributor-banner-text", $"{state.ContributorEmail ?? "Contributor"} has been given access"),
+            { JustRemovedContributor: true } => ("just-removed-contributor-banner-text", $"{state.ContributorEmail ?? "Contributor"} has had their access removed"),
+            _ => null
+        };
+    }
+
+}
+
