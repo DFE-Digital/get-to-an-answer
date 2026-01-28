@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Common.Models;
 
 public class QuestionnaireState
@@ -17,4 +19,10 @@ public class QuestionnaireState
     public bool JustRemovedStartPageImage { get; set; }
     public bool JustCustomisedStyling { get; set; }
     public bool JustAddedCustomButtonText { get; set; }
+    
+    public bool JustUpdatedQuestionnaireName { get; set; }
+    public bool JustAddedContributor { get; set; }
+    
+    
+    public string? ContributorEmail { get; set; }
 }

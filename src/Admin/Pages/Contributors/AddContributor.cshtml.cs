@@ -52,7 +52,7 @@ public class AddContributor(ILogger<AddContributor> logger,
             });
 
             TempData[nameof(QuestionnaireState)] =
-                JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+                JsonConvert.SerializeObject(new QuestionnaireState { JustAddedContributor = true, ContributorEmail = ContributorEmail });
 
             return Redirect(string.Format(Routes.AddAndEditQuestionnaireContributors, QuestionnaireId));
         }

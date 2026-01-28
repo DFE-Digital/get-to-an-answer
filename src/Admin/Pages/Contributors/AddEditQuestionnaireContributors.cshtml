@@ -18,7 +18,7 @@
   @await Html.PartialAsync("_ErrorSummary")
 }
 
-@if (Model.QuestionnaireState is { JustUpdated: true })
+@if (Model.QuestionnaireState is { JustAddedContributor: true })
 {
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -30,7 +30,7 @@
       </div>
       <div class="govuk-notification-banner__content">
         <h3 id="just-saved-access-changes-banner-text" class="govuk-notification-banner__heading">
-          Your changes to access has been saved
+          @Model.QuestionnaireState.ContributorEmail has been given access
         </h3>
       </div>
     </div>
