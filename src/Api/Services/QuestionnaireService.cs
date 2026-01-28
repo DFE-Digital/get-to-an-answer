@@ -404,7 +404,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             else if (answer.DestinationType != DestinationType.ExternalLink && current.Order == questionMap.Count)
             {
                 return (BranchingHealthType.Broken, 
-                    $"Answer '{answer.Content}' of the last question should have an external link or results page as it's destination."); 
+                    $"Answer '{answer.Content}' of the last question should have an external link or results page as its destination."); 
             }    
         }
 
@@ -833,7 +833,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             if (questionnaire == null) 
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             
-            if (status == EntityStatus.Private && questionnaire.Status != EntityStatus.Published)
+            if (status == EntityStatus.Private && (questionnaire.IsUnpublished || questionnaire.Version == 0))
             {
                 return BadRequest(ProblemTrace("You can only unpublish a published questionnaire", 400));
             }
