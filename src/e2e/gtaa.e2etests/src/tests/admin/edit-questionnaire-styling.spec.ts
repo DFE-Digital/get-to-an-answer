@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { JwtHelper } from '../../helpers/JwtHelper';
-import { signIn } from '../../helpers/admin-test-helper';
+import {goToQuestionnaireStylingPageByUrl, signIn} from '../../helpers/admin-test-helper';
 import { createQuestionnaire } from '../../test-data-seeder/questionnaire-data';
 import { QuestionnaireStylingPage } from '../../pages/admin/QuestionnaireStylingPage';
 import { DesignQuestionnairePage } from '../../pages/admin/DesignQuestionnairePage';
@@ -9,6 +9,7 @@ test.describe('Questionnaire custom styling', () => {
     let token: string;
     let questionnaireId: string;
     let stylingPage: QuestionnaireStylingPage;
+    let designQuestionnairePage: DesignQuestionnairePage;
 
     test.beforeEach(async ({ page, request }) => {
         token = JwtHelper.NoRecordsToken();
@@ -54,9 +55,9 @@ test.describe('Questionnaire custom styling', () => {
             new RegExp(`/admin/questionnaires/${questionnaireId}.*?/track`)
         );
 
-        const editQuestionnairePage = new DesignQuestionnairePage(page);
-        await editQuestionnairePage.expectSuccessBannerVisible();
-        await editQuestionnairePage.assertUpdatedStylingSuccessBanner();
+        const designQuestionnairePage = new DesignQuestionnairePage(page);
+        await designQuestionnairePage.expectSuccessBannerVisible();
+        await designQuestionnairePage.assertUpdatedStylingSuccessBanner();
     });
 
     test('Reset to DfE styling redirects to track with reset-styling banner', async ({ page }) => {
@@ -66,9 +67,9 @@ test.describe('Questionnaire custom styling', () => {
             new RegExp(`/admin/questionnaires/${questionnaireId}.*?/track`)
         );
 
-        const editQuestionnairePage = new DesignQuestionnairePage(page);
-        await editQuestionnairePage.expectSuccessBannerVisible();
-        await editQuestionnairePage.assertResetStylingSuccessBanner();
+        const designQuestionnairePage = new DesignQuestionnairePage(page);
+        await designQuestionnairePage.expectSuccessBannerVisible();
+        await designQuestionnairePage.assertResetStylingSuccessBanner();
     });
 
     // ===== Validation unhappy paths =====
@@ -205,8 +206,43 @@ test.describe('Questionnaire custom styling', () => {
             new RegExp(`/admin/questionnaires/${questionnaireId}/track`)
         );
 
-        const editQuestionnairePage = new DesignQuestionnairePage(page);
-        await editQuestionnairePage.expectSuccessBannerVisible();
-        await editQuestionnairePage.assertRemovedStartPageImageSuccessBanner();
+        const designQuestionnairePage = new DesignQuestionnairePage(page);
+        await designQuestionnairePage.expectSuccessBannerVisible();
+        await designQuestionnairePage.assertRemovedStartPageImageSuccessBanner();
+    });
+
+    test('Validate GDS style resetting and values correctness', async ({ page }) => {
+        await stylingPage.setTextColor('');
+        await stylingPage.setBackgroundColor('');
+        await stylingPage.setPrimaryButtonColor('');
+        await stylingPage.setSecondaryButtonColor('');
+        await stylingPage.setStateColor('');
+        await stylingPage.setErrorMessageColor('');
+        
+        await stylingPage.acceptAccessibilityAgreement();
+        await stylingPage.saveAndContinue();
+
+        await stylingPage.expectErrorSummaryForTextColor('Text colour is required.');
+        
+        await stylingPage.clickResetStyling();
+
+        const designQuestionnairePage = new DesignQuestionnairePage(page);
+        await designQuestionnairePage.expectSuccessBannerVisible();
+
+        await designQuestionnairePage.openCustomiseStyling();
+        
+        const textColorValue = await stylingPage.getTextColorValue();
+        const backgroundColorValue = await stylingPage.getBackgroundColorValue();
+        const primaryButtonColorValue = await stylingPage.getPrimaryButtonColorValue();
+        const secondaryButtonColorValue = await stylingPage.getSecondaryButtonColorValue();
+        const stateColorValue = await stylingPage.getStateColorValue();
+        const errorMessageColorValue = await stylingPage.getErrorMessageColorValue();
+        
+        expect(textColorValue).toBe("#0b0c0c");
+        expect(backgroundColorValue).toBe("#ffffff");
+        expect(primaryButtonColorValue).toBe("#00703c");
+        expect(secondaryButtonColorValue).toBe("#1d70b8");
+        expect(stateColorValue).toBe("#ffdd00");
+        expect(errorMessageColorValue).toBe("#c3432b");
     });
 });
