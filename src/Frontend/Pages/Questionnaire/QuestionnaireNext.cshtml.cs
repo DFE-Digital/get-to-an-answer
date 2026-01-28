@@ -94,7 +94,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 
             foreach (var (key, value) in priorities)
             {
-                finalPriorities.Add(key, value == 0 ? int.MaxValue : value);
+                finalPriorities.Add(key, value <= 0 ? int.MaxValue : value);
             }
 
             if (NextStateRequest.SelectedAnswerIds.Count > 1)
