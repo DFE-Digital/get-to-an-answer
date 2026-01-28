@@ -102,6 +102,9 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
                 countObj is > 0 ? CompletionStatus.InProgress : CompletionStatus.NotStarted
         });
         
+        TempData[nameof(QuestionnaireState)] =
+            JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+        
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
     }
     
