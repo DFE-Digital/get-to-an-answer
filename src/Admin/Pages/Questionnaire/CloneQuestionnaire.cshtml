@@ -30,7 +30,10 @@
       <p>Next, you will be sent to the 'Design a questionnaire' page for this copy.</p>
     </div>
     <form accept-charset="UTF-8" method="post">
+      
       <input type="hidden" asp-for="@Model.BackLinkSlug"/>
+      <input type="hidden" asp-for="@Model.CopiedQuestionnaireTitle"/>
+      
       <govuk-form-group asp-for="@Model.Title">
         <fieldset class="govuk-fieldset" aria-describedby="clone-questionnaire-hint">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">

@@ -24,6 +24,9 @@ public class QuestionnaireState
     public bool JustAddedContributor { get; set; }
     public bool JustRemovedContributor { get; set; }
 
+    public bool JustDeletedQuestion { get; set; }
     
+    public string? DeletedQuestionTitle { get; set; }
     public string? ContributorEmail { get; set; }
+    public string? CopiedQuestionnaireTitle { get; set; }
 }
