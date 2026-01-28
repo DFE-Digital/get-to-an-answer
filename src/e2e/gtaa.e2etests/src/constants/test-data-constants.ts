@@ -83,6 +83,8 @@ export const PageHeadings = {
 }
 
 export const SuccessBannerMessages = {
+    
+    DELETED_QUESTION_SUCCESS_MESSAGE: "The question '**questionContent**' has been deleted",
     DELETED_RESULTS_PAGE_SUCCESS_MESSAGE: 'Your results page has been deleted',
     CREATED_RESULTS_PAGE_SUCCESS_MESSAGE: "The results page '**resultsPageTitle**' has been saved",
     UPDATED_RESULTS_PAGE_SUCCESS_MESSAGE: "Your changes to the results page '**resultsPageTitle**' has been saved",

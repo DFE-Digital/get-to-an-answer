@@ -5,7 +5,7 @@ import {UpdateQuestionnaireSlugPage} from "../../pages/admin/UpdateQuestionnaire
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {goToDesignQuestionnairePageByUrl, goToUpdateQuestionPageByUrl, signIn} from "../../helpers/admin-test-helper";
-import {PageHeadings, QuestionType} from "../../constants/test-data-constants";
+import {PageHeadings, QuestionType, SuccessBannerMessages} from "../../constants/test-data-constants";
 import {createQuestion, getQuestion} from "../../test-data-seeder/question-data";
 import {AddQuestionPage, QuestionRadioLabel} from "../../pages/admin/AddQuestionPage";
 import {ViewQuestionPage} from "../../pages/admin/ViewQuestionPage";
@@ -16,6 +16,7 @@ test.describe('Get to an answer update question', () => {
     let token: string;
     let questionnaireId: string;
     let question1Id: string;
+    let question1Title: string;
 
     let viewQuestionnairePage: ViewQuestionnairePage;
     let viewQuestionPage: ViewQuestionPage;
@@ -31,6 +32,8 @@ test.describe('Get to an answer update question', () => {
 
         const q1Resp = await createQuestion(request, questionnaireId, token);
         question1Id = q1Resp.question.id;
+        
+        question1Title = q1Resp.question.content;
     });
 
     test('Edit question page displays all required elements', async ({page}) => {
@@ -227,7 +230,8 @@ test.describe('Get to an answer update question', () => {
 
         viewQuestionPage = new ViewQuestionPage(page);
         await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
-        await viewQuestionPage.assertQuestionDeletionSuccessBanner();
+        
+        await viewQuestionPage.assertQuestionDeletionSuccessBanner(SuccessBannerMessages.DELETED_QUESTION_SUCCESS_MESSAGE.replace('**questionContent**', question1Title));
     });
 
     test('Delete a question with cancellation returns to edit page', async ({page}) => {
