@@ -39,7 +39,7 @@
   <a class="govuk-back-link govuk-!-display-none-print" id="back-to-manage" href="/admin/questionnaires/manage">Back</a>
 }
 
-@await Html.PartialAsync("QuestionnaireNotifications", Model)
+@await Html.PartialAsync("Shared/_Notifications", Model.ViewModel.QuestionnaireState)
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">

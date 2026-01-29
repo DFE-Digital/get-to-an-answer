@@ -12,6 +12,7 @@ export class ViewContributorPage extends BasePage{
     private readonly notificationBanner: Locator;
     private readonly notificationBannerTitle: Locator;
     private readonly notificationBannerHeading: Locator;
+    private readonly contributorAddedSuccessBannerText: Locator;
 
     private readonly addPersonButton: Locator;
     private readonly contributorsTableRegion: Locator;
@@ -35,7 +36,8 @@ export class ViewContributorPage extends BasePage{
         );
         this.notificationBannerTitle = this.notificationBanner.locator('.govuk-notification-banner__title');
         this.notificationBannerHeading = this.notificationBanner.locator('#just-saved-access-changes-banner-text');
-
+        this.contributorAddedSuccessBannerText = this.notificationBanner.locator('#just-added-contributor-banner-text');
+        
         this.addPersonButton = this.page.locator('#add-person');
         this.contributorsTableRegion = this.page.locator('table.govuk-table');
 
@@ -91,8 +93,8 @@ export class ViewContributorPage extends BasePage{
         await expect(this.notificationBanner).toHaveAttribute('role', 'alert');
 
         await expect(this.notificationBannerTitle).toHaveText('Success');
-        await expect(this.notificationBannerHeading).toContainText(
-            'Your changes to access has been saved'
+        await expect(this.contributorAddedSuccessBannerText).toContainText(
+            'has been given access'
         );
     }
 

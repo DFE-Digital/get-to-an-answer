@@ -37,7 +37,7 @@ export class ViewQuestionnairePage extends BasePage {
 
         this.table = new ViewQuestionnaireTable(page);
 
-        this.justDeletedBannerText = this.page.locator('#just-deleted-banner-text');
+        this.justDeletedBannerText = this.page.locator('#just-deleted-questionnaire-banner-text');
         this.justDeletedBannerSubText = this.page.locator('#just-deleted-banner-sub-text');
     }
 

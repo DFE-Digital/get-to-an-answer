@@ -660,7 +660,7 @@ export class DesignQuestionnairePage extends BasePage {
         await expect(
             this.justCreatedBannerText,
             '❌ Questionnaire created success banner text mismatch',
-        ).toHaveText('Your questionnaire has been created.');
+        ).toHaveText('Your questionnaire has been created');
     }
 
     async assertQuestionnaireUpdatedSuccessBanner(): Promise<void> {
@@ -672,7 +672,7 @@ export class DesignQuestionnairePage extends BasePage {
         await expect(
             this.justUpdatedBannerText,
             '❌ Questionnaire updated success banner text mismatch',
-        ).toHaveText('Your changes have been saved.');
+        ).toHaveText('Your changes have been saved');
     }
 
     async assertQuestionnaireClonedSuccessBanner(): Promise<void> {
@@ -720,7 +720,7 @@ export class DesignQuestionnairePage extends BasePage {
         await expect(
             this.justRemovedStartPageBannerText,
             '❌ Start page removed success banner text mismatch',
-        ).toHaveText('Your start page has been removed');
+        ).toHaveText('Your start page has been deleted');
     }
 
     async assertResetStylingSuccessBanner(): Promise<void> {

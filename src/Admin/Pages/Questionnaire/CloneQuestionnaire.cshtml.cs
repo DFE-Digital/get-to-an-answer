@@ -21,6 +21,9 @@ public class CloneQuestionnaire(IApiClient apiClient, ILogger<CloneQuestionnaire
     [Required(ErrorMessage = "Enter a questionnaire title")]
     [GdsTitle]
     public required string Title { get; set; }
+    
+    [BindProperty]
+    public string? CopiedQuestionnaireTitle { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
@@ -28,6 +31,8 @@ public class CloneQuestionnaire(IApiClient apiClient, ILogger<CloneQuestionnaire
 
         var currentQuestionnaire = await apiClient.GetQuestionnaireAsync(QuestionnaireId);
 
+        CopiedQuestionnaireTitle = currentQuestionnaire?.Title;
+        
         Title = $"Copy of {currentQuestionnaire?.Title ?? QuestionnaireTitle}";
         return Page();
     }
@@ -50,7 +55,7 @@ public class CloneQuestionnaire(IApiClient apiClient, ILogger<CloneQuestionnaire
                 return RedirectToErrorPage();
 
             TempData[nameof(QuestionnaireState)] =
-                JsonConvert.SerializeObject(new QuestionnaireState { JustCloned = true });
+                JsonConvert.SerializeObject(new QuestionnaireState { JustCloned = true, CopiedQuestionnaireTitle = CopiedQuestionnaireTitle });
 
             return Redirect(string.Format(Routes.QuestionnaireTrackById, cloneQuestionnaire.Id));
         }

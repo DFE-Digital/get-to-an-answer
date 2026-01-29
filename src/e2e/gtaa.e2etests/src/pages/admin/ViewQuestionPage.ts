@@ -149,15 +149,13 @@ export class ViewQuestionPage extends BasePage {
         await expect(this.finishedYesRadio).not.toBeChecked();
     }
 
-    async assertQuestionDeletionSuccessBanner(): Promise<void> {
+    async assertQuestionDeletionSuccessBanner(expectedText: string): Promise<void> {
         await expect(
             this.successBanner,
             '❌ Delete question success banner should be visible',
         ).toBeVisible();
 
-        await expect(this.successBannerHeading).toHaveText(
-            /The question, .*, has been deleted\./
-        );
+        await expect(this.successBannerHeading).toHaveText(expectedText);
     }
 
     async assertPageElements() {
