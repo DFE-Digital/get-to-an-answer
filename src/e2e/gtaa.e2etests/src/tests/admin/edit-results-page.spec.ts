@@ -14,6 +14,7 @@ test.describe('Get to an answer edit results-page to questionnaire', () => {
     let token: string;
     let editResultsPagePage: EditResultsPagePage;
     let viewResultsPagesPage: ViewResultsPagesPage;
+    let resultsPageTitleInput = `Test title - ${Date.now()}`;
 
     test.beforeEach(async ({request, page}) => {
         token = JwtHelper.NoRecordsToken();
@@ -21,11 +22,13 @@ test.describe('Get to an answer edit results-page to questionnaire', () => {
         const {questionnaire} = await createQuestionnaire(request, token);
         const {content} = await createContent(request, {
             questionnaireId: questionnaire.id,
-            title: "Test title",
+            title: resultsPageTitleInput,
             content: "Test content",
             referenceName: "Test ref name"
         }, token);
-
+        
+        
+        
         await signIn(page, token);
         editResultsPagePage = await goToEditResultPagePageByUrl(page, questionnaire.id, content.id);
         await editResultsPagePage.expectAddResultsPageHeadingOnPage(PageHeadings.EDIT_RESULTS_PAGE_PAGE_HEADING);
@@ -125,6 +128,6 @@ test.describe('Get to an answer edit results-page to questionnaire', () => {
 
         viewResultsPagesPage = await ViewResultsPagesPage.create(page);
         await viewResultsPagesPage.expectSuccessBannerVisible();
-        await viewResultsPagesPage.assertDeletedResultsPageSuccessBanner();
+        await viewResultsPagesPage.assertDeletedResultsPageSuccessBanner(SuccessBannerMessages.DELETED_RESULTS_PAGE_SUCCESS_MESSAGE.replace('**resultsPageTitle**', resultsPageTitleInput));
     });
 });

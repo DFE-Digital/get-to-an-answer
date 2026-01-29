@@ -34,7 +34,7 @@ export class ViewResultsPagesPage extends BasePage {
         
         this.justCreatedBannerText = this.page.locator('#just-created-results-page-banner-text');
         this.justUpdatedBannerText = this.page.locator('#just-updated-results-page-text');
-        this.justDeletedBannerText = this.page.locator('#just-deleted-banner-text');
+        this.justDeletedBannerText = this.page.locator('#just-deleted-results-page-banner-text');
         
         this.resultsPagesHeading = this.page.locator('main h1.govuk-heading-l');
         this.section = this.page.locator('div.govuk-grid-row.gtaa-add-edit-results-pages');
@@ -158,8 +158,8 @@ export class ViewResultsPagesPage extends BasePage {
         await expect(this.justUpdatedBannerText).toHaveText(expectedText);
     }
 
-    async assertDeletedResultsPageSuccessBanner() {
+    async assertDeletedResultsPageSuccessBanner(expectedText: string) {
         await expect(this.justDeletedBannerText).toBeVisible();
-        await expect(this.justDeletedBannerText).toHaveText(SuccessBannerMessages.DELETED_RESULTS_PAGE_SUCCESS_MESSAGE);
+        await expect(this.justDeletedBannerText).toHaveText(expectedText);
     }
 }
