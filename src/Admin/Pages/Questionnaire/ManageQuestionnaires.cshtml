@@ -26,6 +26,10 @@
     </div>
   </div>
 }
+else
+{
+  @await Html.PartialAsync("Shared/_Notifications", Model.ViewModel.QuestionnaireState)
+}
 
 
 <h1 class="govuk-heading-l">
