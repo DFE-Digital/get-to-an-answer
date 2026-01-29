@@ -2,7 +2,7 @@ import {expect, test} from "@playwright/test";
 import {signIn, goToAddResultPagePageByUrl} from '../../helpers/admin-test-helper';
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
-import {PageHeadings} from "../../constants/test-data-constants";
+import {PageHeadings, SuccessBannerMessages} from "../../constants/test-data-constants";
 import {AddResultsPagePage} from "../../pages/admin/AddResultsPagePage";
 import {ViewResultsPagesPage} from "../../pages/admin/ViewResultsPagesPage";
 
@@ -74,7 +74,8 @@ test.describe('Get to an answer add results-page to questionnaire', () => {
         viewResultsPagesPage = await ViewResultsPagesPage.create(page);
         await viewResultsPagesPage.expectResultsPagesHeadingOnPage(PageHeadings.VIEW_RESULTS_PAGES_PAGE_HEADING);
         await viewResultsPagesPage.expectSuccessBannerVisible();
-        await viewResultsPagesPage.assertCreatedResultsPageSuccessBanner();
+        await viewResultsPagesPage.assertCreatedResultsPageSuccessBanner(SuccessBannerMessages.CREATED_RESULTS_PAGE_SUCCESS_MESSAGE
+            .replace('**resultsPageTitle**', resultsPageTitleInput));
     });
 
     test('Inline error and styling for missing results-page title', async ({page}) => {

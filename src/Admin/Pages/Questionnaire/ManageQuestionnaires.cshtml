@@ -1,8 +1,6 @@
 @page "/admin/questionnaires/manage"
 @model Admin.Pages.Questionnaire.ManageQuestionnaires
 
-@using Common.Extensions
-
 @{
   ViewData["Title"] = "Your questionnaires";
   var questionnaires = Model.ViewModel.Questionnaires;
@@ -20,7 +18,7 @@
           </h2>
         </div>
         <div class="govuk-notification-banner__content">
-          <h3 id="just-deleted-banner-text" class="govuk-notification-banner__heading">
+          <h3 id="just-deleted-questionnaire-banner-text" class="govuk-notification-banner__heading">
             Your questionnaire '@TempData.Peek("QuestionnaireTitle")' has been deleted.
           </h3>
         </div>
@@ -28,6 +26,7 @@
     </div>
   </div>
 }
+
 
 <h1 class="govuk-heading-l">
   @ViewData["Title"]

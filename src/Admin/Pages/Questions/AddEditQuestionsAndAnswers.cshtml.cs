@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Common.Client;
 using Common.Domain;
 using Common.Domain.Request.Update;
@@ -7,12 +6,14 @@ using Common.Models;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Admin.Pages.Questions;
 
 [Authorize]
 public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logger, IApiClient apiClient)
-    : BasePageModel
+    : QuestionnairesPageModel
 {
     [FromRoute] public Guid QuestionnaireId { get; set; }
 
@@ -33,12 +34,29 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
             Questions = response.OrderBy(q => q.Order).ToList();
             
             TempData["QuestionCount"] = Questions.Count;
-
+            
             // If a move error message was set during a previous POST, surface it in ModelState
             if (TempData.TryGetValue("MoveError", out var moveErrorObj) && moveErrorObj is string moveError &&
                 !string.IsNullOrWhiteSpace(moveError))
             {
                 ModelState.AddModelError("QuestionMoveError", moveError);
+            }
+            
+            if (TempData.TryGetValue(nameof(QuestionnaireState), out var stateJson))
+            {
+                try
+                {
+                    // TempData returns the value as string (if stored as string)
+                    var jsonString = stateJson?.ToString();
+                    if (!string.IsNullOrEmpty(jsonString))
+                    {
+                        ViewModel.QuestionnaireState = JsonConvert.DeserializeObject<QuestionnaireState>(jsonString);
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Error deserializing QuestionnaireState");
+                }
             }
             
             if (TempData.Peek("CompletionTrackingMap") is string trackingMapJson)
@@ -83,6 +101,9 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
             Status = FinishedEditing ? CompletionStatus.Completed : 
                 countObj is > 0 ? CompletionStatus.InProgress : CompletionStatus.NotStarted
         });
+        
+        TempData[nameof(QuestionnaireState)] =
+            JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
         
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
     }

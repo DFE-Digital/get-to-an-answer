@@ -7,7 +7,13 @@ import {
     updateQuestionnaire
 } from "../../test-data-seeder/questionnaire-data";
 import {createQuestion} from "../../test-data-seeder/question-data";
-import {AnswerDestinationType, EntityStatus, PageHeadings, QuestionType} from "../../constants/test-data-constants";
+import {
+    AnswerDestinationType,
+    EntityStatus,
+    PageHeadings,
+    QuestionType,
+    SuccessBannerMessages
+} from "../../constants/test-data-constants";
 import {createSingleAnswer} from "../../test-data-seeder/answer-data";
 import {
     goToAddQuestionPageByUrl,
@@ -467,7 +473,7 @@ test.describe('Get to an answer questionnaire versions history', () => {
 
         viewQuestionPage = new ViewQuestionPage(page);
         await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
-        await viewQuestionPage.assertQuestionDeletionSuccessBanner();
+        await viewQuestionPage.assertQuestionDeletionSuccessBanner(SuccessBannerMessages.DELETED_QUESTION_SUCCESS_MESSAGE.replace('**questionContent**', questionContent));
         await viewQuestionPage.expectQuestionHeadingOnPage(PageHeadings.VIEW_QUESTION_PAGE_HEADING);
         await viewQuestionPage.markFinishedEditing(true);
         await viewQuestionPage.saveAndContinue();

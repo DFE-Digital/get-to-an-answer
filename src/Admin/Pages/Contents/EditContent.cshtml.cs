@@ -65,7 +65,7 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
                 ReferenceName = ContentRefName
             });
             
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdatedResultsPage = true, ResultsPageTitle = ContentTitle });
             
             return Redirect(string.Format(Routes.AddAndEditResultPages, QuestionnaireId));
         }
@@ -79,6 +79,7 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
     public IActionResult OnPostDeleteContent()
     {
         TempData["ContentReferenceName"] = ContentRefName;
+        TempData["ContentTitle"] = ContentTitle;
         
         return Redirect(string.Format(Routes.ConfirmDeleteContent, QuestionnaireId, ContentId));
     }
