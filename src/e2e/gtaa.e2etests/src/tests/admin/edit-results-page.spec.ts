@@ -1,6 +1,7 @@
 import {expect, test} from "@playwright/test";
 import {
-    signIn, goToEditResultPagePageByUrl} from '../../helpers/admin-test-helper';
+    signIn, goToEditResultPagePageByUrl
+} from '../../helpers/admin-test-helper';
 import {JwtHelper} from "../../helpers/JwtHelper";
 import {createQuestionnaire} from "../../test-data-seeder/questionnaire-data";
 import {PageHeadings, SuccessBannerMessages} from "../../constants/test-data-constants";
@@ -18,7 +19,7 @@ test.describe('Get to an answer edit results-page to questionnaire', () => {
         token = JwtHelper.NoRecordsToken();
 
         const {questionnaire} = await createQuestionnaire(request, token);
-        const { content } = await createContent(request, {
+        const {content} = await createContent(request, {
             questionnaireId: questionnaire.id,
             title: "Test title",
             content: "Test content",
@@ -33,7 +34,7 @@ test.describe('Get to an answer edit results-page to questionnaire', () => {
     test('Validate presence of elements on edit results-page page', async ({page}) => {
         await editResultsPagePage.assertPageElements();
     });
-    
+
     test('Back link takes to view results-page list from edit results-page page', async ({page}) => {
         await editResultsPagePage.verifyBackLinkPresent();
         await editResultsPagePage.clickBackLink();
@@ -46,7 +47,7 @@ test.describe('Get to an answer edit results-page to questionnaire', () => {
         await editResultsPagePage.clearResultsPageTitleInput();
         await editResultsPagePage.clearResultsPageDetailsText();
         await editResultsPagePage.clearResultsPageRefNameInput();
-        
+
         await editResultsPagePage.clickSaveAndContinue();
         await editResultsPagePage.validateMissingAllFieldsErrorMessageSummary(browserName);
     });
@@ -59,7 +60,7 @@ test.describe('Get to an answer edit results-page to questionnaire', () => {
 
         const resultsPageRefNameInput = `Test ref name - ${Date.now()}`;
         await editResultsPagePage.enterResultsPageRefNameInput(resultsPageRefNameInput);
-        
+
         await editResultsPagePage.clickSaveAndContinue();
         await editResultsPagePage.validateMissingTitleErrorMessageSummary(browserName);
     });
@@ -69,10 +70,10 @@ test.describe('Get to an answer edit results-page to questionnaire', () => {
         await editResultsPagePage.enterResultsPageTitleInput(resultsPageTitleInput);
 
         await editResultsPagePage.clearResultsPageDetailsText();
-        
+
         const resultsPageRefNameInput = `Test ref name - ${Date.now()}`;
         await editResultsPagePage.enterResultsPageRefNameInput(resultsPageRefNameInput);
-        
+
         await editResultsPagePage.clickSaveAndContinue();
 
         await editResultsPagePage.clickSaveAndContinue();
@@ -85,17 +86,17 @@ test.describe('Get to an answer edit results-page to questionnaire', () => {
 
         const resultsPageDetailsText = `Test details text - ${Date.now()}`;
         await editResultsPagePage.enterResultsPageDetailsText(resultsPageDetailsText);
-        
+
         await editResultsPagePage.clearResultsPageRefNameInput();
 
         await editResultsPagePage.clickSaveAndContinue();
 
         viewResultsPagesPage = await ViewResultsPagesPage.create(page);
-        
+
         await viewResultsPagesPage.expectResultsPagesHeadingOnPage(PageHeadings.VIEW_RESULTS_PAGES_PAGE_HEADING);
         await viewResultsPagesPage.expectSuccessBannerVisible();
         
-        await viewResultsPagesPage.assertUpdatedResultsPageSuccessBanner( SuccessBannerMessages.UPDATED_RESULTS_PAGE_SUCCESS_MESSAGE
+        await viewResultsPagesPage.assertUpdatedResultsPageSuccessBanner(SuccessBannerMessages.UPDATED_RESULTS_PAGE_SUCCESS_MESSAGE
             .replace('**resultsPageTitle**', resultsPageTitleInput));
     });
 
