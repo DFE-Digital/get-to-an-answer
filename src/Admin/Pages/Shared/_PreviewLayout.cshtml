@@ -7,6 +7,7 @@
 @using Common.Extensions
 @using Admin.Pages.Questionnaire
 @using Joonasw.AspNetCore.SecurityHeaders.Csp
+@using Microsoft.AspNetCore.Http.Features
 @using Microsoft.Extensions.Options
 
 @inject IWebHostEnvironment WebHostEnvironment
@@ -15,6 +16,7 @@
 
 @{
     var scriptConfig = ScriptOptions.Value;
+    var consentFeature = Context.Features.Get<ITrackingConsentFeature>() ?? throw new NullReferenceException();
     
     var languageCode = Context.Request.RouteValues["languageCode"]?.ToString();
     if (string.IsNullOrEmpty(languageCode))
@@ -36,16 +38,27 @@
 
 <head>
     <meta charset="utf-8"/>
-    <script asp-add-nonce="true" type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "ueriupdhuw");
-    </script>
-    
-    @if (WebHostEnvironment.IsProduction() && !string.IsNullOrEmpty(scriptConfig.GTM))
+    @if (WebHostEnvironment.IsProduction())
     {
+        <script async="" src="//www.google-analytics.com/analytics.js" asp-add-nonce="true"></script>
+        <script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-FL1KXJXLLP&amp;cx=c&amp;gtm=4e61q1" asp-add-nonce="true"></script>
+        <script type="text/javascript" async="" src="https://www.googletagmanager.com/gtm.js?id=GTM-NR85VLDG&amp;gtm=4e61q1" asp-add-nonce="true"></script>
+        <script async="" src="https://scripts.clarity.ms/0.8.51/clarity.js" asp-add-nonce="true"></script>
+        <script async="" src="https://www.clarity.ms/tag/ueriupdhuw" asp-add-nonce="true"></script>
+        <script async="" src="https://www.googletagmanager.com/gtm.js?id=GTM-M2CBTMTD" asp-add-nonce="true"></script>
+
+        <script asp-add-nonce="true" type="text/javascript">
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "ueriupdhuw");
+
+            (function () {
+                window.clarity('consent', @(consentFeature.CanTrack.ToString().ToLower()));
+            }());
+        </script>
+    
         <script asp-add-nonce="true">
             // Define dataLayer and the gtag function.
             window.dataLayer = window.dataLayer || [];
@@ -69,7 +82,7 @@
                 j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
                 j.setAttribute('nonce','@CspNonceService.GetNonce()');
                 f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','@scriptConfig.GTM');</script>
+            })(window,document,'script','dataLayer','GTM-M2CBTMTD');</script>
         <!-- End Google Tag Manager -->
     }
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -168,7 +181,7 @@
 <body class="govuk-template__body">
 <!-- Google Tag Manager (noscript) -->
 <noscript>
-    <iframe title="GTM" src="https://www.googletagmanager.com/ns.html?id=@scriptConfig.GTM"
+    <iframe title="GTM" src="https://www.googletagmanager.com/ns.html?id=GTM-M2CBTMTD"
             height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 <script asp-add-nonce="true">
