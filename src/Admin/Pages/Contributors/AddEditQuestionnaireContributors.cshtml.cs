@@ -31,11 +31,11 @@ public class AddEditQuestionnaireContributors(ILogger<AddEditQuestionnaireContri
         {
             logger.LogInformation("Getting questions for questionnaire {QuestionnaireId}", QuestionnaireId);
             var contributors = await apiClient.GetQuestionnaireContributors(QuestionnaireId);
-            
+
             var graphUsers = await graphClient.GetGraphUsersAsync(contributors.ToArray());
 
             Contributors = graphUsers.Value;
-            
+
             var stateFound = TempData.TryGetValue(nameof(QuestionnaireState), out var value);
 
             if (stateFound)
@@ -43,9 +43,19 @@ public class AddEditQuestionnaireContributors(ILogger<AddEditQuestionnaireContri
                 var deserialized = JsonConvert.DeserializeObject<QuestionnaireState>(value?.ToString() ?? string.Empty);
                 if (deserialized == null)
                     logger.LogError("Failed to deserialize QuestionnaireState from TempData.");
-                
+
                 QuestionnaireState = deserialized;
             }
+        }
+        catch (GetToAnAnswerApiException e) when (e.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            logger.LogWarning("User does not have permission to access this questionnaire {QuestionnaireId}", QuestionnaireId);
+            
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState
+            {
+                JustRemovedAsContributor = true, QuestionnaireTitle = QuestionnaireTitle
+            });
+            return Redirect(Routes.QuestionnairesManage);
         }
         catch (Exception e)
         {
