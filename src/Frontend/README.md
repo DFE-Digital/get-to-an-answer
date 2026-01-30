@@ -32,8 +32,6 @@ graph LR
   ST[Start Page] --- Q1[Question Page]
   Q1 --- QN[Subsequent Questions]
   QN --- OUT[Redirect]
-  ST --- PRIV[Privacy Info]
-  ST --- SUP[Support Details]
 
   classDef muted fill:#f5f5f5,stroke:#bbb,color:#666;
 ```
@@ -43,4 +41,3 @@ graph LR
 - Question Page(s): presents each question, validates inputs, and advances the flow.
 - Custom Page / Redirect: shows the result or sends the user to an external destination based on answers.
 - Privacy Info: explains how information is used.
-- Support Details: provides ways to get help during completion.
