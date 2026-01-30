@@ -170,7 +170,7 @@ export class DesignQuestionnairePage extends BasePage {
 
         // ----- Banner Locators -----
         this.justCreatedBannerText = page.locator('#just-created-banner-text');
-        this.justUpdatedBannerText = page.locator('#just-updated-banner-text');
+        this.justUpdatedBannerText = page.locator('#just-updated-questionnaire-slug-banner-text');
         this.justClonedBannerText = page.locator('#just-cloned-banner-text');
         this.justPublishedBannerText = page.locator('#just-published-banner-text');
         this.justUnpublishedBannerText = page.locator('#just-unpublished-banner-text');
@@ -672,7 +672,7 @@ export class DesignQuestionnairePage extends BasePage {
         await expect(
             this.justUpdatedBannerText,
             '❌ Questionnaire updated success banner text mismatch',
-        ).toHaveText('Your changes have been saved');
+        ).toHaveText('Your questionnaire ID has been updated');
     }
 
     async assertQuestionnaireClonedSuccessBanner(): Promise<void> {
