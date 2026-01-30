@@ -141,7 +141,7 @@
                      data-aria-controls="@Id("destination-internal-reveal")" 
         />
         <label class="govuk-label govuk-radios__label" for="@Id("destination-internal")">
-          Results page
+          Results page (using 'Get to an answer')
         </label>
       </div>
       
@@ -180,7 +180,7 @@
                      value="@AnswerDestination.ExternalResultsPage"
                      data-aria-controls="@Id("destination-external-reveal")"/>
         <label class="govuk-label govuk-radios__label" for="@Id("destination-external")">
-          Link (to a page outside of the questionnaire)
+          Link (to a page outside 'Get to an answer')
         </label>
       </div>
 
@@ -220,9 +220,10 @@
       </label>
 
       <div class="govuk-hint" id="@Id(priorityHintIdSuffix)">
-        <p>You can rank options to set a priority order. </p>
-        <p>If people select more than one option, they will be sent to the destination of the highest ranked option.</p>
-        <p>Add 1 for the highest priority answer, add 2 for the highest priority answer, and so on.</p>
+        <p>You can rank answer options by priority.</p>
+        <p>When selecting multiple options, the user is sent to the destination of the highest ranked option.</p>
+        <p>Add 1 for the highest ranked option, add 2 for the second ranked option and so on.</p>
+        <p>By default, it will say 0 which means no value and no priority.</p>
       </div>
 
       <govuk-input id="@Id("RankPriority")"

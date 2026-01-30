@@ -29,7 +29,7 @@
     </h1>
 
     <p class="govuk-hint  govuk-!-margin-bottom-8">
-      People will be able to select one option from your list.
+      Add your answer options to this question.
     </p>
     
     <form method="post" accept-charset="UTF-8">
@@ -38,7 +38,7 @@
       <input name="returnUrl" type="hidden" value="@($"{Request.Path}{Request.QueryString}")"/>
 
       <div class="govuk-body gtaa-add-edit-questions-page">
-        You can add your options individually below, or you can
+        You can add these options individually below or
         
           @* TODO: Change this button to a link, so it can line wrap (same goes for the other button) *@
           <button type="submit" asp-page-handler="RedirectToBulkEntry"

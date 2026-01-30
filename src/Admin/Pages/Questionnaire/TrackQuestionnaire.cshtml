@@ -55,6 +55,16 @@
         </strong>
       </dd>
     </dl>
+    <div class="govuk-body govuk-!-margin-bottom-8 govuk-!-margin-top-4">
+      @if (questionnaireStatus == EntityStatus.Published)
+      {
+        <p>To make changes to a published questionnaire, you must make these then publish again. When you publish changes, it may affect people using your questionnaire at that moment.</p>
+      }
+      else if (questionnaireStatus == EntityStatus.Draft)
+      {
+        <p>You can complete these sections in any order, but to publish your questionnaire to your service, you must complete certain sections. <a class="govuk-link" href="https://educationgovuk.sharepoint.com/:w:/r/sites/DesignOps/Shared%20Documents/7.Design/Patterns%20and%20Components/GTAA%20guidance%20for%20internal%20users.docx?d=wb654e0c7f2a049ed968b56c2bc58aaf5&csf=1&web=1&e=JyoEX9">Read our guidance on designing a questionnaire to find out more</a>.</p>
+      }
+    </div>
     <div class="app-task-list">
       <h2 class="govuk-heading-m">Manage questionnaire</h2>
       <ul class="govuk-task-list">
