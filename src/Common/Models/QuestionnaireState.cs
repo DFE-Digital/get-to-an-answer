@@ -28,7 +28,7 @@ public class QuestionnaireState
     public bool JustDeletedResultsPage { get; set; }
     public bool JustUpdatedResultsPage { get; set; }
     public bool JustUpdatedButtonText { get; set; }
-
+    public bool JustUpdatedQuestionnaireSlugId { get; set; }
     
     public string? DeletedQuestionTitle { get; set; }
     public string? ContributorEmail { get; set; }

@@ -66,7 +66,7 @@ public class EditQuestionnaireSlug(IApiClient apiClient, ILogger<EditQuestionnai
                 return RedirectToErrorPage();
             }
             
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdatedQuestionnaireSlugId = true });
             
             await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
             {
