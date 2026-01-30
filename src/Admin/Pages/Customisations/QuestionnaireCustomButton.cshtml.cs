@@ -8,6 +8,7 @@ using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Newtonsoft.Json;
 
 namespace Admin.Pages.Customisations;
 
@@ -42,6 +43,9 @@ public class QuestionnaireCustomButton(
             Status = UpdateRequest.ContinueButtonText != "Continue" ? 
                 CompletionStatus.Completed : CompletionStatus.Optional
         });
+
+        TempData[nameof(QuestionnaireState)] =
+            JsonConvert.SerializeObject(new QuestionnaireState { JustUpdatedButtonText = true });
         
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
     }
