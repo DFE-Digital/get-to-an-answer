@@ -216,7 +216,7 @@ test.describe('Get to an answer publish questionnaire', () => {
         // You should see an error banner at the top of the page
         await editQuestionnairePage.assertGtaaApiErrorBanner(
             'Error: Publishing the questionnaire failed.',
-            "Answer 'A1' of the last question should have an external link or results page as it's destination."
+            "Answer 'A1' of the last question should have an external link or results page as its destination."
         );
 
         // Verify via API that the questionnaire is now published

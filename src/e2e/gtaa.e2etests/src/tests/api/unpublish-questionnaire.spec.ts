@@ -56,6 +56,46 @@ test.describe('PATCH Unpublish questionnaire api request', () => {
         expect(questionnaireGetBody.status).toBe(status);
     });
 
+    test('unpublishing a draft questionnaire (after previous publish) returns 204 and in the same status', async ({ request }) => {
+        const { questionnaire } = await createQuestionnaire(request);
+
+        await updateQuestionnaire(request, questionnaire.id, { slug: `questionnaire-slug-${Math.floor(Math.random() * 1000000)}` });
+
+        await addContributor(request, questionnaire.id, 'user-1')
+
+        const { question } = await createQuestion(request, questionnaire.id, undefined, 'Custom test questionnaire title', QuestionType.MultiSelect, undefined);
+
+        await createSingleAnswer(request, {
+            questionnaireId: questionnaire.id, questionId: question.id, content: 'A1',
+            destinationType: AnswerDestinationType.ExternalLink, destinationUrl: 'https://example.com'
+        })
+
+        // Publish the questionnaire
+        const { response: publishResponse } = await publishQuestionnaire(request, questionnaire.id);
+
+        expect(publishResponse.status()).toBe(204);
+
+        const { questionnaireGetBody: publishedQuestionnaire } = await getQuestionnaire(request, questionnaire.id);
+
+        expect(publishedQuestionnaire.status).toBe(EntityStatus.Published);
+
+        // Edit the questionnaire after publish to make it a draft again
+        await updateQuestionnaire(request, questionnaire.id, { title: 'Draft Q' });
+
+        const { questionnaireGetBody: draftQuestionnaire } = await getQuestionnaire(request, questionnaire.id);
+
+        expect(draftQuestionnaire.status).toBe(EntityStatus.Draft);
+
+        // Unpublish the draft questionnaire (that was previously published)
+        const { response } = await unpublishQuestionnaire(request, questionnaire.id);
+
+        expect(response.status()).toBe(204);
+
+        const { questionnaireGetBody } = await getQuestionnaire(request, questionnaire.id);
+        expect(questionnaireGetBody.status).toBe(EntityStatus.Draft);
+        expect(questionnaireGetBody.isUnpublished).toBeTruthy();
+    });
+
     test('invalid questionnaire id format returns 404', async ({ request }) => {
         const { response } = await unpublishQuestionnaire(request, 'not-a-guid');
 

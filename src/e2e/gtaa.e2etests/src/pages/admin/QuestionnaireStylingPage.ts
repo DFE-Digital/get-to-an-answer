@@ -82,7 +82,7 @@ export class QuestionnaireStylingPage extends BasePage {
         this.stylingUpdatedBannerText = this.page.locator('#just-updated-styling-banner-text');
 
         // Error summary links
-        this.errorSummaryTextColor = this.errorSummaryLink('#text-color');
+        this.errorSummaryTextColor = this.errorSummaryLink('#UpdateRequest-TextColor');
         this.errorSummaryBackgroundColor = this.errorSummaryLink('#background-color');
         this.errorSummaryPrimaryButtonColor = this.errorSummaryLink('#primary-button-color');
         this.errorSummarySecondaryButtonColor = this.errorSummaryLink('#secondary-button-color');
@@ -118,28 +118,23 @@ export class QuestionnaireStylingPage extends BasePage {
     }
 
     async expectStylingUpdatedBannerVisible(): Promise<void> {
-        await this.stylingUpdatedBannerText.waitFor({ state: 'visible', timeout: Timeouts.LONG });
         await expect(this.stylingUpdatedBannerText).toBeVisible();
     }
 
     async expectErrorSummaryForTextColor(message: string): Promise<void> {
-        await this.errorSummaryTextColor.waitFor({ state: 'visible', timeout: Timeouts.LONG });
         await expect(this.errorSummaryTextColor).toHaveText(message);
     }
 
     async expectInlineErrorForTextColor(message: string): Promise<void> {
-        await this.inlineErrorTextColor.waitFor({ state: 'visible', timeout: Timeouts.LONG });
         await expect(this.inlineErrorTextColor).toContainText(message);
     }
 
     // Similar helpers can be used for the other fields when needed:
     async expectErrorSummaryForAccessibilityAgreement(message: string): Promise<void> {
-        await this.errorSummaryAccessibilityAgreement.waitFor({ state: 'visible', timeout: Timeouts.LONG });
         await expect(this.errorSummaryAccessibilityAgreement).toHaveText(message);
     }
 
     async expectInlineErrorForAccessibilityAgreement(message: string): Promise<void> {
-        await this.inlineErrorAccessibilityAgreement.waitFor({ state: 'visible', timeout: Timeouts.LONG });
         await expect(this.inlineErrorAccessibilityAgreement).toContainText(message);
     }
 
@@ -188,8 +183,32 @@ export class QuestionnaireStylingPage extends BasePage {
         await this.errorMessageColorInput.fill(value);
     }
 
+    async getTextColorValue(): Promise<string> {
+        return await this.textColorInput.inputValue();
+    }
+
+    async getBackgroundColorValue(): Promise<string> {
+        return await this.backgroundColorInput.inputValue();
+    }
+
+    async getPrimaryButtonColorValue(): Promise<string> {
+        return await this.primaryButtonColorInput.inputValue();
+    }
+
+    async getSecondaryButtonColorValue(): Promise<string> {
+        return await this.secondaryButtonColorInput.inputValue();
+    }
+
+    async getStateColorValue(): Promise<string> {
+        return await this.stateColorInput.inputValue();
+    }
+
+    async getErrorMessageColorValue(): Promise<string> {
+        return await this.errorMessageColorInput.inputValue();
+    }
+
+
     async uploadDecorativeImage(filePath: string): Promise<void> {
-        //await this.decorativeImageInput.waitFor({ state: 'visible', timeout: Timeouts.LONG });
         await this.decorativeImageInput.setInputFiles((path.join(__dirname, filePath)));
     }
 
