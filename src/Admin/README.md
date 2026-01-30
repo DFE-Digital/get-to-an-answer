@@ -5,7 +5,6 @@ The Admin project is a secure back-office web application for planning, editing,
 ## Key capabilities
 - Create and organise questionnaires, questions, and answers
 - Manage content blocks, start pages, and slugs
-- Configure support contact details and privacy information
 - Invite/manage contributors and track changes over time
 - Preview questionnaire journeys before publishing
 - Publish, unpublish, clone, and delete questionnaires with version history
@@ -21,7 +20,6 @@ flowchart TD
   E --> F[Add Answers & Destinations]
   D --> G[Manage Content Blocks]
   D --> H[Set Start Page & Slug]
-  D --> I[Support & Privacy Details]
   D --> J[Manage Contributors]
   D --> K[Preview Journey]
   K --> L{Ready to publish?}
@@ -46,7 +44,6 @@ graph LR
   MQs --- EQn[Edit Question]
   MC --- CC[Create Content]
   MC --- EC[Edit Content]
-  EQ --- SP[Support & Privacy]
   EQ --- INV[Manage Contributors]
   EQ --- PRV[Preview]
   EQ --- PUB[Publish / Unpublish]
@@ -67,7 +64,6 @@ graph LR
 - Add Answers: add options, routing destinations, priorities.
 - Manage Content: list reusable content blocks for the journey.
 - Create Content / Edit Content: author and update content blocks.
-- Support & Privacy: configure support contact details and privacy info.
 - Manage Contributors: invite/remove collaborators.
 - Preview: simulate the end-user journey before release.
 - Publish / Unpublish: control visibility and create version snapshots.
@@ -79,9 +75,11 @@ graph LR
 
 ### AzureAD Setup
 
-TODO
+###  Prerequisites
+- To setup an app registration follow this: [Entra ID Setup Guide](../../../docs/architecture/Entra-Id-Setup.md)
 
-Add the following to your user secrets
+### Local Testing
+Add the following to your .NET User Secrets
 ```json
 {
   "ApiSettings": {
