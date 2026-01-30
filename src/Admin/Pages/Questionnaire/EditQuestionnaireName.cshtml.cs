@@ -41,7 +41,7 @@ public class EditQuestionnaireName(IApiClient apiClient, ILogger<EditQuestionnai
             
             await apiClient.UpdateQuestionnaireAsync(QuestionnaireId, updateQuestionnaireRequest);
             
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdatedQuestionnaireName = true });
             
             await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
             {

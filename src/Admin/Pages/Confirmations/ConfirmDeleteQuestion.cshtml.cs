@@ -12,10 +12,10 @@ using Newtonsoft.Json;
 namespace Admin.Pages.Confirmations;
 
 [Authorize]
-public class ConfirmDeleteQuestion(ILogger<ConfirmDeleteQuestion> logger, IApiClient apiClient) : BasePageModel
+public class ConfirmDeleteQuestion(ILogger<ConfirmDeleteQuestion> logger, IApiClient apiClient) : QuestionnairesPageModel
 {
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
-    
+
     [FromRoute(Name = "questionId")] public Guid QuestionId { get; set; }
 
     [BindProperty] public string? QuestionNumber { get; set; }
@@ -30,7 +30,7 @@ public class ConfirmDeleteQuestion(ILogger<ConfirmDeleteQuestion> logger, IApiCl
         QuestionNumber = TempData.Peek("NumberOfQuestionToBeDeleted") as string;
         return Page();
     }
-    
+
     public async Task<IActionResult> OnPost()
     {
         if (ConfirmDelete)
@@ -51,18 +51,18 @@ public class ConfirmDeleteQuestion(ILogger<ConfirmDeleteQuestion> logger, IApiCl
 
             var questionTitle = TempData.Peek("TitleOfQuestionToBeDeleted") as string;
 
-            TempData["DeletedQuestion"] =
-                JsonConvert.SerializeObject(new QuestionNotificationSummary(IsDeleted: true,
-                    QuestionTitle: questionTitle));
+            TempData[nameof(QuestionnaireState)] =
+                JsonConvert.SerializeObject(new QuestionnaireState
+                    { JustDeletedQuestion = true, DeletedQuestionTitle = questionTitle });
 
             await UpdateStatusIfNotQuestionsLeft();
 
             return Redirect(string.Format(Routes.AddAndEditQuestionsAndAnswers, QuestionnaireId));
         }
-        
+
         return Redirect(string.Format(Routes.EditQuestion, QuestionnaireId, QuestionId));
     }
-    
+
     private async Task UpdateStatusIfNotQuestionsLeft()
     {
         // if one before deletion, then will be 0 after

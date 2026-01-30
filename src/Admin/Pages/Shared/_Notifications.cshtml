@@ -1,11 +1,8 @@
-@model Admin.Pages.Questionnaire.TrackQuestionnaires
+@model QuestionnaireState
 @using Common.Models
 
 @{
-    var questionnaireViewModel = Model.ViewModel;
-    var state = questionnaireViewModel.QuestionnaireState;
-
-    var notificationConfig = GetNotificationConfig(state);
+    var notificationConfig = GetNotificationConfig(Model);
 }
 
 @if (notificationConfig != null)
@@ -39,18 +36,24 @@
         return state switch
         {
             { JustCreated: true } => ("just-created-banner-text", "Your questionnaire name has been saved"),
-            { JustUpdated: true } => ("just-updated-banner-text", "Your changes have been saved."),
-            { JustCloned: true } => ("just-cloned-banner-text", "Your copy questionnaire has been created."),
-            { JustPublished: true } => ("just-published-banner-text", "Your questionnaire has been published."),
-            { JustUnpublished: true } => ("just-unpublished-banner-text", "Your questionnaire has been unpublished."),
+            { JustUpdated: true } => ("just-updated-banner-text", "Your changes have been saved"),
+            { JustCloned: true } => ("just-cloned-banner-text", $"A copy of the questionnaire '{state.CopiedQuestionnaireTitle}' has been created"),
+            { JustPublished: true } => ("just-published-banner-text", "Your questionnaire has been published"),
+            { JustUnpublished: true } => ("just-unpublished-banner-text", "Your questionnaire has been unpublished"),
             { JustAddedStartPage: true } => ("just-added-start-page-banner-text", "Your start page has been saved"),
-            { JustRemovedStartPage: true } => ("just-removed-start-page-banner-text", "Your start page has been removed"),
+            { JustRemovedStartPage: true } => ("just-removed-start-page-banner-text", "Your start page has been deleted"),
             { JustResetStyling: true } => ("just-reset-styling-banner-text", "Your customised styling has been reset"),
             { JustCustomisedStyling: true } => ("just-updated-styling-banner-text", "Your customised styling has been saved"),
             { JustAddedCustomButtonText: true } => ("just-modified-button-text-banner-text", "Your button text has been saved"),
             { JustRemovedStartPageImage: true } => ("just-removed-start-page-image-banner-text", "Your start page image has been removed"),
             { JustUpdatedQuestionnaireName: true } => ("just-updated-questionnaire-name-banner-text", "Your questionnaire name has been saved"),
             { JustAddedContributor: true } => ("just-added-contributor-banner-text", $"{state.ContributorEmail ?? "Contributor"} has been given access"),
+            { JustRemovedContributor: true } => ("just-removed-contributor-banner-text", $"{state.ContributorEmail ?? "Contributor"} has had their access removed"),
+            { JustRemovedAsContributor: true } => ("just-removed-self-as-contributor-banner-text", $"Your access had been removed from this questionnaire '{state.QuestionnaireTitle}'"),
+            { JustDeletedQuestion: true } => ("just-deleted-question-banner-text", $"The question '{state.DeletedQuestionTitle}' has been deleted"),
+            { JustAddedResultsPage: true } => ("just-created-results-page-banner-text", $"The results page '{state.ResultsPageTitle}' has been saved"),
+            { JustDeletedResultsPage: true } => ("just-deleted-results-page-banner-text", $"The results page '{state.ResultsPageTitle}' has been deleted"),
+            { JustUpdatedResultsPage: true } => ("just-updated-results-page-text", $"Your changes to the results page '{state.ResultsPageTitle}' has been saved"),
             _ => null
         };
     }

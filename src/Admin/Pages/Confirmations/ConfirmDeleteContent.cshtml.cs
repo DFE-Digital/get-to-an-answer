@@ -23,8 +23,10 @@ public class ConfirmDeleteContent(IApiClient apiClient) : QuestionnairesPageMode
         if (DeleteContent)
         {
             await apiClient.DeleteContentAsync(ContentId);
+         
+            var contentTitle = TempData.Peek("ContentTitle") as string;
             
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustDeleted = true });
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustDeletedResultsPage = true, ResultsPageTitle = contentTitle });
         
             return Redirect(string.Format(Routes.AddAndEditResultPages, QuestionnaireId));
         }
