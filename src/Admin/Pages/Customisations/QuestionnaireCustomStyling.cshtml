@@ -34,7 +34,7 @@
         </h1>
 
         <div class="govuk-hint govuk-!-margin-bottom-8">
-            <p>The default, all questionnaires use DfE styling.</p>
+            <p>By default, all questionnaires use DfE styling.</p>
             <p>
                 You can customise styling if you need to, as long as it meets accessibility standards.
                 For example, to match campaign branding.
@@ -45,7 +45,7 @@
             <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
             <strong class="govuk-warning-text__text">
                 <span class="govuk-visually-hidden">Warning</span>
-                Do not customise styling unless there's a clear user or business need. 
+                Do not customise styling unless there's a clear user or business need. You may cause accessibility issues by customising styles.
             </strong>
         </div>
 
@@ -190,13 +190,20 @@
                     Decorative image
                 </label>
                 <div class="govuk-hint">
-                    <p>This can be a generic image which does not give any additional information to the content. It will appear on the start page or thumbnail.</p>
+                    <p>Decorative images are generic images which do not give any additional information to the content. You do not need alt text for them.</p>
+ 
+                    <p>You can only upload one decorative image, which will appear as the top banner on a start page.</p>
 
-                    <p>Follow GOV.UK guidance on copyright standards when choosing an image.</p>
+                    <p>When choosing an image, follow <a class="govuk-link" href="https://www.gov.uk/guidance/content-design/images">GOV.UK guidance on copyright standards.</a></p>
 
-                    <p>Upload or enter a URL for an image. Images can be JPEG and PNG files. </p>
-
-                    <p>You must upload an image at the size xxxx</p>
+                    <p>
+                        Your image must:
+                        <br/><br/>
+                        be a PNG or JPEG file<br/>
+                        have a maximum width of 1200 pixels<br/>
+                        have a maximum height of 240 pixels<br/>
+                        have a resolution of at least 72 dpi
+                    </p>
                 </div>
                 <div class="govuk-form-group govuk-!-margin-bottom-6">
                     <label class="govuk-label" for="decorative-image-upload" id="decorative-image-upload-label">
@@ -226,7 +233,7 @@
                     Reset to DfE styling
                 </label>
                 <p class="govuk-hint">
-                    Use this to reset the styling to DfE styling.
+                    Use this to reset your questionnaire to the DfE styling.
                 </p>
                 <button id="reset-styling" type="submit" formnovalidate="formnovalidate" class="govuk-button govuk-button--secondary" 
                         data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="" 
@@ -245,8 +252,12 @@
                         </h2>
                     </legend>
                     <div id="accessibility-accepted-hint" class="govuk-hint">
-                        If you customise styling it is your responsibility to ensure colours 
-                        and images meet accessibility standards. 
+                        <p>
+                        If you customise styling, it is your responsibility to ensure colours and images meet the current published WCAG (Web Content Accessibility Guidelines) version to conformance level AA.
+                        </p>
+                        <p>
+                        Learn more about <a class="govuk-link" href="https://standards.education.gov.uk/standard/accessibility-conformance#howtommeet">how to meet these accessibility standards</a> which includes <a class="govuk-link" href="https://accessibility.education.gov.uk/tools-testing/tools/contrast-checker">how to test colour contrast against WCAG levels.</a>
+                        </p>
                     </div>
 
                     <govuk-field-error asp-for="@Model.UpdateRequest.IsAccessibilityAgreementAccepted"
