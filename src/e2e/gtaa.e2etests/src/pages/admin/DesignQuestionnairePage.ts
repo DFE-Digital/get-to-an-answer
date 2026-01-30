@@ -732,7 +732,7 @@ export class DesignQuestionnairePage extends BasePage {
         await expect(
             this.justResetStylingBannerText,
             '❌ Styling reset success banner text mismatch',
-        ).toHaveText('Your customised styling has been reset');
+        ).toHaveText('Your customised styling has been reset to DfE styling');
     }
 
     async assertUpdatedStylingSuccessBanner(): Promise<void> {
