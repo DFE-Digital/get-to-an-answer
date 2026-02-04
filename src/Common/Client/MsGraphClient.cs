@@ -27,7 +27,7 @@ public class MsGraphClient : IMsGraphClient
         _httpClient.DefaultRequestHeaders.Accept.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
-    
+
     public async Task<GraphUser?> GetGraphUserAsync(string contributorEmailAddress)
     {
         var response = await _httpClient.GetAsync($"/v1.0/users/{contributorEmailAddress}");
@@ -36,23 +36,30 @@ public class MsGraphClient : IMsGraphClient
 
     public async Task<GraphUsers> GetGraphUsersAsync(params string?[] contributorUserIds)
     {
-        var contributorQuery = contributorUserIds
-            .Select(id => id?.Contains('@') == true ? $"mail eq '{id}'" : $"id eq '{id}'")
-            .Aggregate(AggregateConditions);
-        
-        if (string.IsNullOrWhiteSpace(contributorQuery)) 
+        var batchedUserIds = contributorUserIds
+            .Select((id, index) => new { id, index })
+            .GroupBy(x => x.index / 5)
+            .Select(g => g.Select(x => x.id).ToArray()).ToArray();
+
+        if (!batchedUserIds.Any())
             return new GraphUsers();
-        
+
         try
         {
-            var response = await _httpClient.GetAsync($"/v1.0/users?$filter={contributorQuery}");
+            var graphUsers = new GraphUsers();
+
+            foreach (var userIds in batchedUserIds)
+            {
+                var contributorQuery = userIds
+                    .Select(id => id?.Contains('@') == true ? $"mail eq '{id}'" : $"id eq '{id}'")
+                    .Aggregate(AggregateConditions);
+
+                var subset = await GetSubsetGraphUsersAsync(contributorQuery);
+                
+                graphUsers.Value.AddRange(subset.Value);
+            }
             
-            if (response.IsSuccessStatusCode)
-                return await response.Content.ReadFromJsonAsync<GraphUsers>() ?? new GraphUsers();
-            
-            _logger.LogError($"Error getting users from Graph, status code '{response.StatusCode}': {await response.Content.ReadAsStringAsync()}");
-            
-            throw new MsGraphException("Error getting users from Graph", null, response.StatusCode);
+            return graphUsers;
         }
         catch (Exception e)
         {
@@ -75,12 +82,23 @@ public class MsGraphClient : IMsGraphClient
                     }).DistinctBy(user => user.Id).ToList()
                 };
             }
-            
+
             throw;
         }
     }
-    
-    
+
+    private async Task<GraphUsers> GetSubsetGraphUsersAsync(string contributorQuery)
+    {
+        var response = await _httpClient.GetAsync($"/v1.0/users?$filter={contributorQuery}");
+
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<GraphUsers>() ?? new GraphUsers();
+
+        _logger.LogError(
+            $"Error getting users from Graph, status code '{response.StatusCode}': {await response.Content.ReadAsStringAsync()}");
+
+        throw new MsGraphException("Error getting users from Graph", null, response.StatusCode);
+    }
 
     private async Task<TResponse?> GetResponse<TResponse>(HttpResponseMessage response, string newContributorEmail) where TResponse : class
     {
