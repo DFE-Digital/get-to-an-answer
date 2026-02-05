@@ -22,7 +22,7 @@ public class ManageQuestionnaires(IApiClient apiClient, IMsGraphClient msGraphCl
                 try
                 {
                     var contributors = await msGraphClient.GetGraphUsersAsync(questionnaires
-                        .Select(q => q.CreatedBy).ToArray());
+                        .Select(q => q.CreatedBy).Distinct().ToArray());
 
                     var contributorMap = contributors.Value.ToDictionary(g => g.Id, g => g.DisplayName);
 
