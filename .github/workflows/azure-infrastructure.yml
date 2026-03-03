@@ -70,7 +70,7 @@ jobs:
           ref: ${{ github.ref_name || 'main' }}
 
       - name: "Setup Terraform"
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
 
       - name: "Azure Login"
         uses: azure/login@v2
