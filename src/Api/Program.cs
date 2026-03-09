@@ -79,7 +79,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedFor;
     options.KnownProxies.Clear();
-    options.KnownNetworks.Clear();
+    options.KnownIPNetworks.Clear();
     options.AllowedHosts = new List<string>
     {
         "*.azurewebsites.net",
