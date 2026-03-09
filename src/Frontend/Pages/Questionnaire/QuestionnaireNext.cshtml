@@ -66,25 +66,25 @@
     {
       <form id="question-form" action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
         @Html.AntiForgeryToken()
-        <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id" autocomplete="off">
-        <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order" autocomplete="off">
-        <input type="hidden" name="Questionnaire.Id" value="@Model?.Questionnaire?.Id" autocomplete="off">
-        <input type="hidden" name="Questionnaire.Slug" value="@Model?.Questionnaire?.Slug" autocomplete="off">
-        <input type="hidden" name="Questionnaire.DisplayTitle" value="@Model?.Questionnaire?.DisplayTitle" autocomplete="off">
-        <input type="hidden" name="Questionnaire.Description" value="@Model?.Questionnaire?.Description" autocomplete="off">
-        <input type="hidden" name="Questionnaire.TextColor" value="@Model?.Questionnaire?.TextColor" autocomplete="off">
-        <input type="hidden" name="Questionnaire.BackgroundColor" value="@Model?.Questionnaire?.BackgroundColor" autocomplete="off">
-        <input type="hidden" name="Questionnaire.PrimaryButtonColor" value="@Model?.Questionnaire?.PrimaryButtonColor" autocomplete="off">
-        <input type="hidden" name="Questionnaire.SecondaryButtonColor" value="@Model?.Questionnaire?.SecondaryButtonColor" autocomplete="off">
-        <input type="hidden" name="Questionnaire.StateColor" value="@Model?.Questionnaire?.StateColor" autocomplete="off">
-        <input type="hidden" name="Questionnaire.ErrorMessageColor" value="@Model?.Questionnaire?.ErrorMessageColor" autocomplete="off">
-        <input type="hidden" name="Questionnaire.ContinueButtonText" value="@Model?.Questionnaire?.ContinueButtonText" autocomplete="off">
-        <input type="hidden" name="Destination.Type" value="@Model?.Destination?.Type" autocomplete="off">
-        <input type="hidden" name="Destination.Question.Type" value="@Model?.Destination?.Question.Type" autocomplete="off">
-        <input type="hidden" name="Destination.Question.Id" value="@Model?.Destination?.Question.Id" autocomplete="off">
-        <input type="hidden" name="Destination.Question.Order" value="@Model?.Destination?.Question.Order" autocomplete="off">
-        <input type="hidden" name="Destination.Question.Content" value="@Model?.Destination?.Question.Content" autocomplete="off">
-        <input type="hidden" name="Destination.Question.Description" value="@Model?.Destination?.Question.Description" autocomplete="off">
+        <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
+        <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
+        <input type="hidden" name="Questionnaire.Id" value="@Model?.Questionnaire?.Id">
+        <input type="hidden" name="Questionnaire.Slug" value="@Model?.Questionnaire?.Slug">
+        <input type="hidden" name="Questionnaire.DisplayTitle" value="@Model?.Questionnaire?.DisplayTitle">
+        <input type="hidden" name="Questionnaire.Description" value="@Model?.Questionnaire?.Description">
+        <input type="hidden" name="Questionnaire.TextColor" value="@Model?.Questionnaire?.TextColor">
+        <input type="hidden" name="Questionnaire.BackgroundColor" value="@Model?.Questionnaire?.BackgroundColor">
+        <input type="hidden" name="Questionnaire.PrimaryButtonColor" value="@Model?.Questionnaire?.PrimaryButtonColor">
+        <input type="hidden" name="Questionnaire.SecondaryButtonColor" value="@Model?.Questionnaire?.SecondaryButtonColor">
+        <input type="hidden" name="Questionnaire.StateColor" value="@Model?.Questionnaire?.StateColor">
+        <input type="hidden" name="Questionnaire.ErrorMessageColor" value="@Model?.Questionnaire?.ErrorMessageColor">
+        <input type="hidden" name="Questionnaire.ContinueButtonText" value="@Model?.Questionnaire?.ContinueButtonText">
+        <input type="hidden" name="Destination.Type" value="@Model?.Destination?.Type">
+        <input type="hidden" name="Destination.Question.Type" value="@Model?.Destination?.Question.Type">
+        <input type="hidden" name="Destination.Question.Id" value="@Model?.Destination?.Question.Id">
+        <input type="hidden" name="Destination.Question.Order" value="@Model?.Destination?.Question.Order">
+        <input type="hidden" name="Destination.Question.Content" value="@Model?.Destination?.Question.Content">
+        <input type="hidden" name="Destination.Question.Description" value="@Model?.Destination?.Question.Description">
         @{
           var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
 
@@ -134,13 +134,13 @@
                   var inputId = $"{inputGroupId}-a-{answer?.Id}";
                   var itemHintId = $"{inputId}-hint";
 
-                  <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer.Id" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer.Priority" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer.Content" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description" autocomplete="off">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer.Id">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer.Priority">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer.Content">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description">
 
                   <div class="govuk-radios__item">
-                    <input type="hidden" name="Priorities.@answer.Id" value="@answer.Priority" autocomplete="off">
+                    <input type="hidden" name="Priorities.@answer.Id" value="@answer.Priority">
                     <input
                       class="govuk-radios__input @(hasFieldError ? "govuk-input--error" : "")"
                       id="@inputId"
@@ -177,15 +177,15 @@
                 {
                   var answer = Model?.Destination?.Question.Answers[a];
 
-                  <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer.Id" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer.Priority" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer.Content" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description" autocomplete="off">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer.Id">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer.Priority">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer.Content">
+                  <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description">
 
                   var inputId = $"{inputGroupId}-a-{answer.Id}";
                   var itemHintId = $"{inputId}-hint";
                   <div class="govuk-checkboxes__item">
-                    <input type="hidden" name="Priorities.@answer.Id" value="@answer.Priority" autocomplete="off">
+                    <input type="hidden" name="Priorities.@answer.Id" value="@answer.Priority">
                     <input
                       class="govuk-checkboxes__input @(hasFieldError ? "govuk-input--error" : "")"
                       id="@inputId"
@@ -223,11 +223,11 @@
               {
                 var answer = Model?.Destination?.Question.Answers[a];
 
-                <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer?.Id" autocomplete="off">
-                <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer?.Priority" autocomplete="off">
-                <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer?.Content" autocomplete="off">
-                <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer?.Description" autocomplete="off">
-                <input type="hidden" name="Priorities.@answer?.Id" value="@answer?.Priority" autocomplete="off">
+                <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer?.Id">
+                <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer?.Priority">
+                <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer?.Content">
+                <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer?.Description">
+                <input type="hidden" name="Priorities.@answer?.Id" value="@answer?.Priority">
               }
               <select class="govuk-select" id="@($"{inputGroupId}-select")" name="NextStateRequest.SelectedAnswerIds">
                 <option value="choose" selected="selected">Select an answer</option>
