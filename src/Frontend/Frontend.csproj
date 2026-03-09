@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <UserSecretsId>a1ca5cb2-6a82-48f9-8459-28c59f35ac07</UserSecretsId>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

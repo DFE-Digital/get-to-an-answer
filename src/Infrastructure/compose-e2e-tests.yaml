@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   cert-generator:
-    image: mcr.microsoft.com/dotnet/sdk:9.0   # or your target SDK
+    image: mcr.microsoft.com/dotnet/sdk:10.0   # or your target SDK
     command: >
       bash -c "
         echo 'Generating self-signed certificate...' &&
