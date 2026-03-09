@@ -128,7 +128,7 @@ builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer((doc, ctx, ct) =>
     {
-        doc.Info = new Microsoft.OpenApi.Models.OpenApiInfo
+        doc.Info = new Microsoft.OpenApi.OpenApiInfo()
         {
             Title = "Get To An Answer API",
             Version = "v1"
