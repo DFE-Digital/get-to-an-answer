@@ -32,8 +32,4 @@
         <PackageReference Include="Serilog.Sinks.ApplicationInsights" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Domain\Request\Delete\" />
-    </ItemGroup>
-
 </Project>
