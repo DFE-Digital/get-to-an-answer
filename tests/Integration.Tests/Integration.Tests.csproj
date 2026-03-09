@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -14,11 +14,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.DataAnnotations" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
-        <PackageReference Include="Microsoft.Extensions.Http" />
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-        <PackageReference Include="System.Web.Mvc.Extensions" />
         <PackageReference Include="Testcontainers" />
         <PackageReference Include="Testcontainers.MsSql" />
         <PackageReference Include="WireMock.Net" />
