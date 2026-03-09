@@ -1,4 +1,3 @@
-using Common.Models;
 using Common.Domain;
 
 namespace Common.Models.ViewModels;

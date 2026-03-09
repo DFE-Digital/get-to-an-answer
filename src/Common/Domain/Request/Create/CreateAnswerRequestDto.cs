@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Common.Domain;
 using Common.Enum;
 using Common.Validation;
 

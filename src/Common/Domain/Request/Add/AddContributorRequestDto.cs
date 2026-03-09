@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Common.Domain;
-using Common.Enum;
 
 namespace Common.Domain.Request.Add;
 

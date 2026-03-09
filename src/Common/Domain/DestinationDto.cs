@@ -1,4 +1,3 @@
-using Common.Domain;
 using Common.Enum;
 
 namespace Common.Domain;
