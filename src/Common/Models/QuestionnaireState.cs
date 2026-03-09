@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Common.Models;
 
 public class QuestionnaireState

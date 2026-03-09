@@ -1,4 +1,3 @@
-using Common.Domain;
 using Common.Enum;
 using Common.Infrastructure.Persistence.Entities;
 

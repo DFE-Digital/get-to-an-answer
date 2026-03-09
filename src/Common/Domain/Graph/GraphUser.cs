@@ -1,7 +1,5 @@
 
 
-using Newtonsoft.Json;
-
 namespace Common.Domain.Graph;
 
 public class GraphUser

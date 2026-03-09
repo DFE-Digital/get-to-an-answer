@@ -1,5 +1,3 @@
-using Common.Enum;
-
 namespace Common.Domain;
 
 public class ContentDto

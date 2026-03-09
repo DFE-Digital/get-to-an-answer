@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Common.Enum;
-using Common.Local;
 using Microsoft.EntityFrameworkCore;
 
 namespace Common.Infrastructure.Persistence.Entities;
