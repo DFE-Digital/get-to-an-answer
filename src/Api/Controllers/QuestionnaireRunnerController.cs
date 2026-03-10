@@ -23,7 +23,7 @@ namespace Api.Controllers;
 [ApiController]
 [Route("api")]
 [AllowAnonymous]
-public class QuestionnaireRunnerController(IQuestionnaireRunnerService questionnaireRunnerService) : Controller
+public class QuestionnaireRunnerController(IQuestionnaireRunnerService questionnaireRunnerService) : ControllerBase
 {
     [HttpGet("questionnaires/{questionnaireIdOrSlug}/publishes/last/info")]
     public async Task<IActionResult> GetLastPublishedQuestionnaireInfo(string questionnaireIdOrSlug, [FromQuery] bool preview = false)
