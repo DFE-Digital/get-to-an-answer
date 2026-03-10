@@ -220,10 +220,9 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
 
             var selectedAnswerId =
                 await db.Answers.Where(x => request.SelectedAnswerIds.Contains(x.Id))
-                    .OrderBy(x => x.Priority)
+                    .OrderBy(x => Math.Abs(x.Priority) < 0.00001f ? float.MaxValue : x.Priority)
                     .Select(x => x.Id)
                     .FirstAsync();
-            
 
             QuestionnaireEntity? questionnaire = null;
             AnswerEntity? answer;
@@ -234,7 +233,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             }
             else
             {
-                var questionnaireVersionJson = isPreview ? null : await GetDraftOrLatestPublishedVersion(questionnaireId);
+                var questionnaireVersionJson = await GetDraftOrLatestPublishedVersion(questionnaireId);
                 
                 if (questionnaireVersionJson == null)
                     return BadRequest(ProblemTrace("No published version found for this questionnaire.", 400));
