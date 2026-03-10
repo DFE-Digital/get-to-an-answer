@@ -79,7 +79,7 @@ jobs:
         run: az acr login --name $ACR_NAME
 
       - name: Set Up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build and Push API Image
         uses: docker/build-push-action@v7
@@ -165,7 +165,7 @@ jobs:
         run: az acr login --name $ACR_NAME
 
       - name: Set Up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build and Push API Image
         uses: docker/build-push-action@v7
@@ -249,7 +249,7 @@ jobs:
         run: az acr login --name $ACR_NAME
 
       - name: Set Up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v7
