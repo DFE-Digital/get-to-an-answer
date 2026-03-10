@@ -19,6 +19,7 @@ public interface IQuestionnaireRunnerService
 {
     Task<ServiceResult> GetLastPublishedQuestionnaireInfo(string questionnaireIdOrSlug, bool isPreview = false);
     Task<ServiceResult> GetInitialQuestion(Guid questionnaireId, bool isPreview = false);
+    Task<ServiceResult> GetCurrentQuestion(Guid questionnaireId, Guid questionId, bool isPreview = false);
     Task<ServiceResult> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool isPreview = false);
 }
 
@@ -136,6 +137,67 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         catch (Exception ex)
         {
             logger.LogError(ex, "GetInitialQuestion failed QuestionnaireId={QuestionnaireId}", questionnaireId);
+            return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
+        }
+    }
+
+    public async Task<ServiceResult> GetCurrentQuestion(Guid questionnaireId, Guid questionId, bool isPreview = false)
+    {
+        try
+        {
+            logger.LogInformation("GetCurrentQuestion started QuestionnaireId={QuestionnaireId}, QuestionId={QuestionId}", questionnaireId, questionId);
+
+            var isExisting = await db.Questionnaires.AnyAsync(q => q.Id == questionnaireId);
+            
+            if (!isExisting)
+                return NotFound(ProblemTrace("The questionnaire does not exist.", 400));
+            
+            QuestionEntity? errorQuestion;
+            
+            if (isPreview)
+            {
+                errorQuestion = await db.Questions
+                    .Include(x => x.Answers.Where(a => !a.IsDeleted))
+                    .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Id == questionId && 
+                                              !x.IsDeleted);
+            }
+            else
+            {
+                var questionnaireVersionJson = await GetDraftOrLatestPublishedVersion(questionnaireId);
+
+                if (questionnaireVersionJson == null)
+                    return BadRequest(ProblemTrace("No published version found for this questionnaire.", 400));
+                
+                var questionnaire = ToQuestionnaire(questionnaireVersionJson);
+
+                errorQuestion = questionnaire?.Questions.FirstOrDefault(q => q is { IsDeleted: false } && q.Id == questionId);
+            }
+
+            if (errorQuestion == null)
+                return BadRequest(ProblemTrace("The question provided cannot be found within the questionnaire provided.", 400));
+
+            logger.LogInformation("GetCurrentQuestion succeeded QuestionnaireId={QuestionnaireId} QuestionId={QuestionId}", questionnaireId, errorQuestion.Id);
+            return Ok(new QuestionDto
+            {
+                Id = errorQuestion.Id,
+                QuestionnaireId = errorQuestion.QuestionnaireId,
+                Content = errorQuestion.Content,
+                Description = errorQuestion.Description,
+                Order = errorQuestion.Order,
+                Answers = errorQuestion.Answers.Select(a => new AnswerDto
+                {
+                    Id = a.Id,
+                    Content = a.Content,
+                    Description = a.Description,
+                    QuestionId = a.QuestionId,
+                    Priority = a.Priority
+                }).ToList(),
+                Type = errorQuestion.Type
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "GetCurrentQuestion failed QuestionnaireId={QuestionnaireId}, QuestionId={QuestionId}", questionnaireId, questionId);
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
     }
