@@ -70,6 +70,7 @@ public interface IApiClient
     // === For Service Users ===
 
     Task<QuestionDto?> GetInitialQuestion(Guid questionnaireId, bool preview = false);
+    Task<QuestionDto?> GetCurrentQuestion(Guid questionnaireId, Guid questionId, bool preview = false);
     Task<DestinationDto?> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool preview = false);
 }
 
@@ -331,6 +332,13 @@ public class ApiClient : IApiClient
     {
         var response =
             await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/initial-state?preview={preview}");
+        return await GetResponse<QuestionDto>(response);
+    }
+
+    public async Task<QuestionDto?> GetCurrentQuestion(Guid questionnaireId, Guid questionId, bool preview = false)
+    {
+        var response =
+            await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/{questionId}?preview={preview}");
         return await GetResponse<QuestionDto>(response);
     }
 
