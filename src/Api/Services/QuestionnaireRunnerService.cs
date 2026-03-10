@@ -218,7 +218,12 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
                 return BadRequest(ProblemTrace("No answer was selected.", 400));           
             }
 
-            var selectedAnswerId = request.SelectedAnswerIds.First();
+            var selectedAnswerId =
+                await db.Answers.Where(x => request.SelectedAnswerIds.Contains(x.Id))
+                    .OrderBy(x => x.Priority)
+                    .Select(x => x.Id)
+                    .FirstAsync();
+            
 
             QuestionnaireEntity? questionnaire = null;
             AnswerEntity? answer;
@@ -242,31 +247,26 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             if (answer == null)
                 return BadRequest(ProblemTrace("The selected answer was not found.", 400));
             
-            if (answer.DestinationType == null)
+            switch (answer.DestinationType)
             {
-                return await GetDestinationQuestion(x => 
-                    x.QuestionnaireId == questionnaireId && 
-                    x.Order == request.CurrentQuestionOrder+1 && !x.IsDeleted, isPreview, questionnaire?.Questions);
+                case null:
+                    return await GetDestinationQuestion(x => 
+                        x.QuestionnaireId == questionnaireId && 
+                        x.Order == request.CurrentQuestionOrder+1 && !x.IsDeleted, isPreview, questionnaire?.Questions);
+                case DestinationType.Question:
+                    return await GetDestinationQuestion(x =>
+                        x.Id == answer.DestinationQuestionId && !x.IsDeleted, isPreview, questionnaire?.Questions);
+                case DestinationType.CustomContent:
+                    return await GetDestinationContent(x =>
+                        x.Id == answer.DestinationContentId && !x.IsDeleted, isPreview, questionnaire?.Contents);
+                default:
+                    logger.LogInformation("GetNextState resolved to external destination for AnswerId={AnswerId}", selectedAnswerId);
+                    return Ok(new DestinationDto
+                    {
+                        Type = answer.DestinationType,
+                        Content = answer.DestinationUrl
+                    });
             }
-
-            if (answer.DestinationType == DestinationType.Question)
-            {
-                return await GetDestinationQuestion(x =>
-                    x.Id == answer.DestinationQuestionId && !x.IsDeleted, isPreview, questionnaire?.Questions);
-            }
-
-            if (answer.DestinationType == DestinationType.CustomContent)
-            {
-                return await GetDestinationContent(x =>
-                    x.Id == answer.DestinationContentId && !x.IsDeleted, isPreview, questionnaire?.Contents);
-            }
-
-            logger.LogInformation("GetNextState resolved to external destination for AnswerId={AnswerId}", selectedAnswerId);
-            return Ok(new DestinationDto
-            {
-                Type = answer.DestinationType,
-                Content = answer.DestinationUrl
-            });
         }
         catch (Exception ex)
         {
@@ -291,8 +291,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             }
             else if (questions is { Count: > 0 })
             {
-                questionEntity = questions.Where(destination.Compile())
-                    .FirstOrDefault();
+                questionEntity = questions.FirstOrDefault(destination.Compile());
             }
 
             if (questionEntity == null)
@@ -337,13 +336,12 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
 
         if (isPreview)
         {
-            contentEntity = await db.Contents.Where(destination)
-                .FirstOrDefaultAsync();
+            contentEntity = await db.Contents.FirstOrDefaultAsync(destination);
         }
         else if (contents is { Count: > 0 })
         {
-            contentEntity = contents.Where(destination.Compile())
-                .FirstOrDefault();
+            contentEntity = contents.FirstOrDefault(destination.Compile());
+
         }
         
         if (contentEntity == null)
