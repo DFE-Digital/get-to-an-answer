@@ -4,7 +4,7 @@
 @model Frontend.Pages.Questionnaire.QuestionnaireNext
 
 @{
-    Layout = "Shared/_Layout";
+  Layout = "Shared/_Layout";
 }
 
 @{
@@ -29,7 +29,7 @@
   }
 
   ViewData["Title"] = dynamicTitle;
-  
+
   var hasErrors = Model != null && !ViewData.ModelState.IsValid;
 }
 
@@ -37,6 +37,7 @@
 {
   @await Html.PartialAsync("_ErrorSummary", Model)
 }
+
 @section BeforeContainer
 {
 
@@ -61,7 +62,7 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    
+
     @if (Model?.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
     {
       var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
@@ -69,16 +70,16 @@
       var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
       var inputGroupId = $"q-{Model.Destination.Question.Id}";
       @using (Html.BeginRouteForm(
-                routeName: $"questionnaires/{Model.Questionnaire?.Slug}/next?embed={Model.IsEmbedded}",
-                routeValues: null,
-                method: FormMethod.Post,
-                antiforgery: false,
-                htmlAttributes: new { Id = "question-form", accept_charset = "utf-8" }
-              ))
+                  routeName: $"questionnaires/{Model.Questionnaire?.Slug}/next?embed={Model.IsEmbedded}",
+                  routeValues: null,
+                  method: FormMethod.Post,
+                  antiforgery: false,
+                  htmlAttributes: new { Id = "question-form", accept_charset = "utf-8" }
+                ))
       {
-        
         <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
-          <fieldset class="govuk-fieldset" aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
+          <fieldset class="govuk-fieldset"
+                    aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
               @if (Model.Destination.Question.Type == QuestionType.DropdownSelect)
               {
@@ -104,7 +105,7 @@
             @if (Model.Destination.Question.Type == QuestionType.SingleSelect)
             {
               var answers = Model.Destination.Question.Answers;
-              
+
               @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
               {
                 <p id="@inputGroupId-error" class="govuk-error-message">
@@ -119,7 +120,7 @@
 
                   var inputId = $"{inputGroupId}-a-{answer?.Id}";
                   var itemHintId = $"{inputId}-hint";
-                  
+
                   <div class="govuk-radios__item">
                     <input
                       class="govuk-radios__input @(hasFieldError ? "govuk-input--error" : "")"
@@ -144,7 +145,7 @@
             else if (Model.Destination.Question.Type == QuestionType.MultiSelect)
             {
               var answers = Model.Destination.Question.Answers;
-              
+
               @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
               {
                 <p id="@inputGroupId-error" class="govuk-error-message">
@@ -157,7 +158,7 @@
                 {
                   var answer = Model?.Destination?.Question.Answers[a];
 
-                  
+
                   var inputId = $"{inputGroupId}-a-{answer.Id}";
                   var itemHintId = $"{inputId}-hint";
                   <div class="govuk-checkboxes__item">
@@ -191,6 +192,7 @@
                   <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
                 </p>
               }
+
               <label class="govuk-label" for="@($"{inputGroupId}-select")">
                 Choose answer
               </label>
@@ -198,6 +200,7 @@
               {
                 var answer = Model?.Destination?.Question.Answers[a];
               }
+
               <select class="govuk-select" id="@($"{inputGroupId}-select")" name="NextStateRequest.SelectedAnswerIds">
                 <option value="choose" selected="selected">Select an answer</option>
                 @foreach (var answer in answers)
@@ -212,12 +215,10 @@
                 data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
           @(Model?.Questionnaire?.ContinueButtonText ?? "Continue")
         </button>
-        
+
         <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
         <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
       }
-      
-      
     }
     else if (Model?.Destination?.Type == DestinationType.CustomContent)
     {
