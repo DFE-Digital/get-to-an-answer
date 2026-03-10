@@ -89,7 +89,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             var isExisting = await db.Questionnaires.AnyAsync(q => q.Id == questionnaireId);
             
             if (!isExisting)
-                return NotFound(ProblemTrace("The questionnaire does not exist.", 400));
+                return NotFound(ProblemTrace("The questionnaire does not exist.", 404));
             
             QuestionEntity? initialQuestion;
             
@@ -150,7 +150,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             var isExisting = await db.Questionnaires.AnyAsync(q => q.Id == questionnaireId);
             
             if (!isExisting)
-                return NotFound(ProblemTrace("The questionnaire does not exist.", 400));
+                return NotFound(ProblemTrace("The questionnaire does not exist.", 404));
             
             QuestionEntity? errorQuestion;
             
@@ -174,7 +174,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             }
 
             if (errorQuestion == null)
-                return BadRequest(ProblemTrace("The question provided cannot be found within the questionnaire provided.", 400));
+                return NotFound(ProblemTrace("The question provided cannot be found within the questionnaire provided.", 404));
 
             logger.LogInformation("GetCurrentQuestion succeeded QuestionnaireId={QuestionnaireId} QuestionId={QuestionId}", questionnaireId, errorQuestion.Id);
             return Ok(new QuestionDto
@@ -211,7 +211,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             var isExisting = await db.Questionnaires.AnyAsync(q => q.Id == questionnaireId);
             
             if (!isExisting)
-                return NotFound(ProblemTrace("The questionnaire does not exist.", 400));
+                return NotFound(ProblemTrace("The questionnaire does not exist.", 404));
             
             if (request.SelectedAnswerIds.Count == 0)
             {
