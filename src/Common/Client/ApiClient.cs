@@ -338,7 +338,7 @@ public class ApiClient : IApiClient
     public async Task<QuestionDto?> GetCurrentQuestion(Guid questionnaireId, Guid questionId, bool preview = false)
     {
         var response =
-            await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/{questionId}?preview={preview}");
+            await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/questions/{questionId}?preview={preview}");
         return await GetResponse<QuestionDto>(response);
     }
 
