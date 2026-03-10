@@ -157,8 +157,6 @@
                 @for (var a = 0; a < answers.Count; a++)
                 {
                   var answer = Model?.Destination?.Question.Answers[a];
-
-
                   var inputId = $"{inputGroupId}-a-{answer.Id}";
                   var itemHintId = $"{inputId}-hint";
                   <div class="govuk-checkboxes__item">
@@ -192,15 +190,9 @@
                   <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
                 </p>
               }
-
               <label class="govuk-label" for="@($"{inputGroupId}-select")">
                 Choose answer
               </label>
-              @for (var a = 0; a < answers.Count; a++)
-              {
-                var answer = Model?.Destination?.Question.Answers[a];
-              }
-
               <select class="govuk-select" id="@($"{inputGroupId}-select")" name="NextStateRequest.SelectedAnswerIds">
                 <option value="choose" selected="selected">Select an answer</option>
                 @foreach (var answer in answers)
