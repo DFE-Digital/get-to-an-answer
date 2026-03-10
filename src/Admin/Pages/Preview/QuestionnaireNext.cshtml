@@ -42,33 +42,18 @@
     
     @if (Model?.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
     {
-      <form id="question-form" action="/admin/questionnaires/@Model.Questionnaire.Id/next-preview?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id" autocomplete="off">
-        <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order" autocomplete="off">
-        <input type="hidden" name="Questionnaire.Id" value="@Model?.Questionnaire?.Id" autocomplete="off">
-        <input type="hidden" name="Questionnaire.Slug" value="@Model?.Questionnaire?.Slug" autocomplete="off">
-        <input type="hidden" name="Questionnaire.DisplayTitle" value="@Model?.Questionnaire?.DisplayTitle" autocomplete="off">
-        <input type="hidden" name="Questionnaire.Description" value="@Model?.Questionnaire?.Description" autocomplete="off">
-        <input type="hidden" name="Questionnaire.TextColor" value="@Model?.Questionnaire?.TextColor" autocomplete="off">
-        <input type="hidden" name="Questionnaire.BackgroundColor" value="@Model?.Questionnaire?.BackgroundColor" autocomplete="off">
-        <input type="hidden" name="Questionnaire.PrimaryButtonColor" value="@Model?.Questionnaire?.PrimaryButtonColor" autocomplete="off">
-        <input type="hidden" name="Questionnaire.SecondaryButtonColor" value="@Model?.Questionnaire?.SecondaryButtonColor" autocomplete="off">
-        <input type="hidden" name="Questionnaire.StateColor" value="@Model?.Questionnaire?.StateColor" autocomplete="off">
-        <input type="hidden" name="Questionnaire.ErrorMessageColor" value="@Model?.Questionnaire?.ErrorMessageColor" autocomplete="off">
-        <input type="hidden" name="Questionnaire.ContinueButtonText" value="@Model?.Questionnaire?.ContinueButtonText" autocomplete="off">
-        <input type="hidden" name="Destination.Type" value="@Model?.Destination?.Type" autocomplete="off">
-        <input type="hidden" name="Destination.Question.Type" value="@Model?.Destination?.Question.Type" autocomplete="off">
-        <input type="hidden" name="Destination.Question.Id" value="@Model?.Destination?.Question.Id" autocomplete="off">
-        <input type="hidden" name="Destination.Question.Order" value="@Model?.Destination?.Question.Order" autocomplete="off">
-        <input type="hidden" name="Destination.Question.Content" value="@Model?.Destination?.Question.Content" autocomplete="off">
-        <input type="hidden" name="Destination.Question.Description" value="@Model?.Destination?.Question.Description" autocomplete="off">
-        @{
-          var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
+      var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
 
-          var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
-          var inputGroupId = $"q-{Model.Destination.Question.Id}";
-        }
+      var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
+      var inputGroupId = $"q-{Model.Destination.Question.Id}";
+      @using (Html.BeginRouteForm(
+                routeName: $"admin/questionnaires/{Model.Questionnaire?.Id}/next-preview?embed={Model.IsEmbedded}",
+                routeValues: null,
+                method: FormMethod.Post,
+                antiforgery: false,
+                htmlAttributes: new { Id = "question-form", accept_charset = "utf-8" }
+              ))
+      {
         <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
           <fieldset class="govuk-fieldset" aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -112,11 +97,6 @@
                   var inputId = $"{inputGroupId}-a-{answer?.Id}";
                   var itemHintId = $"{inputId}-hint";
 
-                  <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer.Id" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer.Priority" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer.Content" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description" autocomplete="off">
-
                   <div class="govuk-radios__item">
                     <input type="hidden" name="Priorities.@answer.Id" value="@answer.Priority" autocomplete="off">
                     <input
@@ -154,12 +134,6 @@
                 @for (var a = 0; a < answers.Count; a++)
                 {
                   var answer = Model?.Destination?.Question.Answers[a];
-
-                  <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer.Id" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer.Priority" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer.Content" autocomplete="off">
-                  <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer.Description" autocomplete="off">
-
                   var inputId = $"{inputGroupId}-a-{answer.Id}";
                   var itemHintId = $"{inputId}-hint";
                   <div class="govuk-checkboxes__item">
@@ -194,16 +168,9 @@
                   <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
                 </p>
               }
-              @for (var a = 0; a < answers.Count; a++)
-              {
-                var answer = Model?.Destination?.Question.Answers[a];
-
-                <input type="hidden" name="Destination.Question.Answers[@a].Id" value="@answer?.Id" autocomplete="off">
-                <input type="hidden" name="Destination.Question.Answers[@a].Priority" value="@answer?.Priority" autocomplete="off">
-                <input type="hidden" name="Destination.Question.Answers[@a].Content" value="@answer?.Content" autocomplete="off">
-                <input type="hidden" name="Destination.Question.Answers[@a].Description" value="@answer?.Description" autocomplete="off">
-                <input type="hidden" name="Priorities.@answer?.Id" value="@answer?.Priority" autocomplete="off">
-              }
+              <label class="govuk-label" for="@($"{inputGroupId}-select")">
+                Choose answer
+              </label>
               <select class="govuk-select" id="@($"{inputGroupId}-select")" name="NextStateRequest.SelectedAnswerIds">
                 <option value="choose" selected="selected">Select an answer</option>
                 @foreach (var answer in answers)
@@ -219,7 +186,9 @@
                 data-govuk-button-init="">
           @(Model?.Questionnaire?.ContinueButtonText ?? "Continue")
         </button>
-      </form>
+        <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
+        <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
+      }
     }
     else if (Model?.Destination?.Type == DestinationType.CustomContent)
     {

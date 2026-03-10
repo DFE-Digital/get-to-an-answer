@@ -19,8 +19,8 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 
     [BindProperty] public required GetNextStateRequest NextStateRequest { get; set; }
     [BindProperty] public required bool IsEmbedded { get; set; }
-    [BindProperty] public required QuestionnaireInfoDto Questionnaire { get; set; }
-    [BindProperty] public required DestinationDto Destination { get; set; }
+    public required QuestionnaireInfoDto Questionnaire { get; set; }
+    public required DestinationDto Destination { get; set; }
 
     [FromQuery(Name = "embed")] 
     public bool Embed { get; set; }
@@ -43,15 +43,26 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
         return Page();
     }
 
-    public async Task<IActionResult> OnPost( 
-        [FromForm(Name = "Priorities")] Dictionary<Guid, float> priorities)
+    public async Task<IActionResult> OnPost()
     {
         try
         {
+            var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireId.ToString(), true);
+            
+            if (questionnaire == null)
+                return NotFound();
+            
+            Questionnaire = questionnaire;
+            Destination = new DestinationDto
+            {
+                Type = DestinationType.Question,
+                Question = await apiClient.GetCurrentQuestion(Questionnaire.Id, NextStateRequest.CurrentQuestionId, true)
+            };
+            IsEmbedded = Embed;
+            
             if (!ModelState.IsValid)
             {
                 ModelState.Clear();
-                
                 if (Destination.Question is not null)
                 {
                     switch (Destination.Question.Type)
@@ -67,29 +78,10 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
                             break;
                     }
                 }
-                
-                IsEmbedded = Embed;
-
                 return Page();
             }
-            
-            Dictionary<Guid, float> finalPriorities = new();
-
-            foreach (var (key, value) in priorities)
-            {
-                finalPriorities.Add(key, value <= 0 ? int.MaxValue : value);
-            }
-
-            if (NextStateRequest.SelectedAnswerIds.Count > 1)
-            {
-                var selectedAnswerId = finalPriorities
-                    .Where(kv => NextStateRequest.SelectedAnswerIds.Contains(kv.Key))
-                    .OrderBy(kv => kv.Value).First().Key;
-                NextStateRequest.SelectedAnswerIds = [selectedAnswerId];
-            } 
         
             var destination = await apiClient.GetNextState(Questionnaire.Id, NextStateRequest, true);
-        
             if (destination == null)
                 return NotFound();
 

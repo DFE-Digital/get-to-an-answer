@@ -23,8 +23,6 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 
     [FromQuery(Name = "embed")] 
     public bool Embed { get; set; }
-    
-    public string? StateCacheString { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
@@ -73,12 +71,10 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 
             Questionnaire = questionnaire;
             Destination = new DestinationDto
-                
             {
                 Type = DestinationType.Question,
                 Question = await apiClient.GetCurrentQuestion(Questionnaire.Id, NextStateRequest.CurrentQuestionId)
             };
-            
             IsEmbedded = Embed;
             
             if (!ModelState.IsValid)
@@ -100,9 +96,6 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
                             break;
                     }
                 }
-
-                IsEmbedded = Embed;
-                
                 return Page();
             }
             
