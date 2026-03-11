@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   cert-generator:
     image: mcr.microsoft.com/dotnet/sdk:10.0   # or your target SDK
@@ -20,9 +18,12 @@ services:
       context: ../..
       dockerfile: src/Admin/Dockerfile
     depends_on:
-      - web-api
-      - azurite
-      - cert-generator
+      web-api:
+        condition: service_healthy
+      azurite:
+        condition: service_started
+      cert-generator:
+        condition: service_completed_successfully
     environment:
       - ApiSettings__BaseUrl=http://web-api:8080
       - BlobStorage__ConnectionString=${E2E_AZURITE_CONNECTION_STRING}
@@ -34,8 +35,7 @@ services:
       - AzureAd__Instance=${AZURE_AD_INSTANCE}
       - AzureAd__Domain=${AZURE_AD_DOMAIN}
       - ASPNETCORE_HTTPS_PORTS=8443
-      - ASPNETCORE_URLS=http://0.0.0.0:8080;https://0.0.0.0:8443
-      - ASPNETCORE_Kestrel__Endpoints__Https__Url=https://0.0.0.0:8443
+      - ASPNETCORE_URLS=http://+:8080;https://+:8443
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/https-dev.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${E2E_CERT_PASSWORD}
       - GtaaFrontendLocalPort=8463
@@ -48,7 +48,7 @@ services:
       - dotnet dev-certs https --trust
     healthcheck:
       # Use CMD-SHELL so shell interpolation works and ensure a non-zero exit on failure
-      test: [ "CMD-SHELL", "echo 'Calling /health healthcheck' && curl -f http://localhost:8080/health || exit 1" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -59,8 +59,10 @@ services:
       context: ../..
       dockerfile: src/Api/Dockerfile
     depends_on:
-      - sqlserver
-      - cert-generator
+      sqlserver:
+        condition: service_healthy
+      cert-generator:
+        condition: service_completed_successfully
     environment:
       - ConnectionStrings__DefaultConnection=${E2E_SQLSERVER_CONNECTION_STRING}
       - SQLSERVER_SA_PASSWORD=${E2E_SQLSERVER_SA_PASSWORD}
@@ -69,12 +71,12 @@ services:
       - AzureAd__TenantId=${AZURE_AD_TENANT_ID}
       - AzureAd__Instance=${AZURE_AD_INSTANCE}
       - AzureAd__Domain=${AZURE_AD_DOMAIN}
-      - ASPNETCORE_URLS=http://0.0.0.0:8080
+      - ASPNETCORE_URLS=http://+:8080
     ports:
       - "8080:8080"
     healthcheck:
       # Use CMD-SHELL so shell interpolation works and ensure a non-zero exit on failure
-      test: [ "CMD-SHELL", "echo 'Calling /health healthcheck' && curl -f http://localhost:8080/health || exit 1" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -85,17 +87,19 @@ services:
       context: ../..
       dockerfile: src/Frontend/Dockerfile
     depends_on:
-      - web-api
-      - azurite
-      - cert-generator
+      web-api:
+        condition: service_healthy
+      azurite:
+        condition: service_started
+      cert-generator:
+        condition: service_completed_successfully      
     environment:
       - ApiSettings__BaseUrl=http://web-api:8080
       - BlobStorage__ConnectionString=${E2E_AZURITE_CONNECTION_STRING}
       - BlobStorage__ContainerName=images
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ASPNETCORE_URLS=http://0.0.0.0:8080;https://0.0.0.0:8443
+      - ASPNETCORE_URLS=http://+:8080;https://+:8443
       - ASPNETCORE_HTTPS_PORTS=8443
-      - ASPNETCORE_Kestrel__Endpoints__Https__Url=https://0.0.0.0:8443
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/https-dev.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${E2E_CERT_PASSWORD}
     ports:
@@ -105,7 +109,7 @@ services:
       - https-cert:/https
     healthcheck:
       # Use CMD-SHELL so shell interpolation works and ensure a non-zero exit on failure
-      test: [ "CMD-SHELL", "echo 'Calling /health healthcheck' && curl -f http://localhost:8080/health || exit 1" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -113,18 +117,21 @@ services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=${E2E_SQLSERVER_SA_PASSWORD}
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "${E2E_SQLSERVER_SA_PASSWORD}"
+      MSSQL_PID: Developer
     ports:
       - "1433:1433"
     healthcheck:
       # Use CMD-SHELL so the SA password env var is expanded inside the command
-      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$E2E_SQLSERVER_SA_PASSWORD\" -Q \"SELECT 1\" || exit 1" ]
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "${E2E_SQLSERVER_SA_PASSWORD}" -C -Q "SELECT 1" || exit 1
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
   
   azurite:
+    container_name: azurite
     image: mcr.microsoft.com/azure-storage/azurite
     command: azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck
     ports:
