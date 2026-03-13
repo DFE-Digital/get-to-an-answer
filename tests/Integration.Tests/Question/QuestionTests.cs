@@ -33,6 +33,7 @@ public class QuestionTests(ApiFixture factory) :
             questionnaireId,
             content = "My Question",
             type = QuestionType.DropdownSelect,
+            referenceName = "my-question-ref"
         };
 
         using var res = await Create(payload);
@@ -45,6 +46,7 @@ public class QuestionTests(ApiFixture factory) :
         dto.QuestionnaireId.Should().Be(questionnaireId);
         dto.Id.Should().NotBeEmpty(because: "id should be auto-generated");
         dto.Content.Should().Be("My Question");
+        dto.ReferenceName.Should().Be("my-question-ref");
         dto.CreatedAt.Should().NotBe(default);
         dto.UpdatedAt.Should().NotBe(default);
 
@@ -61,6 +63,7 @@ public class QuestionTests(ApiFixture factory) :
             questionnaireId,
             content = "T1",
             description = "D1",
+            referenceName = "R1",
             type = QuestionType.SingleSelect
         };
 
@@ -74,6 +77,7 @@ public class QuestionTests(ApiFixture factory) :
         dto.QuestionnaireId.Should().Be(questionnaireId);
         dto.Content.Should().Be("T1");
         dto.Description.Should().Be("D1");
+        dto.ReferenceName.Should().Be("R1");
         AssertNoSensitiveUserData(responseBody);
     }
 
@@ -86,6 +90,7 @@ public class QuestionTests(ApiFixture factory) :
         {
             questionnaireId,
             content = "Duplicate Content",
+            referenceName = "R0",
             type = QuestionType.MultiSelect
         };
 
@@ -102,10 +107,10 @@ public class QuestionTests(ApiFixture factory) :
         var dto2 = res2Body.Deserialize<QuestionDto>()!;
 
         dto1.QuestionnaireId.Should().Be(questionnaireId);
-        dto1.QuestionnaireId.Should().Be(questionnaireId);
         dto1.Id.Should().NotBeEmpty();
         dto2.Id.Should().NotBeEmpty();
         dto2.Id.Should().NotBe(dto1.Id);
+        dto2.ReferenceName.Should().Be(dto1.ReferenceName);
     }
 
     [Fact]
@@ -591,13 +596,14 @@ public class QuestionTests(ApiFixture factory) :
         }
 
         // Act
-        using var res = await UpdateById(id, new { content = "T1" });
+        using var res = await UpdateById(id, new { content = "T1", referenceName = "R1" });
 
         // Assert 204, then GET to verify
         res.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
         var question = await GetById<QuestionDto>(id);
         question.Content.Should().Be("T1");
+        question.ReferenceName.Should().Be("R1");
         question.Description.Should().Be(originalDesc);
         question.CreatedAt.Should().NotBe(default);
         question.UpdatedAt.Should().NotBe(default);
@@ -645,7 +651,7 @@ public class QuestionTests(ApiFixture factory) :
         }
 
         // Act
-        using var res = await UpdateById(id, new { content = "T0", type = (QuestionType)123 });
+        using var res = await UpdateById(id, new { content = "T1", description = "D1", type = (QuestionType)123 });
 
         res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var text = await res.Content.ReadAsStringAsync();
@@ -665,20 +671,21 @@ public class QuestionTests(ApiFixture factory) :
         var questionnaireId = await CreateQuestionnaire();;
         
         string id;
-        using (var postRes = await Create(new { questionnaireId, content = "T0", description = "D0", type = QuestionType.MultiSelect }))
+        using (var postRes = await Create(new { questionnaireId, content = "T0", description = "D0", referenceName = "R0", type = QuestionType.MultiSelect }))
         {
             postRes.StatusCode.Should().Be(HttpStatusCode.Created);
             id = ExtractId(await postRes.Content.ReadAsStringAsync());
         }
 
         // Act
-        using var res = await UpdateById(id, new { content = "T1", description = "D1", type = QuestionType.MultiSelect });
+        using var res = await UpdateById(id, new { content = "T1", description = "D1", referenceName = "R1", type = QuestionType.MultiSelect });
 
         res.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
         var question = await GetById<QuestionDto>(id);
         question.Content.Should().Be("T1");
         question.Description.Should().Be("D1");
+        question.ReferenceName.Should().Be("R1");
     }
 
     // Scenario: Error when invalid JWT bearer token (unauthorized access)

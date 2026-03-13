@@ -28,6 +28,9 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
     [BindProperty] 
     [Required(ErrorMessage = "Select question type")]
     public QuestionType QuestionType { get; set; }
+    
+    [BindProperty] 
+    public string? QuestionRefName { get; set; } = "";
 
     public async Task<IActionResult> OnGet()
     {
@@ -65,7 +68,8 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
                 QuestionnaireId = QuestionnaireId,
                 Content = QuestionContent,
                 Description = QuestionHintText,
-                Type = QuestionType
+                Type = QuestionType,
+                ReferenceName = QuestionRefName
             });
             
             // if no question existed before this was created then mark status as in progress

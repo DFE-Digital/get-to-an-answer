@@ -131,7 +131,8 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
                     QuestionId = a.QuestionId,
                     Priority = a.Priority
                 }).ToList(),
-                Type = initialQuestion.Type
+                Type = initialQuestion.Type,
+                ReferenceName = initialQuestion.ReferenceName
             });
         }
         catch (Exception ex)
@@ -152,11 +153,11 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             if (!isExisting)
                 return NotFound(ProblemTrace("The questionnaire does not exist.", 404));
             
-            QuestionEntity? errorQuestion;
+            QuestionEntity? currentQuestion;
             
             if (isPreview)
             {
-                errorQuestion = await db.Questions
+                currentQuestion = await db.Questions
                     .Include(x => x.Answers.Where(a => !a.IsDeleted))
                     .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && x.Id == questionId && 
                                               !x.IsDeleted);
@@ -170,21 +171,21 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
                 
                 var questionnaire = ToQuestionnaire(questionnaireVersionJson);
 
-                errorQuestion = questionnaire?.Questions.FirstOrDefault(q => q is { IsDeleted: false } && q.Id == questionId);
+                currentQuestion = questionnaire?.Questions.FirstOrDefault(q => q is { IsDeleted: false } && q.Id == questionId);
             }
 
-            if (errorQuestion == null)
+            if (currentQuestion == null)
                 return NotFound(ProblemTrace("The question provided cannot be found within the questionnaire provided.", 404));
 
-            logger.LogInformation("GetCurrentQuestion succeeded QuestionnaireId={QuestionnaireId} QuestionId={QuestionId}", questionnaireId, errorQuestion.Id);
+            logger.LogInformation("GetCurrentQuestion succeeded QuestionnaireId={QuestionnaireId} QuestionId={QuestionId}", questionnaireId, currentQuestion.Id);
             return Ok(new QuestionDto
             {
-                Id = errorQuestion.Id,
-                QuestionnaireId = errorQuestion.QuestionnaireId,
-                Content = errorQuestion.Content,
-                Description = errorQuestion.Description,
-                Order = errorQuestion.Order,
-                Answers = errorQuestion.Answers.Select(a => new AnswerDto
+                Id = currentQuestion.Id,
+                QuestionnaireId = currentQuestion.QuestionnaireId,
+                Content = currentQuestion.Content,
+                Description = currentQuestion.Description,
+                Order = currentQuestion.Order,
+                Answers = currentQuestion.Answers.Select(a => new AnswerDto
                 {
                     Id = a.Id,
                     Content = a.Content,
@@ -192,7 +193,8 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
                     QuestionId = a.QuestionId,
                     Priority = a.Priority
                 }).ToList(),
-                Type = errorQuestion.Type
+                Type = currentQuestion.Type,
+                ReferenceName = currentQuestion.ReferenceName
             });
         }
         catch (Exception ex)
@@ -325,6 +327,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
                     Priority = a.Priority,
                 }).ToList(),
                 Type = questionEntity.Type,
+                ReferenceName = questionEntity.ReferenceName
             }
         };
     }
@@ -351,6 +354,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             Type = DestinationType.CustomContent,
             Content = contentEntity.Content,
             Title = contentEntity.Title,
+            ReferenceName = contentEntity.ReferenceName
         });
     }
 
