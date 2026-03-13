@@ -3,9 +3,11 @@ import {QuestionType} from '../constants/test-data-constants'
 
 export class QuestionBuilder {
     private _questionnaireId: string;
-    private _content: string
-    private _description: string
-    private _type: QuestionType
+    private _content: string;
+    private _description: string;
+    private _type: QuestionType;
+    private _referenceName: string;
+    
 
     constructor(questionnaireId: string) {
         const timestamp = Date.now();
@@ -13,6 +15,7 @@ export class QuestionBuilder {
         this._content = `Default question content - ${timestamp}`;
         this._description = `Default question description - ${timestamp}`;
         this._type = QuestionType.SingleSelect; //set to default
+        this._referenceName = `Default question reference - ${timestamp}`;
     }
 
     withContent(content?: string) {
@@ -33,12 +36,18 @@ export class QuestionBuilder {
         return this;
     }
 
+    withReferenceName(referenceName?: string) {
+        if (referenceName !== undefined)
+            this._referenceName = referenceName;
+        return this;
+    }
     build(): QuestionModel {
         return {
             questionnaireId: this._questionnaireId,
             content: this._content,
             description: this._description,
             type: this._type,
+            referenceName: this._referenceName
         };
     }
 }

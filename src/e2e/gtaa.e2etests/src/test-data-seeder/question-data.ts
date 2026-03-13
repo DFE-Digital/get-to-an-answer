@@ -12,6 +12,7 @@ export async function createQuestion(
     bearerToken?: string,
     content?: string,
     type?: QuestionType,
+    referenceName?: string,
     description?: string,
 ) {
 
@@ -19,6 +20,7 @@ export async function createQuestion(
         .withContent(content)
         .withDescription(description)
         .withType(type)
+        .withReferenceName(referenceName)
         .build();
     
     const response = await request.post(`${BASE_URL}/api/questions`, {
