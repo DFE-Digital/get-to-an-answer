@@ -18,10 +18,10 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
     [FromRoute(Name = "contentId")] public Guid ContentId { get; set; }
 
-    [Required(ErrorMessage = "Enter a title")] 
+    [Required(ErrorMessage = "Enter a title to save")] 
     [BindProperty] public string ContentTitle { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Enter some details")] 
+    [Required(ErrorMessage = "Enter text for the main content to save")] 
     [BindProperty] public string ContentValue { get; set; } = string.Empty;
 
     [BindProperty] public string? ContentRefName { get; set; }

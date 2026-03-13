@@ -80,7 +80,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         foreach (var specificQuestion in optionsWithSpecificQuestionNoSelection)
         {
             var index = specificQuestion.OptionNumber - 1;
-            var errorMessage = $"Please select a question for option {specificQuestion.OptionNumber}";
+            var errorMessage = "Select a question as the destination to save";
 
             var destinationKey = $"Options-{index}-AnswerDestination";
             var specificQuestionRadioInputId = $"Options-{index}-destination-specific";
@@ -96,7 +96,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         foreach (var resultsPage in optionsWithResultsPageNoSelection)
         {
             var index = resultsPage.OptionNumber - 1;
-            var errorMessage = $"Please select a results page for option {resultsPage.OptionNumber}";
+            var errorMessage = "Select a results page as the destination to save";
 
             var destinationKey = $"Options-{index}-AnswerDestination";
             var resultsPageRadioInputId = $"Options-{index}-destination-internal";
@@ -112,7 +112,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         foreach (var externalLink in optionsWithExternalLinkNoSelection)
         {
             var index = externalLink.OptionNumber - 1;
-            var errorMessage = $"Please enter an external link for option {externalLink.OptionNumber}";
+            var errorMessage = "Enter a link as the destination to save";
             
             var destinationKey = $"Options-{index}-AnswerDestination";
             var resultsPageRadioInputId = $"Options-{index}-destination-external";
@@ -292,7 +292,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             foreach (var item in group)
             {
                 ModelState.AddModelError($"Options[{item.index}].OptionContent",
-                    $"Option {item.index + 1} content is duplicated");
+                    $"Option {item.index + 1} already exists");
             }
         }
     }

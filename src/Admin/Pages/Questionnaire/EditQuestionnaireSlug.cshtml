@@ -30,10 +30,9 @@
         <div class="govuk-hint" id="@inputId-hint">
           <p>The questionnaire ID is an identifier used to load the questionnaire into your service. You must do this before publishing the questionnaire.</p>
           <p>The ID must only use lower case letters, numbers and hyphens, with no spaces.</p>
-          <p>This ID will not be visible to the end user.</p>
+          <p>This ID will not be visible to users.</p>
         </div>
         
-        <h2>Questionnaire ID</h2>
         <govuk-field-error asp-for="@Model.Slug" error-id="@inputId-field-error"></govuk-field-error>
         
         <govuk-input id="@inputId"

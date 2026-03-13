@@ -1,11 +1,10 @@
 ﻿@page "/admin/questionnaires/{questionnaireId:guid}/contents/add"
 @addTagHelper *, Common
-@using Common.Enum
 @model Admin.Pages.Contents.AddContent
 
 @{
   Layout = "_Layout";
-  ViewData["Title"] = "Add a results page";
+  ViewData["Title"] = "Add or edit a results page";
 }
 
 @section BeforeContent
@@ -56,12 +55,8 @@
           Main content
         </label>
         <div class="govuk-hint" id="ContentValue-hint">
-          <p>
-            This content could explain what someone's results mean and what they might do next.
-            It can also include any helpful links.
-          </p>
-          
-          <p>You can format your text using Markdown. For example, to add headings or links. To find out more, <a href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/">read this guidance on how to write Markdown.</a> </p>
+          <p>This content could explain what the user’s results mean and what they might do next. It can also include any helpful links.</p>
+          <p>You can format your text using Markdown. For example, to add headings or links. To find out more, <a href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/" target="_blank">read this guidance on how to write Markdown (opens in a new tab)</a>.</p>
         </div>
 
         <govuk-field-error asp-for="@Model.ContentValue" error-id="ContentValue-error">

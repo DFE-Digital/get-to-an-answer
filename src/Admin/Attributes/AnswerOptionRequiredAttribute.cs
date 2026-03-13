@@ -31,7 +31,7 @@ public sealed class AnswerOptionRequiredAttribute(string fieldType) : Validation
         };
 
         
-        var message = $"Option {option.OptionNumber} {label} is required";
+        var message = $"Enter text for Option {option.OptionNumber} to save";
 
         return new ValidationResult(message, [validationContext.MemberName!]);
     }

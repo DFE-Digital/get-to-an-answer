@@ -6,7 +6,7 @@
 
 @{
   Layout = "_Layout";
-  ViewData["Title"] = "Add and edit a start page";
+  ViewData["Title"] = "Add and edit start page";
 }
 
 @section BeforeContent
@@ -58,9 +58,9 @@
           Main content
         </label>
         <div class="govuk-hint" id="Description-hint">
-          <p>This content should help someone understand what the service does and how it will help them.</p>
-          <p>It should also include any information people may need to answer questions.</p>
-          <p>You can format your text using Markdown. For example, to add headings or links. To find out more, <a class="govuk-link" href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown">read this guidance on how to write Markdown.</a></p>
+          <p>This content should help users understand what the service does and how it will help them.</p>
+          <p>It should also include any information users may need to answer questions.</p>
+          <p>To find out more, <a class="govuk-link" href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown" target="_blank">read this guidance on how to write Markdown (opens in a new tab)</a>.</p>
         </div>
 
         <govuk-field-error asp-for="@Model.Description" error-id="Description-error">

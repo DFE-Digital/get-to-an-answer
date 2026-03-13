@@ -25,7 +25,7 @@ public class TermsOfServiceAgreement : BasePageModel
     public IActionResult OnPost()
     {
         if (!Agreed)
-            ModelState.AddModelError(nameof(Agreed), "You need to accept the agreement to continue");
+            ModelState.AddModelError(nameof(Agreed), "You must agree to the Terms of Service to continue");
         
         if (!ModelState.IsValid)
             return Page();

@@ -12,3 +12,6 @@ riderModule.iml
 
 **/*.DotSettings
 **/*.DotSettings.user
+
+node_modules/
+**/wwwroot/**

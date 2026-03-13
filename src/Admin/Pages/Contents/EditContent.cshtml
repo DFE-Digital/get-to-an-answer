@@ -6,7 +6,7 @@
 
 @{
   Layout = "_Layout";
-  ViewData["Title"] = "Edit your results page";
+  ViewData["Title"] = "Add or edit a results page";
 }
 
 @section BeforeContent
@@ -33,10 +33,10 @@
       <!-- Content title -->
       <govuk-form-group asp-for="@Model.ContentTitle">
         <label class="govuk-label govuk-label--m" for="ContentTitle">
-          Add a title of the result page
+          Title
         </label>
         <div class="govuk-hint" id="ContentTitle-hint">
-          This will appear at the top of your result page and should summarise the answer.
+          The title will appear at the top of the results page.
         </div>
 
         <govuk-field-error asp-for="@Model.ContentTitle" error-id="ContentTitle-error">
@@ -54,12 +54,11 @@
       <!-- Main content -->
       <govuk-form-group asp-for="@Model.ContentValue">
         <label class="govuk-label govuk-label--m" for="ContentValue">
-          Add detail about the result
+          Main content
         </label>
         <div class="govuk-hint" id="ContentValue-hint">
-          <p>You could explain the result based on people's answers. </p>
-
-          <p>It could include links to an onward journey. </p>
+          <p>This content could explain what the user’s results mean and what they might do next. It can also include any helpful links.</p>
+          <p>You can format your text using Markdown. For example, to add headings or links. To find out more, <a href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/" target="_blank">read this guidance on how to write Markdown (opens in a new tab)</a>.</p>
         </div>
 
         <govuk-field-error asp-for="@Model.ContentValue" error-id="ContentValue-error">
@@ -75,12 +74,11 @@
       <!-- Question text -->
       <govuk-form-group asp-for="@Model.ContentRefName">
         <label class="govuk-label govuk-label--m" for="ContentRefName">
-          Give your result a reference
+          Results reference (optional)
         </label>
         <div class="govuk-hint" id="ContentRefName-hint">
-          <p>You can add a reference name to make it easier for you to identify results when choosing destinations for question answers.</p>
-
-          <p>If you do not add a reference, the default will be the result title. </p>
+          <p>Add a reference to help you find the right results page when making edits. These are not visible to users.</p>
+          <p>If you do not add a reference, the results page will be listed as its title.</p>
         </div>
 
         <govuk-field-error asp-for="@Model.ContentRefName" error-id="ContentRefName-error">

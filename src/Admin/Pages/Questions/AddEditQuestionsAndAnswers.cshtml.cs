@@ -113,6 +113,15 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
         try
         {
             await apiClient.MoveQuestionUpOneAsync(questionnaireId, questionId);
+            
+            var question = await apiClient.GetQuestionAsync(questionId);
+            TempData[nameof(QuestionnaireState)] =
+                JsonConvert.SerializeObject(new QuestionnaireState
+                {
+                    JustMovedUp = true,
+                    MovedQuestionTitle = question!.Content,
+                    MovedQuestionNumber = question.Order
+                });
 
             // PRG - redirect back to GET for the same questionnaire so refresh won't resubmit
             return RedirectToPage(new { questionnaireId });
@@ -135,6 +144,15 @@ public class AddEditQuestionsAndAnswers(ILogger<AddEditQuestionsAndAnswers> logg
         try
         {
             await apiClient.MoveQuestionDownOneAsync(questionnaireId, questionId);
+            
+            var question = await apiClient.GetQuestionAsync(questionId);
+            TempData[nameof(QuestionnaireState)] =
+                JsonConvert.SerializeObject(new QuestionnaireState
+                {
+                    JustMovedDown = true,
+                    MovedQuestionTitle = question!.Content,
+                    MovedQuestionNumber = question.Order
+                });
 
             // PRG - redirect back to GET for the same questionnaire so refresh won't resubmit
             return RedirectToPage(new { questionnaireId });

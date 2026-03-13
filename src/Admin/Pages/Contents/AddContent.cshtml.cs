@@ -16,11 +16,11 @@ public class AddContent(ILogger<AddContent> logger, IApiClient apiClient) : Base
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
 
     [BindProperty] 
-    [Required(ErrorMessage = "Enter a title")] 
+    [Required(ErrorMessage = "Enter a title to save")] 
     public string ContentTitle { get; set; } = "";
 
     [BindProperty] 
-    [Required(ErrorMessage = "Enter some details")] 
+    [Required(ErrorMessage = "Enter text for the main content to save")] 
     public string ContentValue { get; set; } = "";
 
     [BindProperty] 
