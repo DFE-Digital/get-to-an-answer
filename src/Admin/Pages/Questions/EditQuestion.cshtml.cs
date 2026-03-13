@@ -24,6 +24,8 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
 
     [Required(ErrorMessage = "Select question type")]
     [BindProperty] public QuestionType QuestionType { get; set; }
+    
+    [BindProperty] public string? QuestionRefName { get; set; }
 
     [BindProperty]
     public List<AnswerSummaryViewModel> Answers { get; } = [];
@@ -89,7 +91,8 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
             {
                 Content = QuestionContent,
                 Description = QuestionHintText ?? string.Empty,
-                Type = QuestionType
+                Type = QuestionType,
+                ReferenceName = QuestionRefName
             });
 
             var question = await GetQuestion();
@@ -158,6 +161,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
         QuestionContent = question.Content;
         QuestionHintText = question.Description;
         QuestionType = question.Type;
+        QuestionRefName = question.ReferenceName;
         QuestionNumber = question.Order.ToString();
     }
 }
