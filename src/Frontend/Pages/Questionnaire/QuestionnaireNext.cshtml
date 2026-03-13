@@ -83,7 +83,7 @@
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
               @if (Model.Destination.Question.Type == QuestionType.DropdownSelect)
               {
-                <h1 id="question-content" class="govuk-fieldset__heading">
+                <h1 id="question-content" class="govuk-fieldset__heading" data-reference="@Model.Destination.Question.ReferenceName">
                   <label class="govuk-label govuk-label--l" for="@inputGroupId-select">
                     @Model.Destination.Question.Content
                   </label>
@@ -91,7 +91,7 @@
               }
               else
               {
-                <h1 id="question-content" class="govuk-fieldset__heading">
+                <h1 id="question-content" class="govuk-fieldset__heading" data-reference="@Model.Destination.Question.ReferenceName">
                   @Model.Destination.Question.Content
                 </h1>
               }
