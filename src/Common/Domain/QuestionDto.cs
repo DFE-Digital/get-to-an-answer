@@ -11,6 +11,8 @@ public class QuestionDto
     public string? Description { get; set; }
     public QuestionType Type { get; set; }
     
+    public string? ReferenceName { get; set; }
+    
     public DateTime CreatedAt { get; set; }
     
     public DateTime UpdatedAt { get; set; }

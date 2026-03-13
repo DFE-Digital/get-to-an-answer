@@ -16,4 +16,7 @@ public class CreateQuestionRequestDto
     
     [EnumDefined]
     public required QuestionType Type { get; set; }
+    
+    public string? ReferenceName { get; set; }
+    
 }
