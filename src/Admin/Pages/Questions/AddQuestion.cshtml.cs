@@ -19,14 +19,14 @@ public class AddQuestion(ILogger<AddQuestion> logger, IApiClient apiClient) : Ba
     public string QuestionNumber { get; set; } = 1.ToString();
 
     [BindProperty] 
-    [Required(ErrorMessage = "Enter a question")] 
+    [Required(ErrorMessage = "Enter a question to save")] 
     public string QuestionContent { get; set; } = "";
 
     [BindProperty] 
     public string? QuestionHintText { get; set; } = "";
 
     [BindProperty] 
-    [Required(ErrorMessage = "Select question type")]
+    [Required(ErrorMessage = "Select a question type to save")]
     public QuestionType QuestionType { get; set; }
 
     public async Task<IActionResult> OnGet()

@@ -63,7 +63,7 @@ public class AddContributor(ILogger<AddContributor> logger,
         }
         catch (MsGraphException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
-            ModelState.AddModelError(nameof(ContributorEmail), "Contributor not found");
+            ModelState.AddModelError(nameof(ContributorEmail), "Email not recognised");
             return Page();
         }
         catch (Exception e)

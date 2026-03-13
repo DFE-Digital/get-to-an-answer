@@ -122,10 +122,11 @@ public static class MermaidExtensions
         sb.AppendLine();
         sb.AppendLine("  %% Key");
         sb.AppendLine("  subgraph Key");
-        sb.AppendLine("    L1[Solid arrows = branching via destination fields]");
-        sb.AppendLine("    L3[\"Answer '(priority: n)' = prioritisation only\"]");
+        sb.AppendLine("    L1[Solid arrows = branching between questions and answers]");
+        sb.AppendLine("    L2[Dashed arrows = all questions]");
+        sb.AppendLine("    L3[\"Answer '(priority: n)' = what priority it is\"]");
         sb.AppendLine("    L4[[Results Page]]:::info");
-        sb.AppendLine("    L5{{External Link}}:::link");
+        sb.AppendLine("    L5{{Link}}:::link");
         sb.AppendLine("  end");
         sb.AppendLine();
         sb.AppendLine("  classDef info fill:#e6f4ff,stroke:#2b7cd3,color:#0b3d91;");

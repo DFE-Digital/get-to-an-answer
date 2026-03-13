@@ -159,7 +159,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
 
             if (request.Slug != null && await db.Questionnaires.AnyAsync(q => q.Id != id && q.Slug == request.Slug))
             {
-                return Conflict(ProblemTrace("A questionnaire with the same slug already exists", 409));
+                return Conflict(ProblemTrace("A questionnaire with the same ID already exists", 409));
             }
 
             questionnaire.DisplayTitle = request.DisplayTitle ?? questionnaire.DisplayTitle;
@@ -317,13 +317,13 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
             
             if (string.IsNullOrWhiteSpace(questionnaire.Slug))
-                return BadRequest(ProblemTrace("The questionnaire ID is missing", 400));
+                return BadRequest(ProblemTrace("You must add a questionnaire ID to publish", 400));
             
             if (questionnaire.Contributors.Count < 2)
                 return BadRequest(ProblemTrace("The questionnaire needs to be accessible by 2 people", 400));
             
             if (questionnaire.Questions.Count == 0)
-                return BadRequest(ProblemTrace("The questionnaire has no questions", 400));
+                return BadRequest(ProblemTrace("You must add questions and answers to publish", 400));
 
             foreach (var question in questionnaire.Questions)
             {
@@ -715,7 +715,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             }
             else
             {
-                return BadRequest(ProblemTrace("The contributor already exists", 409));
+                return BadRequest(ProblemTrace($"{userId} has already been given access", 409));
             }
 
             return Ok();

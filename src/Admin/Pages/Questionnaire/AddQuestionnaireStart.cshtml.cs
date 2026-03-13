@@ -54,12 +54,12 @@ public class AddQuestionnaireStart(IApiClient apiClient, ILogger<AddQuestionnair
 
             if (DisplayTitle == null)
             {
-                ModelState.AddModelError(nameof(DisplayTitle), "Display title is required when you save");
+                ModelState.AddModelError(nameof(DisplayTitle), "Enter a title to save the start page");
             }
             
             if (Description == null)
             {
-                ModelState.AddModelError(nameof(Description), "Description is required when you save");
+                ModelState.AddModelError(nameof(Description), "Enter text for the main content to save");
             }
             
             if (!ModelState.IsValid)
