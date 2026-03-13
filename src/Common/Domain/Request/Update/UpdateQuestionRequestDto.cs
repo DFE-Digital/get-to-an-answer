@@ -14,4 +14,6 @@ public class UpdateQuestionRequestDto
     
     [EnumDefined]
     public QuestionType? Type { get; set; }
+    
+    public string? ReferenceName { get; set; }
 }
