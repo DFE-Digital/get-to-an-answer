@@ -18,6 +18,7 @@ export interface QuestionModel {
     content:string;
     description:string;
     type:QuestionType;
+    referenceName?: string;    
 }
 
 export interface AnswerModel {
