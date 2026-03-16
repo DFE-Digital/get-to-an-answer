@@ -22,5 +22,5 @@ The site is made up of various components, each with their own README files deta
 
 ### Developers
 
-- Devevlopment Process: [README](./docs/developers/Development-Process.md)
+- Development Process: [README](./docs/developers/Development-Process.md)
 - Release Process: [README](./docs/developers/Release-Process.md)
