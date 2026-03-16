@@ -56,11 +56,11 @@ export const ErrorMessages = {
     ERROR_MESSAGE_DISPLAY_TITLE_REQUIRED: 'Display title is required when you save',
     ERROR_MESSAGE_QUESTIONNAIRE_DESCRIPTION_REQUIRED: 'Description is required when you save',
 
-    ERROR_MESSAGE_MISSING_ANSWER_OPTION1_CONTENT: 'Option 1 content is required',
-    ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT: 'Option 2 content is required',
+    ERROR_MESSAGE_MISSING_ANSWER_OPTION1_CONTENT: 'Enter text for Option 1 to save',
+    ERROR_MESSAGE_MISSING_ANSWER_OPTION2_CONTENT: 'Enter text for Option 2 to save',
 
-    ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION1_CONTENT: 'Option 1 content is duplicated',
-    ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION2_CONTENT: 'Option 2 content is duplicated',
+    ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION1_CONTENT: 'Option 1 already exists',
+    ERROR_MESSAGE_DUPLICATE_ANSWER_OPTION2_CONTENT: 'Option 2 already exists',
 
     ERROR_MESSAGE_MISSING_RESULTS_PAGE_ANSWER_OPTION1_SUMMARY: 'Please select a results page for option 1',
     ERROR_MESSAGE_MISSING_RESULTS_PAGE_ANSWER_OPTION2_SUMMARY: 'Please select a results page for option 2',
@@ -70,13 +70,13 @@ export const ErrorMessages = {
 export const PageHeadings = {
     DESIGN_QUESTIONNAIRE_PAGE_HEADING: 'Design a questionnaire',
     EDIT_QUESTIONNAIRE_SLUG_PAGE_HEADING: 'Add or edit questionnaire ID',
-    VIEW_QUESTION_PAGE_HEADING: 'Add and edit your questions',
-    ADD_QUESTION_PAGE_HEADING: 'Add a question',
+    VIEW_QUESTION_PAGE_HEADING: 'Add or edit questions and answers',
+    ADD_QUESTION_PAGE_HEADING: 'Add or edit a question',
     EDIT_QUESTION_PAGE_HEADING: 'Edit question',
     ADD_ANSWER_PAGE_HEADING: 'Create a list of answer options',
     
     VIEW_RESULTS_PAGES_PAGE_HEADING: 'Add or edit results pages',
-    ADD_RESULTS_PAGE_PAGE_HEADING: 'Add a results page',
+    ADD_RESULTS_PAGE_PAGE_HEADING: 'Add or edit a results page',
     EDIT_RESULTS_PAGE_PAGE_HEADING: 'Edit your results page',
     
     VIEW_VERSION_HISTORY_PAGE_HEADING: 'View version history',
