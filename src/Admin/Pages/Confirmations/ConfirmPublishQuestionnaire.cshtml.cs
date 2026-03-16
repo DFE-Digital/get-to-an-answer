@@ -38,7 +38,11 @@ public class ConfirmPublishQuestionnaire(IApiClient apiClient, IImageStorageClie
                 return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
             }
 
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustPublished = true });
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState
+            {
+                JustPublished = true,
+                QuestionnaireTitle = questionnaire!.Title
+            });
         }
         
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));

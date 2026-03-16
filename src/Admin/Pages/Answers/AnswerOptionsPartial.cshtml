@@ -55,8 +55,8 @@
     Hint text (optional)
   </label>
   <div class="govuk-hint" id="@Id(contentHintHintIdSuffix)">
-    <p>You can add a short description to help people understand what this option is.</p>
-    <p>You can format your text using Markdown. For example, to add links. To find out more, <a class="govuk-link" href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/">read this guidance on how to write Markdown.</a></p>
+    <p>You can add a short explanation to help users understand what this option means.</p>
+    <p>To find out more, <a class="govuk-link" href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/" target="_blank">read this guidance on how to write Markdown (opens in a new tab)</a>.</p>
   </div>
   
   <textarea class="govuk-textarea"
@@ -74,7 +74,7 @@
     </legend>
     
     <div class="govuk-hint" id="@($"{Id($"{destinationIdSuffix}-hint")}")">
-      <p>Choose where people go next when they select this option.</p>
+      <p>Choose where users go next when they select this option.</p>
     </div>
 
     <govuk-field-error asp-for="AnswerDestination" error-id="@Id($"{destinationIdSuffix}-error")">

@@ -18,7 +18,7 @@ public class EditQuestionnaireSlug(IApiClient apiClient, ILogger<EditQuestionnai
     public Guid QuestionnaireId { get; set; }
     
     [BindProperty(Name = "Slug")]
-    [Required(ErrorMessage = "Enter a questionnaire ID")]
+    [Required(ErrorMessage = "Enter a questionnaire ID to save")]
     [RegularExpression(@"^[a-z0-9]+(?:-[a-z0-9]+)*$", 
         ErrorMessage = "Questionnaire IDs must contain only lowercase letters, numbers, and hyphens, and cannot start or end with a hyphen")]
     public string? Slug { get; set; }
@@ -57,7 +57,7 @@ public class EditQuestionnaireSlug(IApiClient apiClient, ILogger<EditQuestionnai
             }
             catch (GetToAnAnswerApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
             {
-                ModelState.AddModelError(nameof(Slug), "A questionnaire with this slug already exists");
+                ModelState.AddModelError(nameof(Slug), "A questionnaire with this ID already exists");
                 return Page();
             }
             catch (Exception ex)

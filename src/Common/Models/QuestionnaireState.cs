@@ -26,7 +26,6 @@ public class QuestionnaireState
     public bool JustAddedResultsPage { get; set; }
     public bool JustDeletedResultsPage { get; set; }
     public bool JustUpdatedResultsPage { get; set; }
-
     
     public string? DeletedQuestionTitle { get; set; }
     public string? ContributorEmail { get; set; }
@@ -34,4 +33,8 @@ public class QuestionnaireState
     public string? QuestionnaireTitle { get; set; }
     public string? CopiedQuestionnaireTitle { get; set; }
     public string? ResultsPageTitle { get; set; }
+    
+    public string? MovedQuestionTitle { get; set; }
+    public int MovedQuestionNumber { get; set; }
+    
 }

@@ -96,7 +96,7 @@ public class QuestionnaireCustomStyling(
         if (!UpdateRequest.IsAccessibilityAgreementAccepted)
         {
             ModelState.AddModelError("UpdateRequest.IsAccessibilityAgreementAccepted", 
-                "You must accept the accessibility agreement");
+                "You must agree to confirm the customised styling meets accessibility standards to save");
 
             return Page();
         }

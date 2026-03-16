@@ -28,7 +28,7 @@ public sealed class GdsColorAttribute : ValidationAttribute
         
         if (value is null && IsRequired)
         {
-            return new ValidationResult(ErrorMessage ?? $"{friendlyName} is required.");
+            return new ValidationResult(ErrorMessage ?? $"Enter a {friendlyName} to save");
         }
 
         if (value is not string valAsString)
@@ -43,13 +43,13 @@ public sealed class GdsColorAttribute : ValidationAttribute
 
         // Length
         if (!LengthsAllowed.Contains(trimmed.Length))
-            return new ValidationResult($"{friendlyName} must be one of these lengths: {string.Join(", ", LengthsAllowed)}.");
+            return new ValidationResult($"Enter a valid hex code for the {friendlyName} to save");
         
         // Regex
         var regex = new Regex(Pattern);
         
         if (!regex.IsMatch(trimmed))
-            return new ValidationResult($"{friendlyName} must be a valid hex code");
+            return new ValidationResult($"Enter a valid hex code for the {friendlyName} to save");
 
         return ValidationResult.Success;
     }
@@ -70,9 +70,8 @@ public sealed class GdsColorAttribute : ValidationAttribute
         // 2. Lower‑case all except first word
         var words = withSpaces.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (words.Length == 0) return input;
-
-        words[0] = CapitaliseFirst(words[0]);
-        for (var i = 1; i < words.Length; i++)
+        
+        for (var i = 0; i < words.Length; i++)
         {
             words[i] = words[i].ToLowerInvariant();
         }
@@ -83,12 +82,5 @@ public sealed class GdsColorAttribute : ValidationAttribute
         result = result.Replace("Color", "colour", StringComparison.OrdinalIgnoreCase);
 
         return result;
-    }
-
-    private static string CapitaliseFirst(string s)
-    {
-        if (s.Length == 0) return s;
-        if (s.Length == 1) return char.ToUpperInvariant(s[0]).ToString();
-        return char.ToUpperInvariant(s[0]) + s.Substring(1).ToLowerInvariant();
     }
 }

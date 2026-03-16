@@ -6,7 +6,7 @@
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Edit question";
+    ViewData["Title"] = "Add or edit a question";
 
     var displayAnswerPriorities = Model.QuestionType == QuestionType.MultiSelect;
 }
@@ -56,7 +56,7 @@
                         
                     }
                     <p>
-                        <a class="govuk-link" href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to your questions</a>
+                        <a class="govuk-link" href="@string.Format(Routes.AddAndEditQuestionsAndAnswers, Model.QuestionnaireId)">Back to add or edit questions and answers</a>
                     </p>
                 </div>
             </div>
@@ -77,7 +77,7 @@
             
             <govuk-form-group asp-for="QuestionContent">
                 <label class="govuk-label govuk-label--m" for="QuestionContent">
-                    Your question
+                    Question
                 </label>
                 <div class="govuk-hint" id="QuestionContent-hint">
                     Ask the question the way you would in person. For example, ‘Which of these countries have you lived in?’
@@ -118,9 +118,8 @@
                     Hint text (optional)
                 </label>
                 <div class="govuk-hint" id="QuestionHintText-hint">
-                    <p>You can add a short sentence to help people answer the question.
-                        For example, if someone can select one or more options, use 'Select all that apply'.</p>
-                    <p>You can format your text using Markdown. For example, to add links. To find out more, <a href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/">read this guidance on how to write Markdown.</a></p>
+                    <p>You can add a short explanation to help users understand what this option means.</p>
+                    <p>To find out more, <a class="govuk-link" href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/" target="_blank">read this guidance on how to write Markdown (opens in a new tab)</a>.</p>
                 </div>
 
                 <textarea class="govuk-textarea"
@@ -129,8 +128,8 @@
                           rows="4"></textarea>
             </govuk-form-group>
 
-            <h2 class="govuk-heading-m govuk-!-margin-top-6">Answer type</h2>
-            <p class="govuk-body">Choose how many options people will be able to select to answer.</p>
+            <h2 class="govuk-heading-m govuk-!-margin-top-6">Question type</h2>
+            <p class="govuk-body">Choose how many options users will be able to select to answer.</p>
 
             <div class="govuk-radios" data-module="govuk-radios">
                 @{
@@ -147,7 +146,7 @@
                             @if (option == QuestionType.SingleSelect)
                             {
                                 <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
-                                    One option only (using <a class="govuk-link" href="https://design-system.service.gov.uk/components/radios/">radio buttons</a>)
+                                    One option only (using the <a class="govuk-link" href="https://design-system.service.gov.uk/components/radios/">radio component</a>)
                                 </label>
                                 <div class="govuk-hint govuk-radios__hint">
                                     Use for a small list of options
@@ -156,7 +155,7 @@
                             else if (option == QuestionType.DropdownSelect)
                             {
                                 <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
-                                    One option only (using a <a class="govuk-link" href="https://design-system.service.gov.uk/components/select/">drop-down</a>)
+                                    One option only (using the <a class="govuk-link" href="https://design-system.service.gov.uk/components/select/">select component</a>)
                                 </label>
                                 <div class="govuk-hint govuk-radios__hint">
                                     Use for a longer list of options
@@ -165,7 +164,7 @@
                             else if (option == QuestionType.MultiSelect)
                             {
                                 <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
-                                    One or more options (using <a class="govuk-link" href="https://design-system.service.gov.uk/components/checkboxes/">checkboxes</a>)
+                                    One or more options (using the <a class="govuk-link" href="https://design-system.service.gov.uk/components/checkboxes/">checkbox component</a>)
                                 </label>
                                 <div class="govuk-hint govuk-radios__hint">
                                     Use for selecting one or more options

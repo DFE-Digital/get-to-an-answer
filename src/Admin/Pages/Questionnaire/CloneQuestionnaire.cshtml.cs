@@ -18,7 +18,7 @@ public class CloneQuestionnaire(IApiClient apiClient, ILogger<CloneQuestionnaire
     [FromRoute(Name = "questionnaireId")] public Guid QuestionnaireId { get; set; }
 
     [BindProperty(Name = "Title")]
-    [Required(ErrorMessage = "Enter a questionnaire title")]
+    [Required(ErrorMessage = "Enter a questionnaire name to save")]
     [GdsTitle]
     public required string Title { get; set; }
     

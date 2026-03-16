@@ -6,7 +6,7 @@
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Add and edit your questions";
+    ViewData["Title"] = "Add or edit questions and answers";
 
     var questionDeletedTempData = TempData.Peek("DeletedQuestion");
     var deletedQuestion = JsonConvert.DeserializeObject<QuestionNotificationSummary>(questionDeletedTempData?.ToString() ?? string.Empty);
@@ -94,12 +94,12 @@
                     <fieldset class="govuk-fieldset" aria-describedby="finished-hint">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                             <h2 class="govuk-fieldset__heading">
-                                Have you finished editing your questions?
+                                Have you finished editing your questions and answers?
                             </h2>
                         </legend>
 
                         <div id="finished-hint" class="govuk-hint">
-                            Selecting “Yes” will mark this task as complete. You’ll still be able to make changes if you
+                            Selecting ‘Yes’ will mark this task as complete. You’ll still be able to make changes if you
                             need to.
                         </div>
 

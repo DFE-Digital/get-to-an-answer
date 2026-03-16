@@ -15,7 +15,7 @@ namespace Admin.Pages.Questionnaire;
 public class CreateQuestionnaires(IApiClient apiClient, ILogger<CreateQuestionnaires> logger) : QuestionnairesPageModel
 {
     [BindProperty]
-    [Required(ErrorMessage = "Enter a questionnaire title")]
+    [Required(ErrorMessage = "Enter a questionnaire name to save")]
     [GdsTitle]
     public string? Title { get; set; }
 
