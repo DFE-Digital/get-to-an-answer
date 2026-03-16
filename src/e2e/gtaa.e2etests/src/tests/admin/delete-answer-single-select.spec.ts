@@ -18,6 +18,7 @@ test.describe('Get to an answer update questionnaire', () => {
     let questionnaireId: string;
     let question1Id: string;
     let question1Content: string;
+    let question1Reference: string;
     let rowData: any;
     let answer1: any;
     let answer2: any;
@@ -30,11 +31,13 @@ test.describe('Get to an answer update questionnaire', () => {
         token = JwtHelper.NoRecordsToken();
         const {questionnaire} = await createQuestionnaire(request, token);
         questionnaireId = questionnaire.id;
+        
 
         const q1Resp = await createQuestion(request, questionnaireId, token,
             undefined, QuestionType.SingleSelect);
         question1Id = q1Resp.question.id;
         question1Content = q1Resp.question.content;
+        question1Reference = q1Resp.question.referenceName;
 
         answer1 = await createSingleAnswer(request, {
             questionId: question1Id, questionnaireId, content: 'A1'
@@ -52,7 +55,7 @@ test.describe('Get to an answer update questionnaire', () => {
         await viewQuestionPage.expectQuestionHeadingOnPage();
 
         viewQuestionPage = await ViewQuestionPage.create(page);
-        await viewQuestionPage.table.clickEditByQuestionContent(question1Content);
+        await viewQuestionPage.table.clickEditByQuestionContent(question1Reference);
 
         addQuestionPage = await AddQuestionPage.create(page);
 
