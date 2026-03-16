@@ -12,8 +12,8 @@ export async function createQuestion(
     bearerToken?: string,
     content?: string,
     type?: QuestionType,
-    referenceName?: string,
     description?: string,
+    referenceName?: string
 ) {
 
     const payload = new QuestionBuilder(questionnaireId)
