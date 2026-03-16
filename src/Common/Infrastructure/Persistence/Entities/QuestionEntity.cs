@@ -27,6 +27,9 @@ public class QuestionEntity
 
     [Required]
     public QuestionType Type { get; set; }
+    
+    [MaxLength(250)]
+    public string? ReferenceName { get; set; }
 
     public bool IsDeleted { get; set; }
     

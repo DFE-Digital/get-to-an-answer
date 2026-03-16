@@ -53,8 +53,9 @@
                                 @question.Order
                             </dt>
                             <dd class="govuk-summary-list__value">
-                                @question.Content
+                                @(question.ReferenceName ?? question.Content)
                             </dd>
+                            
                             <dd class="govuk-summary-list__actions govuk-summary-list__actions-m">
                                 <ul class="govuk-summary-list__actions-list">
                                     <li class="govuk-summary-list__actions-list-item">

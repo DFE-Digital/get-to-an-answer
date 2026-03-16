@@ -13,12 +13,14 @@ export async function createQuestion(
     content?: string,
     type?: QuestionType,
     description?: string,
+    referenceName?: string
 ) {
 
     const payload = new QuestionBuilder(questionnaireId)
         .withContent(content)
         .withDescription(description)
         .withType(type)
+        .withReferenceName(referenceName)
         .build();
     
     const response = await request.post(`${BASE_URL}/api/questions`, {

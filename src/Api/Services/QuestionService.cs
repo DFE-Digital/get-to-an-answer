@@ -43,6 +43,7 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
                 Content = request.Content,
                 Description = request.Description,
                 Type = request.Type,
+                ReferenceName = request.ReferenceName,
                 Order = db.Questions.Count(x => x.QuestionnaireId == request.QuestionnaireId
                                                 && !x.IsDeleted) + 1,
                 CreatedBy = userId,
@@ -63,6 +64,7 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
                 Content = entity.Content,
                 Description = entity.Description,
                 Type = entity.Type,
+                ReferenceName = entity.ReferenceName,
                 Order = entity.Order,
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt,
@@ -110,6 +112,7 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
                     DestinationType = a.DestinationType,
                 }).ToList(),
                 Type = question.Type,
+                ReferenceName = question.ReferenceName,
                 CreatedAt = question.CreatedAt,
                 UpdatedAt = question.UpdatedAt,
             });
@@ -147,6 +150,7 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
                     Description = q.Description,
                     Order = q.Order,
                     Type = q.Type,
+                    ReferenceName = q.ReferenceName,
                     CreatedAt = q.CreatedAt,
                     UpdatedAt = q.UpdatedAt,
                 }).ToList();
@@ -180,6 +184,7 @@ public class QuestionService(GetToAnAnswerDbContext db, ILogger<QuestionService>
             question.Content = request.Content;
             question.Description = request.Description ?? question.Description;
             question.Type = request.Type ?? question.Type;
+            question.ReferenceName = request.ReferenceName ?? question.ReferenceName;
             question.UpdatedAt = DateTime.UtcNow;
 
             await db.SaveChangesAsync();

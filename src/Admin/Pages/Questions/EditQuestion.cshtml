@@ -90,6 +90,28 @@
                              govuk-error-for="QuestionContent-error"/>
 
             </govuk-form-group>
+            
+            <govuk-form-group asp-for="@Model.QuestionRefName">
+                <label class="govuk-label govuk-label--m" for="QuestionRefName">
+                    Question reference (optional)
+                </label>
+                <div class="govuk-hint" id="QuestionRefName-hint">
+                    <p>Add a reference to help you find the right question when making edits. These are not visible to users.</p>
+
+                    <p>If you do not add a reference, the question content will be listed as its title.</p>
+                </div>
+
+                <govuk-field-error asp-for="@Model.QuestionRefName" error-id="QuestionRefName-error">
+                </govuk-field-error>
+
+                <govuk-input id="QuestionRefName"
+                             class="govuk-input"
+                             aria-describedby="QuestionRefName-hint"
+                             type="text"
+                             asp-for="QuestionRefName"
+                             value="@Model.QuestionRefName"
+                             govuk-error-for="@Model.QuestionRefName"/>
+            </govuk-form-group>
 
             <govuk-form-group asp-for="QuestionHintText">
                 <label class="govuk-label govuk-label--m" for="QuestionHintText">

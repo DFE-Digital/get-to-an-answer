@@ -40,7 +40,7 @@ public static class MermaidExtensions
         {
             var id = NodeId($"Q{i + 1}");
             questionIds[questions[i].Id] = id;
-            var label = EscapeLabel(string.IsNullOrWhiteSpace(questions[i].Content) ? $"Question {i + 1}" : Truncate(questions[i].Content!, 60));
+            var label = EscapeLabel(string.IsNullOrWhiteSpace(questions[i].ReferenceName ?? questions[i].Content) ? $"Question {i + 1}" : Truncate(questions[i].ReferenceName ?? questions[i].Content!, 60));
             sb.AppendLine($"  {id}{{\"{label}\"}}");
         }
 
