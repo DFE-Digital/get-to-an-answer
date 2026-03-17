@@ -578,7 +578,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 .Where(q => q.Id == id && q.Status != EntityStatus.Deleted)
                 .Include(q => q.Questions.Where(a => !a.IsDeleted))
                 .ThenInclude(qq => qq.Answers.Where(a => !a.IsDeleted))
-                .Include(questionnaireEntity => questionnaireEntity.Contents)
+                .Include(questionnaireEntity => questionnaireEntity.Contents.Where(c => !c.IsDeleted))
                 .FirstOrDefaultAsync();
 
             if (questionnaire == null)
