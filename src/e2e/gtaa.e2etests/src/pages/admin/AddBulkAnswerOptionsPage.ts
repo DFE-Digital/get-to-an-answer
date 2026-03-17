@@ -212,7 +212,7 @@ export class AddBulkAnswerOptionsPage extends BasePage {
     }
 
     async validateDuplicateEntriesError(browserName: string) {
-        const expectedMessage = 'Duplicate entries found';
+        const expectedMessage = ' There are answer options that are duplicated';
         await expect(this.errorSummary).toBeVisible();
         await expect(this.errorList).toContainText(expectedMessage);
         await expect(this.inlineError).toContainText(expectedMessage);

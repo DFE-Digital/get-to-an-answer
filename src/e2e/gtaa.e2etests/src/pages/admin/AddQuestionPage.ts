@@ -117,7 +117,7 @@ export class AddQuestionPage extends BasePage {
         this.successBanner = page.locator('.govuk-notification-banner--success');
         this.successBannerHeading = this.successBanner.getByRole('heading', {name: /your changes have been saved/i});
         this.addQuestionButton = page.getByRole('button', {name: /add a question/i});
-        this.backToQuestionsLink = page.getByRole('link', {name: /back to your questions/i});
+        this.backToQuestionsLink = page.getByRole('link', {name: /Back to add or edit questions and answers/i});
 
         this.table = new EditAnswerTable(page);
     }

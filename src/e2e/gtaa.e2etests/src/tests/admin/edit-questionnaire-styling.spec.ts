@@ -222,7 +222,7 @@ test.describe('Questionnaire custom styling', () => {
         await stylingPage.acceptAccessibilityAgreement();
         await stylingPage.saveAndContinue();
 
-        await stylingPage.expectErrorSummaryForTextColor('Text colour is required.');
+        await stylingPage.expectErrorSummaryForTextColor('Enter a text colour to save');
         
         await stylingPage.clickResetStyling();
 
