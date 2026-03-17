@@ -126,7 +126,7 @@ test.describe('Get to an answer publish questionnaire', () => {
         // You should see an error banner at the top of the page
         await editQuestionnairePage.assertGtaaApiErrorBanner(
             'Error: Publishing the questionnaire failed.',
-            'The questionnaire has no questions'
+            'You must add questions and answers to publish'
         );
         
         // Verify via API that the questionnaire is now published

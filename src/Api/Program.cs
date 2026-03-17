@@ -10,7 +10,6 @@ using Common.Telemetry;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Web;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
@@ -101,11 +100,6 @@ builder.Services.AddHealthChecks();
 builder.Services.AddControllers()
     .AddDataAnnotationsLocalization();
 
-if (builderIsLocalEnvironment)
-{
-//    builder.AddLogging();
-}
-
 builder.Services.ConfigureHttpJsonOptions(o => { o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
 
 if (builderIsLocalEnvironment)
@@ -126,7 +120,7 @@ else
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi(options =>
 {
-    options.AddDocumentTransformer((doc, ctx, ct) =>
+    options.AddDocumentTransformer((doc, _, _) =>
     {
         doc.Info = new Microsoft.OpenApi.OpenApiInfo()
         {
@@ -138,11 +132,6 @@ builder.Services.AddOpenApi(options =>
 });
 
 var app = builder.Build();
-
-if (builderIsLocalEnvironment)
-{
-//    app.UseLogEnrichment();
-}
 
 var appIsLocalEnvironment = app.Environment.IsEnvironment(localEnvironmentName);
 
@@ -189,7 +178,8 @@ using (var scope = app.Services.CreateScope())
         var dbContext = scope.ServiceProvider.GetRequiredService<GetToAnAnswerDbContext>();
         
         // Only run if there are pending migrations
-        if (dbContext.Database.GetPendingMigrations().Any())
+        var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+        if (pendingMigrations.Any())
         {
             await dbContext.Database.MigrateAsync();
         }
@@ -208,14 +198,13 @@ using (var scope = app.Services.CreateScope())
 
 if (!appIsLocalEnvironment)
 {
-    //app.UseHttpsRedirection();
     app.UseForwardedHeaders();
 }
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.Run();
+await app.RunAsync();
 
 namespace Api
 {
