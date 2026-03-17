@@ -35,7 +35,7 @@
       <input type="hidden" asp-for="@Model.CopiedQuestionnaireTitle"/>
       
       <govuk-form-group asp-for="@Model.Title">
-        <fieldset class="govuk-fieldset" aria-describedby="clone-questionnaire-hint">
+        <fieldset class="govuk-fieldset" aria-describedby="@inputId-hint">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
             <h2 class="govuk-fieldset__heading">
               <label class="govuk-label govuk-label--m" for="@inputId">
