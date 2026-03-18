@@ -100,7 +100,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             var errorMessage = "Select a question as the destination to save";
 
             var destinationKey = $"Options-{index}-AnswerDestination";
-            var specificQuestionRadioInputId = $"Options-{index}-destination-interim-select-question";
+            var specificQuestionRadioInputId = $"Options-{index}-destination-interim-question";
 
             ModelState.AddModelError(destinationKey, string.Empty);
             ModelState.AddModelError(specificQuestionRadioInputId, errorMessage);
@@ -132,7 +132,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             var errorMessage = "Select a results page as the destination to save";
 
             var destinationKey = $"Options-{index}-AnswerDestination";
-            var resultsPageRadioInputId = $"Options-{index}-destination-interim-select-result";
+            var resultsPageRadioInputId = $"Options-{index}-destination-interim-result";
             
             ModelState.AddModelError(destinationKey, string.Empty);
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
