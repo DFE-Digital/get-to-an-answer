@@ -257,13 +257,12 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
                 case DestinationType.CustomContent:
                     return await GetDestinationContent(x =>
                         x.Id == answer.DestinationContentId && !x.IsDeleted, isPreview, questionnaire?.Contents);
-                case DestinationType.InterimThenQuestion when request.ShowContent:
+                case DestinationType.InterimThenQuestion:
                     return await GetDestinationContentAndQuestion(x =>
                             x.Id == answer.DestinationQuestionId && !x.IsDeleted, x =>
                             x.Id == answer.DestinationContentId && !x.IsDeleted, isPreview, questionnaire?.Questions,
                         questionnaire?.Contents);
                 case DestinationType.Question:
-                case DestinationType.InterimThenQuestion when !request.ShowContent:
                     return await GetDestinationQuestion(x =>
                         x.Id == answer.DestinationQuestionId && !x.IsDeleted, isPreview, questionnaire?.Questions);
                 default:

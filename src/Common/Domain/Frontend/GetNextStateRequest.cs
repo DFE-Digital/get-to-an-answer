@@ -11,5 +11,5 @@ public class GetNextStateRequest
     [MinLength(length: 1, ErrorMessage = "Select which answer(s) apply")]
     public List<Guid> SelectedAnswerIds { get; set; } = new();
     
-    public bool ShowContent { get; set; } = true;
+    public bool ValidateAnswers { get; set; } = true;
 }
