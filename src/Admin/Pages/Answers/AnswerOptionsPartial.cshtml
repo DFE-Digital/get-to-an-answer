@@ -48,7 +48,7 @@
                type="text"
                asp-for="@Model.OptionContent"
                govuk-error-for="@Id($"{contentIdSuffix}-error")"
-               aria-describedby="@(optionContentHasError ? $"{Id(contentIdSuffix)}-error": string.Empty)" 
+               aria-describedby="@(optionContentHasError ? $"{Id(contentIdSuffix)}-error": null)" 
                custom-override-aria-describedby="true" />
 </govuk-form-group>
 
@@ -168,7 +168,7 @@
                     asp-for="SelectedInterimResultsPage"
                     asp-items="Model.ResultsPageSelectList"
                     govuk-error-for="@Id(destinationInterimResultErrorId)"
-                    aria-describedby="@(hasInterimResultError ? Id(destinationInterimResultErrorId) : string.Empty) ">
+                    aria-describedby="@(hasInterimResultError ? Id(destinationInterimResultErrorId) : null) ">
               <option value="">Select a results page</option>
             </select>
           
@@ -189,7 +189,7 @@
                   asp-for="SelectedInterimDestinationQuestion"
                   asp-items="Model.QuestionSelectList"
                   govuk-error-for="@Id(destinationInterimQuestionErrorId)"
-                  aria-describedby="@(hasInterimQuestionError ? Id(destinationInterimQuestionErrorId) : string.Empty) ">
+                  aria-describedby="@(hasInterimQuestionError ? Id(destinationInterimQuestionErrorId) : null) ">
             <option value="">Select a question</option>
           </select>
         </div>
@@ -229,7 +229,7 @@
                   asp-for="SelectedResultsPage"
                   asp-items="Model.ResultsPageSelectList"
                   govuk-error-for="@Id(destinationInternalSelectErrorId)"
-                  aria-describedby="@(hasInternalError ? Id(destinationInternalSelectErrorId) : string.Empty) ">
+                  aria-describedby="@(hasInternalError ? Id(destinationInternalSelectErrorId) : null) ">
             <option value="">Select a results page</option>
           </select>
         </div>
