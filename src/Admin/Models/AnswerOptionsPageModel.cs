@@ -74,7 +74,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
     {
         var optionsWithSpecificQuestionNoSelection =
             Options.Where(x =>
-                x.AnswerDestination == AnswerDestination.SpecificQuestion &&
+                x.AnswerDestination is AnswerDestination.SpecificQuestion &&
                 string.IsNullOrEmpty(x.SelectedDestinationQuestion));
 
         foreach (var specificQuestion in optionsWithSpecificQuestionNoSelection)
@@ -88,9 +88,26 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             ModelState.AddModelError(destinationKey, string.Empty);
             ModelState.AddModelError(specificQuestionRadioInputId, errorMessage);
         }
+        
+        var optionsWithInterimQuestionNoSelection =
+            Options.Where(x =>
+                x.AnswerDestination is AnswerDestination.InterimWithSpecificQuestion &&
+                string.IsNullOrEmpty(x.SelectedInterimDestinationQuestion));
+
+        foreach (var specificQuestion in optionsWithInterimQuestionNoSelection)
+        {
+            var index = specificQuestion.OptionNumber - 1;
+            var errorMessage = "Select a question as the destination to save";
+
+            var destinationKey = $"Options-{index}-AnswerDestination";
+            var specificQuestionRadioInputId = $"Options-{index}-destination-interim-question";
+
+            ModelState.AddModelError(destinationKey, string.Empty);
+            ModelState.AddModelError(specificQuestionRadioInputId, errorMessage);
+        }
 
         var optionsWithResultsPageNoSelection = Options.Where(o =>
-            o.AnswerDestination == AnswerDestination.InternalResultsPage &&
+            o.AnswerDestination is AnswerDestination.InternalResultsPage &&
             string.IsNullOrEmpty(o.SelectedResultsPage));
 
         foreach (var resultsPage in optionsWithResultsPageNoSelection)
@@ -100,6 +117,22 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
             var destinationKey = $"Options-{index}-AnswerDestination";
             var resultsPageRadioInputId = $"Options-{index}-destination-internal";
+            
+            ModelState.AddModelError(destinationKey, string.Empty);
+            ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
+        }
+        
+        var optionsWithInterimResultsPageNoSelection = Options.Where(o =>
+            o.AnswerDestination is AnswerDestination.InterimWithSpecificQuestion &&
+            string.IsNullOrEmpty(o.SelectedInterimResultsPage));
+
+        foreach (var resultsPage in optionsWithInterimResultsPageNoSelection)
+        {
+            var index = resultsPage.OptionNumber - 1;
+            var errorMessage = "Select a results page as the destination to save";
+
+            var destinationKey = $"Options-{index}-AnswerDestination";
+            var resultsPageRadioInputId = $"Options-{index}-destination-interim-result";
             
             ModelState.AddModelError(destinationKey, string.Empty);
             ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
@@ -194,12 +227,18 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
                 AnswerDestination = MapStoredAnswerDestination(existingAnswer),
                 OptionContent = existingAnswer.Content,
                 OptionHint = existingAnswer.Description,
-                SelectedDestinationQuestion = existingAnswer.DestinationQuestionId?.ToString(),
+                SelectedDestinationQuestion = existingAnswer.DestinationType != DestinationType.InterimThenQuestion ?
+                    existingAnswer.DestinationQuestionId?.ToString() : null,
+                SelectedInterimDestinationQuestion =  existingAnswer.DestinationType == DestinationType.InterimThenQuestion ?
+                    existingAnswer.DestinationQuestionId?.ToString() : null,
                 QuestionType = currentQuestion?.Type,
                 RankPriority = existingAnswer.Priority.ToString(CultureInfo.InvariantCulture),
                 ExternalLink = existingAnswer.DestinationUrl,
                 ResultsPageSelectList = resultsPagesForSelection,
-                SelectedResultsPage = existingAnswer.DestinationContentId.ToString()
+                SelectedResultsPage = existingAnswer.DestinationType != DestinationType.InterimThenQuestion ?
+                    existingAnswer.DestinationContentId.ToString() : null,
+                SelectedInterimResultsPage = existingAnswer.DestinationType == DestinationType.InterimThenQuestion ?
+                    existingAnswer.DestinationContentId.ToString() : null
             });
         }
 
@@ -216,7 +255,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         var resultsPages = await apiClient.GetContentsAsync(QuestionnaireId);
 
         var questionSelectionList = questionForSelection.Where(x => x.Id != QuestionId)
-            .Select(q => new SelectListItem(q.Content, q.Id.ToString())).ToList();
+            .Select(q => new SelectListItem(q.ReferenceName ?? q.Content, q.Id.ToString())).ToList();
 
         var resultsPagesForSelection = resultsPages
             .Select(ToResultsPageSelectListItem).ToList();
@@ -250,12 +289,24 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             Content = option.OptionContent,
             Description = option.OptionHint,
             DestinationType = MapDestination(option.AnswerDestination),
-            DestinationQuestionId = option.SelectedDestinationQuestion != null
-                ? Guid.Parse(option.SelectedDestinationQuestion)
-                : null,
-            DestinationContentId = !string.IsNullOrEmpty(option.SelectedResultsPage)
-                ? Guid.Parse(option.SelectedResultsPage)
-                : null,
+            DestinationQuestionId = 
+                option switch
+                {
+                    { SelectedDestinationQuestion: not null, AnswerDestination: AnswerDestination.SpecificQuestion } 
+                        => Guid.Parse(option.SelectedDestinationQuestion),
+                    { SelectedInterimDestinationQuestion: not null, AnswerDestination: AnswerDestination.InterimWithSpecificQuestion } 
+                        => Guid.Parse(option.SelectedInterimDestinationQuestion),
+                    _ => null
+                },
+            DestinationContentId = 
+                option switch
+                {
+                    { SelectedResultsPage: not null, AnswerDestination: AnswerDestination.InternalResultsPage } 
+                        => Guid.Parse(option.SelectedResultsPage),
+                    { SelectedInterimResultsPage: not null, AnswerDestination: AnswerDestination.InterimWithSpecificQuestion } 
+                        => Guid.Parse(option.SelectedInterimResultsPage),
+                    _ => null
+                },
             DestinationUrl = option.ExternalLink,
             Priority = Convert.ToSingle(option.RankPriority),
         });
@@ -267,14 +318,26 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         {
             Content = option.OptionContent,
             DestinationType = MapDestination(option.AnswerDestination),
-            DestinationQuestionId = option.SelectedDestinationQuestion != null
-                ? Guid.Parse(option.SelectedDestinationQuestion)
-                : null,
+            DestinationQuestionId = 
+                option switch
+                {
+                    { SelectedDestinationQuestion: not null, AnswerDestination: AnswerDestination.SpecificQuestion } 
+                        => Guid.Parse(option.SelectedDestinationQuestion),
+                    { SelectedInterimDestinationQuestion: not null, AnswerDestination: AnswerDestination.InterimWithSpecificQuestion } 
+                        => Guid.Parse(option.SelectedInterimDestinationQuestion),
+                    _ => null
+                },
+            DestinationContentId = 
+                option switch
+                {
+                    { SelectedResultsPage: not null, AnswerDestination: AnswerDestination.InternalResultsPage } 
+                        => Guid.Parse(option.SelectedResultsPage),
+                    { SelectedInterimResultsPage: not null, AnswerDestination: AnswerDestination.InterimWithSpecificQuestion } 
+                        => Guid.Parse(option.SelectedInterimResultsPage),
+                    _ => null
+                },
             DestinationUrl = option.ExternalLink,
             Priority = Convert.ToSingle(option.RankPriority),
-            DestinationContentId = option.SelectedResultsPage != null
-                ? Guid.Parse(option.SelectedResultsPage)
-                : null,
             Description = option.OptionHint
         });
     }
@@ -326,8 +389,9 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
         existingAnswer.DestinationType switch
         {
             DestinationType.Question when existingAnswer.DestinationQuestionId is null
-                                          || existingAnswer.DestinationQuestionId == Guid.Empty => AnswerDestination
-                .NextQuestion,
+                                          || existingAnswer.DestinationQuestionId == Guid.Empty 
+                => AnswerDestination.NextQuestion,
+            DestinationType.InterimThenQuestion => AnswerDestination.InterimWithSpecificQuestion,
             DestinationType.Question => AnswerDestination.SpecificQuestion,
             DestinationType.CustomContent => AnswerDestination.InternalResultsPage,
             DestinationType.ExternalLink => AnswerDestination.ExternalResultsPage,
@@ -343,6 +407,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
             AnswerDestination.SpecificQuestion => DestinationType.Question,
             AnswerDestination.InternalResultsPage => DestinationType.CustomContent,
             AnswerDestination.ExternalResultsPage => DestinationType.ExternalLink,
+            AnswerDestination.InterimWithSpecificQuestion => DestinationType.InterimThenQuestion,
             _ => throw new ArgumentOutOfRangeException(nameof(answerDestination), answerDestination, null)
         };
 }

@@ -1,10 +1,8 @@
-using System.Text.Json;
 using Common.Models.PageModels;
 using Common.Client;
 using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
-using Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,7 +61,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             if (!ModelState.IsValid)
             {
                 ModelState.Clear();
-                if (Destination.Question is not null)
+                if (Destination.Question is not null && NextStateRequest.ValidateAnswers)
                 {
                     switch (Destination.Question.Type)
                     {

@@ -43,7 +43,7 @@
 
   @if (Model != null)
   {
-    @if (!Model.IsEmbedded && Model.Destination.Type == DestinationType.CustomContent)
+    @if (!Model.IsEmbedded && Model.Destination.Type is DestinationType.CustomContent or DestinationType.InterimThenQuestion)
     {
       <section class="dfe-page-grey" id="main-content-header">
         <div class="govuk-width-container" id="main-header-container">
@@ -62,21 +62,16 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
+    <form id="question-form" action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
 
-    @if (Model?.Destination?.Type == DestinationType.Question && Model.Destination.Question != null)
-    {
+      @if (Model?.Destination is { Type: DestinationType.Question, Question: not null } || 
+           Model is { Destination: { Type: DestinationType.InterimThenQuestion, Question: not null}, NextStateRequest.ValidateAnswers: false })
+      {    
       var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
 
       var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
       var inputGroupId = $"q-{Model.Destination.Question.Id}";
-      @using (Html.BeginRouteForm(
-                  routeName: $"questionnaires/{Model.Questionnaire?.Slug}/next?embed={Model.IsEmbedded}",
-                  routeValues: null,
-                  method: FormMethod.Post,
-                  antiforgery: false,
-                  htmlAttributes: new { Id = "question-form", accept_charset = "utf-8" }
-                ))
-      {
+
         <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
           <fieldset class="govuk-fieldset"
                     aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
@@ -239,9 +234,9 @@
 
         <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
         <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
-      }
     }
-    else if (Model?.Destination?.Type == DestinationType.CustomContent)
+    else if (Model is { Destination.Type: DestinationType.CustomContent} 
+             or { Destination.Type: DestinationType.InterimThenQuestion, NextStateRequest.ValidateAnswers: true })
     {
       @if (Model.IsEmbedded)
       {
@@ -258,10 +253,23 @@
       {
         <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
       }
+      @if (Model.Destination.Type == DestinationType.InterimThenQuestion)
+      {
+          <button type="submit" formnovalidate="formnovalidate" class="govuk-button"
+                  data-module="govuk-button" data-prevent-double-click="true"
+                  data-govuk-button-init="">
+            @(Model?.Questionnaire?.ContinueButtonText ?? "Continue")
+          </button>
+          <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
+          <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
+          <input type="hidden" name="NextStateRequest.ValidateAnswers" value="false">
+      }
     }
     else if (Model?.Destination?.Type == DestinationType.ExternalLink)
     {
       <input type="hidden" id="external-link-dest" value="@Model.Destination.Content">
-    }
+      }
+    </form>
+      
   </div>
 </div>
