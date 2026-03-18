@@ -42,7 +42,7 @@
     <form id="question-form" action="/admin/questionnaires/@Model.Questionnaire.Id/next-preview?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
     
       @if (Model?.Destination is { Type: DestinationType.Question, Question: not null } || 
-           Model is { Destination: { Type: DestinationType.InterimThenQuestion, Question: not null}, NextStateRequest.ShowContent: false })
+           Model is { Destination: { Type: DestinationType.InterimThenQuestion, Question: not null}, NextStateRequest.ValidateAnswers: false })
       {
         var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
 
@@ -186,7 +186,7 @@
       
       }
       else if (Model is { Destination.Type: DestinationType.CustomContent} 
-               or { Destination.Type: DestinationType.InterimThenQuestion, NextStateRequest.ShowContent: true })
+               or { Destination.Type: DestinationType.InterimThenQuestion, NextStateRequest.ValidateAnswers: true })
       {
         @if (Model.IsEmbedded)
         {
@@ -212,7 +212,7 @@
           </button>
           <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
           <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
-          <input type="hidden" name="NextStateRequest.ShowContent" value="false">
+          <input type="hidden" name="NextStateRequest.ValidateAnswers" value="false">
         }
       }
       else if (Model?.Destination?.Type == DestinationType.ExternalLink)

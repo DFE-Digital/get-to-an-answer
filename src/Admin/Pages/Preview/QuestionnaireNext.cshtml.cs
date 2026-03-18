@@ -61,7 +61,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             if (!ModelState.IsValid)
             {
                 ModelState.Clear();
-                if (Destination.Question is not null && NextStateRequest.ShowContent)
+                if (Destination.Question is not null && NextStateRequest.ValidateAnswers)
                 {
                     switch (Destination.Question.Type)
                     {

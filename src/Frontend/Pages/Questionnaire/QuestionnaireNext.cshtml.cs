@@ -78,22 +78,27 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             if (!ModelState.IsValid)
             {
                 ModelState.Clear();
-                if (Destination.Question is not null && NextStateRequest.ShowContent)
+                
+                // If we don't have a question OR we don't need to validate the answers, return the page
+                if (Destination.Question is null || !NextStateRequest.ValidateAnswers) 
+                    return Page();
+                
+                // Otherwise, set the error message based on the question type
+                switch (Destination.Question.Type)
                 {
-                    switch (Destination.Question.Type)
-                    {
-                        case QuestionType.MultiSelect:
-                            ModelState.AddModelError("NextStateRequest.SelectedAnswerIds",
-                                "Select at least one answer");
-                            break;
-                        case QuestionType.SingleSelect:
-                            ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select an answer");
-                            break;
-                        case QuestionType.DropdownSelect:
-                            ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select an option");
-                            break;
-                    }
+                    case QuestionType.MultiSelect:
+                        ModelState.AddModelError("NextStateRequest.SelectedAnswerIds",
+                            "Select at least one answer");
+                        break;
+                    case QuestionType.SingleSelect:
+                        ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select an answer");
+                        break;
+                    case QuestionType.DropdownSelect:
+                        ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select an option");
+                        break;
                 }
+                
+                // Return the page with the errors added
                 return Page();
             }
             
