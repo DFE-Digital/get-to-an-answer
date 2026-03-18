@@ -5,5 +5,6 @@ public enum DestinationType
     Auto = 0,
     Question = 1,
     ExternalLink = 2,
-    CustomContent = 3
+    CustomContent = 3,
+    InterimThenQuestion = 4
 }
