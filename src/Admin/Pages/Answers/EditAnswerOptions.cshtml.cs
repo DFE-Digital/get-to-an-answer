@@ -97,6 +97,7 @@ public class EditAnswerOptionOptions(ILogger<EditAnswerOptionOptions> logger, IA
             DestinationType.Question => AnswerDestination.NextQuestion,
             DestinationType.CustomContent => AnswerDestination.InternalResultsPage,
             DestinationType.ExternalLink => AnswerDestination.ExternalResultsPage,
+            DestinationType.InterimThenQuestion => AnswerDestination.InterimWithSpecificQuestion,
             null => AnswerDestination.NextQuestion,
             _ => throw new ArgumentOutOfRangeException(nameof(destinationType), destinationType, null)
         };
