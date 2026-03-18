@@ -254,12 +254,18 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
                     return await GetDestinationQuestion(x => 
                         x.QuestionnaireId == questionnaireId && 
                         x.Order == request.CurrentQuestionOrder+1 && !x.IsDeleted, isPreview, questionnaire?.Questions);
-                case DestinationType.Question:
-                    return await GetDestinationQuestion(x =>
-                        x.Id == answer.DestinationQuestionId && !x.IsDeleted, isPreview, questionnaire?.Questions);
                 case DestinationType.CustomContent:
                     return await GetDestinationContent(x =>
                         x.Id == answer.DestinationContentId && !x.IsDeleted, isPreview, questionnaire?.Contents);
+                case DestinationType.InterimThenQuestion when request.ShowContent:
+                    return await GetDestinationContentAndQuestion(x =>
+                            x.Id == answer.DestinationQuestionId && !x.IsDeleted, x =>
+                            x.Id == answer.DestinationContentId && !x.IsDeleted, isPreview, questionnaire?.Questions,
+                        questionnaire?.Contents);
+                case DestinationType.Question:
+                case DestinationType.InterimThenQuestion when !request.ShowContent:
+                    return await GetDestinationQuestion(x =>
+                        x.Id == answer.DestinationQuestionId && !x.IsDeleted, isPreview, questionnaire?.Questions);
                 default:
                     logger.LogInformation("GetNextState resolved to external destination for AnswerId={AnswerId}", selectedAnswerId);
                     return Ok(new DestinationDto
@@ -306,6 +312,60 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
     }
+    
+    [ApiExplorerSettings(IgnoreApi = true)]
+    private async Task<ServiceResult> GetDestinationContentAndQuestion(Expression<Func<QuestionEntity,bool>> destination, Expression<Func<ContentEntity, bool>> content, bool isPreview = false, ICollection<QuestionEntity>? questions = null, ICollection<ContentEntity>? contents = null)
+    {
+        try
+        {
+            QuestionEntity? questionEntity = null;
+
+            if (isPreview)
+            {
+                questionEntity = await db.Questions.Where(destination)
+                    .Include(x => x.Answers.Where(a => !a.IsDeleted))
+                    .FirstOrDefaultAsync();
+                
+            }
+            else if (questions is { Count: > 0 })
+            {
+                questionEntity = questions.FirstOrDefault(destination.Compile());
+            }
+
+            if (questionEntity == null)
+                return BadRequest(ProblemTrace("Next question could not be determined.", 400));
+
+            ContentEntity? contentEntity = null;
+
+            if (isPreview)
+            {
+                contentEntity = await db.Contents.FirstOrDefaultAsync(content);
+            }
+            else if (contents is { Count: > 0 })
+            {
+                contentEntity = contents.FirstOrDefault(content.Compile());
+
+            }
+        
+            if (contentEntity == null)
+                return BadRequest();
+
+            return Ok(new DestinationDto
+            {
+                Type = DestinationType.InterimThenQuestion,
+                Content = contentEntity.Content,
+                Title = contentEntity.Title,
+                Question = ToDestinationDto(questionEntity)?.Question,
+                ReferenceName = contentEntity.ReferenceName
+            });
+            
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "GetDestinationQuestion failed");
+            return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
+        }
+    }
 
     private DestinationDto? ToDestinationDto(QuestionEntity questionEntity)
     {
@@ -332,7 +392,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         };
     }
     
-    private async Task<ServiceResult> GetDestinationContent(Expression<Func<ContentEntity,bool>> destination, bool isPreview = false, ICollection<ContentEntity>? contents = null)
+    private async Task<ServiceResult> GetDestinationContent(Expression<Func<ContentEntity, bool>> destination, bool isPreview = false, ICollection<ContentEntity>? contents = null)
     {
         ContentEntity? contentEntity = null;
 
