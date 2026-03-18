@@ -7,6 +7,13 @@
   ViewData["Title"] = title;
 
   const string inputId = nameof(Model.Title);
+  
+  var titleDescribedBy = $"{inputId}-hint";
+
+  if (ViewData.ModelState[nameof(Model.Title)]?.Errors.Any() == true)
+  {
+    titleDescribedBy += $" {inputId}-error";
+  }
 }
 
 @section BeforeContent
@@ -35,7 +42,7 @@
       <input type="hidden" asp-for="@Model.CopiedQuestionnaireTitle"/>
       
       <govuk-form-group asp-for="@Model.Title">
-        <fieldset class="govuk-fieldset" aria-describedby="@inputId-hint">
+        <fieldset class="govuk-fieldset" aria-describedby="@titleDescribedBy">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
             <h2 class="govuk-fieldset__heading">
               <label class="govuk-label govuk-label--m" for="@inputId">
@@ -48,7 +55,7 @@
 
           <govuk-input id="@inputId"
                        class="govuk-input"
-                       aria-describedby="@inputId-hint"
+                       aria-describedby="@titleDescribedBy"
                        type="text"
                        name="@nameof(Model.Title)"
                        asp-for="@Model.Title"
