@@ -121,6 +121,20 @@
                   var inputId = $"{inputGroupId}-a-{answer?.Id}";
                   var itemHintId = $"{inputId}-hint";
 
+                  string? itemDescribedBy = null;
+
+                  if (answer?.Description != null)
+                  {
+                    itemDescribedBy = itemHintId;
+                  }
+
+                  if (hasFieldError)
+                  {
+                    itemDescribedBy = itemDescribedBy != null
+                      ? $"{itemDescribedBy} {inputGroupId}-error"
+                      : $"{inputGroupId}-error";
+                  }
+
                   <div class="govuk-radios__item">
                     <input
                       class="govuk-radios__input @(hasFieldError ? "govuk-input--error" : "")"
@@ -128,7 +142,7 @@
                       name="NextStateRequest.SelectedAnswerIds"
                       type="radio"
                       value="@answer.Id"
-                      aria-describedby="Answer option id @inputId">
+                      aria-describedby="@itemDescribedBy">
                     <label class="govuk-label govuk-radios__label" for="@inputId">
                       @answer.Content
                     </label>
@@ -157,8 +171,23 @@
                 @for (var a = 0; a < answers.Count; a++)
                 {
                   var answer = Model?.Destination?.Question.Answers[a];
-                  var inputId = $"{inputGroupId}-a-{answer.Id}";
+                  var inputId = $"{inputGroupId}-a-{answer?.Id}";
                   var itemHintId = $"{inputId}-hint";
+
+                  string? itemDescribedBy = null;
+
+                  if (answer?.Description != null)
+                  {
+                    itemDescribedBy = itemHintId;
+                  }
+
+                  if (hasFieldError)
+                  {
+                    itemDescribedBy = itemDescribedBy != null
+                      ? $"{itemDescribedBy} {inputGroupId}-error"
+                      : $"{inputGroupId}-error";
+                  }
+
                   <div class="govuk-checkboxes__item">
                     <input
                       class="govuk-checkboxes__input @(hasFieldError ? "govuk-input--error" : "")"
@@ -166,7 +195,7 @@
                       name="NextStateRequest.SelectedAnswerIds"
                       type="checkbox"
                       value="@answer.Id"
-                      aria-describedby="@(answer.Description != null ? itemHintId : null)">
+                      aria-describedby="@itemDescribedBy">
                     <label class="govuk-label govuk-checkboxes__label" for="@inputId">
                       @answer.Content
                     </label>
@@ -216,7 +245,7 @@
     {
       @if (Model.IsEmbedded)
       {
-        <fieldset class="govuk-fieldset" aria-describedby="@Model.Destination.Title">
+        <fieldset class="govuk-fieldset" aria-describedby="results-page-details">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
             <h1 id="results-page-title" class="govuk-fieldset__heading">
               @Model.Destination.Title
