@@ -39,22 +39,16 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
+    <form id="question-form" action="/admin/questionnaires/@Model.Questionnaire.Id/next-preview?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
     
-    @if (Model?.Destination is { Type: DestinationType.Question, Question: not null } || 
-         Model is { Destination: { Type: DestinationType.InterimThenQuestion, Question: not null}, NextStateRequest.ShowContent: false })
-    {
-      var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
-
-      var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
-      var inputGroupId = $"q-{Model.Destination.Question.Id}";
-      @using (Html.BeginRouteForm(
-                routeName: $"admin/questionnaires/{Model.Questionnaire?.Id}/next-preview?embed={Model.IsEmbedded}",
-                routeValues: null,
-                method: FormMethod.Post,
-                antiforgery: false,
-                htmlAttributes: new { Id = "question-form", accept_charset = "utf-8" }
-              ))
+      @if (Model?.Destination is { Type: DestinationType.Question, Question: not null } || 
+           Model is { Destination: { Type: DestinationType.InterimThenQuestion, Question: not null}, NextStateRequest.ShowContent: false })
       {
+        var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
+
+        var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
+        var inputGroupId = $"q-{Model.Destination.Question.Id}";
+      
         <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
           <fieldset class="govuk-fieldset" aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -189,35 +183,27 @@
         </button>
         <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
         <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
+      
       }
-    }
-    else if (Model is { Destination.Type: DestinationType.CustomContent} 
-             or { Destination.Type: DestinationType.InterimThenQuestion, NextStateRequest.ShowContent: true })
-    {
-      @if (Model.IsEmbedded)
+      else if (Model is { Destination.Type: DestinationType.CustomContent} 
+               or { Destination.Type: DestinationType.InterimThenQuestion, NextStateRequest.ShowContent: true })
       {
-        <fieldset class="govuk-fieldset" aria-describedby="@Model.Destination.Title">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-            <h1 id="results-page-title" class="govuk-fieldset__heading">
-              @Model.Destination.Title
-            </h1>
-          </legend>
+        @if (Model.IsEmbedded)
+        {
+          <fieldset class="govuk-fieldset" aria-describedby="@Model.Destination.Title">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+              <h1 id="results-page-title" class="govuk-fieldset__heading">
+                @Model.Destination.Title
+              </h1>
+            </legend>
+            <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
+          </fieldset>
+        }
+        else
+        {
           <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
-        </fieldset>
-      }
-      else
-      {
-        <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
-      }
-      @if (Model.Destination.Type == DestinationType.InterimThenQuestion)
-      {
-        @using (Html.BeginRouteForm(
-                  routeName: $"admin/questionnaires/{Model.Questionnaire?.Id}/next-preview?embed={Model.IsEmbedded}",
-                  routeValues: null,
-                  method: FormMethod.Post,
-                  antiforgery: false,
-                  htmlAttributes: new { Id = "question-form", accept_charset = "utf-8" }
-                ))
+        }
+        @if (Model.Destination.Type == DestinationType.InterimThenQuestion)
         {
           <button type="submit" formnovalidate="formnovalidate" class="govuk-button"
                   data-module="govuk-button" data-prevent-double-click="true"
@@ -229,10 +215,10 @@
           <input type="hidden" name="NextStateRequest.ShowContent" value="false">
         }
       }
-    }
-    else if (Model?.Destination?.Type == DestinationType.ExternalLink)
-    {
+      else if (Model?.Destination?.Type == DestinationType.ExternalLink)
+      {
       <input type="hidden" id="external-link-dest" value="@Model.Destination.Content">
-    }
+      }
+    </form>
   </div>
 </div>

@@ -62,6 +62,7 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
+    <form id="question-form" action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
 
       @if (Model?.Destination is { Type: DestinationType.Question, Question: not null } || 
            Model is { Destination: { Type: DestinationType.InterimThenQuestion, Question: not null}, NextStateRequest.ShowContent: false })
@@ -70,14 +71,7 @@
 
       var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
       var inputGroupId = $"q-{Model.Destination.Question.Id}";
-      @using (Html.BeginRouteForm(
-                  routeName: $"questionnaires/{Model.Questionnaire?.Slug}/next?embed={Model.IsEmbedded}",
-                  routeValues: null,
-                  method: FormMethod.Post,
-                  antiforgery: false,
-                  htmlAttributes: new { Id = "question-form", accept_charset = "utf-8" }
-                ))
-      {
+
         <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
           <fieldset class="govuk-fieldset"
                     aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
@@ -211,7 +205,6 @@
 
         <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
         <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
-      }
     }
     else if (Model is { Destination.Type: DestinationType.CustomContent} 
              or { Destination.Type: DestinationType.InterimThenQuestion, NextStateRequest.ShowContent: true })
@@ -233,14 +226,6 @@
       }
       @if (Model.Destination.Type == DestinationType.InterimThenQuestion)
       {
-        @using (Html.BeginRouteForm(
-                  routeName: $"questionnaires/{Model.Questionnaire?.Slug}/next?embed={Model.IsEmbedded}",
-                  routeValues: null,
-                  method: FormMethod.Post,
-                  antiforgery: false,
-                  htmlAttributes: new { Id = "question-form", accept_charset = "utf-8" }
-                ))
-        {
           <button type="submit" formnovalidate="formnovalidate" class="govuk-button"
                   data-module="govuk-button" data-prevent-double-click="true"
                   data-govuk-button-init="">
@@ -249,12 +234,13 @@
           <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
           <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
           <input type="hidden" name="NextStateRequest.ShowContent" value="false">
-        }
       }
     }
     else if (Model?.Destination?.Type == DestinationType.ExternalLink)
     {
       <input type="hidden" id="external-link-dest" value="@Model.Destination.Content">
-    }
+      }
+    </form>
+      
   </div>
 </div>
