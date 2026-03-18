@@ -1,5 +1,3 @@
-using System.Buffers.Text;
-using System.Text.Json;
 using Common.Models.PageModels;
 using Common.Client;
 using Common.Domain;
@@ -80,7 +78,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             if (!ModelState.IsValid)
             {
                 ModelState.Clear();
-                if (Destination.Question != null)
+                if (Destination.Question is not null && NextStateRequest.ShowContent)
                 {
                     switch (Destination.Question.Type)
                     {
