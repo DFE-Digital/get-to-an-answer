@@ -26,19 +26,10 @@ window.addEventListener('message', (e) => {
     if (e.data?.type === 'HEIGHT') {
         frame.style.height = `${e.data.h}px`;
     } else if (e.data?.type === 'DEST-REDIRECT') {
-        if (validateOrigin(e.origin))
+        if (e.origin === "null" && e.source === frame.contentWindow)
             window.location.href = e.data.externalLinkDest;
     } else if (e.data?.type === 'GA4_GTAA_IFRAME_EVENT' && typeof gtag === 'function') {
         // Send iframe page_view event to the GA4 dataLayer
         gtag('event', e.data.eventName, e.data.eventParams);
     }
 });
-
-function validateOrigin(origin)
-{
-    // Set valid get-to-an-answer locations
-    const regex = /^https:\/\/[\w\-+]+.get-to-an-answer\.education\.gov\.uk$/im;
-    
-    // Match if the calling site matches a known GTAA location
-    return origin.match(regex);
-}
