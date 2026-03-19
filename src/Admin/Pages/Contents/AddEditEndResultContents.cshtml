@@ -28,8 +28,14 @@
       @ViewData["Title"]
     </h1>
     <div class="govuk-hint govuk-!-margin-bottom-8">
-      <p>After answering questions, users can end on a result page.</p>
-      <p>You can take users to a results page if they select a certain answer option to a question when you <a class="govuk-link" href="/admin/questionnaires/@Model.QuestionnaireId/questions">add or edit questions and answers</a>.</p>
+      <p>You can show users a result page</p>
+      <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+        <li class="govuk-hint">after they’ve selected an answer - to provide more information before sending them to the next question</li>
+        <li class="govuk-hint">at the end of their journey - to explain what their result means and what they might do next</li>
+      </ul>
+      <p>
+        The result page behaviour (interim or end) is set by the destination option when you <a class="govuk-link" href="/admin/questionnaires/@Model.QuestionnaireId/questions">add or edit questions and answers</a>.
+      </p>
     </div>
     <div class="govuk-button-group">
       <a id="add-results-page-btn" class="govuk-button govuk-!-margin-bottom-3 govuk-!-margin-top-3" data-module="govuk-button" 
