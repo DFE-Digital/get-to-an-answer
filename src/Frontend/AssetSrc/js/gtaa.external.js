@@ -20,7 +20,7 @@ frame.addEventListener('load', () => {
 window.addEventListener('message', (e) => {
     const frame = document.getElementById('gtaaFrame');
     
-    if (!frame) 
+    if (!frame || !validateOrigin(e.origin)) 
         return;
     
     if (e.data?.type === 'HEIGHT') {
@@ -32,3 +32,12 @@ window.addEventListener('message', (e) => {
         gtag('event', e.data.eventName, e.data.eventParams);
     }
 });
+
+function validateOrigin(origin)
+{
+    // Set valid get-to-an-answer locations
+    const regex = /^https:\/\/[\w\-+]+.get-to-an-answer\.education\.gov\.uk$/im;
+    
+    // Match if the calling site matches a known GTAA location
+    return origin.match(regex);
+}
