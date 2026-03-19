@@ -26,18 +26,29 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
     public async Task<IActionResult> OnGet()
     {
         var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireId.ToString(), true);
-            
+
         if (questionnaire == null)
+        {
             return NotFound();
+        }
 
         Questionnaire = questionnaire;
         IsEmbedded = Embed;
-        Destination = new DestinationDto
+
+        try
         {
-            Type = DestinationType.Question,
-            Question = await apiClient.GetInitialQuestion(questionnaire.Id, true)
-        };
-        
+            Destination = new DestinationDto
+            {
+                Type = DestinationType.Question,
+                Question = await apiClient.GetInitialQuestion(questionnaire.Id, true)
+            };
+        }
+        catch (GetToAnAnswerApiException)
+        {
+            ModelState.AddModelError(string.Empty, "Preview is not available until content has been added.");
+            return Page();
+        }
+
         return Page();
     }
 
@@ -86,7 +97,11 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             // Redirect to external-link (if embedded or not, but different for Frontend, which is only standalone)
             if (destination is { Type: DestinationType.ExternalLink, Content: not null })
             {
-                return Redirect(destination.Content);
+                var url = Uri.TryCreate(destination.Content, UriKind.Absolute, out var uri)
+                    ? uri.ToString()
+                    : "https://" + destination.Content;
+
+                return Redirect(url);
             }
 
             IsEmbedded = Embed;

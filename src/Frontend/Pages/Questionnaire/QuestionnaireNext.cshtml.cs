@@ -108,7 +108,11 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             
             if (!Embed && destination is { Type: DestinationType.ExternalLink, Content: not null })
             {
-                return Redirect(destination.Content);
+                var url = Uri.TryCreate(destination.Content, UriKind.Absolute, out var uri)
+                    ? uri.ToString()
+                    : "https://" + destination.Content;
+
+                return Redirect(url);
             }
 
             IsEmbedded = Embed;

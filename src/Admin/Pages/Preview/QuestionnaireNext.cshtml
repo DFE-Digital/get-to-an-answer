@@ -8,7 +8,9 @@
 }
 
 @{
-  ViewData["Title"] = Model.Questionnaire.DisplayTitle ?? Model?.Destination.Content ?? "Preview questionnaire start page";
+  ViewData["Title"] = Model?.Questionnaire.DisplayTitle
+                      ?? Model?.Destination?.Content
+                      ?? "Preview questionnaire start page";
   
   var hasErrors = Model != null && !ViewData.ModelState.IsValid;
 }
