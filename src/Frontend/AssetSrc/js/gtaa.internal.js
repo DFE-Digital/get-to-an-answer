@@ -18,7 +18,7 @@ window.addEventListener('message', function(e) {
 window.addEventListener('load', function (e) {
     const externalLinkDest = document.getElementById('external-link-dest');
     if (externalLinkDest) {
-        parent?.postMessage({ type: 'DEST-REDIRECT', externalLinkDest: externalLinkDest.value }, '*');
+        parent?.postMessage({ type: 'DEST-REDIRECT', externalLinkDest: externalLinkDest.value }, window.origin);
     }
     
     // https://developers.google.com/analytics/devguides/collection/ga4/views?client_type=gtag
