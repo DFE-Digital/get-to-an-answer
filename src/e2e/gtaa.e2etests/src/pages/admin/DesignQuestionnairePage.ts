@@ -365,7 +365,7 @@ export class DesignQuestionnairePage extends BasePage {
 
         await expect(
             this.edit_startPage,
-            '❌ "Add and edit start page" link should be visible in Edit section',
+            '❌ "Add or edit start page" link should be visible in Edit section',
         ).toBeVisible();
 
         await expect(
@@ -445,7 +445,7 @@ export class DesignQuestionnairePage extends BasePage {
         await this.assertTaskStatus(
             this.edit_startPage_status,
             'Optional',
-            'Add and edit start page'
+            'Add or edit start page'
         );
 
         await this.assertTaskStatus(
