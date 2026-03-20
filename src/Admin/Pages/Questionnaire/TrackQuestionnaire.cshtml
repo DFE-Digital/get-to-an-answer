@@ -13,19 +13,23 @@
     Html.Raw(Model.Questionnaire?.CompletionTrackingMap?.GetOrDefault(task, defStatus) switch
     {
       CompletionStatus.NotStarted =>
-        "<strong class=\"govuk-tag govuk-tag--blue\">Not started</strong>",
+        "<strong class=\"govuk-tag govuk-tag--red\">Not started</strong>",
       CompletionStatus.InProgress =>
-        "<strong class=\"govuk-tag govuk-tag--light-blue\">In progress</strong>",
-      CompletionStatus.Completed => "Completed",
-      _ => "<strong class=\"govuk-tag govuk-tag--blue\">Not started</strong>"
+        "<strong class=\"govuk-tag govuk-tag--blue\">In progress</strong>",
+      CompletionStatus.Completed => 
+        "<strong class=\"govuk-tag govuk-tag--green\">Completed</strong>",
+      _ => "<strong class=\"govuk-tag govuk-tag--red\">Not started</strong>"
     });
   
   IHtmlContent OptionalStatusTag(CompletableTask task, CompletionStatus defStatus = CompletionStatus.Optional) =>
     Html.Raw(Model.Questionnaire?.CompletionTrackingMap?.GetOrDefault(task, defStatus) switch
     {
-      CompletionStatus.Optional =>
+      CompletionStatus.NotStarted or CompletionStatus.Optional =>
         "<strong class=\"govuk-tag govuk-tag--grey\">Optional</strong>",
-      CompletionStatus.Completed => "Completed",
+      CompletionStatus.InProgress =>
+        "<strong class=\"govuk-tag govuk-tag--blue\">In progress</strong>",
+      CompletionStatus.Completed => 
+        "<strong class=\"govuk-tag govuk-tag--green\">Completed</strong>",
       _ => "<strong class=\"govuk-tag govuk-tag--grey\">Optional</strong>"
     });
 
@@ -88,6 +92,9 @@
                href="/admin/questionnaires/@questionnaire?.Id/contributors">
               Manage access
             </a>
+          </div>
+          <div class="govuk-task-list__status" id="edit-contributors-status">
+            @TaskStatusTag(CompletableTask.AddContributors)
           </div>
         </li>
         <li class="govuk-task-list__item govuk-task-list__item--with-link">
