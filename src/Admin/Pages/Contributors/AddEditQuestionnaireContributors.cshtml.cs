@@ -35,6 +35,9 @@ public class AddEditQuestionnaireContributors(ILogger<AddEditQuestionnaireContri
             var graphUsers = await graphClient.GetGraphUsersAsync(contributors.ToArray());
 
             Contributors = graphUsers.Value;
+            
+            TempData["ContributorsCount"] = Contributors.Count;
+            
 
             var stateFound = TempData.TryGetValue(nameof(QuestionnaireState), out var value);
 
@@ -75,8 +78,16 @@ public class AddEditQuestionnaireContributors(ILogger<AddEditQuestionnaireContri
         return Redirect(string.Format(Routes.ConfirmRemoveContributor, QuestionnaireId, contributorId));
     }
 
-    public ActionResult OnPostSaveAndContinueAsync()
+    public async Task<IActionResult> OnPostSaveAndContinueAsync()
     {
+        var countObj = TempData.Peek("ContributorsCount") ?? 0;
+        
+        await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
+        {
+            Task = CompletableTask.AddContributors,
+            Status = countObj is >= 2 ? CompletionStatus.Completed : CompletionStatus.NotStarted
+        });
+        
         return Redirect(string.Format(Routes.QuestionnaireTrackById, QuestionnaireId));
     }
 }
