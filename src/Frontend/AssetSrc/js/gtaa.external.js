@@ -26,7 +26,8 @@ window.addEventListener('message', (e) => {
     if (e.data?.type === 'HEIGHT') {
         frame.style.height = `${e.data.h}px`;
     } else if (e.data?.type === 'DEST-REDIRECT') {
-        window.location.href = e.data.externalLinkDest;
+        if (e.origin === "null" && e.source === frame.contentWindow)
+            window.location.href = e.data.externalLinkDest;
     } else if (e.data?.type === 'GA4_GTAA_IFRAME_EVENT' && typeof gtag === 'function') {
         // Send iframe page_view event to the GA4 dataLayer
         gtag('event', e.data.eventName, e.data.eventParams);
