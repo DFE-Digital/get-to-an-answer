@@ -19,16 +19,27 @@ public static class MermaidExtensions
         if (questionnaire == null) throw new ArgumentNullException(nameof(questionnaire));
 
         var sb = new StringBuilder();
-        sb.AppendLine("flowchart TD");
-        sb.AppendLine("  %% Generated from Questionnaire -> Questions -> Answers");
-        sb.AppendLine("  %% Destinations: Question, External Link, Results Page");
-        sb.AppendLine("  %% Priorities are used for routing for multiselect questions");
+        sb.AppendLine("flowchart LR");
+        sb.AppendLine("  subgraph Q [ ]");
+        sb.AppendLine("    direction TD");
+        
+        sb.AppendLine("    %% Generated from Questionnaire -> Questions -> Answers");
+        sb.AppendLine("    %% Destinations: Question, External Link, Results Page");
+        sb.AppendLine("    %% Priorities are used for routing for multiselect questions");
         sb.AppendLine();
 
         // Root node
         var qnId = NodeId("QE");
-        sb.AppendLine($"  {qnId}[Questionnaire]");
+        sb.AppendLine($"    {qnId}({questionnaire.Title}):::questionnaire -->");
         sb.AppendLine();
+        
+        // Start page, if we have one
+        if (!string.IsNullOrEmpty(questionnaire.DisplayTitle))
+        {
+            var spId = NodeId("SP");
+            sb.AppendLine($"    {spId}{{{{{questionnaire.DisplayTitle}}}}}:::startpage -->");
+            sb.AppendLine();
+        }
 
         // Map questions to stable IDs
         var questions = questionnaire.Questions?
@@ -41,7 +52,7 @@ public static class MermaidExtensions
             var id = NodeId($"Q{i + 1}");
             questionIds[questions[i].Id] = id;
             var label = EscapeLabel(string.IsNullOrWhiteSpace(questions[i].ReferenceName ?? questions[i].Content) ? $"Question {i + 1}" : Truncate(questions[i].ReferenceName ?? questions[i].Content!, 60));
-            sb.AppendLine($"  {id}{{\"{label}\"}}");
+            sb.AppendLine($"    {id}{{\"{label}\"}}");
         }
 
         // Containers for special destinations (info pages and external links) to avoid duplicate nodes
@@ -61,7 +72,7 @@ public static class MermaidExtensions
                 switch (a.DestinationType)
                 {
                     case DestinationType.Question when a.DestinationQuestionId.HasValue && questionIds.TryGetValue(a.DestinationQuestionId.Value, out var destQNode):
-                        sb.AppendLine($"  {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {destQNode}");
+                        sb.AppendLine($"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {destQNode}");
                         break;
 
                     case DestinationType.CustomContent:
@@ -78,14 +89,39 @@ public static class MermaidExtensions
                                     var infoLabel = EscapeLabel(string.IsNullOrWhiteSpace(a.DestinationUrl)
                                         ? $"Results page '{contentTitle}'"
                                         : Truncate(a.DestinationUrl!, 60));
-                                    sb.AppendLine($"  {infoNodeId}[[{infoLabel}]]:::info");
+                                    sb.AppendLine($"    {infoNodeId}[[{infoLabel}]]:::result");
                                 }
-                                sb.AppendLine($"  {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {infoNodeId}");
+                                sb.AppendLine($"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {infoNodeId}");
                             }
-                            
+
                             break;
                         }
+                    case DestinationType.InterimThenQuestion:
+                    {
+                        if (a.DestinationContentId is { } key)
+                        {
+                            if (!customInfoNodes.TryGetValue(key, out var infoNodeId))
+                            {
+                                infoNodeId = NodeId($"CI{customInfoNodes.Count + 1}");
+                                customInfoNodes[key] = infoNodeId;
 
+                                var contentTitle = contentMap[key];
+                                
+                                var infoLabel = EscapeLabel(string.IsNullOrWhiteSpace(a.DestinationUrl)
+                                    ? $"Interim page '{contentTitle}'"
+                                    : Truncate(a.DestinationUrl!, 60));
+                                sb.AppendLine($"    {infoNodeId}[{infoLabel}]:::interim");
+                            }
+                            sb.AppendLine($"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {infoNodeId}");
+                                
+                            if (a.DestinationQuestionId.HasValue && questionIds.TryGetValue(a.DestinationQuestionId.Value, out var destQNode))
+                            {
+                                sb.AppendLine($"    {infoNodeId} --> {destQNode}");
+                            }
+                        }
+
+                        break;
+                    }
                     case DestinationType.ExternalLink:
                         {
                             var url = string.IsNullOrWhiteSpace(a.DestinationUrl) ? "External Link" : a.DestinationUrl!;
@@ -94,9 +130,9 @@ public static class MermaidExtensions
                                 linkNodeId = NodeId($"EL{externalLinkNodes.Count + 1}");
                                 externalLinkNodes[url] = linkNodeId;
                                 var linkLabel = EscapeLabel(Truncate(url, 60));
-                                sb.AppendLine($"  {linkNodeId}{{{{{linkLabel}}}}}:::link");
+                                sb.AppendLine($"    {linkNodeId}{{{{{linkLabel}}}}}:::link");
                             }
-                            sb.AppendLine($"  {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {linkNodeId}");
+                            sb.AppendLine($"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {linkNodeId}");
                             break;
                         }
 
@@ -105,32 +141,51 @@ public static class MermaidExtensions
                             questionIds.TryGetValue(nextQuestion.Id, out var nextQNode))
                         {
                             sb.AppendLine(
-                                $"  {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {nextQNode}");
+                                $"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {nextQNode}");
                         }
                         else
                         {
                             sb.AppendLine(
-                                $"  {qNode} -- \"{EscapeLabel(answerLabel)}\" --> UNKNOWN([Unknown])");
+                                $"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> UNKNOWN([Unknown])");
                         }
 
                         break;
                 }
             }
         }
+        
+        // End the first questionnaire subflow
+        sb.AppendLine("  end");
 
         // Key and styles
         sb.AppendLine();
-        sb.AppendLine("  %% Key");
-        sb.AppendLine("  subgraph Key");
-        sb.AppendLine("    L1[Solid arrows = branching between questions and answers]");
-        sb.AppendLine("    L2[Dashed arrows = all questions]");
-        sb.AppendLine("    L3[\"Answer '(priority: n)' = what priority it is\"]");
-        sb.AppendLine("    L4[[Results Page]]:::info");
-        sb.AppendLine("    L5{{Link}}:::link");
+        sb.AppendLine("  %% Legend");
+        sb.AppendLine("  subgraph Legend");
+        sb.AppendLine("    direction LR");
+        sb.AppendLine("    L1(\"`Solid arrows = branching between questions and answers");
+        sb.AppendLine("    <br>");
+        sb.AppendLine("    Dashed arrows = all questions");
+        sb.AppendLine("    <br>");
+        sb.AppendLine("    Answer '(priority: n)' = what priority it is`\")");
+        sb.AppendLine("    L2(Questionnaire):::questionnaire");
+        sb.AppendLine("    L3{{Start Page}}:::startpage");
+        sb.AppendLine("    L4{Question}");
+        sb.AppendLine("    L5[Interim Page]:::interim");
+        sb.AppendLine("    L6[[Results Page]]:::result");
+        sb.AppendLine("    L7{{Link}}:::link");
         sb.AppendLine("  end");
         sb.AppendLine();
-        sb.AppendLine("  classDef info fill:#e6f4ff,stroke:#2b7cd3,color:#0b3d91;");
+        
+        // Make sure the legend is on the right of the questionnaire
+        sb.AppendLine("  Q ~~~ Legend");
+        sb.AppendLine();
+        
+        // Formatting and styling
+        sb.AppendLine("  classDef result fill:#e6f4ff,stroke:#2b7cd3,color:#0b3d91;");
         sb.AppendLine("  classDef link fill:#fff3e6,stroke:#d37c2b,color:#7a3d0b;");
+        sb.AppendLine("  classDef interim fill:#fcaee9,stroke:#710456,color:#540234;");
+        sb.AppendLine("  classDef questionnaire fill:#b3eba4,stroke:#34861d,color:#173b0d;");
+        sb.AppendLine("  classDef startpage fill:#b3eba4,stroke:#34861d,color:#173b0d;");
 
         return sb.ToString();
     }

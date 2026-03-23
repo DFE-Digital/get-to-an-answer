@@ -42,11 +42,6 @@ gulp.task('dfe-assets', function() {
         .pipe(gulp.dest(paths.dist + 'assets'));
 });
 
-gulp.task("js", function() {
-    return gulp.src(paths.src + '/js/**/*', {encoding:false})
-        .pipe(gulp.dest(paths.dist + 'js'));
-})
-
 gulp.task("sass", function () {
     return gulp.src(paths.src + '/scss/**/*.scss')
         .pipe(sass({
@@ -71,7 +66,6 @@ gulp.task("dev",
         "dfe-js",
         "dfe-css",
         "dfe-assets",
-        "js",
         "images",
         "sass"
     )

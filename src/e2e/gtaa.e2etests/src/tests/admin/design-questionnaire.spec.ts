@@ -193,13 +193,13 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await designQuestionnairePage.taskStatusAddEditQuestionnaireId('Completed', 'Add or edit questionnaire ID');
     });
 
-    test('Validate add and edit start page link status as Completed', async ({page}) => {
+    test('Validate add or edit start page link status as Completed', async ({page}) => {
         await signIn(page, token);
 
         designQuestionnairePage = await goToDesignQuestionnairePageByUrl(page, questionnaireId);
         await designQuestionnairePage.expectEditQuestionnaireHeadingOnPage(PageHeadings.DESIGN_QUESTIONNAIRE_PAGE_HEADING);
 
-        await designQuestionnairePage.taskStatusAddEditStartPage('Optional', 'Add and edit start page');
+        await designQuestionnairePage.taskStatusAddEditStartPage('Optional', 'Add or edit start page');
 
         await designQuestionnairePage.openStartPage();
         
@@ -208,7 +208,7 @@ test.describe('Get to an answer create a new questionnaire', () => {
         await addQuestionnaireStartPage.enterQuestionnaireDescriptionText("Questionnaire Description");
         await addQuestionnaireStartPage.clickSaveAndContinue();
         
-        await designQuestionnairePage.taskStatusAddEditStartPage('Completed', 'Add and edit start page');
+        await designQuestionnairePage.taskStatusAddEditStartPage('Completed', 'Add or edit start page');
     });
 
     test('Validate edit button text page link status as Completed', async ({page}) => {
