@@ -210,7 +210,7 @@ public static class MermaidExtensions
     private static string BuildAnswerLabel(string? content, float? priority)
     {
         var baseText = string.IsNullOrWhiteSpace(content) ? "Answer" : Truncate(content!, 60);
-        return priority.HasValue ? $"{baseText} (priority: {priority.Value})" : baseText;
+        return priority.GetValueOrDefault(0) > 0 ? $"{baseText}<br/>(priority: {priority.Value})" : baseText;
     }
 
     private static string EscapeLabel(string text)
