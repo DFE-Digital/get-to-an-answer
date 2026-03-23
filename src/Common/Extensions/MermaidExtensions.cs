@@ -187,7 +187,6 @@ public static class MermaidExtensions
         sb.AppendLine("  classDef questionnaire fill:#b3eba4,stroke:#34861d,color:#173b0d;");
         sb.AppendLine("  classDef startpage fill:#b3eba4,stroke:#34861d,color:#173b0d;");
         sb.AppendLine("  style Q fill:none, stroke: none");
-        sb.AppendLine("  style Legend fill:none, stroke: none");
 
         return sb.ToString();
     }
