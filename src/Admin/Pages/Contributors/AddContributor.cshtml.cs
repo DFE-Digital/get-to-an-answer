@@ -58,7 +58,7 @@ public class AddContributor(ILogger<AddContributor> logger,
         }
         catch (GetToAnAnswerApiException e) when (e.StatusCode == System.Net.HttpStatusCode.Conflict)
         {
-            ModelState.AddModelError(nameof(ContributorEmail), e.ProblemDetails?.Detail!);
+            ModelState.AddModelError(nameof(ContributorEmail), $"{ContributorEmail} has already been given access");
             return Page();
         }
         catch (MsGraphException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)

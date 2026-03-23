@@ -1,5 +1,3 @@
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Common.Domain;
@@ -14,7 +12,6 @@ using Common.Infrastructure.Persistence.Entities;
 using Common.Local;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Api.Services;
 
@@ -531,15 +528,13 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
 
         return (cloneQuestions, oldIdCloneQuestions, orderAnswers);
     }
-    
-    
 
-    private (
-        Dictionary<string, ContentEntity>, 
-        Dictionary<Guid, ContentEntity>
-        ) GetContentClonePrerequisites(string userId, Guid cloneQuestionnaireId, QuestionnaireEntity questionnaire)
+    private (List<ContentEntity>, Dictionary<Guid, ContentEntity>) GetContentClonePrerequisites(
+        string userId,
+        Guid cloneQuestionnaireId,
+        QuestionnaireEntity questionnaire)
     {
-        var cloneContents = new Dictionary<string, ContentEntity>();
+        var cloneContents = new List<ContentEntity>();
         var oldIdCloneContents = new Dictionary<Guid, ContentEntity>();
             
         foreach (var content in questionnaire.Contents)
@@ -554,8 +549,9 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             };
+            
             oldIdCloneContents.Add(content.Id, cloneContent);
-            cloneContents.Add(content.ReferenceName!, cloneContent);
+            cloneContents.Add(cloneContent);
         }
 
         return (cloneContents, oldIdCloneContents);
@@ -582,7 +578,9 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 .FirstOrDefaultAsync();
 
             if (questionnaire == null)
+            {
                 return NotFound(ProblemTrace("We could not find that questionnaire", 404));
+            }
 
             var cloneQuestionnaire = CreateCopy(userId, request.Title, questionnaire);
 
@@ -604,7 +602,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             var (cloneContents, oldIdCloneContents) = 
                 GetContentClonePrerequisites(userId, cloneQuestionnaireId, questionnaire);
             
-            await db.Contents.AddRangeAsync(cloneContents.Values);
+            await db.Contents.AddRangeAsync(cloneContents);
             await db.SaveChangesAsync();
             
             var contentOldToNewIds = new Dictionary<Guid, Guid>();
