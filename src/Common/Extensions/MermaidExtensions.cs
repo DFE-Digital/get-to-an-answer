@@ -173,25 +173,23 @@ public static class MermaidExtensions
 
         // Key and styles
         sb.AppendLine();
-        sb.AppendLine("  %% Legend");
-        sb.AppendLine("  subgraph Legend");
-        sb.AppendLine("    direction LR");
-        sb.AppendLine("    L1(\"`Solid arrows = branching between questions and answers");
-        sb.AppendLine("    <br>");
-        sb.AppendLine("    Dashed arrows = all questions");
-        sb.AppendLine("    <br>");
-        sb.AppendLine("    Answer '(priority: n)' = what priority it is`\")");
+        sb.AppendLine("  %% Key");
+        sb.AppendLine("  subgraph Key [\"`**Key**`\"]");
+        sb.AppendLine("    direction RL");
+        sb.AppendLine("    L1[\"`Arrows show the routes through the questionnaire." +
+                      "<br/><br/>" +
+                      "If you have applied ranking to any answer it will be indicated on that branch by '(priority:&nbsp;n)'`\"]");
         sb.AppendLine("    L2(Questionnaire):::questionnaire");
         sb.AppendLine("    L3{{Start Page}}:::startpage");
         sb.AppendLine("    L4{Question}");
-        sb.AppendLine("    L5[Interim Page]:::interim");
-        sb.AppendLine("    L6[[Results Page]]:::result");
-        sb.AppendLine("    L7{{Link}}:::link");
+        sb.AppendLine("    L5[Interim result page]:::interim");
+        sb.AppendLine("    L6[[Result Page]]:::result");
+        sb.AppendLine("    L7{{Link to external content}}:::link");
         sb.AppendLine("  end");
         sb.AppendLine();
         
-        // Make sure the legend is on the right of the questionnaire
-        sb.AppendLine("  Q ~~~ Legend");
+        // Make sure the key is on the right of the questionnaire
+        sb.AppendLine("  Q ~~~ Key");
         sb.AppendLine();
         
         // Formatting and styling
@@ -200,7 +198,9 @@ public static class MermaidExtensions
         sb.AppendLine("  classDef interim fill:#fcaee9,stroke:#710456,color:#540234;");
         sb.AppendLine("  classDef questionnaire fill:#b3eba4,stroke:#34861d,color:#173b0d;");
         sb.AppendLine("  classDef startpage fill:#b3eba4,stroke:#34861d,color:#173b0d;");
-        sb.AppendLine("  style Q fill:none, stroke: none");
+        sb.AppendLine("  style Q fill:none, stroke: none;");
+        sb.AppendLine("  style L1 text-align:left;");
+        
 
         return sb.ToString();
     }
