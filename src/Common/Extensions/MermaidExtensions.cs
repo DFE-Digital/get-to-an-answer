@@ -86,7 +86,7 @@ public static class MermaidExtensions
                 switch (a.DestinationType)
                 {
                     case DestinationType.Question when a.DestinationQuestionId.HasValue && questionIds.TryGetValue(a.DestinationQuestionId.Value, out var destQNode):
-                        sb.AppendLine($"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {destQNode}");
+                        sb.AppendLine($"    {qNode} -- \"`{EscapeLabel(answerLabel)}`\" --> {destQNode}");
                         break;
 
                     case DestinationType.CustomContent:
@@ -99,13 +99,10 @@ public static class MermaidExtensions
                                     customInfoNodes[key] = infoNodeId;
 
                                     var contentTitle = contentMap[key];
-                                
-                                    var infoLabel = EscapeLabel(string.IsNullOrWhiteSpace(a.DestinationUrl)
-                                        ? $"Results page '{contentTitle}'"
-                                        : Truncate(a.DestinationUrl!, 60));
-                                    sb.AppendLine($"    {infoNodeId}[[{infoLabel}]]:::result");
+                                    var infoLabel = EscapeLabel($"{Truncate(contentTitle,60)}");
+                                    sb.AppendLine($"    {infoNodeId}[[\"`{infoLabel}`\"]]:::result");
                                 }
-                                sb.AppendLine($"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {infoNodeId}");
+                                sb.AppendLine($"    {qNode} -- \"`{EscapeLabel(answerLabel)}`\" --> {infoNodeId}");
                             }
 
                             break;
@@ -120,13 +117,10 @@ public static class MermaidExtensions
                                 customInfoNodes[key] = infoNodeId;
 
                                 var contentTitle = contentMap[key];
-                                
-                                var infoLabel = EscapeLabel(string.IsNullOrWhiteSpace(a.DestinationUrl)
-                                    ? $"Interim page '{contentTitle}'"
-                                    : Truncate(a.DestinationUrl!, 60));
-                                sb.AppendLine($"    {infoNodeId}[{infoLabel}]:::interim");
+                                var infoLabel = EscapeLabel($"{Truncate(contentTitle,60)}");
+                                sb.AppendLine($"    {infoNodeId}[\"`{infoLabel}`\"]:::interim");
                             }
-                            sb.AppendLine($"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {infoNodeId}");
+                            sb.AppendLine($"    {qNode} -- \"`{EscapeLabel(answerLabel)}`\" --> {infoNodeId}");
                                 
                             if (a.DestinationQuestionId.HasValue && questionIds.TryGetValue(a.DestinationQuestionId.Value, out var destQNode))
                             {
@@ -146,7 +140,7 @@ public static class MermaidExtensions
                                 var linkLabel = EscapeLabel(Truncate(url, 60));
                                 sb.AppendLine($"    {linkNodeId}{{{{{linkLabel}}}}}:::link");
                             }
-                            sb.AppendLine($"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {linkNodeId}");
+                            sb.AppendLine($"    {qNode} -- \"`{EscapeLabel(answerLabel)}`\" --> {linkNodeId}");
                             break;
                         }
 
@@ -155,12 +149,12 @@ public static class MermaidExtensions
                             questionIds.TryGetValue(nextQuestion.Id, out var nextQNode))
                         {
                             sb.AppendLine(
-                                $"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {nextQNode}");
+                                $"    {qNode} -- \"`{EscapeLabel(answerLabel)}`\" --> {nextQNode}");
                         }
                         else
                         {
                             sb.AppendLine(
-                                $"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> UNKNOWN([Unknown])");
+                                $"    {qNode} -- \"`{EscapeLabel(answerLabel)}`\" --> UNKNOWN([Unknown])");
                         }
 
                         break;
