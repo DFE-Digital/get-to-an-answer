@@ -19,6 +19,7 @@ public class QuestionnaireState
     public bool JustAddedCustomButtonText { get; set; }
     
     public bool JustUpdatedQuestionnaireName { get; set; }
+    public bool JustUpdatedQuestionnaireId { get; set; }
     public bool JustAddedContributor { get; set; }
     public bool JustRemovedContributor { get; set; }
     public bool JustRemovedAsContributor { get; set; }

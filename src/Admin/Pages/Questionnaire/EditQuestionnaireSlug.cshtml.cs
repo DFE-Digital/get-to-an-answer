@@ -4,7 +4,6 @@ using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Models;
 using Common.Models.PageModels;
-using Common.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -66,7 +65,10 @@ public class EditQuestionnaireSlug(IApiClient apiClient, ILogger<EditQuestionnai
                 return RedirectToErrorPage();
             }
             
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdated = true });
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState
+            {
+                JustUpdatedQuestionnaireId = true
+            });
             
             await apiClient.UpdateCompletionStateAsync(QuestionnaireId, new UpdateCompletionStateRequestDto
             {
