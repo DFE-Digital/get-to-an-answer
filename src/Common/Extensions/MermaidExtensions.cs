@@ -51,8 +51,22 @@ public static class MermaidExtensions
         {
             var id = NodeId($"Q{i + 1}");
             questionIds[questions[i].Id] = id;
-            var label = EscapeLabel(string.IsNullOrWhiteSpace(questions[i].ReferenceName ?? questions[i].Content) ? $"Question {i + 1}" : Truncate(questions[i].ReferenceName ?? questions[i].Content!, 60));
-            sb.AppendLine($"    {id}{{\"{label}\"}}");
+            var label = string.Empty;
+            if (!string.IsNullOrWhiteSpace(questions[i].ReferenceName))
+            {
+                label += $"**Ref: {EscapeLabel(questions[i].ReferenceName!)}**<br/>";
+            }
+
+            if (!string.IsNullOrWhiteSpace(questions[i].Content))
+            {
+                label += EscapeLabel(Truncate(questions[i].Content, 60));
+            }
+            else
+            {
+                label += EscapeLabel($"Question {i + 1}");
+            }
+            
+            sb.AppendLine($"    {id}{{\"`{label}`\"}}");
         }
 
         // Containers for special destinations (info pages and external links) to avoid duplicate nodes
