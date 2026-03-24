@@ -903,7 +903,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
             var contentMap = await db.Contents
                 .AsNoTracking()
                 .Where(x => x.QuestionnaireId == questionnaireId)
-                .ToDictionaryAsync(c => c.Id, c => c.ReferenceName ?? c.Title);
+                .ToDictionaryAsync(c => c.Id, c => !string.IsNullOrWhiteSpace(c.ReferenceName) ? $"**Ref: {c.ReferenceName}**<br/>{c.Title}" : c.Title);
             
             return Ok(new QuestionnaireBranchingMapDto
             {

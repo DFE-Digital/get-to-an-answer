@@ -51,8 +51,22 @@ public static class MermaidExtensions
         {
             var id = NodeId($"Q{i + 1}");
             questionIds[questions[i].Id] = id;
-            var label = EscapeLabel(string.IsNullOrWhiteSpace(questions[i].ReferenceName ?? questions[i].Content) ? $"Question {i + 1}" : Truncate(questions[i].ReferenceName ?? questions[i].Content!, 60));
-            sb.AppendLine($"    {id}{{\"{label}\"}}");
+            var label = string.Empty;
+            if (!string.IsNullOrWhiteSpace(questions[i].ReferenceName))
+            {
+                label += $"**Ref: {EscapeLabel(questions[i].ReferenceName!)}**<br/>";
+            }
+
+            if (!string.IsNullOrWhiteSpace(questions[i].Content))
+            {
+                label += EscapeLabel(Truncate(questions[i].Content, 60));
+            }
+            else
+            {
+                label += EscapeLabel($"Question {i + 1}");
+            }
+            
+            sb.AppendLine($"    {id}{{\"`{label}`\"}}");
         }
 
         // Containers for special destinations (info pages and external links) to avoid duplicate nodes
@@ -72,7 +86,7 @@ public static class MermaidExtensions
                 switch (a.DestinationType)
                 {
                     case DestinationType.Question when a.DestinationQuestionId.HasValue && questionIds.TryGetValue(a.DestinationQuestionId.Value, out var destQNode):
-                        sb.AppendLine($"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {destQNode}");
+                        sb.AppendLine($"    {qNode} -- \"`{EscapeLabel(answerLabel)}`\" --> {destQNode}");
                         break;
 
                     case DestinationType.CustomContent:
@@ -85,13 +99,10 @@ public static class MermaidExtensions
                                     customInfoNodes[key] = infoNodeId;
 
                                     var contentTitle = contentMap[key];
-                                
-                                    var infoLabel = EscapeLabel(string.IsNullOrWhiteSpace(a.DestinationUrl)
-                                        ? $"Results page '{contentTitle}'"
-                                        : Truncate(a.DestinationUrl!, 60));
-                                    sb.AppendLine($"    {infoNodeId}[[{infoLabel}]]:::result");
+                                    var infoLabel = EscapeLabel($"{Truncate(contentTitle,60)}");
+                                    sb.AppendLine($"    {infoNodeId}[[\"`{infoLabel}`\"]]:::result");
                                 }
-                                sb.AppendLine($"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {infoNodeId}");
+                                sb.AppendLine($"    {qNode} -- \"`{EscapeLabel(answerLabel)}`\" --> {infoNodeId}");
                             }
 
                             break;
@@ -106,13 +117,10 @@ public static class MermaidExtensions
                                 customInfoNodes[key] = infoNodeId;
 
                                 var contentTitle = contentMap[key];
-                                
-                                var infoLabel = EscapeLabel(string.IsNullOrWhiteSpace(a.DestinationUrl)
-                                    ? $"Interim page '{contentTitle}'"
-                                    : Truncate(a.DestinationUrl!, 60));
-                                sb.AppendLine($"    {infoNodeId}[{infoLabel}]:::interim");
+                                var infoLabel = EscapeLabel($"{Truncate(contentTitle,60)}");
+                                sb.AppendLine($"    {infoNodeId}[\"`{infoLabel}`\"]:::interim");
                             }
-                            sb.AppendLine($"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {infoNodeId}");
+                            sb.AppendLine($"    {qNode} -- \"`{EscapeLabel(answerLabel)}`\" --> {infoNodeId}");
                                 
                             if (a.DestinationQuestionId.HasValue && questionIds.TryGetValue(a.DestinationQuestionId.Value, out var destQNode))
                             {
@@ -132,7 +140,7 @@ public static class MermaidExtensions
                                 var linkLabel = EscapeLabel(Truncate(url, 60));
                                 sb.AppendLine($"    {linkNodeId}{{{{{linkLabel}}}}}:::link");
                             }
-                            sb.AppendLine($"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {linkNodeId}");
+                            sb.AppendLine($"    {qNode} -- \"`{EscapeLabel(answerLabel)}`\" --> {linkNodeId}");
                             break;
                         }
 
@@ -141,12 +149,12 @@ public static class MermaidExtensions
                             questionIds.TryGetValue(nextQuestion.Id, out var nextQNode))
                         {
                             sb.AppendLine(
-                                $"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> {nextQNode}");
+                                $"    {qNode} -- \"`{EscapeLabel(answerLabel)}`\" --> {nextQNode}");
                         }
                         else
                         {
                             sb.AppendLine(
-                                $"    {qNode} -- \"{EscapeLabel(answerLabel)}\" --> UNKNOWN([Unknown])");
+                                $"    {qNode} -- \"`{EscapeLabel(answerLabel)}`\" --> UNKNOWN([Unknown])");
                         }
 
                         break;
@@ -159,25 +167,23 @@ public static class MermaidExtensions
 
         // Key and styles
         sb.AppendLine();
-        sb.AppendLine("  %% Legend");
-        sb.AppendLine("  subgraph Legend");
-        sb.AppendLine("    direction LR");
-        sb.AppendLine("    L1(\"`Solid arrows = branching between questions and answers");
-        sb.AppendLine("    <br>");
-        sb.AppendLine("    Dashed arrows = all questions");
-        sb.AppendLine("    <br>");
-        sb.AppendLine("    Answer '(priority: n)' = what priority it is`\")");
+        sb.AppendLine("  %% Key");
+        sb.AppendLine("  subgraph Key [\"`**Key**`\"]");
+        sb.AppendLine("    direction RL");
+        sb.AppendLine("    L1[\"`Arrows show the routes through the questionnaire." +
+                      "<br/><br/>" +
+                      "If you have applied ranking to any answer it will be indicated on that branch by '(priority:&nbsp;n)'`\"]");
         sb.AppendLine("    L2(Questionnaire):::questionnaire");
         sb.AppendLine("    L3{{Start Page}}:::startpage");
         sb.AppendLine("    L4{Question}");
-        sb.AppendLine("    L5[Interim Page]:::interim");
-        sb.AppendLine("    L6[[Results Page]]:::result");
-        sb.AppendLine("    L7{{Link}}:::link");
+        sb.AppendLine("    L5[Interim result page]:::interim");
+        sb.AppendLine("    L6[[Result Page]]:::result");
+        sb.AppendLine("    L7{{Link to external content}}:::link");
         sb.AppendLine("  end");
         sb.AppendLine();
         
-        // Make sure the legend is on the right of the questionnaire
-        sb.AppendLine("  Q ~~~ Legend");
+        // Make sure the key is on the right of the questionnaire
+        sb.AppendLine("  Q ~~~ Key");
         sb.AppendLine();
         
         // Formatting and styling
@@ -186,7 +192,9 @@ public static class MermaidExtensions
         sb.AppendLine("  classDef interim fill:#fcaee9,stroke:#710456,color:#540234;");
         sb.AppendLine("  classDef questionnaire fill:#b3eba4,stroke:#34861d,color:#173b0d;");
         sb.AppendLine("  classDef startpage fill:#b3eba4,stroke:#34861d,color:#173b0d;");
-        sb.AppendLine("  style Q fill:none, stroke: none");
+        sb.AppendLine("  style Q fill:none, stroke: none;");
+        sb.AppendLine("  style L1 text-align:left;");
+        
 
         return sb.ToString();
     }
@@ -196,7 +204,7 @@ public static class MermaidExtensions
     private static string BuildAnswerLabel(string? content, float? priority)
     {
         var baseText = string.IsNullOrWhiteSpace(content) ? "Answer" : Truncate(content!, 60);
-        return priority.HasValue ? $"{baseText} (priority: {priority.Value})" : baseText;
+        return priority.GetValueOrDefault(0) > 0 ? $"{baseText}<br/>(priority: {priority.Value})" : baseText;
     }
 
     private static string EscapeLabel(string text)
