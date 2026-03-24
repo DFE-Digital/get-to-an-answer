@@ -119,7 +119,7 @@ test.describe('Get to an answer add or edit questionnaire slug', () => {
         designQuestionnairePage = await DesignQuestionnairePage.create(page);
         await designQuestionnairePage.validateHeadingAndStatus();
         await designQuestionnairePage.expectSuccessBannerVisible();
-        await designQuestionnairePage.assertQuestionnaireUpdatedSuccessBanner();
+        await designQuestionnairePage.assertQuestionnaireIdUpdatedSuccessBanner();
     });
 
     test('Successfully update questionnaire slug', async ({page}) => {
