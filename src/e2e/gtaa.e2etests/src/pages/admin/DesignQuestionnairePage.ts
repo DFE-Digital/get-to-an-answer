@@ -67,6 +67,7 @@ export class DesignQuestionnairePage extends BasePage {
     // Notification banners
     private readonly justCreatedBannerText: Locator;
     private readonly justUpdatedBannerText: Locator;
+    private readonly justUpdatedQuestionnaireIdBannerText: Locator;
     private readonly justClonedBannerText: Locator;
     private readonly justPublishedBannerText: Locator;
     private readonly justUnpublishedBannerText: Locator;
@@ -171,6 +172,7 @@ export class DesignQuestionnairePage extends BasePage {
         // ----- Banner Locators -----
         this.justCreatedBannerText = page.locator('#just-created-banner-text');
         this.justUpdatedBannerText = page.locator('#just-updated-banner-text');
+        this.justUpdatedQuestionnaireIdBannerText = page.locator('#just-updated-questionnaire-id-banner-text');
         this.justClonedBannerText = page.locator('#just-cloned-banner-text');
         this.justPublishedBannerText = page.locator('#just-published-banner-text');
         this.justUnpublishedBannerText = page.locator('#just-unpublished-banner-text');
@@ -673,6 +675,18 @@ export class DesignQuestionnairePage extends BasePage {
             this.justUpdatedBannerText,
             '❌ Questionnaire updated success banner text mismatch',
         ).toHaveText('Your changes have been saved');
+    }
+
+    async assertQuestionnaireIdUpdatedSuccessBanner(): Promise<void> {
+        await expect(
+            this.justUpdatedQuestionnaireIdBannerText,
+            '❌ Questionnaire ID updated success banner should be visible',
+        ).toBeVisible();
+
+        await expect(
+            this.justUpdatedQuestionnaireIdBannerText,
+            '❌ Questionnaire ID updated success banner text mismatch',
+        ).toHaveText('Your questionnaire ID has been saved');
     }
 
     async assertQuestionnaireClonedSuccessBanner(): Promise<void> {

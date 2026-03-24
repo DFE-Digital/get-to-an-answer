@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Common.Client;
 using Common.Domain.Request.Add;
-using Common.Domain.Request.Create;
 using Common.Domain.Request.Update;
 using Common.Enum;
 using Common.Models;
@@ -36,9 +35,11 @@ public class AddContributor(ILogger<AddContributor> logger,
         try
         {
             var graphUser = await graphClient.GetGraphUserAsync(ContributorEmail);
-            
+
             if (graphUser == null)
+            {
                 return NotFound();
+            }
 
             await apiClient.AddQuestionnaireContributor(QuestionnaireId, new AddContributorRequestDto()
             {
@@ -52,7 +53,11 @@ public class AddContributor(ILogger<AddContributor> logger,
             });
 
             TempData[nameof(QuestionnaireState)] =
-                JsonConvert.SerializeObject(new QuestionnaireState { JustAddedContributor = true, ContributorEmail = ContributorEmail });
+                JsonConvert.SerializeObject(new QuestionnaireState
+                {
+                    JustAddedContributor = true,
+                    ContributorEmail = ContributorEmail
+                });
 
             return Redirect(string.Format(Routes.AddAndEditQuestionnaireContributors, QuestionnaireId));
         }

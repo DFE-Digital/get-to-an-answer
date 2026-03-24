@@ -11,14 +11,16 @@ namespace Admin.Pages.Confirmations;
 public class ConfirmRemoveContributor(IApiClient apiClient) : QuestionnairesPageModel
 {
     [FromRoute(Name = "questionnaireId")]
-    public Guid QuestionnaireId { get; set; }
+    public required Guid QuestionnaireId { get; set; }
     
     [FromRoute(Name = "contributorId")]
-    public Guid ContributorId { get; set; }
+    public required string ContributorId { get; set; }
     
+    [BindProperty]
     public string? ContributorEmail { get; set; }
     
-    [BindProperty] public bool RemoveContributor { get; set; }
+    [BindProperty]
+    public bool RemoveContributor { get; set; }
 
     public void OnGet()
     {
@@ -29,9 +31,13 @@ public class ConfirmRemoveContributor(IApiClient apiClient) : QuestionnairesPage
     {
         if (RemoveContributor)
         {
-            await apiClient.RemoveQuestionnaireContributor(QuestionnaireId, ContributorId.ToString());
+            await apiClient.RemoveQuestionnaireContributor(QuestionnaireId, ContributorId);
                 
-            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustRemovedContributor = true, ContributorEmail = ContributorEmail });
+            TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState
+            {
+                JustRemovedContributor = true,
+                ContributorEmail = ContributorEmail
+            });
         }
         return Redirect(string.Format(Routes.AddAndEditQuestionnaireContributors, QuestionnaireId));
     }
