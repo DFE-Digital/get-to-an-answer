@@ -72,7 +72,7 @@ public class EditQuestion(IApiClient apiClient, ILogger<EditQuestion> logger) : 
     private static string ToDestDisplayName(DestinationType? type) => type switch
     {
         DestinationType.Question => "Specific question",
-        DestinationType.InterimThenQuestion => "Interim result page then question",
+        DestinationType.InterimThenQuestion => "Interim result page, then question",
         DestinationType.CustomContent => "Results page",
         DestinationType.ExternalLink => "Link",
         _ => "Next question",
