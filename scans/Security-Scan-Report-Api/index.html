@@ -1,0 +1,3695 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../Security-Scan-Report-Admin/">
+      
+      
+        <link rel="next" href="../Security-Scan-Report-Frontend/">
+      
+      
+      <link rel="icon" href="../../favicons/favicon.ico">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>ZAP Scanning Report - Get To An Answer Documentation</title>
+      
+    
+    
+  
+      <link rel="stylesheet" href="../../assets/stylesheets/main.bcfcd587.min.css">
+      
+      
+
+
+    
+  <link rel="stylesheet" href="../../assets/stylesheets/extra.css">
+
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#zap-scanning-report" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Get To An Answer Documentation" class="md-header__button md-logo" aria-label="Get To An Answer Documentation" data-md-component="logo">
+      
+  <img src="../../logos/govuk-icon-512.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Get To An Answer Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ZAP Scanning Report
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/Application-Architecture/" class="md-tabs__link">
+          
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../developers/Branching-Strategy/" class="md-tabs__link">
+          
+  
+  Developers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../high-level/Proposal-Summary/" class="md-tabs__link">
+          
+  
+  High level
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../integration/Iframe-and-contentful-integration/" class="md-tabs__link">
+          
+  
+  Integration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../operational/Design-System-Changes-Jun-2025/" class="md-tabs__link">
+          
+  
+  Operational
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../Security-Scan-Report-Admin/" class="md-tabs__link">
+          
+  
+  Scans
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../testing/Performance-Test-Plan/" class="md-tabs__link">
+          
+  
+  Testing
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Get To An Answer Documentation" class="md-nav__button md-logo" aria-label="Get To An Answer Documentation" data-md-component="logo">
+      
+  <img src="../../logos/govuk-icon-512.png" alt="logo">
+
+    </a>
+    Get To An Answer Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/Application-Architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Application Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/Deployment-Architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Deployment Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/Entra-Id-Setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure App Registration in Azure Portal
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/Front-Door/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Front Door
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/Terraform-State-Setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup the terraform backend
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/Terraform/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Terraform
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/Volumetrics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GTAA Volumetrics
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Adr
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            Adr
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/adr/001-azure-elz-terraform-subnet-alternative/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Decision - 0001 - Azure ELZ Terraform Subnet Alternative
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Developers
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Developers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developers/Branching-Strategy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Branching strategy and code quality
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developers/Definition-Of-Done/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Definition of Done
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developers/Development-Process/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Development Process
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developers/Project-Setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Project Setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developers/Release-Process/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Release Process
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    High level
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            High level
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../high-level/Proposal-Summary/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Comparison: “Get to an answer” service vs Riddle, for Care Leavers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../high-level/Requirements/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GTAA Requirements Document
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Integration
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Integration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/Iframe-and-contentful-integration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GetToAnAnswer (GTAA) Integration Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Operational
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Operational
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operational/Design-System-Changes-Jun-2025/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Design System Changes - June 2025
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operational/Disaster-Recovery/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Disaster Recovery
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operational/ELZ-Setup-Timeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Enterprise Landing Zone (ELZ) Setup Timeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operational/Stopping-The-Site/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stopping The Site
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Scans
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Scans
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Security-Scan-Report-Admin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ZAP Scanning Report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    ZAP Scanning Report
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    ZAP Scanning Report
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary-of-alerts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary of Alerts
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alerts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alerts
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alert-detail" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alert Detail
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Alert Detail">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#csp-failure-to-define-directive-with-no-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      CSP: Failure to Define Directive with No Fallback
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CSP: Failure to Define Directive with No Fallback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#medium-high" class="md-nav__link">
+    <span class="md-ellipsis">
+      Medium (High)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-693" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 693
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 15
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csp-wildcard-directive" class="md-nav__link">
+    <span class="md-ellipsis">
+      CSP: Wildcard Directive
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CSP: Wildcard Directive">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#medium-high_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Medium (High)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-693_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 693
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-15_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 15
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csp-script-src-unsafe-inline" class="md-nav__link">
+    <span class="md-ellipsis">
+      CSP: script-src unsafe-inline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CSP: script-src unsafe-inline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#medium-high_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Medium (High)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-693_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 693
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-15_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 15
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csp-style-src-unsafe-inline" class="md-nav__link">
+    <span class="md-ellipsis">
+      CSP: style-src unsafe-inline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CSP: style-src unsafe-inline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#medium-high_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Medium (High)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-693_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 693
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-15_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 15
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proxy-disclosure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Proxy Disclosure
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Proxy Disclosure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#medium-medium" class="md-nav__link">
+    <span class="md-ellipsis">
+      Medium (Medium)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-204" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 204
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-45" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 45
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 1
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#permissions-policy-header-not-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      Permissions Policy Header Not Set
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Permissions Policy Header Not Set">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#low-medium" class="md-nav__link">
+    <span class="md-ellipsis">
+      Low (Medium)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-693_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 693
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-15_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 15
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#strict-transport-security-header-not-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      Strict-Transport-Security Header Not Set
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Strict-Transport-Security Header Not Set">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#low-high" class="md-nav__link">
+    <span class="md-ellipsis">
+      Low (High)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-319" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 319
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-15_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 15
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#base64-disclosure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Base64 Disclosure
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Base64 Disclosure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informational-medium" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informational (Medium)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-319_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 319
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 13
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modern-web-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      Modern Web Application
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modern Web Application">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informational-medium_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informational (Medium)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#non-storable-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      Non-Storable Content
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Non-Storable Content">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informational-medium_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informational (Medium)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-524" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 524
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-13_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 13
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sec-fetch-dest-header-is-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sec-Fetch-Dest Header is Missing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sec-Fetch-Dest Header is Missing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informational-high" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informational (High)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-352" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 352
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-9" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 9
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sec-fetch-mode-header-is-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sec-Fetch-Mode Header is Missing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sec-Fetch-Mode Header is Missing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informational-high_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informational (High)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-352_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 352
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-9_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 9
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sec-fetch-site-header-is-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sec-Fetch-Site Header is Missing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sec-Fetch-Site Header is Missing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informational-high_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informational (High)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-352_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 352
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-9_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 9
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sec-fetch-user-header-is-missing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sec-Fetch-User Header is Missing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sec-Fetch-User Header is Missing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informational-high_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informational (High)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-352_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 352
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-9_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 9
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storable-and-cacheable-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      Storable and Cacheable Content
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Storable and Cacheable Content">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informational-medium_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informational (Medium)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-524_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 524
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-13_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 13
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-agent-fuzzer" class="md-nav__link">
+    <span class="md-ellipsis">
+      User Agent Fuzzer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="User Agent Fuzzer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informational-medium_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informational (Medium)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#source-id-1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 1
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Security-Scan-Report-Frontend/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ZAP Scanning Report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Testing
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Testing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/Performance-Test-Plan/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Performance Test Plan GTAA Shared Service
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/Test-Plan/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Test Plan for GTAA
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="zap-scanning-report">ZAP Scanning Report</h1>
+<p>ZAP by <a href="https://checkmarx.com/">Checkmarx</a>.</p>
+<h2 id="summary-of-alerts">Summary of Alerts</h2>
+<table>
+<thead>
+<tr>
+<th>Risk Level</th>
+<th>Number of Alerts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Medium</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Low</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Informational</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+<h2 id="alerts">Alerts</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Risk Level</th>
+<th>Number of Instances</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CSP: Failure to Define Directive with No Fallback</td>
+<td>Medium</td>
+<td>1</td>
+</tr>
+<tr>
+<td>CSP: Wildcard Directive</td>
+<td>Medium</td>
+<td>1</td>
+</tr>
+<tr>
+<td>CSP: script-src unsafe-inline</td>
+<td>Medium</td>
+<td>1</td>
+</tr>
+<tr>
+<td>CSP: style-src unsafe-inline</td>
+<td>Medium</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Proxy Disclosure</td>
+<td>Medium</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Permissions Policy Header Not Set</td>
+<td>Low</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Strict-Transport-Security Header Not Set</td>
+<td>Low</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Base64 Disclosure</td>
+<td>Informational</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Modern Web Application</td>
+<td>Informational</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Non-Storable Content</td>
+<td>Informational</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Sec-Fetch-Dest Header is Missing</td>
+<td>Informational</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Sec-Fetch-Mode Header is Missing</td>
+<td>Informational</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Sec-Fetch-Site Header is Missing</td>
+<td>Informational</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Sec-Fetch-User Header is Missing</td>
+<td>Informational</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Storable and Cacheable Content</td>
+<td>Informational</td>
+<td>3</td>
+</tr>
+<tr>
+<td>User Agent Fuzzer</td>
+<td>Informational</td>
+<td>24</td>
+</tr>
+</tbody>
+</table>
+<h2 id="alert-detail">Alert Detail</h2>
+<h3 id="csp-failure-to-define-directive-with-no-fallback"><a href="https://www.zaproxy.org/docs/alerts/10055/"> CSP: Failure to Define Directive with No Fallback </a></h3>
+<h5 id="medium-high">Medium (High)</h5>
+<h3 id="description">Description</h3>
+<p>The Content Security Policy fails to define one of the directives that has no fallback. Missing/excluding them is the same as allowing anything.</p>
+<ul>
+<li>
+<p>URL: https://dev.get-to-an-answer.education.gov.uk/en/service-unavailable</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Content-Security-Policy</code></li>
+<li>Attack: ``</li>
+<li>Evidence: <code>frame-ancestors *</code></li>
+<li>Other Info: <code>The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.</code></li>
+</ul>
+<p>Instances: 1</p>
+<h3 id="solution">Solution</h3>
+<p>Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.</p>
+<h3 id="reference">Reference</h3>
+<ul>
+<li><a href="https://www.w3.org/TR/CSP/"> https://www.w3.org/TR/CSP/ </a></li>
+<li><a href="https://caniuse.com/#search=content+security+policy"> https://caniuse.com/#search=content+security+policy </a></li>
+<li><a href="https://content-security-policy.com/"> https://content-security-policy.com/ </a></li>
+<li><a href="https://github.com/HtmlUnit/htmlunit-csp"> https://github.com/HtmlUnit/htmlunit-csp </a></li>
+<li><a href="https://web.dev/articles/csp#resource-options"> https://web.dev/articles/csp#resource-options </a></li>
+</ul>
+<h4 id="cwe-id-693">CWE Id: <a href="https://cwe.mitre.org/data/definitions/693.html"> 693 </a></h4>
+<h4 id="wasc-id-15">WASC Id: 15</h4>
+<h4 id="source-id-3">Source ID: 3</h4>
+<h3 id="csp-wildcard-directive"><a href="https://www.zaproxy.org/docs/alerts/10055/"> CSP: Wildcard Directive </a></h3>
+<h5 id="medium-high_1">Medium (High)</h5>
+<h3 id="description_1">Description</h3>
+<p>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks. Including (but not limited to) Cross Site Scripting (XSS), and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</p>
+<ul>
+<li>
+<p>URL: https://dev.get-to-an-answer.education.gov.uk/en/service-unavailable</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Content-Security-Policy</code></li>
+<li>Attack: ``</li>
+<li>Evidence: <code>frame-ancestors *</code></li>
+<li>Other Info: <code>The following directives either allow wildcard sources (or ancestors), are not defined, or are overly broadly defined:
+script-src, style-src, img-src, connect-src, frame-src, font-src, media-src, object-src, manifest-src, worker-src</code></li>
+</ul>
+<p>Instances: 1</p>
+<h3 id="solution_1">Solution</h3>
+<p>Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.</p>
+<h3 id="reference_1">Reference</h3>
+<ul>
+<li><a href="https://www.w3.org/TR/CSP/"> https://www.w3.org/TR/CSP/ </a></li>
+<li><a href="https://caniuse.com/#search=content+security+policy"> https://caniuse.com/#search=content+security+policy </a></li>
+<li><a href="https://content-security-policy.com/"> https://content-security-policy.com/ </a></li>
+<li><a href="https://github.com/HtmlUnit/htmlunit-csp"> https://github.com/HtmlUnit/htmlunit-csp </a></li>
+<li><a href="https://web.dev/articles/csp#resource-options"> https://web.dev/articles/csp#resource-options </a></li>
+</ul>
+<h4 id="cwe-id-693_1">CWE Id: <a href="https://cwe.mitre.org/data/definitions/693.html"> 693 </a></h4>
+<h4 id="wasc-id-15_1">WASC Id: 15</h4>
+<h4 id="source-id-3_1">Source ID: 3</h4>
+<h3 id="csp-script-src-unsafe-inline"><a href="https://www.zaproxy.org/docs/alerts/10055/"> CSP: script-src unsafe-inline </a></h3>
+<h5 id="medium-high_2">Medium (High)</h5>
+<h3 id="description_2">Description</h3>
+<p>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks. Including (but not limited to) Cross Site Scripting (XSS), and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</p>
+<ul>
+<li>
+<p>URL: https://dev.get-to-an-answer.education.gov.uk/en/service-unavailable</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Content-Security-Policy</code></li>
+<li>Attack: ``</li>
+<li>Evidence: <code>frame-ancestors *</code></li>
+<li>Other Info: <code>script-src includes unsafe-inline.</code></li>
+</ul>
+<p>Instances: 1</p>
+<h3 id="solution_2">Solution</h3>
+<p>Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.</p>
+<h3 id="reference_2">Reference</h3>
+<ul>
+<li><a href="https://www.w3.org/TR/CSP/"> https://www.w3.org/TR/CSP/ </a></li>
+<li><a href="https://caniuse.com/#search=content+security+policy"> https://caniuse.com/#search=content+security+policy </a></li>
+<li><a href="https://content-security-policy.com/"> https://content-security-policy.com/ </a></li>
+<li><a href="https://github.com/HtmlUnit/htmlunit-csp"> https://github.com/HtmlUnit/htmlunit-csp </a></li>
+<li><a href="https://web.dev/articles/csp#resource-options"> https://web.dev/articles/csp#resource-options </a></li>
+</ul>
+<h4 id="cwe-id-693_2">CWE Id: <a href="https://cwe.mitre.org/data/definitions/693.html"> 693 </a></h4>
+<h4 id="wasc-id-15_2">WASC Id: 15</h4>
+<h4 id="source-id-3_2">Source ID: 3</h4>
+<h3 id="csp-style-src-unsafe-inline"><a href="https://www.zaproxy.org/docs/alerts/10055/"> CSP: style-src unsafe-inline </a></h3>
+<h5 id="medium-high_3">Medium (High)</h5>
+<h3 id="description_3">Description</h3>
+<p>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks. Including (but not limited to) Cross Site Scripting (XSS), and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</p>
+<ul>
+<li>
+<p>URL: https://dev.get-to-an-answer.education.gov.uk/en/service-unavailable</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Content-Security-Policy</code></li>
+<li>Attack: ``</li>
+<li>Evidence: <code>frame-ancestors *</code></li>
+<li>Other Info: <code>style-src includes unsafe-inline.</code></li>
+</ul>
+<p>Instances: 1</p>
+<h3 id="solution_3">Solution</h3>
+<p>Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.</p>
+<h3 id="reference_3">Reference</h3>
+<ul>
+<li><a href="https://www.w3.org/TR/CSP/"> https://www.w3.org/TR/CSP/ </a></li>
+<li><a href="https://caniuse.com/#search=content+security+policy"> https://caniuse.com/#search=content+security+policy </a></li>
+<li><a href="https://content-security-policy.com/"> https://content-security-policy.com/ </a></li>
+<li><a href="https://github.com/HtmlUnit/htmlunit-csp"> https://github.com/HtmlUnit/htmlunit-csp </a></li>
+<li><a href="https://web.dev/articles/csp#resource-options"> https://web.dev/articles/csp#resource-options </a></li>
+</ul>
+<h4 id="cwe-id-693_3">CWE Id: <a href="https://cwe.mitre.org/data/definitions/693.html"> 693 </a></h4>
+<h4 id="wasc-id-15_3">WASC Id: 15</h4>
+<h4 id="source-id-3_3">Source ID: 3</h4>
+<h3 id="proxy-disclosure"><a href="https://www.zaproxy.org/docs/alerts/40025/"> Proxy Disclosure </a></h3>
+<h5 id="medium-medium">Medium (Medium)</h5>
+<h3 id="description_4">Description</h3>
+<p>2 proxy server(s) were detected or fingerprinted. This information helps a potential attacker to determine
+- A list of targets for an attack against the application.
+ - Potential vulnerabilities on the proxy servers that service the application.
+ - The presence or absence of any proxy-based components that might cause attacks against the application to be detected, prevented, or mitigated.</p>
+<ul>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/robots.txt</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: <code>TRACE, OPTIONS methods with 'Max-Forwards' header. TRACK method.</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: `Using the TRACE, OPTIONS, and TRACK methods, the following proxy servers have been identified between ZAP and the application/web server:</li>
+<li>Unknown</li>
+<li>Unknown
+The following web/application server has been identified:</li>
+<li>Unknown
+`</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/sitemap.xml</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: <code>TRACE, OPTIONS methods with 'Max-Forwards' header. TRACK method.</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: `Using the TRACE, OPTIONS, and TRACK methods, the following proxy servers have been identified between ZAP and the application/web server:</li>
+<li>Unknown</li>
+<li>Unknown
+The following web/application server has been identified:</li>
+<li>Unknown
+`</li>
+</ul>
+<p>Instances: 2</p>
+<h3 id="solution_4">Solution</h3>
+<p>Disable the 'TRACE' method on the proxy servers, as well as the origin web/application server.
+Disable the 'OPTIONS' method on the proxy servers, as well as the origin web/application server, if it is not required for other purposes, such as 'CORS' (Cross Origin Resource Sharing).
+Configure the web and application servers with custom error pages, to prevent 'fingerprintable' product-specific error pages being leaked to the user in the event of HTTP errors, such as 'TRACK' requests for non-existent pages.
+Configure all proxies, application servers, and web servers to prevent disclosure of the technology and version information in the 'Server' and 'X-Powered-By' HTTP response headers.</p>
+<h3 id="reference_4">Reference</h3>
+<ul>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc7231#section-5.1.2"> https://datatracker.ietf.org/doc/html/rfc7231#section-5.1.2 </a></li>
+</ul>
+<h4 id="cwe-id-204">CWE Id: <a href="https://cwe.mitre.org/data/definitions/204.html"> 204 </a></h4>
+<h4 id="wasc-id-45">WASC Id: 45</h4>
+<h4 id="source-id-1">Source ID: 1</h4>
+<h3 id="permissions-policy-header-not-set"><a href="https://www.zaproxy.org/docs/alerts/10063/"> Permissions Policy Header Not Set </a></h3>
+<h5 id="low-medium">Low (Medium)</h5>
+<h3 id="description_5">Description</h3>
+<p>Permissions Policy Header is an added layer of security that helps to restrict from unauthorized access or usage of browser/client features by web resources. This policy ensures the user privacy by limiting or specifying the features of the browsers can be used by the web resources. Permissions Policy provides a set of standard HTTP headers that allow website owners to limit which features of browsers can be used by the page such as camera, microphone, location, full screen etc.</p>
+<ul>
+<li>
+<p>URL: https://dev.get-to-an-answer.education.gov.uk/en/service-unavailable</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 1</p>
+<h3 id="solution_5">Solution</h3>
+<p>Ensure that your web server, application server, load balancer, etc. is configured to set the Permissions-Policy header.</p>
+<h3 id="reference_5">Reference</h3>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Permissions-Policy"> https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Permissions-Policy </a></li>
+<li><a href="https://developer.chrome.com/blog/feature-policy/"> https://developer.chrome.com/blog/feature-policy/ </a></li>
+<li><a href="https://scotthelme.co.uk/a-new-security-header-feature-policy/"> https://scotthelme.co.uk/a-new-security-header-feature-policy/ </a></li>
+<li><a href="https://w3c.github.io/webappsec-feature-policy/"> https://w3c.github.io/webappsec-feature-policy/ </a></li>
+<li><a href="https://www.smashingmagazine.com/2018/12/feature-policy/"> https://www.smashingmagazine.com/2018/12/feature-policy/ </a></li>
+</ul>
+<h4 id="cwe-id-693_4">CWE Id: <a href="https://cwe.mitre.org/data/definitions/693.html"> 693 </a></h4>
+<h4 id="wasc-id-15_4">WASC Id: 15</h4>
+<h4 id="source-id-3_4">Source ID: 3</h4>
+<h3 id="strict-transport-security-header-not-set"><a href="https://www.zaproxy.org/docs/alerts/10035/"> Strict-Transport-Security Header Not Set </a></h3>
+<h5 id="low-high">Low (High)</h5>
+<h3 id="description_6">Description</h3>
+<p>HTTP Strict Transport Security (HSTS) is a web security policy mechanism whereby a web server declares that complying user agents (such as a web browser) are to interact with it using only secure HTTPS connections (i.e. HTTP layered over TLS/SSL). HSTS is an IETF standards track protocol and is specified in RFC 6797.</p>
+<ul>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/robots.txt</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/sitemap.xml</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 4</p>
+<h3 id="solution_6">Solution</h3>
+<p>Ensure that your web server, application server, load balancer, etc. is configured to enforce Strict-Transport-Security.</p>
+<h3 id="reference_6">Reference</h3>
+<ul>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html"> https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html </a></li>
+<li><a href="https://owasp.org/www-community/Security_Headers"> https://owasp.org/www-community/Security_Headers </a></li>
+<li><a href="https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security"> https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security </a></li>
+<li><a href="https://caniuse.com/stricttransportsecurity"> https://caniuse.com/stricttransportsecurity </a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc6797"> https://datatracker.ietf.org/doc/html/rfc6797 </a></li>
+</ul>
+<h4 id="cwe-id-319">CWE Id: <a href="https://cwe.mitre.org/data/definitions/319.html"> 319 </a></h4>
+<h4 id="wasc-id-15_5">WASC Id: 15</h4>
+<h4 id="source-id-3_5">Source ID: 3</h4>
+<h3 id="base64-disclosure"><a href="https://www.zaproxy.org/docs/alerts/10094/"> Base64 Disclosure </a></h3>
+<h5 id="informational-medium">Informational (Medium)</h5>
+<h3 id="description_7">Description</h3>
+<p>Base64 encoded data was disclosed by the application/web server. Note: in the interests of performance not all base64 strings in the response were analyzed individually, the entire response should be looked at by the analyst/security team/developer(s).</p>
+<ul>
+<li>
+<p>URL: https://dev.get-to-an-answer.education.gov.uk/en/service-unavailable</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>e6Pz54n_UZOUoLj4th_S0Jg72AaVI1oeaBWWj_PEamA</code></li>
+<li>Other Info: `{����Q�������И;��#Zh����j``</li>
+</ul>
+<p>Instances: 1</p>
+<h3 id="solution_7">Solution</h3>
+<p>Manually confirm that the Base64 data does not leak sensitive information, and that the data cannot be aggregated/used to exploit other vulnerabilities.</p>
+<h3 id="reference_7">Reference</h3>
+<ul>
+<li><a href="https://projects.webappsec.org/w/page/13246936/Information%20Leakage"> https://projects.webappsec.org/w/page/13246936/Information%20Leakage </a></li>
+</ul>
+<h4 id="cwe-id-319_1">CWE Id: <a href="https://cwe.mitre.org/data/definitions/319.html"> 319 </a></h4>
+<h4 id="wasc-id-13">WASC Id: 13</h4>
+<h4 id="source-id-3_6">Source ID: 3</h4>
+<h3 id="modern-web-application"><a href="https://www.zaproxy.org/docs/alerts/10109/"> Modern Web Application </a></h3>
+<h5 id="informational-medium_1">Informational (Medium)</h5>
+<h3 id="description_8">Description</h3>
+<p>The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one.</p>
+<ul>
+<li>
+<p>URL: https://dev.get-to-an-answer.education.gov.uk/en/service-unavailable</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>&lt;a class="govuk-header__link govuk-header__link--homepage" href="#" aria-label="GetToAnAnswer homepage"&gt;
+                    &lt;img src="/assets/department-for-education_white.png" alt="GetToAnAnswer homepage" class="govuk-header__logotype"&gt;
+                &lt;/a&gt;</code></li>
+<li>Other Info: <code>Links have been found that do not have traditional href attributes, which is an indication that this is a modern web application.</code></li>
+</ul>
+<p>Instances: 1</p>
+<h3 id="solution_8">Solution</h3>
+<p>This is an informational alert and so no changes are required.</p>
+<h3 id="reference_8">Reference</h3>
+<h4 id="source-id-3_7">Source ID: 3</h4>
+<h3 id="non-storable-content"><a href="https://www.zaproxy.org/docs/alerts/10049/"> Non-Storable Content </a></h3>
+<h5 id="informational-medium_2">Informational (Medium)</h5>
+<h3 id="description_9">Description</h3>
+<p>The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.</p>
+<ul>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>302</code></li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>302</code></li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 2</p>
+<h3 id="solution_9">Solution</h3>
+<p>The content may be marked as storable by ensuring that the following conditions are satisfied:
+The request method must be understood by the cache and defined as being cacheable ("GET", "HEAD", and "POST" are currently defined as cacheable)
+The response status code must be understood by the cache (one of the 1XX, 2XX, 3XX, 4XX, or 5XX response classes are generally understood)
+The "no-store" cache directive must not appear in the request or response header fields
+For caching by "shared" caches such as "proxy" caches, the "private" response directive must not appear in the response
+For caching by "shared" caches such as "proxy" caches, the "Authorization" header field must not appear in the request, unless the response explicitly allows it (using one of the "must-revalidate", "public", or "s-maxage" Cache-Control response directives)
+In addition to the conditions above, at least one of the following conditions must also be satisfied by the response:
+It must contain an "Expires" header field
+It must contain a "max-age" response directive
+For "shared" caches such as "proxy" caches, it must contain a "s-maxage" response directive
+It must contain a "Cache Control Extension" that allows it to be cached
+It must have a status code that is defined as cacheable by default (200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501).</p>
+<h3 id="reference_9">Reference</h3>
+<ul>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc7234"> https://datatracker.ietf.org/doc/html/rfc7234 </a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc7231"> https://datatracker.ietf.org/doc/html/rfc7231 </a></li>
+<li><a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html"> https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html </a></li>
+</ul>
+<h4 id="cwe-id-524">CWE Id: <a href="https://cwe.mitre.org/data/definitions/524.html"> 524 </a></h4>
+<h4 id="wasc-id-13_1">WASC Id: 13</h4>
+<h4 id="source-id-3_8">Source ID: 3</h4>
+<h3 id="sec-fetch-dest-header-is-missing"><a href="https://www.zaproxy.org/docs/alerts/90005/"> Sec-Fetch-Dest Header is Missing </a></h3>
+<h5 id="informational-high">Informational (High)</h5>
+<h3 id="description_10">Description</h3>
+<p>Specifies how and where the data would be used. For instance, if the value is audio, then the requested resource must be audio data and not any other type of resource.</p>
+<ul>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Sec-Fetch-Dest</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Sec-Fetch-Dest</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev.get-to-an-answer.education.gov.uk/en/service-unavailable</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Sec-Fetch-Dest</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 3</p>
+<h3 id="solution_10">Solution</h3>
+<p>Ensure that Sec-Fetch-Dest header is included in request headers.</p>
+<h3 id="reference_10">Reference</h3>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Dest"> https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Dest </a></li>
+</ul>
+<h4 id="cwe-id-352">CWE Id: <a href="https://cwe.mitre.org/data/definitions/352.html"> 352 </a></h4>
+<h4 id="wasc-id-9">WASC Id: 9</h4>
+<h4 id="source-id-3_9">Source ID: 3</h4>
+<h3 id="sec-fetch-mode-header-is-missing"><a href="https://www.zaproxy.org/docs/alerts/90005/"> Sec-Fetch-Mode Header is Missing </a></h3>
+<h5 id="informational-high_1">Informational (High)</h5>
+<h3 id="description_11">Description</h3>
+<p>Allows to differentiate between requests for navigating between HTML pages and requests for loading resources like images, audio etc.</p>
+<ul>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Sec-Fetch-Mode</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Sec-Fetch-Mode</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev.get-to-an-answer.education.gov.uk/en/service-unavailable</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Sec-Fetch-Mode</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 3</p>
+<h3 id="solution_11">Solution</h3>
+<p>Ensure that Sec-Fetch-Mode header is included in request headers.</p>
+<h3 id="reference_11">Reference</h3>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Mode"> https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Mode </a></li>
+</ul>
+<h4 id="cwe-id-352_1">CWE Id: <a href="https://cwe.mitre.org/data/definitions/352.html"> 352 </a></h4>
+<h4 id="wasc-id-9_1">WASC Id: 9</h4>
+<h4 id="source-id-3_10">Source ID: 3</h4>
+<h3 id="sec-fetch-site-header-is-missing"><a href="https://www.zaproxy.org/docs/alerts/90005/"> Sec-Fetch-Site Header is Missing </a></h3>
+<h5 id="informational-high_2">Informational (High)</h5>
+<h3 id="description_12">Description</h3>
+<p>Specifies the relationship between request initiator's origin and target's origin.</p>
+<ul>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Sec-Fetch-Site</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Sec-Fetch-Site</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev.get-to-an-answer.education.gov.uk/en/service-unavailable</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Sec-Fetch-Site</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 3</p>
+<h3 id="solution_12">Solution</h3>
+<p>Ensure that Sec-Fetch-Site header is included in request headers.</p>
+<h3 id="reference_12">Reference</h3>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Site"> https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-Site </a></li>
+</ul>
+<h4 id="cwe-id-352_2">CWE Id: <a href="https://cwe.mitre.org/data/definitions/352.html"> 352 </a></h4>
+<h4 id="wasc-id-9_2">WASC Id: 9</h4>
+<h4 id="source-id-3_11">Source ID: 3</h4>
+<h3 id="sec-fetch-user-header-is-missing"><a href="https://www.zaproxy.org/docs/alerts/90005/"> Sec-Fetch-User Header is Missing </a></h3>
+<h5 id="informational-high_3">Informational (High)</h5>
+<h3 id="description_13">Description</h3>
+<p>Specifies if a navigation request was initiated by a user.</p>
+<ul>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Sec-Fetch-User</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Sec-Fetch-User</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev.get-to-an-answer.education.gov.uk/en/service-unavailable</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Sec-Fetch-User</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 3</p>
+<h3 id="solution_13">Solution</h3>
+<p>Ensure that Sec-Fetch-User header is included in user initiated requests.</p>
+<h3 id="reference_13">Reference</h3>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-User"> https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Sec-Fetch-User </a></li>
+</ul>
+<h4 id="cwe-id-352_3">CWE Id: <a href="https://cwe.mitre.org/data/definitions/352.html"> 352 </a></h4>
+<h4 id="wasc-id-9_3">WASC Id: 9</h4>
+<h4 id="source-id-3_12">Source ID: 3</h4>
+<h3 id="storable-and-cacheable-content"><a href="https://www.zaproxy.org/docs/alerts/10049/"> Storable and Cacheable Content </a></h3>
+<h5 id="informational-medium_3">Informational (Medium)</h5>
+<h3 id="description_14">Description</h3>
+<p>The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where "shared" caching servers such as "proxy" caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.</p>
+<ul>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/robots.txt</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: <code>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</code></li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/sitemap.xml</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: <code>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</code></li>
+<li>
+<p>URL: https://dev.get-to-an-answer.education.gov.uk/en/service-unavailable</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: <code>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</code></li>
+</ul>
+<p>Instances: 3</p>
+<h3 id="solution_14">Solution</h3>
+<p>Validate that the response does not contain sensitive, personal or user-specific information. If it does, consider the use of the following HTTP response headers, to limit, or prevent the content being stored and retrieved from the cache by another user:
+Cache-Control: no-cache, no-store, must-revalidate, private
+Pragma: no-cache
+Expires: 0
+This configuration directs both HTTP 1.0 and HTTP 1.1 compliant caching servers to not store the response, and to not retrieve the response (without validation) from the cache, in response to a similar request.</p>
+<h3 id="reference_14">Reference</h3>
+<ul>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc7234"> https://datatracker.ietf.org/doc/html/rfc7234 </a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc7231"> https://datatracker.ietf.org/doc/html/rfc7231 </a></li>
+<li><a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html"> https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html </a></li>
+</ul>
+<h4 id="cwe-id-524_1">CWE Id: <a href="https://cwe.mitre.org/data/definitions/524.html"> 524 </a></h4>
+<h4 id="wasc-id-13_2">WASC Id: 13</h4>
+<h4 id="source-id-3_13">Source ID: 3</h4>
+<h3 id="user-agent-fuzzer"><a href="https://www.zaproxy.org/docs/alerts/10104/"> User Agent Fuzzer </a></h3>
+<h5 id="informational-medium_4">Informational (Medium)</h5>
+<h3 id="description_15">Description</h3>
+<p>Check for differences in response based on fuzzed User Agent (eg. mobile sites, access as a Search Engine Crawler). Compares the response statuscode and the hashcode of the response body with the original response.</p>
+<ul>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (Windows NT 10.0; Trident/7.0; rv:11.0) like Gecko</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3739.0 Safari/537.36 Edg/75.0.109.0</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:93.0) Gecko/20100101 Firefox/91.0</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (iPhone; CPU iPhone OS 8_0_2 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12A366 Safari/600.1.4</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (iPhone; U; CPU iPhone OS 3_0 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Version/4.0 Mobile/7A341 Safari/528.16</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>msnbot/1.1 (+http://search.msn.com/msnbot.htm)</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1)</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (Windows NT 10.0; Trident/7.0; rv:11.0) like Gecko</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3739.0 Safari/537.36 Edg/75.0.109.0</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:93.0) Gecko/20100101 Firefox/91.0</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (iPhone; CPU iPhone OS 8_0_2 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12A366 Safari/600.1.4</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>Mozilla/5.0 (iPhone; U; CPU iPhone OS 3_0 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Version/4.0 Mobile/7A341 Safari/528.16</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>
+<p>URL: https://dev-api.get-to-an-answer.education.gov.uk/</p>
+</li>
+<li>
+<p>Method: <code>GET</code></p>
+</li>
+<li>Parameter: <code>Header User-Agent</code></li>
+<li>Attack: <code>msnbot/1.1 (+http://search.msn.com/msnbot.htm)</code></li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 24</p>
+<h3 id="solution_15">Solution</h3>
+<h3 id="reference_15">Reference</h3>
+<ul>
+<li><a href="https://owasp.org/wstg"> https://owasp.org/wstg </a></li>
+</ul>
+<h4 id="source-id-1_1">Source ID: 1</h4>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+  <footer class="md-footer">
+    <div class="md-footer-meta__inner md-grid">
+
+      <div class="md-copyright">
+
+        
+
+        Made with 
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        <br><br>
+        <img src="../../assets/images/ogl.png" >
+        All content is available under the 
+        <a
+            href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+            target="_blank" rel="noopener"
+        >
+            Open Government Licence v3.0</a>
+        , except where otherwise stated
+      </div>
+
+      <div class="md-copyright">
+        <a 
+          href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
+          target="_blank" rel="noopener">
+          <img src="../../assets/images/govuk-crest.svg" width=125px height=102px;>
+          <br>
+          © Crown copyright
+        </a>
+      </div>
+
+    </div>
+  </footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy", "content.action.edit", "content.action.view", "toc.integrate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+    
+  </body>
+</html>
