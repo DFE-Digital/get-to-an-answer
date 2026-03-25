@@ -4,4 +4,5 @@ COPY package.json yarn.lock ./
 RUN yarn install
 COPY . .
 ENV API_URL=http://web-api:8080
+ENV DOTENV_CONFIG_QUIET=true
 CMD ["yarn", "playwright", "test", "-c", "playwright.config.ts"]

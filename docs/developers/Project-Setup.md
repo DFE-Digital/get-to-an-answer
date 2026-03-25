@@ -1,13 +1,13 @@
 # Project Setup
 
-This repository contains a multi-project .NET 9 solution with three web applications (API, Admin, Frontend), a shared Common library, automated tests, infrastructure-as-code, and developer documentation.
+This repository contains a multi-project .NET 10 solution with three web applications (API, Admin, Frontend), a shared Common library, automated tests, infrastructure-as-code, and developer documentation.
 
 ## Prerequisites
 
-- .NET SDK 9.x
-- Node.js 18+ with npm (for Admin/Frontend assets and E2E tests)
+- .NET SDK 10.x
+- Node.js 20+ with npm (for Admin/Frontend assets and E2E tests)
 - Docker Desktop (for local compose and E2E)
-- Azure CLI and Terraform/OpenTofu (for infrastructure workflows, optional)
+- Azure CLI and Terraform (for infrastructure workflows, optional)
 - Git
 
 ## Solution structure (high level)
@@ -39,6 +39,44 @@ Option B: Run via Docker Compose
     - docker compose -f compose.yaml up --build
 - Services will be available at the ports defined in compose.yaml.
 
+### Creating a valid login token
+
+In order to login to a locally running version of the admin, you will need to create a valid JWT to use with the Mock OAuth.
+
+To create this, head to https://jwt.io, head to the JWTEncoder, select `HS256` as the signing algorithm, then click  `Generate Example`
+
+Once you've done this, replace the payload with the following:
+
+```json
+{
+  "iss": "http://dfe-issuer",
+  "aud": "test-audience",
+  "sub": "test-subject",
+  "name": "",
+  "emailaddress": "",
+  "role": [
+    "Admin"
+  ],
+  "oid": "",
+  "exp": 0,
+  "iat": 0
+}
+```
+
+- Set `name` to your name
+- Set `emailaddress` to an `@education.gov.uk` email address
+- Set `oid` to a GUID
+- Set `exp` to an epoch in the future
+- Set `iat` to an epoch in the past
+
+To get epochs, there is a useful tool at https://www.epochconverter.com/
+
+Once you have updated the payload in the https://jwt.io site, copy the encoded JWT to your clipboard.
+
+From there, you will need to go to your locally running admin and enter the url
+
+`/dev/login?jt=XXXXXXX` where `XXXXXX` is the encoded JWT
+
 ## Configuration
 
 - Each app has appsettings.*.json files. For local development, use appsettings.Local.json (not committed).
@@ -52,11 +90,11 @@ We provide Playwright-based E2E tests that run against a locally hosted site or 
 Recommended workflow:
 - Build local images and run the local compose stack (see “Running locally — Docker Compose”).
 - From the E2E project folder, install and run tests:
-    - npm ci
-    - npx playwright install
-    - npx playwright test
+    - yarn ci
+    - yarn playwright install
+    - yarn playwright test
 - To view failures:
-    - npx playwright show-report
+    - yarn playwright show-report
 
 Note: Stop any conflicting local instances before running against containers to avoid port clashes.
 
