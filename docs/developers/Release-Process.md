@@ -4,11 +4,11 @@ This document describes how we promote changes to Test and Production using GitH
 
 ---
 
-## Automated deployments to Test
+## Creating a new version tag
 
-On merge to `main`:
-1. Version tagging: the workflow locates the latest semver tag (e.g., `v1.2.3`), increments it (e.g., `v1.2.4`), and tags the merge commit.
-2. Application deploys: API, Frontend, and Admin deploy to the Test environment via their respective GitHub workflows.
+After a merge to `main`, once you are happy the version is ready for release:
+1. Version tagging: Create a new semver tag (e.g., `v1.2.3`) for the latest commit within GitHub.
+2. Trigger the application deployment of the new tag: API, Frontend, and Admin deploy to the Test environment via their respective GitHub workflows.
 3. Validation: automated tests (unit, integration, accessibility, e2e, security scan) run via dedicated workflows.
 
 Outcome: Test reflects the latest `main` plus a new tag.
@@ -29,14 +29,7 @@ Guidelines:
 
 Production deployments are manual after successful validation in Test.
 
-### 1) GitHub Release (primary)
-
-1. Choose a tag to release (e.g., `v1.2.4`).
-2. In GitHub, go to Releases → Draft a new release.
-3. Select the tag, add release notes, and Publish.
-4. Publishing triggers Production deployment workflows for API, Frontend, and Admin.
-
-### 2) Manual workflow dispatch (alternative)
+### Manual workflow dispatch (alternative)
 
 Use for hotfixes or exceptional cases.
 

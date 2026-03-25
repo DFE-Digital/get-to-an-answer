@@ -46,7 +46,7 @@ API and SQL Server; the API waits until SQL is ready.
 ## Running the Tests from your local machine
 
 1. Change directory to `src/e2e/gtaa.e2etests`, modify the `.env` to point to the correct API URL (e.g.,
-   `http://localhost:8080` for Docker Compose network).
+   `http://localhost:8080` for Docker Compose network). See `.env.example` for examples
 2. Run tests (commands):
 
 ```sh
@@ -100,7 +100,7 @@ Key `playwright.config.ts` settings:
 ## Image Storage
 The mock to the image storage behaviour we are going to use Azurite (a.k.a. local Azure Blob Storage) for local development.
 
-1) Run the container standalone (or via docker compose):
+1) Run the container standalone (or via docker compose) - ***ensure you remember the skipApiVersionCheck***:
 ```bash
 docker run -d -p 10000:10000 mcr.microsoft.com/azure-storage/azurite azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck
 ```
