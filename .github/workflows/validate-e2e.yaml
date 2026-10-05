@@ -41,10 +41,11 @@ jobs:
         if: ${{ env.ENVIRONMENT == 'Local' }}
         working-directory: ./src
         env:
-          E2E_SQLSERVER_CONNECTION_STRING: ${{ secrets.E2E_SQLSERVER_CONNECTION_STRING }}
-          E2E_SQLSERVER_SA_PASSWORD: ${{ secrets.E2E_SQLSERVER_SA_PASSWORD }}
-          E2E_AZURITE_CONNECTION_STRING: ${{ secrets.E2E_AZURITE_CONNECTION_STRING }}
-          E2E_CERT_PASSWORD: ${{ secrets.E2E_CERT_PASSWORD }}
+          # Dependabot PRs cannot access Actions secrets; these defaults are for the isolated local stack only.
+          E2E_SQLSERVER_CONNECTION_STRING: ${{ secrets.E2E_SQLSERVER_CONNECTION_STRING || format('Server=sqlserver;Database=EndToEndDb;User Id=sa;Pwd={0};TrustServerCertificate=True;', secrets.E2E_SQLSERVER_SA_PASSWORD || 'E2e_local_123!') }}
+          E2E_SQLSERVER_SA_PASSWORD: ${{ secrets.E2E_SQLSERVER_SA_PASSWORD || 'E2e_local_123!' }}
+          E2E_AZURITE_CONNECTION_STRING: ${{ secrets.E2E_AZURITE_CONNECTION_STRING || 'UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://azurite;' }}
+          E2E_CERT_PASSWORD: ${{ secrets.E2E_CERT_PASSWORD || 'E2e_local_cert_123!' }}
           ASPNETCORE_ENVIRONMENT: ${{ env.ENVIRONMENT }}
           AZURE_AD_CLIENT_ID: "123"
           AZURE_AD_TENANT_ID: "456"
