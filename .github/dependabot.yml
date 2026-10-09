@@ -16,6 +16,26 @@ updates:
       prefix: "[github actions] "
     open-pull-requests-limit: 5
 
+  - package-ecosystem: "npm"
+    directory: "/src/Frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    ignore:
+      # No patched releases are available for these dependencies.
+      - dependency-name: "braces"
+
+  - package-ecosystem: "npm"
+    directory: "/src/e2e/gtaa.e2etests"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    ignore:
+      # basic-ftp's safe release is outside the ranges required by pa11y and puppeteer.
+      - dependency-name: "basic-ftp"
+      # No patched release is available for this dependency.
+      - dependency-name: "extract-zip"
+
   - package-ecosystem: "nuget"
     directory: "/src"
     schedule:
