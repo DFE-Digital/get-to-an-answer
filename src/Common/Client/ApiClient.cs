@@ -72,6 +72,7 @@ public interface IApiClient
     Task<QuestionDto?> GetInitialQuestion(Guid questionnaireId, bool preview = false);
     Task<QuestionDto?> GetCurrentQuestion(Guid questionnaireId, Guid questionId, bool preview = false);
     Task<DestinationDto?> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool preview = false);
+    Task<DestinationDto?> GetPreviousState(Guid questionnaireId, int currentQuestionOrder, bool preview = false);
 }
 
 public class ApiClient : IApiClient
@@ -348,6 +349,14 @@ public class ApiClient : IApiClient
         var response =
             await _httpClient.PostAsJsonAsync($"{Questionnaires}/{questionnaireId}/next-state?preview={preview}",
                 request);
+        return await GetResponse<DestinationDto>(response);
+    }
+
+    public async Task<DestinationDto?> GetPreviousState(Guid questionnaireId, int currentQuestionOrder,
+        bool preview = false)
+    {
+        var response =
+            await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/previous-state?currentQuestionOrder={currentQuestionOrder}&preview={preview}");
         return await GetResponse<DestinationDto>(response);
     }
 
