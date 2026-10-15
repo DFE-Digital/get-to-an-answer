@@ -73,7 +73,7 @@
       var inputGroupId = $"q-{Model.Destination.Question.Id}";
 
         @if (Model?.Destination?.Question?.Order > 1){
-            <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" formaction="/questionnaires/@Model.Questionnaire?.Slug/next?handler=Back&embed=@Model.IsEmbedded">Back</button>
+            <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" formaction="next?handler=Back&embed=@Model.IsEmbedded">Back</button>
         }
         <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
           <fieldset class="govuk-fieldset"
