@@ -62,7 +62,69 @@ window.addEventListener('load', function (e) {
                 sendGA4EventToParent('page_submit', result);
             });
         }
-    });    
+    }); 
+
+    // Check if the URL contains the query string 'embed=True' (case-insensitive)
+    const urlParams = new URLSearchParams(window.location.search);
+    const embedParam = urlParams.get('embed');
+
+    // Run this logic ONLY when embed=True is present and back button is used to return to the page
+    if (embedParam && embedParam.toLowerCase() === 'true') {
+
+        // Select all form controls inside your question form (including dropdowns)
+        const formElements = document.querySelectorAll('#question-form input, #question-form select, #question-form textarea');
+
+        formElements.forEach(element => {
+            // Use the element's 'name' or 'id' as a unique storage key
+            const storageKey = element.name || element.id;
+            if (!storageKey) return; // Skip if no identifier exists
+
+            // 1. RESTORE STATE: Check if there's a saved answer in sessionStorage
+            const savedValue = sessionStorage.getItem(storageKey);
+            if (savedValue !== null) {
+                if (element.tagName === 'SELECT') {
+                    // Restore dropdown selected option
+                    element.value = savedValue;
+                } else if (element.type === 'checkbox') {
+                    // Restore checkbox state
+                    element.checked = (savedValue === 'true');
+                } else if (element.type === 'radio') {
+                    // Restore radio button state if it matches
+                    if (element.value === savedValue) {
+                        element.checked = true;
+                    }
+                } else {
+                    // Restore text inputs and textareas
+                    element.value = savedValue;
+                }
+            }
+
+            // 2. SAVE STATE: Listen for changes and update sessionStorage
+            const eventType = (element.tagName === 'SELECT' || element.type === 'checkbox' || element.type === 'radio') ? 'change' : 'input';
+
+            element.addEventListener(eventType, (e) => {
+                let valueToSave;
+
+                if (element.tagName === 'SELECT') {
+                    // Capture the selected option's value from the dropdown
+                    valueToSave = element.value;
+                } else if (element.type === 'checkbox') {
+                    valueToSave = element.checked ? 'true' : 'false';
+                } else if (element.type === 'radio') {
+                    if (element.checked) {
+                        valueToSave = element.value;
+                    } else {
+                        return; // Ignore unchecked radios in a group
+                    }
+                } else {
+                    valueToSave = element.value;
+                }
+
+                // Store it securely in the session
+                sessionStorage.setItem(storageKey, valueToSave);
+            });
+        });
+    }
     
     const h = document.documentElement.offsetHeight;
     parent?.postMessage({ type: 'HEIGHT', h }, '*');
