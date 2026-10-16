@@ -60,7 +60,7 @@
   }
 }
 
-<div class="govuk-grid-row">
+<div class="govuk-grid-row">  
   <div class="govuk-grid-column-full">
     <form id="question-form" action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
 
@@ -72,6 +72,9 @@
       var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
       var inputGroupId = $"q-{Model.Destination.Question.Id}";
 
+        @if (Model?.Destination?.Question?.Order > 1){
+            <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" formaction="next?handler=Back&embed=@Model.IsEmbedded">Back</button>
+        }
         <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
           <fieldset class="govuk-fieldset"
                     aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
@@ -130,6 +133,8 @@
                       : $"{inputGroupId}-error";
                   }
 
+                  var isChecked = Model.Destination.PreviouslySelectedAnswerIds?.Contains(answer?.Id ?? Guid.Empty) ?? false;
+
                   <div class="govuk-radios__item">
                     <input
                       class="govuk-radios__input @(hasFieldError ? "govuk-input--error" : "")"
@@ -137,7 +142,8 @@
                       name="NextStateRequest.SelectedAnswerIds"
                       type="radio"
                       value="@answer.Id"
-                      aria-describedby="@itemDescribedBy">
+                      aria-describedby="@itemDescribedBy"
+                      @(isChecked ? "checked" : "")>
                     <label class="govuk-label govuk-radios__label" for="@inputId">
                       @answer.Content
                     </label>
@@ -183,6 +189,8 @@
                       : $"{inputGroupId}-error";
                   }
 
+                  var isChecked = Model.Destination.PreviouslySelectedAnswerIds?.Contains(answer?.Id ?? Guid.Empty) ?? false;
+
                   <div class="govuk-checkboxes__item">
                     <input
                       class="govuk-checkboxes__input @(hasFieldError ? "govuk-input--error" : "")"
@@ -190,7 +198,8 @@
                       name="NextStateRequest.SelectedAnswerIds"
                       type="checkbox"
                       value="@answer.Id"
-                      aria-describedby="@itemDescribedBy">
+                      aria-describedby="@itemDescribedBy"
+                      @(isChecked ? "checked" : "")>
                     <label class="govuk-label govuk-checkboxes__label" for="@inputId">
                       @answer.Content
                     </label>
@@ -218,10 +227,28 @@
                 Choose answer
               </label>
               <select class="govuk-select" id="@($"{inputGroupId}-select")" name="NextStateRequest.SelectedAnswerIds">
-                <option value="choose" selected="selected">Select an answer</option>
+                @{
+                  var firstPreviouslySelectedId = Model.Destination.PreviouslySelectedAnswerIds?.FirstOrDefault();
+                }
+                @if (firstPreviouslySelectedId == null || firstPreviouslySelectedId == Guid.Empty)
+                {
+                  <option value="choose" selected="selected">Select an answer</option>
+                }
+                else
+                {
+                  <option value="choose">Select an answer</option>
+                }
                 @foreach (var answer in answers)
                 {
-                  <option value="@answer.Id">@answer.Content</option>
+                  var isSelected = firstPreviouslySelectedId == answer.Id;
+                  if (isSelected)
+                  {
+                    <option value="@answer.Id" selected>@answer.Content</option>
+                  }
+                  else
+                  {
+                    <option value="@answer.Id">@answer.Content</option>
+                  }
                 }
               </select>
             }
@@ -234,6 +261,7 @@
 
         <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
         <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
+        <input type="hidden" name="AnswerHistory" value="@Model.AnswerHistory">
     }
     else if (Model is { Destination.Type: DestinationType.CustomContent} 
              or { Destination.Type: DestinationType.InterimThenQuestion, NextStateRequest.ValidateAnswers: true })
