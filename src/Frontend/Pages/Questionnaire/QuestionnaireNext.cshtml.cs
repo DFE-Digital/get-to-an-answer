@@ -186,7 +186,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             // This is necessary because when back is clicked, the form doesn't actually submit
             // the selected checkboxes/radio values, so ModelState would be invalid otherwise
             ModelState.Clear();
-            TryUpdateModelAsync(NextStateRequest);
+            //TryUpdateModelAsync(NextStateRequest);
         }
         catch (Exception e)
         {
@@ -204,6 +204,25 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
     {
         try
         {
+            // Validate inputs
+            if (questionId == Guid.Empty)
+            {
+                logger.LogWarning("SaveAnswersToHistory called with empty questionId");                
+                return;
+            }
+
+            if (selectedAnswerIds == null)
+            {
+                logger.LogWarning("SaveAnswersToHistory called with null selectedAnswerIds");
+                return;
+            }
+
+            // Ensure AnswerHistory is not null
+            if (string.IsNullOrEmpty(AnswerHistory))
+            {
+                AnswerHistory = "{}";
+            }
+
             var options = new System.Text.Json.JsonSerializerOptions 
             { 
                 PropertyNameCaseInsensitive = true,
@@ -212,11 +231,11 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             var history = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, List<Guid>>>(AnswerHistory, options) ?? new();
             history[questionId.ToString()] = selectedAnswerIds;
             AnswerHistory = System.Text.Json.JsonSerializer.Serialize(history, options);
-            logger.LogInformation("Saved answers to history for question {QuestionId}. Total questions in history: {Count}", questionId, history.Count);
+            logger.LogInformation("Saved answers to history for question {QuestionId}. Total questions in history: {Count}", questionId, history.Count);            
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error saving answers to history for question {QuestionId}", questionId);
+            logger.LogError(ex, "Error saving answers to history for question {QuestionId}: {ExceptionMessage}", questionId, ex.Message);
         }
     }
 
@@ -227,6 +246,19 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
     {
         try
         {
+            // Validate input
+            if (questionId == Guid.Empty)
+            {
+                logger.LogWarning("GetAnswersFromHistory called with empty questionId");
+                return new();
+            }
+
+            // Ensure AnswerHistory is not null
+            if (string.IsNullOrEmpty(AnswerHistory))
+            {
+                AnswerHistory = "{}";
+            }
+
             var options = new System.Text.Json.JsonSerializerOptions 
             { 
                 PropertyNameCaseInsensitive = true
@@ -234,12 +266,12 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             var history = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, List<Guid>>>(AnswerHistory, options) ?? new();
             var questionKey = questionId.ToString();
             var hasAnswers = history.TryGetValue(questionKey, out var answers);
-            logger.LogInformation("Retrieved answers for question {QuestionId}: Found={Found}, Answers={Count}", questionId, hasAnswers, answers?.Count ?? 0);
+            logger.LogInformation("Retrieved answers for question {QuestionId}: Found={Found}, Answers={Count}", questionId, hasAnswers, answers?.Count ?? 0);            
             return hasAnswers && answers != null ? answers : new();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error retrieving answers from history for question {QuestionId}", questionId);
+            logger.LogError(ex, "Error retrieving answers from history for question {QuestionId}: {ExceptionMessage}", questionId, ex.Message);
             return new();
         }
     }
