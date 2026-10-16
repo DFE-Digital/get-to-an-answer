@@ -97,6 +97,7 @@ window.addEventListener('load', function (e) {
         }
 
         // 1. Restore state on initial page load
+        // For embedded iframes, sessionStorage contains answers from the previous form submission
         restoreFormState();
 
         // 2. Listen for Back/Forward button navigation (handles browser cache & history restoration)

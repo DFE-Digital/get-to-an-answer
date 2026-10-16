@@ -64,6 +64,12 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             Questionnaire = questionnaire;
             IsEmbedded = Embed;
 
+            // Save the current question's answers to history before going back
+            if (NextStateRequest.CurrentQuestionId != Guid.Empty && NextStateRequest.SelectedAnswerIds.Count > 0)
+            {
+                SaveAnswersToHistory(NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
+            }
+
             // Get the previous question based on the current question's order
             var previousDestination = await apiClient.GetPreviousState(Questionnaire.Id, NextStateRequest.CurrentQuestionOrder, preview: true);
             if (previousDestination == null)
