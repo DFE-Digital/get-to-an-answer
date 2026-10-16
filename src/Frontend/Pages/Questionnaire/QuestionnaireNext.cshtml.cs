@@ -156,7 +156,8 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             IsEmbedded = Embed;
 
             // Save the current question's answers to history before going back
-            if (NextStateRequest.CurrentQuestionId != Guid.Empty && NextStateRequest.SelectedAnswerIds.Count > 0)
+            // Save even if empty - this ensures answer history stays accurate
+            if (NextStateRequest.CurrentQuestionId != Guid.Empty)
             {
                 SaveAnswersToHistory(NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
             }
