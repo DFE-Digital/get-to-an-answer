@@ -68,45 +68,54 @@ window.addEventListener('load', function (e) {
     const urlParams = new URLSearchParams(window.location.search);
     const embedParam = urlParams.get('embed');
 
-    // Run this logic ONLY when embed=True is present and back button is used to return to the page
+    // Run this logic ONLY when embed=True is present
     if (embedParam && embedParam.toLowerCase() === 'true') {
 
-        // Select all form controls inside your question form (including dropdowns)
         const formElements = document.querySelectorAll('#question-form input, #question-form select, #question-form textarea');
 
-        formElements.forEach(element => {
-            // Use the element's 'name' or 'id' as a unique storage key
-            const storageKey = element.name || element.id;
-            if (!storageKey) return; // Skip if no identifier exists
+        // Function to restore all form answers from sessionStorage
+        function restoreFormState() {
+            formElements.forEach(element => {
+                const storageKey = element.name || element.id;
+                if (!storageKey) return; // Skip if no identifier exists
 
-            // 1. RESTORE STATE: Check if there's a saved answer in sessionStorage
-            const savedValue = sessionStorage.getItem(storageKey);
-            if (savedValue !== null) {
-                if (element.tagName === 'SELECT') {
-                    // Restore dropdown selected option
-                    element.value = savedValue;
-                } else if (element.type === 'checkbox') {
-                    // Restore checkbox state
-                    element.checked = (savedValue === 'true');
-                } else if (element.type === 'radio') {
-                    // Restore radio button state if it matches
-                    if (element.value === savedValue) {
-                        element.checked = true;
+                const savedValue = sessionStorage.getItem(storageKey);
+                if (savedValue !== null) {
+                    if (element.tagName === 'SELECT') {
+                        element.value = savedValue;
+                    } else if (element.type === 'checkbox') {
+                        element.checked = (savedValue === 'true');
+                    } else if (element.type === 'radio') {
+                        if (element.value === savedValue) {
+                            element.checked = true;
+                        }
+                    } else {
+                        element.value = savedValue;
                     }
-                } else {
-                    // Restore text inputs and textareas
-                    element.value = savedValue;
                 }
-            }
+            });
+        }
 
-            // 2. SAVE STATE: Listen for changes and update sessionStorage
+        // 1. Restore state on initial page load
+        restoreFormState();
+
+        // 2. Listen for Back/Forward button navigation (handles browser cache & history restoration)
+        window.addEventListener('pageshow', function (event) {
+            // Re-run restoration when navigating back to this page
+            restoreFormState();
+        });
+
+        // 3. SAVE STATE: Listen for changes and update sessionStorage as the user interacts
+        formElements.forEach(element => {
+            const storageKey = element.name || element.id;
+            if (!storageKey) return;
+
             const eventType = (element.tagName === 'SELECT' || element.type === 'checkbox' || element.type === 'radio') ? 'change' : 'input';
 
             element.addEventListener(eventType, (e) => {
                 let valueToSave;
 
                 if (element.tagName === 'SELECT') {
-                    // Capture the selected option's value from the dropdown
                     valueToSave = element.value;
                 } else if (element.type === 'checkbox') {
                     valueToSave = element.checked ? 'true' : 'false';
