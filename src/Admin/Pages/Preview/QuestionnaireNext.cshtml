@@ -51,7 +51,7 @@
         var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
         var inputGroupId = $"q-{Model.Destination.Question.Id}";
         @if (Model?.Destination?.Question?.Order > 1){
-            <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" formaction="next-preview?handler=Back&embed=@Model.IsEmbedded">Back</button>
+            <button type="submit" name="handler" value="Back" formnovalidate="formnovalidate" class="govuk-back-link">Back</button>
         }
         <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
           <fieldset class="govuk-fieldset" aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
