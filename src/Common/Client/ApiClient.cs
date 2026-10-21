@@ -339,8 +339,10 @@ public class ApiClient : IApiClient
 
     public async Task<QuestionDto?> GetCurrentQuestion(Guid questionnaireId, Guid questionId, bool preview = false)
     {
+        var encodedQuestionnaireId = Uri.EscapeDataString(questionnaireId.ToString());
+        var encodedQuestionId = Uri.EscapeDataString(questionId.ToString());
         var response =
-            await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/questions/{questionId}?preview={preview}");
+            await _httpClient.GetAsync($"{Questionnaires}/{encodedQuestionnaireId}/questions/{encodedQuestionId}?preview={preview}");
         return await GetResponse<QuestionDto>(response);
     }
 
