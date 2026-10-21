@@ -60,6 +60,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
         {
             "continueButton" => await HandleContinueAsync(),
             "backButton" => await HandleBackAsync(),
+            "customContentBackButton" => await HandleCustomContentAsync(),
             _ => HandleUnknownButton(buttonValue ?? string.Empty)
         };
     }
@@ -122,6 +123,37 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
         catch (Exception e)
         {
             logger.LogError(e, "Error loading previous question. Error: {EMessage}", e.Message);
+            throw;
+        }
+    }
+
+    private async Task<IActionResult> HandleCustomContentAsync()
+    {
+        try
+        {
+            var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireId.ToString(), true);
+            if (questionnaire == null)
+                return NotFound();
+
+            Questionnaire = questionnaire;
+            Destination = new DestinationDto
+            {
+                Type = DestinationType.Question,
+                Question = await apiClient.GetLastQuestion(Questionnaire.Id, true)
+            };
+
+            if (Destination?.Question == null)
+                return NotFound();
+
+            IsEmbedded = Embed;
+
+            RestorePreviousQuestion(Destination);
+            ModelState.Clear();
+            return Page();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error loading last question. Error: {EMessage}", e.Message);
             throw;
         }
     }
