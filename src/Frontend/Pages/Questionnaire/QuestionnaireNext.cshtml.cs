@@ -54,6 +54,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             "continueButton" => await HandleContinueAsync(),
             "backButton" => await HandleBackAsync(),
             "customContentBackButton" => await HandleCustomContentAsync(),
+            "backButtonForStartPage" => await HandleStartPageBackAsync(),
             _ => HandleUnknownButton(buttonValue ?? string.Empty)
         };
     }
@@ -146,6 +147,23 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
         catch (Exception e)
         {
             logger.LogError(e, "Error loading last question. Error: {EMessage}", e.Message);
+            throw;
+        }
+    }
+
+    private async Task<IActionResult> HandleStartPageBackAsync()
+    {
+        try
+        {
+            if (QuestionnaireSlug == null)
+                throw new InvalidOperationException("QuestionnaireSlug is required");
+
+            // Redirect to the questionnaire start page
+            return Redirect($"/questionnaires/{QuestionnaireSlug}/start?embed={Embed}");
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error navigating to start page. Error: {EMessage}", e.Message);
             throw;
         }
     }

@@ -61,6 +61,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             "continueButton" => await HandleContinueAsync(),
             "backButton" => await HandleBackAsync(),
             "customContentBackButton" => await HandleCustomContentAsync(),
+            "backButtonForStartPage" => await HandleBackButtonForStartPageAsync(),
             _ => HandleUnknownButton(buttonValue ?? string.Empty)
         };
     }
@@ -154,6 +155,20 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
         catch (Exception e)
         {
             logger.LogError(e, "Error loading last question. Error: {EMessage}", e.Message);
+            throw;
+        }
+    }
+
+    private async Task<IActionResult> HandleBackButtonForStartPageAsync()
+    {
+        try
+        {
+            // Redirect to the questionnaire start page in preview mode
+            return Redirect($"/admin/questionnaires/{QuestionnaireId}/start-preview?embed={Embed}");
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error navigating to start page. Error: {EMessage}", e.Message);
             throw;
         }
     }
