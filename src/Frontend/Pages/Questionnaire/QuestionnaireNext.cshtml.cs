@@ -28,9 +28,6 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 
     public async Task<IActionResult> OnGet()
     {
-        // Load FrontEnd URL from configuration
-        FrontEndUrl = _configuration["FrontEndUrl"]?? "";
-
         HttpContext.Features.Set(new QuestionnaireRunFeature
         {
             IsEmbedded = Embed
@@ -57,156 +54,150 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
 
     public async Task<IActionResult> OnPost()
     {
+        string? buttonValue = Request.Form["submitButton"];
+        return buttonValue switch
+        {
+            "continueButton" => await HandleContinueAsync(),
+            "backButton" => await HandleBackAsync(),
+            _ => HandleUnknownButton(buttonValue ?? string.Empty)
+        };
+    }
+
+    private async Task<IActionResult> HandleContinueAsync()
+    {
         try
         {
-            // Load FrontEnd URL from configuration
-            FrontEndUrl = _configuration["FrontEndUrl"] ?? "";
+            await InitializeQuestionnaireAsync();
 
-            HttpContext.Features.Set(new QuestionnaireRunFeature
-            {
-                IsEmbedded = Embed
-            });
-
-            if (QuestionnaireSlug == null)
-                return NotFound();
-            
-            var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireSlug);
-        
-            if (questionnaire == null)
-                return NotFound();
-
-            
-
-            Questionnaire = questionnaire;
-            Destination = new DestinationDto
-            {
-                Type = DestinationType.Question,
-                Question = await apiClient.GetCurrentQuestion(Questionnaire.Id, NextStateRequest.CurrentQuestionId)
-            };
-            IsEmbedded = Embed;
-            
             if (!ModelState.IsValid)
-            {
-                ModelState.Clear();
-                
-                // If we don't have a question OR we don't need to validate the answers, return the page
-                if (Destination.Question is null || !NextStateRequest.ValidateAnswers) 
-                    return Page();
-                
-                // Otherwise, set the error message based on the question type
-                switch (Destination.Question.Type)
-                {
-                    case QuestionType.MultiSelect:
-                        ModelState.AddModelError("NextStateRequest.SelectedAnswerIds",
-                            "Select at least one answer");
-                        break;
-                    case QuestionType.SingleSelect:
-                        ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select an answer");
-                        break;
-                    case QuestionType.DropdownSelect:
-                        ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select an option");
-                        break;
-                }
-                
-                // Return the page with the errors added
-                return Page();
-            }
+                return await HandleValidationErrorAsync();
 
             var destination = await apiClient.GetNextState(Questionnaire.Id, NextStateRequest);
             if (destination == null)
                 return NotFound();
 
-            // Save the current answers before moving to the next question
-            if (NextStateRequest.CurrentQuestionId != Guid.Empty && NextStateRequest.SelectedAnswerIds.Count > 0)
-            {
-                SaveAnswersToHistory(NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
-            }
+            SaveCurrentAnswersToHistory();
 
             if (!Embed && destination is { Type: DestinationType.ExternalLink, Content: not null })
-            {
-                var url = Uri.TryCreate(destination.Content, UriKind.Absolute, out var uri)
-                    ? uri.ToString()
-                    : "https://" + destination.Content;
-
-                return Redirect(url);
-            }
+                return HandleExternalLinkRedirect(destination.Content);
 
             IsEmbedded = Embed;
             Destination = destination;
             NextStateRequest = new GetNextStateRequest();
+            return Page();
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error load next question or final destination. Error: {EMessage}", e.Message);
             throw;
         }
-
-        return Page();
     }
 
-    public async Task<IActionResult> OnPostBack()
+    private async Task<IActionResult> HandleBackAsync()
     {
         try
         {
-            // Load FrontEnd URL from configuration
-            FrontEndUrl = _configuration["FrontEndUrl"] ?? "";
+            await InitializeQuestionnaireAsync();
 
-            HttpContext.Features.Set(new QuestionnaireRunFeature
-            {
-                IsEmbedded = Embed
-            });
+            SaveCurrentAnswersToHistory();
 
-            if (QuestionnaireSlug == null)
-                return NotFound();
-
-            var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireSlug);
-
-            if (questionnaire == null)
-                return NotFound();
-
-            Questionnaire = questionnaire;
-            IsEmbedded = Embed;
-
-            // Save the current question's answers to history before going back
-            // Save even if empty - this ensures answer history stays accurate
-            if (NextStateRequest.CurrentQuestionId != Guid.Empty)
-            {
-                SaveAnswersToHistory(NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
-            }
-
-            // Get the previous question based on the current question's order
             var previousDestination = await apiClient.GetPreviousState(Questionnaire.Id, NextStateRequest.CurrentQuestionOrder);
             if (previousDestination == null)
                 return NotFound();
 
-            // Restore previously selected answers for this question from history
-            var previousQuestionId = previousDestination.Question?.Id ?? Guid.Empty;
-            var restoredAnswers = GetAnswersFromHistory(previousQuestionId);
-            previousDestination.PreviouslySelectedAnswerIds = restoredAnswers;
-
-            logger.LogInformation("OnPostBack: Question={QuestionId}, PreviouslySelectedAnswers={AnswerCount}, AnswerHistory={HistoryJson}", 
-                previousQuestionId, previousDestination.PreviouslySelectedAnswerIds.Count, AnswerHistory);
-
-            Destination = previousDestination;
-
-            // Pre-populate NextStateRequest with the restored answers so validation passes
-            NextStateRequest.CurrentQuestionId = previousQuestionId;
-            NextStateRequest.CurrentQuestionOrder = previousDestination.Question?.Order ?? 0;
-            NextStateRequest.SelectedAnswerIds = restoredAnswers;
-
-            // Clear ModelState so the pre-populated SelectedAnswerIds is used for validation
-            // This is necessary because when back is clicked, the form doesn't actually submit
-            // the selected checkboxes/radio values, so ModelState would be invalid otherwise
+            RestorePreviousQuestion(previousDestination);
             ModelState.Clear();
-            //TryUpdateModelAsync(NextStateRequest);
+            return Page();
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error loading previous question. Error: {EMessage}", e.Message);
             throw;
         }
+    }
 
+    private IActionResult HandleUnknownButton(string buttonValue)
+    {
+        logger.LogWarning("Unknown button value submitted: {ButtonValue}", buttonValue);
+        return BadRequest("Unknown action");
+    }
+
+    private async Task InitializeQuestionnaireAsync()
+    {
+        HttpContext.Features.Set(new QuestionnaireRunFeature
+        {
+            IsEmbedded = Embed
+        });
+
+        if (QuestionnaireSlug == null)
+            throw new InvalidOperationException("QuestionnaireSlug is required");
+
+        var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireSlug);
+        if (questionnaire == null)
+            throw new InvalidOperationException("Questionnaire not found");
+
+        Questionnaire = questionnaire;
+        Destination = new DestinationDto
+        {
+            Type = DestinationType.Question,
+            Question = await apiClient.GetCurrentQuestion(Questionnaire.Id, NextStateRequest.CurrentQuestionId)
+        };
+        IsEmbedded = Embed;
+    }
+
+    private async Task<IActionResult> HandleValidationErrorAsync()
+    {
+        ModelState.Clear();
+
+        if (Destination.Question is null || !NextStateRequest.ValidateAnswers)
+            return Page();
+
+        AddValidationError(Destination.Question.Type);
         return Page();
+    }
+
+    private void AddValidationError(QuestionType questionType)
+    {
+        var errorMessage = questionType switch
+        {
+            QuestionType.MultiSelect => "Select at least one answer",
+            QuestionType.SingleSelect => "Select an answer",
+            QuestionType.DropdownSelect => "Select an option",
+            _ => "Please provide an answer"
+        };
+
+        ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", errorMessage);
+    }
+
+    private void SaveCurrentAnswersToHistory()
+    {
+        if (NextStateRequest.CurrentQuestionId != Guid.Empty && NextStateRequest.SelectedAnswerIds.Count > 0)
+            SaveAnswersToHistory(NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
+    }
+
+    private IActionResult HandleExternalLinkRedirect(string content)
+    {
+        var url = Uri.TryCreate(content, UriKind.Absolute, out var uri)
+            ? uri.ToString()
+            : "https://" + content;
+
+        return Redirect(url);
+    }
+
+    private void RestorePreviousQuestion(DestinationDto previousDestination)
+    {
+        var previousQuestionId = previousDestination.Question?.Id ?? Guid.Empty;
+        var restoredAnswers = GetAnswersFromHistory(previousQuestionId);
+        previousDestination.PreviouslySelectedAnswerIds = restoredAnswers;
+
+        logger.LogInformation("OnPostBack: Question={QuestionId}, PreviouslySelectedAnswers={AnswerCount}, AnswerHistory={HistoryJson}",
+            previousQuestionId, previousDestination.PreviouslySelectedAnswerIds.Count, AnswerHistory);
+
+        Destination = previousDestination;
+
+        NextStateRequest.CurrentQuestionId = previousQuestionId;
+        NextStateRequest.CurrentQuestionOrder = previousDestination.Question?.Order ?? 0;
+        NextStateRequest.SelectedAnswerIds = restoredAnswers;
     }
 
     /// <summary>

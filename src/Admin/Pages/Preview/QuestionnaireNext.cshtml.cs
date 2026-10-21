@@ -53,128 +53,151 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
         return Page();
     }
 
-    public async Task<IActionResult> OnPostBack()
-    {
-        try
-        {
-            var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireId.ToString(), true);
-            if (questionnaire == null)
-                return NotFound();
-
-            Questionnaire = questionnaire;
-            IsEmbedded = Embed;
-
-            // Save the current question's answers to history before going back
-            // Save even if empty - this ensures answer history stays accurate
-            if (NextStateRequest.CurrentQuestionId != Guid.Empty)
-            {
-                SaveAnswersToHistory(NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
-            }
-
-            // Get the previous question based on the current question's order
-            var previousDestination = await apiClient.GetPreviousState(Questionnaire.Id, NextStateRequest.CurrentQuestionOrder, preview: true);
-            if (previousDestination == null)
-                return NotFound();
-
-            // Restore previously selected answers for this question from history
-            var previousQuestionId = previousDestination.Question?.Id ?? Guid.Empty;
-            var restoredAnswers = GetAnswersFromHistory(previousQuestionId);
-            previousDestination.PreviouslySelectedAnswerIds = restoredAnswers;
-
-            logger.LogInformation("OnPostBack: Question={QuestionId}, PreviouslySelectedAnswers={AnswerCount}, AnswerHistory={HistoryJson}", 
-                previousQuestionId, previousDestination.PreviouslySelectedAnswerIds.Count, AnswerHistory);
-
-            Destination = previousDestination;
-
-            // Pre-populate NextStateRequest with the restored answers so validation passes
-            NextStateRequest.CurrentQuestionId = previousQuestionId;
-            NextStateRequest.CurrentQuestionOrder = previousDestination.Question?.Order ?? 0;
-            NextStateRequest.SelectedAnswerIds = restoredAnswers;
-
-            // Clear ModelState so the pre-populated SelectedAnswerIds is used for validation
-            // This is necessary because when back is clicked, the form doesn't actually submit
-            // the selected checkboxes/radio values, so ModelState would be invalid otherwise
-            ModelState.Clear();
-            //TryUpdateModelAsync(NextStateRequest);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, "Error loading previous question. Error: {EMessage}", e.Message);
-            throw;
-        }
-
-        return Page();
-    }
-
     public async Task<IActionResult> OnPost()
     {
+        string? buttonValue = Request.Form["submitButton"];
+        return buttonValue switch
+        {
+            "continueButton" => await HandleContinueAsync(),
+            "backButton" => await HandleBackAsync(),
+            _ => HandleUnknownButton(buttonValue ?? string.Empty)
+        };
+    }
+
+    private async Task<IActionResult> HandleContinueAsync()
+    {
         try
         {
             var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireId.ToString(), true);
-            
             if (questionnaire == null)
                 return NotFound();
-            
-            Questionnaire = questionnaire;
-            Destination = new DestinationDto
-            {
-                Type = DestinationType.Question,
-                Question = await apiClient.GetCurrentQuestion(Questionnaire.Id, NextStateRequest.CurrentQuestionId, true)
-            };
-            IsEmbedded = Embed;
-            
-            if (!ModelState.IsValid)
-            {
-                ModelState.Clear();
-                if (Destination.Question is not null && NextStateRequest.ValidateAnswers)
-                {
-                    switch (Destination.Question.Type)
-                    {
-                        case QuestionType.MultiSelect:
-                            ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select at least one answer");
-                            break;
-                        case QuestionType.SingleSelect:
-                            ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select an answer");
-                            break;
-                        case QuestionType.DropdownSelect:
-                            ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select an option");
-                            break;
-                    }
-                }
-                return Page();
-            }
 
-            // Save the current answers to history before moving to the next question
-            if (NextStateRequest.CurrentQuestionId != Guid.Empty && NextStateRequest.SelectedAnswerIds.Count > 0)
-            {
-                SaveAnswersToHistory(NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
-            }
+            await InitializeDestination(questionnaire);
+
+            if (!ModelState.IsValid)
+                return await HandleValidationErrorAsync();
+
+            SaveCurrentAnswersToHistory();
 
             var destination = await apiClient.GetNextState(Questionnaire.Id, NextStateRequest, true);
             if (destination == null)
                 return NotFound();
 
-            // Redirect to external-link (if embedded or not, but different for Frontend, which is only standalone)
             if (destination is { Type: DestinationType.ExternalLink, Content: not null })
-            {
-                var url = Uri.TryCreate(destination.Content, UriKind.Absolute, out var uri)
-                    ? uri.ToString()
-                    : "https://" + destination.Content;
-
-                return Redirect(url);
-            }
+                return HandleExternalLinkRedirect(destination.Content);
 
             IsEmbedded = Embed;
             Destination = destination;
             NextStateRequest = new GetNextStateRequest();
+            return Page();
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error load next question or final destination. Error: {EMessage}", e.Message);
             throw;
         }
+    }
 
-        return Page();
+    private async Task<IActionResult> HandleBackAsync()
+    {
+        try
+        {
+            var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireId.ToString(), true);
+            if (questionnaire == null)
+                return NotFound();
+
+            Questionnaire = questionnaire;
+            IsEmbedded = Embed;
+
+            SaveCurrentAnswersToHistory();
+
+            var previousDestination = await apiClient.GetPreviousState(Questionnaire.Id, NextStateRequest.CurrentQuestionOrder, preview: true);
+            if (previousDestination == null)
+                return NotFound();
+
+            RestorePreviousQuestion(previousDestination);
+            ModelState.Clear();
+            return Page();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error loading previous question. Error: {EMessage}", e.Message);
+            throw;
+        }
+    }
+
+    private IActionResult HandleUnknownButton(string buttonValue)
+    {
+        logger.LogWarning("Unknown button value submitted: {ButtonValue}", buttonValue);
+        return BadRequest("Unknown action");
+    }
+
+    private async Task<IActionResult> HandleValidationErrorAsync()
+    {
+        ModelState.Clear();
+        ValidateAndAddErrors();
+        return await Task.FromResult(Page());
+    }
+
+    private void SaveCurrentAnswersToHistory()
+    {
+        if (NextStateRequest.CurrentQuestionId != Guid.Empty && NextStateRequest.SelectedAnswerIds.Count > 0)
+            SaveAnswersToHistory(NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
+    }
+
+    private IActionResult HandleExternalLinkRedirect(string content)
+    {
+        var url = Uri.TryCreate(content, UriKind.Absolute, out var uri)
+            ? uri.ToString()
+            : "https://" + content;
+
+        return Redirect(url);
+    }
+
+    private void RestorePreviousQuestion(DestinationDto previousDestination)
+    {
+        var previousQuestionId = previousDestination.Question?.Id ?? Guid.Empty;
+        var restoredAnswers = GetAnswersFromHistory(previousQuestionId);
+        previousDestination.PreviouslySelectedAnswerIds = restoredAnswers;
+
+        logger.LogInformation("OnPostBack: Question={QuestionId}, PreviouslySelectedAnswers={AnswerCount}, AnswerHistory={HistoryJson}",
+            previousQuestionId, previousDestination.PreviouslySelectedAnswerIds.Count, AnswerHistory);
+
+        Destination = previousDestination;
+
+        NextStateRequest.CurrentQuestionId = previousQuestionId;
+        NextStateRequest.CurrentQuestionOrder = previousDestination.Question?.Order ?? 0;
+        NextStateRequest.SelectedAnswerIds = restoredAnswers;
+    }
+
+    private async Task InitializeDestination(QuestionnaireInfoDto questionnaire)
+    {
+        Questionnaire = questionnaire;
+        Destination = new DestinationDto
+        {
+            Type = DestinationType.Question,
+            Question = await apiClient.GetCurrentQuestion(Questionnaire.Id, NextStateRequest.CurrentQuestionId, true)
+        };
+        IsEmbedded = Embed;
+    }
+
+    private void ValidateAndAddErrors()
+    {
+        if (Destination.Question is not null && NextStateRequest.ValidateAnswers)
+        {
+            switch (Destination.Question.Type)
+            {
+                case QuestionType.MultiSelect:
+                    ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select at least one answer");
+                    break;
+                case QuestionType.SingleSelect:
+                    ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select an answer");
+                    break;
+                case QuestionType.DropdownSelect:
+                    ModelState.AddModelError("NextStateRequest.SelectedAnswerIds", "Select an option");
+                    break;
+            }
+        }
     }
 
     /// <summary>
