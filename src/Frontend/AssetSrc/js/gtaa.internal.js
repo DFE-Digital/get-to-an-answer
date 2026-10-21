@@ -30,7 +30,7 @@ window.addEventListener('load', function (e) {
     });
 
     // Add an event listener for when the form is posted
-    document.getElementById('question-form').addEventListener('submit', function(e) {
+    document.getElementById('question-form')?.addEventListener('submit', function(e) {
         // Grab the question content (text only)
         let question = document.getElementById("question-content").innerText;
         let questionReference = document.getElementById("question-content").attributes.getNamedItem("data-reference")?.value;

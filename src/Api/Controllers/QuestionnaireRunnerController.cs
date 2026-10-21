@@ -42,7 +42,13 @@ public class QuestionnaireRunnerController(IQuestionnaireRunnerService questionn
     {
         return (await questionnaireRunnerService.GetNextState(questionnaireId, request, preview)).ToActionResult();
     }
-    
+
+    [HttpGet("questionnaires/{questionnaireId:guid}/previous-state")]
+    public async Task<IActionResult> GetPreviousState(Guid questionnaireId, [FromQuery] int currentQuestionOrder, [FromQuery] bool preview = false)
+    {
+        return (await questionnaireRunnerService.GetPreviousState(questionnaireId, currentQuestionOrder, preview)).ToActionResult();
+    }
+
     [HttpGet("questionnaires/{questionnaireId:guid}/questions/{questionId:guid}")]
     public async Task<IActionResult> GetCurrentQuestion(Guid questionnaireId, Guid questionId, [FromQuery] bool preview = false)
     {

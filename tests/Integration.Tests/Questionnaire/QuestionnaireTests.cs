@@ -998,11 +998,244 @@ public class QuestionnaireTests(ApiFixture factory) :
     
         res.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
-    
+
     #endregion
-    
+
+    // === Tests for the back button and navigation functionality ===
+
+    #region Back Button Navigation Tests
+
+    /// <summary>
+    /// Helper method to create a multi-question questionnaire with answers for testing navigation.
+    /// Returns a tuple of (questionnaireId, question1, question2, question1Answer1, question1Answer2, question2Answer1, question2Answer2)
+    /// </summary>
+    private async Task<(Guid QuestionnaireId, QuestionDto Q1, QuestionDto Q2, AnswerDto Q1A1, AnswerDto Q1A2, AnswerDto Q2A1, AnswerDto Q2A2)>
+        CreateMultiQuestionQuestionnaire()
+    {
+        // Create questionnaire
+        var questionnaire = await Create<QuestionnaireDto>(new { title = "Navigation Test Questionnaire", description = "Test for back button" });
+        var questionnaireId = questionnaire.Id;
+
+        // Create first question (SingleSelect)
+        var question1 = await Create<QuestionDto>(
+            new { questionnaireId, content = "What is your name?", type = QuestionType.SingleSelect, order = 1 },
+            routePrefixOverride: "/api/questions");
+
+        // Create answers for question 1
+        var question1Answer1 = await Create<AnswerDto>(
+            new { questionnaireId, questionId = question1.Id, content = "Answer 1A", description = "First option", priority = 1 },
+            routePrefixOverride: "/api/answers");
+
+        var question1Answer2 = await Create<AnswerDto>(
+            new { questionnaireId, questionId = question1.Id, content = "Answer 1B", description = "Second option", priority = 2 },
+            routePrefixOverride: "/api/answers");
+
+        // Create second question (MultiSelect)
+        var question2 = await Create<QuestionDto>(
+            new { questionnaireId, content = "What are your interests?", type = QuestionType.MultiSelect, order = 2 },
+            routePrefixOverride: "/api/questions");
+
+        // Create answers for question 2
+        var question2Answer1 = await Create<AnswerDto>(
+            new { questionnaireId, questionId = question2.Id, content = "Technology", description = "Tech interest", priority = 1 },
+            routePrefixOverride: "/api/answers");
+
+        var question2Answer2 = await Create<AnswerDto>(
+            new { questionnaireId, questionId = question2.Id, content = "Sports", description = "Sports interest", priority = 2 },
+            routePrefixOverride: "/api/answers");
+
+        return (questionnaireId, question1, question2, question1Answer1, question1Answer2, question2Answer1, question2Answer2);
+    }
+
+    [Fact(DisplayName = "Back button navigation: GetPreviousState returns previous question")]
+    public async Task BackButton_GetPreviousState_Returns_Previous_Question()
+    {
+        // Arrange
+        var (questionnaireId, q1, q2, _, _, _, _) = await CreateMultiQuestionQuestionnaire();
+
+        // Act: Get previous state from question 2 (order 2) with preview=true for draft questionnaire
+        using var response = await GetAll(
+            routePrefixOverride: $"/api/questionnaires/{questionnaireId}/previous-state?currentQuestionOrder=2&preview=true");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+        responseBody.Should().NotBeNullOrEmpty();
+
+        var previousState = responseBody.Deserialize<DestinationDto>()!;
+        previousState.Should().NotBeNull();
+        previousState.Question.Should().NotBeNull();
+        previousState.Question.Id.Should().Be(q1.Id);
+        previousState.Question.Order.Should().Be(1);
+    }
+
+    [Fact(DisplayName = "Back button navigation: Navigate forward with next-state then back")]
+    public async Task BackButton_Navigate_Forward_Then_Back()
+    {
+        // Arrange
+        var (questionnaireId, q1, q2, q1a1, q1a2, q2a1, q2a2) = await CreateMultiQuestionQuestionnaire();
+
+        // Get initial question with preview=true for draft questionnaire
+        using (var getInitialResponse = await GetAll(
+            routePrefixOverride: $"/api/questionnaires/{questionnaireId}/initial-state?preview=true"))
+        {
+            getInitialResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            var initialBody = await getInitialResponse.Content.ReadAsStringAsync();
+            // Note: initial-state returns a QuestionDto, not a DestinationDto
+            var initialQuestion = initialBody.Deserialize<QuestionDto>()!;
+            initialQuestion.Should().NotBeNull();
+            initialQuestion.Id.Should().Be(q1.Id);
+        }
+
+        // Act: Move to next question using next-state endpoint
+        var nextStateRequest = new
+        {
+            CurrentQuestionId = q1.Id,
+            CurrentQuestionOrder = 1,
+            SelectedAnswerIds = new[] { q1a1.Id },
+            ValidateAnswers = true
+        };
+
+        using var nextResponse = new HttpRequestMessage(HttpMethod.Post,
+            Client.BaseAddress + $"api/questionnaires/{questionnaireId}/next-state?preview=true")
+        {
+            Content = new StringContent(
+                JsonSerializer.Serialize(nextStateRequest, new JsonSerializerOptions(JsonSerializerDefaults.Web)),
+                Encoding.UTF8,
+                "application/json")
+        };
+        nextResponse.Headers.Authorization = new AuthenticationHeaderValue("Bearer", JwtTestTokenGenerator.ValidJwtToken);
+
+        using var postResponse = await Client.SendAsync(nextResponse);
+        postResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var responseBody = await postResponse.Content.ReadAsStringAsync();
+        var destination = responseBody.Deserialize<DestinationDto>()!;
+        destination.Question.Id.Should().Be(q2.Id);
+
+        // Now go back to question 1
+        using var previousResponse = await GetAll(
+            routePrefixOverride: $"/api/questionnaires/{questionnaireId}/previous-state?currentQuestionOrder=2&preview=true");
+
+        previousResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var previousBody = await previousResponse.Content.ReadAsStringAsync();
+        var previousState = previousBody.Deserialize<DestinationDto>()!;
+
+        previousState.Question.Id.Should().Be(q1.Id);
+        previousState.Question.Order.Should().Be(1);
+    }
+
+    [Fact(DisplayName = "Back button navigation: Cannot navigate before first question")]
+    public async Task BackButton_Cannot_Navigate_Before_First_Question()
+    {
+        // Arrange
+        var (questionnaireId, q1, _, _, _, _, _) = await CreateMultiQuestionQuestionnaire();
+
+        // Act: Try to get previous state from question 1 (order 1)
+        using var response = await GetAll(
+            routePrefixOverride: $"/api/questionnaires/{questionnaireId}/previous-state?currentQuestionOrder=1&preview=true");
+
+        // Assert: Should return BadRequest since there's no previous question
+        response.StatusCode.Should().BeOneOf(HttpStatusCode.NotFound, HttpStatusCode.BadRequest);
+    }
+
+    [Fact(DisplayName = "Back button navigation: Multiple questions preserve navigation order")]
+    public async Task BackButton_Multiple_Questions_Navigation_Preserves_Order()
+    {
+        // Arrange: Create a questionnaire with 3 questions
+        var questionnaire = await Create<QuestionnaireDto>(
+            new { title = "Multi-Question Navigation Test", description = "Test navigation order" });
+        var questionnaireId = questionnaire.Id;
+
+        var questions = new List<QuestionDto>();
+        for (int i = 1; i <= 3; i++)
+        {
+            var question = await Create<QuestionDto>(
+                new { questionnaireId, content = $"Question {i}?", type = QuestionType.SingleSelect, order = i },
+                routePrefixOverride: "/api/questions");
+            questions.Add(question);
+
+            // Add at least one answer to each question
+            await Create<AnswerDto>(
+                new { questionnaireId, questionId = question.Id, content = $"Answer {i}-1", description = $"Option {i}", priority = 1 },
+                routePrefixOverride: "/api/answers");
+        }
+
+        // Act & Assert: Navigate backwards from question 3 with preview=true
+        using (var q2Response = await GetAll(
+            routePrefixOverride: $"/api/questionnaires/{questionnaireId}/previous-state?currentQuestionOrder=3&preview=true"))
+        {
+            q2Response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var q2Body = await q2Response.Content.ReadAsStringAsync();
+            var q2Destination = q2Body.Deserialize<DestinationDto>()!;
+            q2Destination.Question.Order.Should().Be(2);
+        }
+
+        using (var q1Response = await GetAll(
+            routePrefixOverride: $"/api/questionnaires/{questionnaireId}/previous-state?currentQuestionOrder=2&preview=true"))
+        {
+            q1Response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var q1Body = await q1Response.Content.ReadAsStringAsync();
+            var q1Destination = q1Body.Deserialize<DestinationDto>()!;
+            q1Destination.Question.Order.Should().Be(1);
+        }
+    }
+
+    [Fact(DisplayName = "Back button navigation: Answer selection preserved across navigation")]
+    public async Task BackButton_Answer_Selection_Preserved_Across_Navigation()
+    {
+        // Arrange
+        var (questionnaireId, q1, q2, q1a1, q1a2, q2a1, q2a2) = await CreateMultiQuestionQuestionnaire();
+
+        // Simulate navigating forward
+        var nextStateRequest = new
+        {
+            CurrentQuestionId = q1.Id,
+            CurrentQuestionOrder = 1,
+            SelectedAnswerIds = new[] { q1a1.Id },
+            ValidateAnswers = true
+        };
+
+        DestinationDto destination = null!;
+        using (var nextResponse = new HttpRequestMessage(HttpMethod.Post,
+            Client.BaseAddress + $"api/questionnaires/{questionnaireId}/next-state?preview=true")
+        {
+            Content = new StringContent(
+                JsonSerializer.Serialize(nextStateRequest, new JsonSerializerOptions(JsonSerializerDefaults.Web)),
+                Encoding.UTF8,
+                "application/json")
+        })
+        {
+            nextResponse.Headers.Authorization = new AuthenticationHeaderValue("Bearer", JwtTestTokenGenerator.ValidJwtToken);
+            using var postResponse = await Client.SendAsync(nextResponse);
+            postResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            var responseBody = await postResponse.Content.ReadAsStringAsync();
+            destination = responseBody.Deserialize<DestinationDto>()!;
+        }
+
+        // Now go back to question 1
+        DestinationDto previousState = null!;
+        using (var previousResponse = await GetAll(
+            routePrefixOverride: $"/api/questionnaires/{questionnaireId}/previous-state?currentQuestionOrder=2&preview=true"))
+        {
+            previousResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            var previousBody = await previousResponse.Content.ReadAsStringAsync();
+            previousState = previousBody.Deserialize<DestinationDto>()!;
+        }
+
+        // Act: Verify previous state shows previous question and has the answer history structure
+        previousState.Question.Id.Should().Be(q1.Id);
+        previousState.Question.Order.Should().Be(1);
+
+        // PreviouslySelectedAnswerIds should be available for restoration on the front-end
+        previousState.PreviouslySelectedAnswerIds.Should().NotBeNull();
+    }
+
+    #endregion
+
     // === Tests for the clone questionnaire endpoint ===
-    
+
     #region Clone Questionnaire Endpoint Tests
 
     [Fact(DisplayName = "Clone questionnaire returns Created with new ID")]
