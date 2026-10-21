@@ -30,15 +30,10 @@ public class QuestionnaireNextPageModelTests
     {
         _mockApiClient = new Mock<IApiClient>();
         _mockLogger = new Mock<ILogger<QuestionnaireNext>>();
-        _mockConfiguration = new Mock<IConfiguration>();
         _mockHttpContext = new Mock<HttpContext>();
-        _mockFormCollection = new Mock<IFormCollection>();
+        _mockFormCollection = new Mock<IFormCollection>();  
 
-        _mockConfiguration
-            .Setup(x => x["FrontEndUrl"])
-            .Returns("https://localhost:3000");
-
-        _pageModel = new QuestionnaireNext(_mockApiClient.Object, _mockLogger.Object, _mockConfiguration.Object)
+        _pageModel = new QuestionnaireNext(_mockApiClient.Object, _mockLogger.Object)
         {
             QuestionnaireSlug = "test-questionnaire",
             NextStateRequest = new GetNextStateRequest

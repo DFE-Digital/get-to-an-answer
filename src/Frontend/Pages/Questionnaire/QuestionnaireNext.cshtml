@@ -62,7 +62,7 @@
 
 <div class="govuk-grid-row">  
   <div class="govuk-grid-column-full">
-    <form id="question-form" action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post" novalidate>
+    <form id="question-form" action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
 
       @if (Model?.Destination is { Type: DestinationType.Question, Question: not null } || 
            Model is { Destination: { Type: DestinationType.InterimThenQuestion, Question: not null}, NextStateRequest.ValidateAnswers: false })
@@ -257,7 +257,7 @@
             }
           </fieldset>
         </div>
-                <button type="submit" formnovalidate="formnovalidate" class="govuk-button" name="submitButton" value="continueButton"
+        <button type="submit" formnovalidate="formnovalidate" class="govuk-button" name="submitButton" value="continueButton"
                 data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
           @(Model?.Questionnaire?.ContinueButtonText ?? "Continue")
         </button>
@@ -305,4 +305,3 @@
 
   </div>
 </div>
-<script src="~/js/back-button-handler.js"></script>

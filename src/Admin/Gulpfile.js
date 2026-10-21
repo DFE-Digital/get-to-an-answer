@@ -59,7 +59,7 @@ gulp.task("images", function() {
 
 gulp.task("dev",
     gulp.series(
-        "govuk-step-by-step-js",        
+        "govuk-step-by-step-js",
         "govuk-assets",
         "govuk-js",
         "govuk-css",

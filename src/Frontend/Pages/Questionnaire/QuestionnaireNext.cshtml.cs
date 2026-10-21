@@ -9,17 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace Frontend.Pages.Questionnaire;
 
 [IgnoreAntiforgeryToken]
-public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> logger, IConfiguration configuration) : QuestionnairesPageModel
+public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> logger) : QuestionnairesPageModel
 {
-    private readonly IConfiguration _configuration = configuration;
-
     [BindProperty] public required GetNextStateRequest NextStateRequest { get; set; }
     [BindProperty] public required bool IsEmbedded { get; set; }
     [BindProperty] public string AnswerHistory { get; set; } = "{}"; // JSON string to store answer history
     public required QuestionnaireInfoDto Questionnaire { get; set; }
     public required DestinationDto Destination { get; set; }
-    public string FrontEndUrl { get; set; } = "";
-
+   
     [FromRoute(Name = "questionnaireSlug")] 
     public new string? QuestionnaireSlug { get; set; }
 
@@ -32,12 +29,9 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
         {
             IsEmbedded = Embed
         });
-
         if (QuestionnaireSlug == null)
             return NotFound();
-
         var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireSlug);
-
         if (questionnaire == null)
             return NotFound();
 

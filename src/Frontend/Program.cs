@@ -99,22 +99,8 @@ app.Use(async (context, next) =>
     context.Response.Headers.Remove("X-Frame-Options");
 
     // Important: Because this service is designed to be embedded in other sites,
-    // we need to allow it to be embedded in other sites,
-    // and we can't predict the domain of the target site.
-    // However, we need to include other security directives as well.
-    //var cspHeader = "frame-ancestors *; " +
-    //                "default-src 'self'; " +
-    //                "img-src 'self' https: data:; " +
-    //                "style-src 'self' 'unsafe-inline' https:; " +
-    //                "script-src 'self' 'unsafe-inline' https:; " +
-    //                "font-src 'self' data: https:; " +
-    //                "form-action 'self' https: https://*.get-to-an-answer.education.gov.uk; " +
-    //                "connect-src 'self' https: ws: wss:";
-
-    //context.Response.Headers["Content-Security-Policy"] = cspHeader;
-
+    // we need to allow it to be embedded in other sites.
     context.Response.Headers["Content-Security-Policy"] = "frame-ancestors *";
-
     //context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
     //context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
     await next();
