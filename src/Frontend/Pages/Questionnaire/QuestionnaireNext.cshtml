@@ -72,8 +72,20 @@
       var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
       var inputGroupId = $"q-{Model.Destination.Question.Id}";
 
-      @* Render back button *@
-      @await Html.PartialAsync("_BackButton", (Model?.Destination?.Question?.Order, Model?.Questionnaire?.HasStartPage))
+      @if (Model?.Destination?.Question?.Order == 1 && Model?.Questionnaire?.HasStartPage == true)
+      {
+          <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="backButtonForStartPage"
+                  data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
+              Back
+          </button>
+      }
+      else if (Model?.Destination?.Question?.Order > 1)
+      {
+          <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="backButton"
+                  data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
+              Back
+          </button>
+      }
 
         <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
           <fieldset class="govuk-fieldset"
