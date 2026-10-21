@@ -3,6 +3,7 @@ using Common.Client;
 using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
+using Common.Helpers;
 using Frontend.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -224,7 +225,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
     private void SaveCurrentAnswersToHistory()
     {
         if (NextStateRequest.CurrentQuestionId != Guid.Empty && NextStateRequest.SelectedAnswerIds.Count > 0)
-            SaveAnswersToHistory(NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
+            AnswerHistory = AnswerHistoryHelper.SaveAnswersToHistory(AnswerHistory, NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
     }
 
     private IActionResult HandleExternalLinkRedirect(string content)
@@ -253,81 +254,10 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
     }
 
     /// <summary>
-    /// Saves the currently selected answers to the answer history for the current question
-    /// </summary>
-    private void SaveAnswersToHistory(Guid questionId, List<Guid> selectedAnswerIds)
-    {
-        try
-        {
-            // Validate inputs
-            if (questionId == Guid.Empty)
-            {
-                logger.LogWarning("SaveAnswersToHistory called with empty questionId");                
-                return;
-            }
-
-            if (selectedAnswerIds == null)
-            {
-                logger.LogWarning("SaveAnswersToHistory called with null selectedAnswerIds");
-                return;
-            }
-
-            // Ensure AnswerHistory is not null
-            if (string.IsNullOrEmpty(AnswerHistory))
-            {
-                AnswerHistory = "{}";
-            }
-
-            var options = new System.Text.Json.JsonSerializerOptions 
-            { 
-                PropertyNameCaseInsensitive = true,
-                WriteIndented = false
-            };
-            var history = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, List<Guid>>>(AnswerHistory, options) ?? new();
-            history[questionId.ToString()] = selectedAnswerIds;
-            AnswerHistory = System.Text.Json.JsonSerializer.Serialize(history, options);
-            logger.LogInformation("Saved answers to history for question {QuestionId}. Total questions in history: {Count}", questionId, history.Count);            
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error saving answers to history for question {QuestionId}: {ExceptionMessage}", questionId, ex.Message);
-        }
-    }
-
-    /// <summary>
     /// Retrieves previously selected answers for a question from the history
     /// </summary>
     private List<Guid> GetAnswersFromHistory(Guid questionId)
     {
-        try
-        {
-            // Validate input
-            if (questionId == Guid.Empty)
-            {
-                logger.LogWarning("GetAnswersFromHistory called with empty questionId");
-                return new();
-            }
-
-            // Ensure AnswerHistory is not null
-            if (string.IsNullOrEmpty(AnswerHistory))
-            {
-                AnswerHistory = "{}";
-            }
-
-            var options = new System.Text.Json.JsonSerializerOptions 
-            { 
-                PropertyNameCaseInsensitive = true
-            };
-            var history = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, List<Guid>>>(AnswerHistory, options) ?? new();
-            var questionKey = questionId.ToString();
-            var hasAnswers = history.TryGetValue(questionKey, out var answers);
-            logger.LogInformation("Retrieved answers for question {QuestionId}: Found={Found}, Answers={Count}", questionId, hasAnswers, answers?.Count ?? 0);            
-            return hasAnswers && answers != null ? answers : new();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error retrieving answers from history for question {QuestionId}: {ExceptionMessage}", questionId, ex.Message);
-            return new();
-        }
+        return AnswerHistoryHelper.GetAnswersFromHistory(AnswerHistory, questionId);
     }
 }
