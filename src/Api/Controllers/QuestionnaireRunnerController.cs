@@ -37,6 +37,12 @@ public class QuestionnaireRunnerController(IQuestionnaireRunnerService questionn
         return (await questionnaireRunnerService.GetInitialQuestion(questionnaireId, preview)).ToActionResult();
     }
 
+    [HttpGet("questionnaires/{questionnaireId:guid}/last-state")]
+    public async Task<IActionResult> GetLastState(Guid questionnaireId, [FromQuery] bool preview = false)
+    {
+        return (await questionnaireRunnerService.GetLastQuestion(questionnaireId, preview)).ToActionResult();
+    }
+
     [HttpPost("questionnaires/{questionnaireId:guid}/next-state")]
     public async Task<IActionResult> GetNextState(Guid questionnaireId, GetNextStateRequest request, [FromQuery] bool preview = false)
     {

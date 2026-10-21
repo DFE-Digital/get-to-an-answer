@@ -926,4 +926,124 @@ public class QuestionnaireNextPageModelTests
     }
 
     #endregion
-}
+
+    #region OnPost - Custom Content Button Tests
+
+    [Fact]
+    public async Task OnPost_CustomContentBackButton_Returns_Page_With_Last_Question()
+    {
+        // Arrange
+        var questionnaireId = Guid.NewGuid();
+        var question3Id = Guid.NewGuid();
+
+        var questionnaire = new QuestionnaireInfoDto
+        {
+            Id = questionnaireId,
+            DisplayTitle = "Test Questionnaire",
+            Slug = "test-questionnaire"
+        };
+
+        var question3 = new QuestionDto
+        {
+            Id = question3Id,
+            Order = 3,
+            Content = "Question 3",
+            Type = QuestionType.SingleSelect,
+            Answers = new List<AnswerDto>()
+        };
+
+        _pageModel.QuestionnaireSlug = "test-questionnaire";
+        _pageModel.Questionnaire = questionnaire;
+        _mockFormCollection.Setup(x => x["submitButton"]).Returns("customContentBackButton");
+
+        _mockApiClient
+            .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync("test-questionnaire"))
+            .ReturnsAsync(questionnaire);
+
+        _mockApiClient
+            .Setup(x => x.GetLastQuestion(questionnaireId, false))
+            .ReturnsAsync(question3);
+
+        // Act
+        var result = await _pageModel.OnPost();
+
+        // Assert
+        result.Should().BeOfType<PageResult>();
+        _pageModel.Destination.Should().NotBeNull();
+        _pageModel.Destination!.Type.Should().Be(DestinationType.Question);
+        _pageModel.Destination!.Question.Should().Be(question3);
+        _pageModel.Destination!.Question!.Order.Should().Be(3);
+    }
+
+    [Fact]
+    public async Task OnPost_CustomContentBackButton_WithNoQuestions_Returns_NotFound()
+    {
+        // Arrange
+        var questionnaireId = Guid.NewGuid();
+        var questionnaire = new QuestionnaireInfoDto
+        {
+            Id = questionnaireId,
+            DisplayTitle = "Test Questionnaire",
+            Slug = "test-questionnaire"
+        };
+
+        _pageModel.QuestionnaireSlug = "test-questionnaire";
+        _pageModel.Questionnaire = questionnaire;
+        _mockFormCollection.Setup(x => x["submitButton"]).Returns("customContentBackButton");
+
+        _mockApiClient
+            .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync("test-questionnaire"))
+            .ReturnsAsync(questionnaire);
+
+        _mockApiClient
+            .Setup(x => x.GetCurrentQuestion(questionnaireId, It.IsAny<Guid>(), false))
+            .ReturnsAsync((QuestionDto?)null);
+
+        _mockApiClient
+            .Setup(x => x.GetLastQuestion(questionnaireId, false))
+            .ReturnsAsync((QuestionDto?)null);
+
+        // Act
+        var result = await _pageModel.OnPost();
+
+        // Assert
+        result.Should().BeOfType<NotFoundResult>();
+    }
+
+    [Fact]
+    public async Task OnPost_CustomContentBackButton_WithNullQuestions_Returns_NotFound()
+    {
+        // Arrange
+        var questionnaireId = Guid.NewGuid();
+        var questionnaire = new QuestionnaireInfoDto
+        {
+            Id = questionnaireId,
+            DisplayTitle = "Test Questionnaire",
+            Slug = "test-questionnaire"
+        };
+
+        _pageModel.QuestionnaireSlug = "test-questionnaire";
+        _pageModel.Questionnaire = questionnaire;
+        _mockFormCollection.Setup(x => x["submitButton"]).Returns("customContentBackButton");
+
+        _mockApiClient
+            .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync("test-questionnaire"))
+            .ReturnsAsync(questionnaire);
+
+        _mockApiClient
+            .Setup(x => x.GetCurrentQuestion(questionnaireId, It.IsAny<Guid>(), false))
+            .ReturnsAsync((QuestionDto?)null);
+
+        _mockApiClient
+            .Setup(x => x.GetLastQuestion(questionnaireId, false))
+            .ReturnsAsync((QuestionDto?)null);
+
+        // Act
+        var result = await _pageModel.OnPost();
+
+        // Assert
+        result.Should().BeOfType<NotFoundResult>();
+             }
+
+             #endregion
+        }

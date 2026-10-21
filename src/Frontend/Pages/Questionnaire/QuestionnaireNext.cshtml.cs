@@ -53,6 +53,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
         {
             "continueButton" => await HandleContinueAsync(),
             "backButton" => await HandleBackAsync(),
+            "customContentBackButton" => await HandleCustomContentAsync(),
             _ => HandleUnknownButton(buttonValue ?? string.Empty)
         };
     }
@@ -102,10 +103,49 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
             RestorePreviousQuestion(previousDestination);
             ModelState.Clear();
             return Page();
-        }
+         }
         catch (Exception e)
         {
             logger.LogError(e, "Error loading previous question. Error: {EMessage}", e.Message);
+            throw;
+        }
+    }
+
+    private async Task<IActionResult> HandleCustomContentAsync()
+    {
+        try
+        {
+            HttpContext.Features.Set(new QuestionnaireRunFeature
+            {
+                IsEmbedded = Embed
+            });
+
+            if (QuestionnaireSlug == null)
+                throw new InvalidOperationException("QuestionnaireSlug is required");
+
+            var questionnaire = await apiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireSlug);
+            if (questionnaire == null)
+                throw new InvalidOperationException("Questionnaire not found");
+
+            Questionnaire = questionnaire;
+            Destination = new DestinationDto
+            {
+                Type = DestinationType.Question,
+                Question = await apiClient.GetLastQuestion(Questionnaire.Id)
+            };
+
+            if (Destination?.Question == null)
+                return NotFound();
+
+            IsEmbedded = Embed;          
+
+            RestorePreviousQuestion(Destination);
+            ModelState.Clear();
+            return Page();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error loading last question. Error: {EMessage}", e.Message);
             throw;
         }
     }
@@ -114,7 +154,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
     {
         logger.LogWarning("Unknown button value submitted: {ButtonValue}", buttonValue);
         return BadRequest("Unknown action");
-    }
+    }  
 
     private async Task InitializeQuestionnaireAsync()
     {
