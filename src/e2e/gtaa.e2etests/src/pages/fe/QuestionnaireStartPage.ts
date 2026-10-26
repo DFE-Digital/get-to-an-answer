@@ -100,6 +100,8 @@ export class QuestionnaireStartPage extends RunBasePage {
         expectedHexColor: string,
         expectedHexHoverColor?: string
     ): Promise<void> {
+        // move the pointer away so the :hover colour does not affect the computed colour
+        await this.page.mouse.move(0, 0);
         const continueButtonColor = await this.startButton.evaluate((el) =>
             window.getComputedStyle(el).getPropertyValue('background-color')
         );

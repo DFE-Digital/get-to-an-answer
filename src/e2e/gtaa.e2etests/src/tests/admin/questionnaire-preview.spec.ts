@@ -287,6 +287,7 @@ test.describe('Questionnaire preview run (start & next)', () => {
         await nextPreviewPage.selectFirstRadioOption();
         await nextPreviewPage.clickContinue();
 
+        await page.waitForURL(externalUrl);
         expect(page.url()).toBe(externalUrl);
     });
 
