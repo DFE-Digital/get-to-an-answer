@@ -1,0 +1,29 @@
+@using Common.Custom
+@model (Common.Domain.AnswerDto answer, string inputGroupId, bool hasFieldError, List<Guid> previouslySelectedAnswerIds)
+
+@{
+    var inputId = $"{Model.inputGroupId}-a-{Model.answer.Id}";
+    var itemHintId = $"{inputId}-hint";
+    var isChecked = Model.previouslySelectedAnswerIds?.Contains(Model.answer?.Id ?? Guid.Empty) ?? false;
+}
+
+<div class="govuk-radios__item">
+    <input type="hidden" name="Priorities.@Model.answer.Id" value="@Model.answer.Priority" autocomplete="off">
+    <input
+        class="govuk-radios__input @(Model.hasFieldError ? "govuk-input--error" : "")"
+        id="@inputId"
+        name="NextStateRequest.SelectedAnswerIds"
+        type="radio"
+        value="@Model.answer.Id"
+        aria-describedby="Answer option id @inputId"
+        @(isChecked ? "checked" : "")>
+    <label class="govuk-label govuk-radios__label" for="@inputId">
+        @Model.answer.Content
+    </label>
+    @if (Model.answer.Description != null)
+    {
+        <div id="@itemHintId" class="govuk-hint govuk-radios__hint">
+            @(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.answer.Description)))
+        </div>
+    }
+</div>

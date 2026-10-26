@@ -1,0 +1,8 @@
+@model (bool hasFieldError, string? firstErrorMessage, string inputGroupId)
+
+@if (Model.hasFieldError && !string.IsNullOrWhiteSpace(Model.firstErrorMessage))
+{
+    <p id="@Model.inputGroupId-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> @Model.firstErrorMessage
+    </p>
+}
