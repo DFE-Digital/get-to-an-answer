@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "Integration.Tests": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:55524;http://localhost:55525"
+    }
+  },
+  "comments": {
+    "DOCKER_HOST_note": "Platform-specific Docker configuration is handled automatically by PlatformConfiguration.ConfigureDockerEnvironment() in ModuleInitializer. Do not set DOCKER_HOST here on macOS/Linux as it overrides automatic detection.",
+    "windows": "On Windows: DOCKER_HOST will be set to 'npipe://./pipe/docker_engine' automatically",
+    "macos_linux": "On macOS/Linux: DOCKER_HOST remains unset to use Unix socket default (/var/run/docker.sock)"
+  }
+}
