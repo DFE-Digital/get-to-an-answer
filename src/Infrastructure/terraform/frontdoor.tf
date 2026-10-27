@@ -126,7 +126,7 @@ resource "azurerm_cdn_frontdoor_route" "frontdoor-api-route" {
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.fd-api-origin-group.id
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.frontdoor-api-origin.id]
   cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.security_redirects.id, azurerm_cdn_frontdoor_rule_set.security_headers.id]
-  enabled = true
+  enabled                       = true
 
   forwarding_protocol    = "MatchRequest"
   https_redirect_enabled = true
@@ -143,7 +143,7 @@ resource "azurerm_cdn_frontdoor_route" "frontdoor-admin-route" {
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.fd-admin-origin-group.id
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.frontdoor-admin-origin.id]
   cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.security_redirects.id, azurerm_cdn_frontdoor_rule_set.security_headers.id]
-  enabled = true
+  enabled                       = true
 
   forwarding_protocol    = "MatchRequest"
   https_redirect_enabled = true
@@ -160,7 +160,7 @@ resource "azurerm_cdn_frontdoor_route" "frontdoor-frontend-route" {
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.fd-frontend-origin-group.id
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.frontdoor-frontend-origin.id]
   cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.security_redirects.id, azurerm_cdn_frontdoor_rule_set.security_headers.id]
-  enabled = true
+  enabled                       = true
 
   forwarding_protocol    = "MatchRequest"
   https_redirect_enabled = true
@@ -261,7 +261,7 @@ resource "azurerm_cdn_frontdoor_firewall_policy" "web_firewall_policy" {
       match_variable     = "RemoteAddr"
       operator           = "IPMatch"
       negation_condition = false
-      match_values       = [
+      match_values = [
         "51.143.160.0/23",
         "51.143.162.0/24"
       ]
