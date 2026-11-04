@@ -28,6 +28,8 @@ Refer to each project’s README for details.
 
 ## Running locally
 
+For detailed instructions on setting up locally using either option, see [Developer Setup](Developer-Setup.md).
+
 Option A: Run via IDE
 - Restore and build the solution.
 - Start the API, then Admin and Frontend.
