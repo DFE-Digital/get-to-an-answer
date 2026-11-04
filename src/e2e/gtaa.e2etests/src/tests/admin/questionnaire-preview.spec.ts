@@ -261,7 +261,7 @@ test.describe('Questionnaire preview run (start & next)', () => {
         await nextPreviewPage.assertResultsPage(content.title, content.content.replace(/\*\*markdown\*\*/g, 'markdown'));
     });
 
-    test('External-link destination in non-embedded preview – check for redirect', async ({ page, request }) => {
+    test('External-link destination in embedded preview – check for redirect', async ({ page, request }) => {
         const { question, questionPostResponse } = await createQuestion(request, questionnaireId, token);
         expect200HttpStatusCode(questionPostResponse, 201);
 
@@ -279,10 +279,10 @@ test.describe('Questionnaire preview run (start & next)', () => {
         );
         expect200HttpStatusCode(answerPostResponse, 201);
 
-        startPreviewPage = await goToQuestionnaireStartPreviewByUrl(page, questionnaireId, false);
+        startPreviewPage = await goToQuestionnaireStartPreviewByUrl(page, questionnaireId, true);
 
         nextPreviewPage = await QuestionnaireNextPreviewPage.create(page);
-        await nextPreviewPage.assertSingleSelectQuestion(false);
+        await nextPreviewPage.assertSingleSelectQuestion(true);
 
         await nextPreviewPage.selectFirstRadioOption();
         await nextPreviewPage.clickContinue();
