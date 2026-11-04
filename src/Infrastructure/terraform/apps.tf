@@ -100,11 +100,10 @@ resource "azurerm_private_dns_zone" "webapps_privatelink" {
 }
 # Link VNet to the Private DNS zone
 resource "azurerm_private_dns_zone_virtual_network_link" "webapps_privatelink_vnet_link" {
-  name                  = "${var.prefix}-webapps-privatelink-link"
-  resource_group_name   = azurerm_resource_group.gettoananswer-rg.name
-  private_dns_zone_name = azurerm_private_dns_zone.webapps_privatelink.name
-  virtual_network_id    = azurerm_virtual_network.gettoananswer_vnet.id
-  registration_enabled  = false
+  name                 = "${var.prefix}-webapps-privatelink-link"
+  private_dns_zone_id  = azurerm_private_dns_zone.webapps_privatelink.id
+  virtual_network_id   = azurerm_virtual_network.gettoananswer_vnet.id
+  registration_enabled = false
 }
 # Private Endpoint for API app
 resource "azurerm_private_endpoint" "api_pe" {
