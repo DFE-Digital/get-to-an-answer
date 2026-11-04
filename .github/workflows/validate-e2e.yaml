@@ -19,7 +19,7 @@ run-name: Run E2E Tests against ${{ github.event.inputs.environment || 'E2E' }}
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Run Playwright Tests
     env:
       ENVIRONMENT: ${{ github.event.inputs.environment || 'Local' }}
