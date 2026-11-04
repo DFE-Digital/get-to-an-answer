@@ -87,7 +87,8 @@
           </button>
       }
 
-        <div class="govuk-form-group @(hasFieldError ? "govuk-form-group--error" : "")">
+                
+       <div class="govuk-form-group govuk-!-padding-top-9 @(hasFieldError ? "govuk-form-group--error" : "")">
           <fieldset class="govuk-fieldset"
                     aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
