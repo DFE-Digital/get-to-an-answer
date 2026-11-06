@@ -33,11 +33,6 @@
   var hasErrors = Model != null && !ViewData.ModelState.IsValid;
 }
 
-@if (hasErrors)
-{
-  @await Html.PartialAsync("_ErrorSummary", Model)
-}
-
 @section BeforeContainer
 {
 
@@ -63,7 +58,24 @@
 <div class="govuk-grid-row">  
   <div class="govuk-grid-column-full">
     <form id="question-form" action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
-
+    @if (Model?.Destination?.Question?.Order == 1 && Model?.Questionnaire?.HasStartPage == true)
+    {
+        <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="backButtonForStartPage"
+                data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
+            Back
+        </button>
+    }
+    else if (Model?.Destination?.Question?.Order > 1)
+    {
+        <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="backButton"
+                data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
+            Back
+        </button>
+    }
+    @if (hasErrors)
+    {
+        @await Html.PartialAsync("_ErrorSummary", Model)
+    }
       @if (Model?.Destination is { Type: DestinationType.Question, Question: not null } || 
            Model is { Destination: { Type: DestinationType.InterimThenQuestion, Question: not null}, NextStateRequest.ValidateAnswers: false })
       {    
@@ -72,23 +84,9 @@
       var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
       var inputGroupId = $"q-{Model.Destination.Question.Id}";
 
-      @if (Model?.Destination?.Question?.Order == 1 && Model?.Questionnaire?.HasStartPage == true)
-      {
-          <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="backButtonForStartPage"
-                  data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
-              Back
-          </button>
-      }
-      else if (Model?.Destination?.Question?.Order > 1)
-      {
-          <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="backButton"
-                  data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
-              Back
-          </button>
-      }
-
+      
                 
-       <div class="govuk-form-group govuk-!-padding-top-9 @(hasFieldError ? "govuk-form-group--error" : "")">
+       <div class="govuk-form-group govuk-!-margin-top-9 @(hasFieldError ? "govuk-form-group--error" : "")">
           <fieldset class="govuk-fieldset"
                     aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
