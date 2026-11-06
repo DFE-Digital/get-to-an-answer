@@ -15,11 +15,11 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="Testcontainers" />
         <PackageReference Include="Testcontainers.MsSql" />
         <PackageReference Include="WireMock.Net" />
-        <PackageReference Include="xunit"/>
+        <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -29,7 +29,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="FluentAssertions" />
-        <PackageReference Include="Bogus"/>
+        <PackageReference Include="Bogus" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     </ItemGroup>
 
@@ -39,10 +39,11 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Api\Api.csproj" />
         <ProjectReference Include="..\..\src\Admin\Admin.csproj" />
+        <ProjectReference Include="..\..\src\Common\Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <Using Include="Xunit"/>
+        <Using Include="Xunit" />
     </ItemGroup>
 
     <ItemGroup>

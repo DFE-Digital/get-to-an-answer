@@ -261,7 +261,7 @@ test.describe('Questionnaire preview run (start & next)', () => {
         await nextPreviewPage.assertResultsPage(content.title, content.content.replace(/\*\*markdown\*\*/g, 'markdown'));
     });
 
-    test('External-link destination in embedded preview – hidden field is rendered instead of redirect', async ({ page, request }) => {
+    test('External-link destination in embedded preview is exposed for redirect', async ({ page, request }) => {
         const { question, questionPostResponse } = await createQuestion(request, questionnaireId, token);
         expect200HttpStatusCode(questionPostResponse, 201);
 
@@ -286,8 +286,7 @@ test.describe('Questionnaire preview run (start & next)', () => {
 
         await nextPreviewPage.selectFirstRadioOption();
         await nextPreviewPage.clickContinue();
-
-        expect(page.url()).toBe(externalUrl);
+        await expect(nextPreviewPage.externalLinkHiddenInput).toHaveValue(externalUrl);
     });
 
     test('Preview uses current custom styling (primary colour and button label)', async ({ request, page }) => {

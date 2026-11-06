@@ -4,6 +4,9 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 
+# Visual Studio
+.vs/
+
 # Rider project files
 .idea/
 *.sln.DotSettings
