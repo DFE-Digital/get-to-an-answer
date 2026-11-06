@@ -8,11 +8,10 @@ resource "azurerm_private_dns_zone" "kv" {
 
 # Link DNS zone to the VNet
 resource "azurerm_private_dns_zone_virtual_network_link" "kv_link" {
-  name                  = "${var.prefix}-vnet-link"
-  resource_group_name   = azurerm_resource_group.gettoananswer-rg.name
-  private_dns_zone_name = azurerm_private_dns_zone.kv.name
-  virtual_network_id    = azurerm_virtual_network.gettoananswer_vnet.id
-  registration_enabled  = false
+  name                 = "${var.prefix}-vnet-link"
+  private_dns_zone_id  = azurerm_private_dns_zone.kv.id
+  virtual_network_id   = azurerm_virtual_network.gettoananswer_vnet.id
+  registration_enabled = false
 }
 
 resource "azurerm_key_vault" "kv" {
