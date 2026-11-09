@@ -5,7 +5,8 @@ This repository contains a multi-project .NET 10 solution with three web applica
 ## Prerequisites
 
 - .NET SDK 10.x
-- Node.js 20+ with npm (for Admin/Frontend assets and E2E tests)
+- Node.js 20+ with npm (for Admin/Frontend assets)
+- Node.js 22.13+ (for E2E tests)
 - Docker Desktop (for local compose and E2E)
 - Azure CLI and Terraform (for infrastructure workflows, optional)
 - Git
