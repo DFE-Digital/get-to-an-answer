@@ -20,7 +20,9 @@ public interface IQuestionnaireRunnerService
     Task<ServiceResult> GetLastPublishedQuestionnaireInfo(string questionnaireIdOrSlug, bool isPreview = false);
     Task<ServiceResult> GetInitialQuestion(Guid questionnaireId, bool isPreview = false);
     Task<ServiceResult> GetCurrentQuestion(Guid questionnaireId, Guid questionId, bool isPreview = false);
+    Task<ServiceResult> GetLastQuestion(Guid questionnaireId, bool isPreview = false);
     Task<ServiceResult> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool isPreview = false);
+    Task<ServiceResult> GetPreviousState(Guid questionnaireId, int currentQuestionOrder, bool isPreview = false);
 }
 
 public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<QuestionnaireRunnerService> logger) : AbstractService, IQuestionnaireRunnerService
@@ -200,6 +202,72 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         catch (Exception ex)
         {
             logger.LogError(ex, "GetCurrentQuestion failed QuestionnaireId={QuestionnaireId}, QuestionId={QuestionId}", questionnaireId, questionId);
+            return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
+        }
+    }
+
+    public async Task<ServiceResult> GetLastQuestion(Guid questionnaireId, bool isPreview = false)
+    {
+        try
+        {
+            logger.LogInformation("GetLastQuestion started QuestionnaireId={QuestionnaireId}", questionnaireId);
+
+            var isExisting = await db.Questionnaires.AnyAsync(q => q.Id == questionnaireId);
+
+            if (!isExisting)
+                return NotFound(ProblemTrace("The questionnaire does not exist.", 404));
+
+            QuestionEntity? lastQuestion;
+
+            if (isPreview)
+            {
+                lastQuestion = await db.Questions
+                    .Include(x => x.Answers.Where(a => !a.IsDeleted))
+                    .Where(x => x.QuestionnaireId == questionnaireId && !x.IsDeleted)
+                    .OrderByDescending(x => x.Order)
+                    .FirstOrDefaultAsync();
+            }
+            else
+            {
+                var questionnaireVersionJson = await GetDraftOrLatestPublishedVersion(questionnaireId);
+
+                if (questionnaireVersionJson == null)
+                    return BadRequest(ProblemTrace("No published version found for this questionnaire.", 400));
+
+                var questionnaire = ToQuestionnaire(questionnaireVersionJson);
+
+                lastQuestion = questionnaire?.Questions
+                    .Where(q => !q.IsDeleted)
+                    .OrderByDescending(q => q.Order)
+                    .FirstOrDefault();
+            }
+
+            if (lastQuestion == null)
+                return NotFound(ProblemTrace("No questions found in the questionnaire.", 404));
+
+            logger.LogInformation("GetLastQuestion succeeded QuestionnaireId={QuestionnaireId} QuestionId={QuestionId}", questionnaireId, lastQuestion.Id);
+            return Ok(new QuestionDto
+            {
+                Id = lastQuestion.Id,
+                QuestionnaireId = lastQuestion.QuestionnaireId,
+                Content = lastQuestion.Content,
+                Description = lastQuestion.Description,
+                Order = lastQuestion.Order,
+                Answers = lastQuestion.Answers.Select(a => new AnswerDto
+                {
+                    Id = a.Id,
+                    Content = a.Content,
+                    Description = a.Description,
+                    QuestionId = a.QuestionId,
+                    Priority = a.Priority
+                }).ToList(),
+                Type = lastQuestion.Type,
+                ReferenceName = lastQuestion.ReferenceName
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "GetLastQuestion failed QuestionnaireId={QuestionnaireId}", questionnaireId);
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
     }
@@ -442,5 +510,56 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         options.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false));
 
         return JsonSerializer.Deserialize<QuestionnaireEntity>(questionnaireJson, options);
+    }
+
+    public async Task<ServiceResult> GetPreviousState(Guid questionnaireId, int currentQuestionOrder, bool isPreview = false)
+    {
+        try
+        {
+            logger.LogInformation("GetPreviousState started QuestionnaireId={QuestionnaireId} CurrentOrder={CurrentOrder}", questionnaireId, currentQuestionOrder);
+
+            var isExisting = await db.Questionnaires.AnyAsync(q => q.Id == questionnaireId);
+
+            if (!isExisting)
+                return NotFound(ProblemTrace("The questionnaire does not exist.", 404));
+
+            // If we're at the first question (Order 1), there's no previous question
+            if (currentQuestionOrder <= 1)
+                return BadRequest(ProblemTrace("Cannot go back from the first question.", 400));
+
+            int previousQuestionOrder = currentQuestionOrder - 1;
+            QuestionEntity? previousQuestion;
+
+            if (isPreview)
+            {
+                previousQuestion = await db.Questions
+                    .Include(x => x.Answers.Where(a => !a.IsDeleted))
+                    .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && 
+                                              x.Order == previousQuestionOrder && 
+                                              !x.IsDeleted);
+            }
+            else
+            {
+                var questionnaireVersionJson = await GetDraftOrLatestPublishedVersion(questionnaireId);
+
+                if (questionnaireVersionJson == null)
+                    return BadRequest(ProblemTrace("No published version found for this questionnaire.", 400));
+
+                var questionnaire = ToQuestionnaire(questionnaireVersionJson);
+
+                previousQuestion = questionnaire?.Questions.FirstOrDefault(q => q is { Order: > 0, IsDeleted: false } && q.Order == previousQuestionOrder);
+            }
+
+            if (previousQuestion == null)
+                return BadRequest(ProblemTrace("Previous question could not be determined.", 400));
+
+            logger.LogInformation("GetPreviousState succeeded QuestionnaireId={QuestionnaireId} QuestionId={QuestionId}", questionnaireId, previousQuestion.Id);
+            return Ok(ToDestinationDto(previousQuestion));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "GetPreviousState failed QuestionnaireId={QuestionnaireId}", questionnaireId);
+            return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
+        }
     }
 }

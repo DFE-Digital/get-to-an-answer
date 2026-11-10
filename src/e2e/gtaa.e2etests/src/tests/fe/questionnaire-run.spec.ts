@@ -295,7 +295,7 @@ test.describe('Questionnaire run (start & next)', () => {
         await nextPage.assertResultsPage(content.title, content.content.replace(/\*\*markdown\*\*/g, 'markdown'));
     });
 
-    test('External-link destination in embedded questionnaire – hidden field is rendered instead of redirect', async ({ page, request }) => {
+    test('External-link destination in embedded questionnaire – check for redirect', async ({ page, request }) => {
         await addContributor(request, questionnaireId, 'user-1', token)
 
         const { question, questionPostResponse } = await createQuestion(request, questionnaireId, token);
@@ -324,7 +324,7 @@ test.describe('Questionnaire run (start & next)', () => {
 
         await nextPage.selectFirstRadioOption();
         await nextPage.clickContinue();
-
+        await page.waitForURL(externalUrl);
         expect(page.url()).toBe(externalUrl);
     });
 
