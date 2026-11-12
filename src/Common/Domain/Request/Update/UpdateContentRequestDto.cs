@@ -4,5 +4,6 @@ public class UpdateContentRequestDto
 {
     public string? Title { get; set; }
     public string? Content { get; set; }
+    public string? NoResultContent { get; set; }
     public string? ReferenceName { get; set; }
 } 

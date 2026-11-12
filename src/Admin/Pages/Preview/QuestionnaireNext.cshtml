@@ -90,7 +90,7 @@
                 @(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Question.Description)))
               </div>
             }
-            @if (Model.Destination.Question.Type == QuestionType.SingleSelect)
+            @if (Model.Destination.Question.Type == QuestionType.SingleSelect || Model.Destination.Question.Type == QuestionType.VoteValue)
             {
               var answers = Model.Destination.Question.Answers;
 
@@ -206,12 +206,22 @@
                 @Model.Destination.Title
               </h1>
             </legend>
-            <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
+            @if (Model.Tally is not null)
+            {
+              <p class="govuk-body" id="vote-tally">Yes: @Model.Tally.Yes, No: @Model.Tally.No</p>
+              <p class="govuk-body" id="vote-result">Result: @Model.VoteResult</p>
+            }
+            <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.VoteResult == "No" && Model.Destination.NoResultContent is not null ? Model.Destination.NoResultContent : Model.Destination.Content)))</div>
           </fieldset>
         }
         else
         {
-          <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
+          @if (Model.Tally is not null)
+          {
+            <p class="govuk-body" id="vote-tally">Yes: @Model.Tally.Yes, No: @Model.Tally.No</p>
+            <p class="govuk-body" id="vote-result">Result: @Model.VoteResult</p>
+          }
+          <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.VoteResult == "No" && Model.Destination.NoResultContent is not null ? Model.Destination.NoResultContent : Model.Destination.Content)))</div>
         }
         @if (Model.Destination.Type == DestinationType.InterimThenQuestion)
         {

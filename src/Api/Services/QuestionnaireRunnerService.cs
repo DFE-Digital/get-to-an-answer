@@ -23,6 +23,7 @@ public interface IQuestionnaireRunnerService
     Task<ServiceResult> GetLastQuestion(Guid questionnaireId, bool isPreview = false);
     Task<ServiceResult> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool isPreview = false);
     Task<ServiceResult> GetPreviousState(Guid questionnaireId, int currentQuestionOrder, bool isPreview = false);
+    Task<ServiceResult> GetVoteTally(Guid questionnaireId, List<Guid> answerIds);
 }
 
 public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<QuestionnaireRunnerService> logger) : AbstractService, IQuestionnaireRunnerService
@@ -78,6 +79,30 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         catch (Exception ex)
         {
             logger.LogError(ex, "GetLastPublishedQuestionnaireInfo failed SlugOrId={Slug}", questionnaireIdOrSlug);
+            return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
+        }
+    }
+
+    public async Task<ServiceResult> GetVoteTally(Guid questionnaireId, List<Guid> answerIds)
+    {
+        try
+        {
+            logger.LogInformation("GetVoteTally started QuestionnaireId={QuestionnaireId}", questionnaireId);
+
+            var votes = await db.Answers
+                .Where(a => a.QuestionnaireId == questionnaireId && answerIds.Contains(a.Id) && !a.IsDeleted && a.VoteValue != null)
+                .Select(a => a.VoteValue)
+                .ToListAsync();
+
+            return Ok(new VoteTally
+            {
+                Yes = votes.Count(v => v == VoteValue.Yes),
+                No = votes.Count(v => v == VoteValue.No)
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "GetVoteTally failed QuestionnaireId={QuestionnaireId}", questionnaireId);
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
     }
@@ -480,6 +505,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         {
             Type = DestinationType.CustomContent,
             Content = contentEntity.Content,
+            NoResultContent = contentEntity.NoResultContent,
             Title = contentEntity.Title,
             ReferenceName = contentEntity.ReferenceName
         });

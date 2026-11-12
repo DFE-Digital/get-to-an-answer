@@ -68,6 +68,24 @@
             aria-describedby="@Id(contentHintHintIdSuffix)"></textarea>
 </govuk-form-group>
 
+<govuk-form-group asp-for="VoteValue">
+  <fieldset class="govuk-fieldset">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+      Vote value
+    </legend>
+    <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" id="@Id("vote-value-yes")" type="radio" name="Options[@(Model.OptionNumber - 1)].VoteValue" value="@VoteValue.Yes" @(Model.VoteValue == VoteValue.Yes ? "checked" : "") />
+        <label class="govuk-label govuk-radios__label" for="@Id("vote-value-yes")">Yes</label>
+      </div>
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" id="@Id("vote-value-no")" type="radio" name="Options[@(Model.OptionNumber - 1)].VoteValue" value="@VoteValue.No" @(Model.VoteValue == VoteValue.No ? "checked" : "") />
+        <label class="govuk-label govuk-radios__label" for="@Id("vote-value-no")">No</label>
+      </div>
+    </div>
+  </fieldset>
+</govuk-form-group>
+
 <govuk-form-group asp-for="AnswerDestination">
   <fieldset class="govuk-fieldset"
             aria-describedby="@($"{Id($"{destinationIdSuffix}-hint")}")">

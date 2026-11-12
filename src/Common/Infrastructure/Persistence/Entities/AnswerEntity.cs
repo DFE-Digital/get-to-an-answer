@@ -23,7 +23,9 @@ public class AnswerEntity
     public float Priority { get; set; }
     
     public DestinationType? DestinationType { get; set; }
-    
+
+    public VoteValue? VoteValue { get; set; }
+
     [MaxLength(250)]
     public string? DestinationUrl { get; set; }
     

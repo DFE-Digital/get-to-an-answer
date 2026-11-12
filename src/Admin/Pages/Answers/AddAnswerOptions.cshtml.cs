@@ -66,6 +66,7 @@ public class AddAnswerOptionOptions(ILogger<AddAnswerOptionOptions> logger, IApi
                     Content = option.OptionContent,
                     Description = option.OptionHint ?? string.Empty,
                     DestinationType = MapDestination(option.AnswerDestination),
+                    VoteValue = option.VoteValue,
                     DestinationQuestionId = !string.IsNullOrEmpty(option.SelectedDestinationQuestion)
                         ? Guid.Parse(option.SelectedDestinationQuestion)
                         : null,

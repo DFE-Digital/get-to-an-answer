@@ -133,7 +133,7 @@
 
             <div class="govuk-radios" data-module="govuk-radios">
                 @{
-                    QuestionType[] options = [QuestionType.SingleSelect, QuestionType.DropdownSelect, QuestionType.MultiSelect];
+                    QuestionType[] options = [QuestionType.SingleSelect, QuestionType.DropdownSelect, QuestionType.MultiSelect, QuestionType.VoteValue];
                     foreach (var option in options)
                     {
                         <div class="govuk-radios__item">
@@ -168,6 +168,15 @@
                                 </label>
                                 <div class="govuk-hint govuk-radios__hint">
                                     Use for selecting one or more options
+                                </div>
+                            }
+                            else if (option == QuestionType.VoteValue)
+                            {
+                                <label class="govuk-label govuk-radios__label" for="@($"{option}-radio")">
+                                    Yes or no (vote) (using the <a class="govuk-link" href="https://design-system.service.gov.uk/components/radios/">radio component</a>)
+                                </label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                    Use for yes or no questions where the result depends on the number of yes and no answers. This answer type will assist in creating voting questionnaire.
                                 </div>
                             }
                         </div>

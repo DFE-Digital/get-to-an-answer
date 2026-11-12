@@ -13,7 +13,9 @@ public class UpdateAnswerRequestDto
     
     [EnumDefined]
     public DestinationType? DestinationType { get; set; }
-    
+
+    public VoteValue? VoteValue { get; set; }
+
     [MaxLength(250)]
     [RegularExpression(@"^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$", 
         ErrorMessage = "Please enter a valid URL")]

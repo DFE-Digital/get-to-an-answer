@@ -168,6 +168,19 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
                 ModelState.AddModelError($"Options-{index}-RankPriority", errorMessage);
             }
         }
+
+        if (QuestionType is Common.Enum.QuestionType.VoteValue)
+        {
+            var optionsWithoutVoteValue = Options.Where(o => o.VoteValue is null);
+
+            foreach (var option in optionsWithoutVoteValue)
+            {
+                var index = option.OptionNumber - 1;
+                var errorMessage = $"Select yes or no for option {option.OptionNumber}";
+
+                ModelState.AddModelError($"Options-{index}-VoteValue", errorMessage);
+            }
+        }
     }
 
     private SelectListItem ToResultsPageSelectListItem(ContentDto content) =>
@@ -227,6 +240,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
                 AnswerDestination = MapStoredAnswerDestination(existingAnswer),
                 OptionContent = existingAnswer.Content,
                 OptionHint = existingAnswer.Description,
+                VoteValue = existingAnswer.VoteValue,
                 SelectedDestinationQuestion = existingAnswer.DestinationType != DestinationType.InterimThenQuestion ?
                     existingAnswer.DestinationQuestionId?.ToString() : null,
                 SelectedInterimDestinationQuestion =  existingAnswer.DestinationType == DestinationType.InterimThenQuestion ?
@@ -309,6 +323,7 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
                 },
             DestinationUrl = option.ExternalLink,
             Priority = Convert.ToSingle(option.RankPriority),
+            VoteValue = option.VoteValue,
         });
     }
 
@@ -338,7 +353,8 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
                 },
             DestinationUrl = option.ExternalLink,
             Priority = Convert.ToSingle(option.RankPriority),
-            Description = option.OptionHint
+            Description = option.OptionHint,
+            VoteValue = option.VoteValue
         });
     }
 

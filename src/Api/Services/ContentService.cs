@@ -36,6 +36,7 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
                 QuestionnaireId = request.QuestionnaireId,
                 Title = request.Title,
                 Content = request.Content,
+                NoResultContent = request.NoResultContent,
                 ReferenceName = request.ReferenceName,
                 CreatedBy = userId,
                 CreatedAt = DateTime.UtcNow,
@@ -132,6 +133,7 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
 
             answer.Content = request.Content ?? answer.Content;
             answer.Title = request.Title ?? answer.Title;
+            answer.NoResultContent = request.NoResultContent ?? answer.NoResultContent;
             answer.ReferenceName = request.ReferenceName ?? answer.ReferenceName;
             answer.UpdatedAt = DateTime.UtcNow;
 
@@ -186,6 +188,7 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
             Id = entity.Id,
             Title = entity.Title,
             Content = entity.Content,
+            NoResultContent = entity.NoResultContent,
             ReferenceName = entity.ReferenceName,
             QuestionnaireId = entity.QuestionnaireId,
             CreatedAt = entity.CreatedAt,

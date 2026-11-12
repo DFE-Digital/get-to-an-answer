@@ -23,6 +23,9 @@ public class ContentEntity
     [Required]
     [MaxLength(10000)]
     public string Content { get; set; }
+
+    [MaxLength(10000)]
+    public string? NoResultContent { get; set; }
     
     [Required]
     [MaxLength(500)]

@@ -72,8 +72,23 @@
                   id="ContentValue"
                   rows="4"
                   asp-for="ContentValue"
-                  aria-describedby="ContentValue-hint"></textarea>
-      </govuk-form-group>
+                               aria-describedby="ContentValue-hint"></textarea>
+                  </govuk-form-group>
+
+                  <!-- No result content -->
+                  <govuk-form-group asp-for="@Model.NoResultContentValue">
+                    <label class="govuk-label govuk-label--m" for="NoResultContentValue">
+                      No result content (optional)
+                    </label>
+                    <div class="govuk-hint" id="NoResultContentValue-hint">
+                    Shown instead of the main content when the No count is the majority for a voting questionnaire.
+                    </div>
+                    <textarea class="govuk-textarea"
+                              id="NoResultContentValue"
+                              rows="4"
+                              asp-for="NoResultContentValue"
+                              aria-describedby="NoResultContentValue-hint"></textarea>
+                  </govuk-form-group>
 
       <!-- Question text -->
       <govuk-form-group asp-for="@Model.ContentRefName">

@@ -3,6 +3,7 @@ using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
 using Common.Helpers;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -23,6 +24,8 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
     [BindProperty] public string AnswerHistory { get; set; } = "{}"; // JSON string to store answer history
     public required QuestionnaireInfoDto Questionnaire { get; set; }
     public required DestinationDto Destination { get; set; }
+    public VoteTally? Tally { get; set; }
+    public string? VoteResult => VoteTally.GetResult(Tally);
 
     [FromQuery(Name = "embed")] 
     public bool Embed { get; set; }
@@ -72,6 +75,7 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
 
             IsEmbedded = Embed;
             Destination = destination;
+            Tally = destination.Type == DestinationType.CustomContent ? await GetVoteTallyFromHistoryAsync() : null;
             NextStateRequest = new GetNextStateRequest();
             return Page();
         }
@@ -254,6 +258,19 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
         NextStateRequest.CurrentQuestionId = previousQuestionId;
         NextStateRequest.CurrentQuestionOrder = previousDestination.Question?.Order ?? 0;
         NextStateRequest.SelectedAnswerIds = restoredAnswers;
+    }
+
+    /// <summary>
+    /// Flattens all selected answer IDs from the answer history and retrieves the Yes/No vote tally
+    /// </summary>
+    protected async Task<VoteTally?> GetVoteTallyFromHistoryAsync()
+    {
+        var history = JsonSerializer.Deserialize<Dictionary<string, List<Guid>>>(AnswerHistory) ?? new();
+        var answerIds = history.Values.SelectMany(ids => ids).Distinct().ToList();
+        if (answerIds.Count == 0)
+            return null;
+
+        return await ApiClient.GetVoteTallyAsync(Questionnaire.Id, answerIds);
     }
 
     /// <summary>

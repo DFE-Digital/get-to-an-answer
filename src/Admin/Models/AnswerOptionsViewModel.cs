@@ -20,7 +20,9 @@ public class AnswerOptionsViewModel
 
     [AnswerOptionRequired(fieldType: "destination")]
     public AnswerDestination AnswerDestination { get; set; } = AnswerDestination.NextQuestion;
-    
+
+    public VoteValue? VoteValue { get; set; }
+
     public IEnumerable<SelectListItem> QuestionSelectList { get; set; } = [];
     public List<SelectListItem> ResultsPageSelectList { get; set; } = [];
     
