@@ -30,12 +30,7 @@
       <input type="hidden" asp-for="@Model.BackLinkSlug" />
       <!-- Content title -->
       <govuk-form-group asp-for="@Model.ContentTitle">
-        <label class="govuk-label govuk-label--m" for="ContentTitle">
-          Title
-        </label>
-        <div class="govuk-hint" id="ContentTitle-hint">
-          The title will appear at the top of the results page.
-        </div>
+        @await Html.PartialAsync("_ContentFieldLabelHint", new { Name = "ContentTitle", LabelText = "Title", HintHtml = "The title will appear at the top of the results page." })
 
         <govuk-field-error asp-for="@Model.ContentTitle" error-id="ContentTitle-error">
         </govuk-field-error>
@@ -75,14 +70,7 @@
 
       <!-- Question text -->
       <govuk-form-group asp-for="@Model.ContentRefName">
-        <label class="govuk-label govuk-label--m" for="ContentRefName">
-          Results reference (optional)
-        </label>
-        <div class="govuk-hint" id="ContentRefName-hint">
-          <p>Add a reference to help you find the right results page when making edits. These are not visible to users.</p>
-
-          <p>If you do not add a reference, the results page will be listed as its title.</p>
-        </div>
+        @await Html.PartialAsync("_ContentFieldLabelHint", new { Name = "ContentRefName", LabelText = "Results reference (optional)", HintHtml = "<p>Add a reference to help you find the right results page when making edits. These are not visible to users.</p><p>If you do not add a reference, the results page will be listed as its title.</p>" })
 
         <govuk-field-error asp-for="@Model.ContentRefName" error-id="ContentRefName-error">
         </govuk-field-error>

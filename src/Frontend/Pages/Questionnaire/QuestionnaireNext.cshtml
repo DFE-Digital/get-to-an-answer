@@ -276,24 +276,25 @@
     else if (Model is { Destination.Type: DestinationType.CustomContent} 
              or { Destination.Type: DestinationType.InterimThenQuestion, NextStateRequest.ValidateAnswers: true })    {
                 <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="customContentBackButton">Back</button>
-      @if (Model.IsEmbedded)
-      {
-        <div class="govuk-!-padding-top-9">
-            <fieldset class="govuk-fieldset" aria-describedby="results-page-details">
-              <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                <h1 id="results-page-title" class="govuk-fieldset__heading">
-                  @Model.Destination.Title
-                </h1>
-              </legend>
-          
-              <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
-            </fieldset>
-        </div>
-      }
-      else
-      {
-        <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
-      }
+      Func<dynamic?, object> resultsPageDetails = @<div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>;
+        @if (Model.IsEmbedded)
+        {
+            <div class="govuk-!-padding-top-9">
+                <fieldset class="govuk-fieldset" aria-describedby="results-page-details">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h1 id="results-page-title" class="govuk-fieldset__heading">
+                    @Model.Destination.Title
+                    </h1>
+                </legend>
+
+                @resultsPageDetails(null)
+                </fieldset>
+            </div>
+        }
+        else
+        {
+            @resultsPageDetails(null)
+        }
       @if (Model.Destination.Type == DestinationType.InterimThenQuestion)
       {
           <button type="submit" formnovalidate="formnovalidate" class="govuk-button"
