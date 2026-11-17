@@ -7,6 +7,11 @@ internal static class ModuleInitializer
     [ModuleInitializer]
     public static void Initialize()
     {
+        if (!OperatingSystem.IsWindows() || !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI")))
+        {
+            return;
+        }
+
         // Docker environment configuration for Testcontainers
         // This module initializer runs before any static constructors
 
@@ -19,7 +24,6 @@ internal static class ModuleInitializer
             // If it's the malformed dockerDesktopLinuxEngine URI, clear it
             if (dockerHost.Contains("dockerDesktopLinuxEngine") || dockerHost.Contains("////pipe"))
             {
-                // Clear the invalid DOCKER_HOST to let Testcontainers auto-detect
                 Environment.SetEnvironmentVariable("DOCKER_HOST", "");
             }
             // If it's already a valid 2-slash format, leave it alone

@@ -1,22 +1,6 @@
 [
   {
     "Name": "New Profile",
-    "Projects": [
-      {
-        "Path": "src\\Frontend\\Frontend.csproj",
-        "Action": "Start",
-        "DebugTarget": "https"
-      },
-      {
-        "Path": "src\\Admin\\Admin.csproj",
-        "Action": "Start",
-        "DebugTarget": "https"
-      },
-      {
-        "Path": "src\\Api\\Api.csproj",
-        "Action": "Start",
-        "DebugTarget": "https"
-      }
-    ]
+    "Projects": []
   }
 ]
