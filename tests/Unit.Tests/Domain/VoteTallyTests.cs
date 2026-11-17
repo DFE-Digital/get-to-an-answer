@@ -11,7 +11,7 @@ public class VoteTallyTests
     {
         var tally = new VoteTally { Yes = 3, No = 1 };
 
-        VoteTally.GetResult(tally).Should().Be("Yes");
+        VoteTally.GetResult(tally).Should().Be("Yes Result Message");
     }
 
     [Fact]
@@ -19,7 +19,7 @@ public class VoteTallyTests
     {
         var tally = new VoteTally { Yes = 1, No = 3 };
 
-        VoteTally.GetResult(tally).Should().Be("No");
+        VoteTally.GetResult(tally).Should().Be("No Result Message");
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public class VoteTallyTests
     {
         var tally = new VoteTally { Yes = 2, No = 2 };
 
-        VoteTally.GetResult(tally).Should().Be("No");
+        VoteTally.GetResult(tally).Should().Be("No Result Message");
     }
 
     [Fact]
@@ -41,6 +41,6 @@ public class VoteTallyTests
     {
         var tally = new VoteTally { Yes = 0, No = 0 };
 
-        VoteTally.GetResult(tally).Should().Be("No");
+        VoteTally.GetResult(tally).Should().Be("No Result Message");
     }
 }

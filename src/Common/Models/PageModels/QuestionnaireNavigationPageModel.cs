@@ -25,7 +25,7 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
     public required QuestionnaireInfoDto Questionnaire { get; set; }
     public required DestinationDto Destination { get; set; }
     public VoteTally? Tally { get; set; }
-    public string? VoteResult => VoteTally.GetResult(Tally);
+    public string? VoteResult => Tally is null ? null : Tally.Yes > Tally.No ? "Yes" : "No";
 
     [FromQuery(Name = "embed")] 
     public bool Embed { get; set; }

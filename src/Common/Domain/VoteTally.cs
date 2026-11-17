@@ -6,5 +6,13 @@ public class VoteTally
 
     public int No { get; set; }
 
-    public static string? GetResult(VoteTally? tally) => tally is null ? null : tally.Yes > tally.No ? "Yes" : "No";
+    public static string? GetResult(VoteTally? tally)
+    {
+        if (tally is null)
+        {
+            return null;
+        }
+
+        return tally.Yes > tally.No ? "Yes Result Message" : "No Result Message";
+    }
 }
