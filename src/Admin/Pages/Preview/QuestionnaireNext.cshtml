@@ -209,9 +209,9 @@
             @if (Model.Tally is not null)
             {
               <p class="govuk-body" id="vote-tally">Yes: @Model.Tally.Yes, No: @Model.Tally.No</p>
-              <p class="govuk-body" id="vote-result">Result: @Model.VoteResult</p>
+              <p class="govuk-body" id="vote-result">Result: @Model.GetVoteResult()</p>
             }
-            <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.VoteResult == "No" && Model.Destination.NoResultContent is not null ? Model.Destination.NoResultContent : Model.Destination.Content)))</div>
+            <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.GetVoteResult() == "No" && Model.Destination.NoResultContent is not null ? Model.Destination.NoResultContent : Model.Destination.Content)))</div>
           </fieldset>
         }
         else
@@ -219,9 +219,9 @@
           @if (Model.Tally is not null)
           {
             <p class="govuk-body" id="vote-tally">Yes: @Model.Tally.Yes, No: @Model.Tally.No</p>
-            <p class="govuk-body" id="vote-result">Result: @Model.VoteResult</p>
+            <p class="govuk-body" id="vote-result">Result: @Model.GetVoteResult()</p>
           }
-          <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.VoteResult == "No" && Model.Destination.NoResultContent is not null ? Model.Destination.NoResultContent : Model.Destination.Content)))</div>
+          <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.GetVoteResult() == "No" && Model.Destination.NoResultContent is not null ? Model.Destination.NoResultContent : Model.Destination.Content)))</div>
         }
         @if (Model.Destination.Type == DestinationType.InterimThenQuestion)
         {

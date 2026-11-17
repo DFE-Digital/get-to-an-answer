@@ -72,114 +72,87 @@ public class AnswerOptionsPageModel(IApiClient apiClient) : BasePageModel
 
     protected void ValidateSelectedQuestionsIfAny()
     {
-        var optionsWithSpecificQuestionNoSelection =
-            Options.Where(x =>
-                x.AnswerDestination is AnswerDestination.SpecificQuestion &&
-                string.IsNullOrEmpty(x.SelectedDestinationQuestion));
+        AddDestinationErrors(
+            Options.Where(o =>
+                o.AnswerDestination is AnswerDestination.SpecificQuestion &&
+                string.IsNullOrEmpty(o.SelectedDestinationQuestion)),
+            "Select a question as the destination to save",
+            "destination-specific");
 
-        foreach (var specificQuestion in optionsWithSpecificQuestionNoSelection)
-        {
-            var index = specificQuestion.OptionNumber - 1;
-            var errorMessage = "Select a question as the destination to save";
+        AddDestinationErrors(
+            Options.Where(o =>
+                o.AnswerDestination is AnswerDestination.InterimWithSpecificQuestion &&
+                string.IsNullOrEmpty(o.SelectedInterimDestinationQuestion)),
+            "Select a question as the destination to save",
+            "destination-interim-question");
 
-            var destinationKey = $"Options-{index}-AnswerDestination";
-            var specificQuestionRadioInputId = $"Options-{index}-destination-specific";
+        AddDestinationErrors(
+            Options.Where(o =>
+                o.AnswerDestination is AnswerDestination.InternalResultsPage &&
+                string.IsNullOrEmpty(o.SelectedResultsPage)),
+            "Select a results page as the destination to save",
+            "destination-internal");
 
-            ModelState.AddModelError(destinationKey, string.Empty);
-            ModelState.AddModelError(specificQuestionRadioInputId, errorMessage);
-        }
-        
-        var optionsWithInterimQuestionNoSelection =
-            Options.Where(x =>
-                x.AnswerDestination is AnswerDestination.InterimWithSpecificQuestion &&
-                string.IsNullOrEmpty(x.SelectedInterimDestinationQuestion));
+        AddDestinationErrors(
+            Options.Where(o =>
+                o.AnswerDestination is AnswerDestination.InterimWithSpecificQuestion &&
+                string.IsNullOrEmpty(o.SelectedInterimResultsPage)),
+            "Select a results page as the destination to save",
+            "destination-interim-result");
 
-        foreach (var specificQuestion in optionsWithInterimQuestionNoSelection)
-        {
-            var index = specificQuestion.OptionNumber - 1;
-            var errorMessage = "Select a question as the destination to save";
-
-            var destinationKey = $"Options-{index}-AnswerDestination";
-            var specificQuestionRadioInputId = $"Options-{index}-destination-interim-question";
-
-            ModelState.AddModelError(destinationKey, string.Empty);
-            ModelState.AddModelError(specificQuestionRadioInputId, errorMessage);
-        }
-
-        var optionsWithResultsPageNoSelection = Options.Where(o =>
-            o.AnswerDestination is AnswerDestination.InternalResultsPage &&
-            string.IsNullOrEmpty(o.SelectedResultsPage));
-
-        foreach (var resultsPage in optionsWithResultsPageNoSelection)
-        {
-            var index = resultsPage.OptionNumber - 1;
-            var errorMessage = "Select a results page as the destination to save";
-
-            var destinationKey = $"Options-{index}-AnswerDestination";
-            var resultsPageRadioInputId = $"Options-{index}-destination-internal";
-            
-            ModelState.AddModelError(destinationKey, string.Empty);
-            ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
-        }
-        
-        var optionsWithInterimResultsPageNoSelection = Options.Where(o =>
-            o.AnswerDestination is AnswerDestination.InterimWithSpecificQuestion &&
-            string.IsNullOrEmpty(o.SelectedInterimResultsPage));
-
-        foreach (var resultsPage in optionsWithInterimResultsPageNoSelection)
-        {
-            var index = resultsPage.OptionNumber - 1;
-            var errorMessage = "Select a results page as the destination to save";
-
-            var destinationKey = $"Options-{index}-AnswerDestination";
-            var resultsPageRadioInputId = $"Options-{index}-destination-interim-result";
-            
-            ModelState.AddModelError(destinationKey, string.Empty);
-            ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
-        }
-
-        var optionsWithExternalLinkNoSelection = Options.Where(o =>
-            o.AnswerDestination == AnswerDestination.ExternalResultsPage &&
-            string.IsNullOrEmpty(o.ExternalLink));
-
-        foreach (var externalLink in optionsWithExternalLinkNoSelection)
-        {
-            var index = externalLink.OptionNumber - 1;
-            var errorMessage = "Enter a link as the destination to save";
-            
-            var destinationKey = $"Options-{index}-AnswerDestination";
-            var resultsPageRadioInputId = $"Options-{index}-destination-external";
-
-            
-            ModelState.AddModelError(destinationKey, string.Empty);
-            ModelState.AddModelError(resultsPageRadioInputId, errorMessage);
-        }
+        AddDestinationErrors(
+            Options.Where(o =>
+                o.AnswerDestination == AnswerDestination.ExternalResultsPage &&
+                string.IsNullOrEmpty(o.ExternalLink)),
+            "Enter a link as the destination to save",
+            "destination-external");
 
         if (QuestionType is Common.Enum.QuestionType.MultiSelect)
         {
-            var optionsWithInvalidPriorities = Options.Where(o =>
-                int.TryParse(o.RankPriority, out var priority) && priority < 0);
-            
-            foreach (var invalidPriority in optionsWithInvalidPriorities)
-            {
-                var index = invalidPriority.OptionNumber - 1;
-                var errorMessage = $"Priority must be a positive number (0, 1, ...) for option {invalidPriority.OptionNumber}";
-                
-                ModelState.AddModelError($"Options-{index}-RankPriority", errorMessage);
-            }
+            ValidateRankPriorities();
         }
 
         if (QuestionType is Common.Enum.QuestionType.VoteValue)
         {
-            var optionsWithoutVoteValue = Options.Where(o => o.VoteValue is null);
+            ValidateVoteValues();
+        }
+    }
 
-            foreach (var option in optionsWithoutVoteValue)
-            {
-                var index = option.OptionNumber - 1;
-                var errorMessage = $"Select yes or no for option {option.OptionNumber}";
+    private void AddDestinationErrors(IEnumerable<AnswerOptionsViewModel> options, string errorMessage, string inputIdSuffix)
+    {
+        foreach (var option in options)
+        {
+            var index = option.OptionNumber - 1;
 
-                ModelState.AddModelError($"Options-{index}-VoteValue", errorMessage);
-            }
+            ModelState.AddModelError($"Options-{index}-AnswerDestination", string.Empty);
+            ModelState.AddModelError($"Options-{index}-{inputIdSuffix}", errorMessage);
+        }
+    }
+
+    private void ValidateRankPriorities()
+    {
+        var optionsWithInvalidPriorities = Options.Where(o =>
+            int.TryParse(o.RankPriority, out var priority) && priority < 0);
+
+        foreach (var invalidPriority in optionsWithInvalidPriorities)
+        {
+            var index = invalidPriority.OptionNumber - 1;
+            var errorMessage = $"Priority must be a positive number (0, 1, ...) for option {invalidPriority.OptionNumber}";
+
+            ModelState.AddModelError($"Options-{index}-RankPriority", errorMessage);
+        }
+    }
+
+    private void ValidateVoteValues()
+    {
+        var optionsWithoutVoteValue = Options.Where(o => o.VoteValue is null);
+
+        foreach (var option in optionsWithoutVoteValue)
+        {
+            var index = option.OptionNumber - 1;
+            var errorMessage = $"Select yes or no for option {option.OptionNumber}";
+
+            ModelState.AddModelError($"Options-{index}-VoteValue", errorMessage);
         }
     }
 

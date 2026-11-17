@@ -16,7 +16,7 @@ public class AnswerEntity
     public Guid Id { get; set; }
 
     [Required]
-    public string Content { get; set; }
+    public required string Content { get; set; }
     
     public string? Description { get; set; }
     
