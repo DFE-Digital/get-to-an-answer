@@ -4,315 +4,312 @@
 @model Frontend.Pages.Questionnaire.QuestionnaireNext
 
 @{
-  Layout = "Shared/_Layout";
+    Layout = "Shared/_Layout";
 }
 
 @{
-  var dynamicTitle = Model.Questionnaire.DisplayTitle ?? "";
-  dynamicTitle = $"{(dynamicTitle.Any() ? " - " : "")}{dynamicTitle}";
+    var dynamicTitle = Model.Questionnaire.DisplayTitle ?? "";
+    dynamicTitle = $"{(dynamicTitle.Any() ? " - " : "")}{dynamicTitle}";
 
-  var destination = Model.Destination;
+    var destination = Model.Destination;
 
-  if (destination.Type == DestinationType.Question)
-  {
-    var question = destination.Question;
+    if (destination.Type == DestinationType.Question)
+    {
+        var question = destination.Question;
 
-    dynamicTitle = $"Question {question?.Order}{dynamicTitle}";
-  }
-  else if (destination.Type == DestinationType.CustomContent)
-  {
-    dynamicTitle = $"{destination.Title} - Results page {dynamicTitle}";
-  }
-  else if (destination.Type == DestinationType.ExternalLink)
-  {
-    dynamicTitle = $"External link {dynamicTitle}";
-  }
+        dynamicTitle = $"Question {question?.Order}{dynamicTitle}";
+    }
+    else if (destination.Type == DestinationType.CustomContent)
+    {
+        dynamicTitle = $"{destination.Title} - Results page {dynamicTitle}";
+    }
+    else if (destination.Type == DestinationType.ExternalLink)
+    {
+        dynamicTitle = $"External link {dynamicTitle}";
+    }
 
-  ViewData["Title"] = dynamicTitle;
+    ViewData["Title"] = dynamicTitle;
 
-  var hasErrors = Model != null && !ViewData.ModelState.IsValid;
+    var hasErrors = Model != null && !ViewData.ModelState.IsValid;
 }
 
 @section BeforeContainer
 {
 
-  @if (Model != null)
-  {
-    @if (!Model.IsEmbedded && Model.Destination.Type is DestinationType.CustomContent or DestinationType.InterimThenQuestion)
+    @if (Model != null)
     {
-      <section class="dfe-page-grey" id="main-content-header">
-        <div class="govuk-width-container" id="main-header-container">
-          <div class="govuk-grid-row">
-            <div class="govuk-grid-column-full">              
-              <h1 id="results-page-title" class="govuk-heading-xl">
-                @Model?.Destination.Title
-              </h1>
-            </div>
-          </div>
-        </div>
-      </section>
+        @if (!Model.IsEmbedded && Model.Destination.Type is DestinationType.CustomContent or DestinationType.InterimThenQuestion)
+        {
+            <section class="dfe-page-grey" id="main-content-header">
+                <div class="govuk-width-container" id="main-header-container">
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full">
+                            <h1 id="results-page-title" class="govuk-heading-xl">
+                                @Model?.Destination.Title
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        }
     }
-  }
 }
 
-<div class="govuk-grid-row">  
-  <div class="govuk-grid-column-full">
-    <form id="question-form" action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
-    @if (Model?.Destination?.Question?.Order == 1 && Model?.Questionnaire?.HasStartPage == true)
-    {
-        <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="backButtonForStartPage"
-                data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
-            Back
-        </button>
-    }
-    else if (Model?.Destination?.Question?.Order > 1)
-    {
-        <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="backButton"
-                data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
-            Back
-        </button>
-    }
-    @if (hasErrors)
-    {
-        @await Html.PartialAsync("_ErrorSummary", Model)
-    }
-      @if (Model?.Destination is { Type: DestinationType.Question, Question: not null } || 
-           Model is { Destination: { Type: DestinationType.InterimThenQuestion, Question: not null}, NextStateRequest.ValidateAnswers: false })
-      {    
-      var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <form id="question-form" action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
+            @if (Model?.Destination?.Question?.Order == 1 && Model?.Questionnaire?.HasStartPage == true)
+            {
+                <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="backButtonForStartPage"
+                        data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
+                    Back
+                </button>
+            }
+            else if (Model?.Destination?.Question?.Order > 1)
+            {
+                <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="backButton"
+                        data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
+                    Back
+                </button>
+            }
+            @if (hasErrors)
+            {
+                @await Html.PartialAsync("_ErrorSummary", Model)
+            }
+            @if (Model?.Destination is { Type: DestinationType.Question, Question: not null } ||
+                 Model is { Destination: { Type: DestinationType.InterimThenQuestion, Question: not null }, NextStateRequest.ValidateAnswers: false })
+            {
+                var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
 
-      var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
-      var inputGroupId = $"q-{Model.Destination.Question.Id}";
+                var firstErrorMessage = ms2?.Errors.FirstOrDefault()?.ErrorMessage;
+                var inputGroupId = $"q-{Model.Destination.Question.Id}";
 
       
                 
-       <div class="govuk-form-group govuk-!-margin-top-9 @(hasFieldError ? "govuk-form-group--error" : "")">
-          <fieldset class="govuk-fieldset"
-                    aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
-            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-              @if (Model.Destination.Question.Type == QuestionType.DropdownSelect)
-              {
-                <h1 id="question-content" class="govuk-fieldset__heading" data-reference="@Model.Destination.Question.ReferenceName">
-                  <label class="govuk-label govuk-label--l" for="@inputGroupId-select">
-                    @Model.Destination.Question.Content
-                  </label>
-                </h1>
-              }
-              else
-              {
-                <h1 id="question-content" class="govuk-fieldset__heading" data-reference="@Model.Destination.Question.ReferenceName">
-                  @Model.Destination.Question.Content
-                </h1>
-              }
-            </legend>
-            @if (Model.Destination.Question.Description != null)
-            {
-              <div id="@($"{inputGroupId}-hint")" class="govuk-hint">
-                @(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Question.Description)))
-              </div>
+                <div class="govuk-form-group govuk-!-margin-top-9 @(hasFieldError ? "govuk-form-group--error" : "")">
+                    <fieldset class="govuk-fieldset"
+                              aria-describedby="@(Model.Destination.Question.Description != null ? $"{inputGroupId}-hint" : null)">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                            @if (Model.Destination.Question.Type == QuestionType.DropdownSelect)
+                            {
+                                <h1 id="question-content" class="govuk-fieldset__heading" data-reference="@Model.Destination.Question.ReferenceName">
+                                    <label class="govuk-label govuk-label--l" for="@inputGroupId-select">
+                                        @Model.Destination.Question.Content
+                                    </label>
+                                </h1>
+                            }
+                            else
+                            {
+                                <h1 id="question-content" class="govuk-fieldset__heading" data-reference="@Model.Destination.Question.ReferenceName">
+                                    @Model.Destination.Question.Content
+                                </h1>
+                            }
+                        </legend>
+                        @if (Model.Destination.Question.Description != null)
+                        {
+                            <div id="@($"{inputGroupId}-hint")" class="govuk-hint">
+                                @(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Question.Description)))
+                            </div>
+                        }
+                        @if (Model.Destination.Question.Type == QuestionType.SingleSelect)
+                        {
+                            var answers = Model.Destination.Question.Answers;
+
+                            @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
+                            {
+                                <p id="@inputGroupId-error" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
+                                </p>
+                            }
+
+                            <div class="govuk-radios" data-module="govuk-radios">
+                                @for (var a = 0; a < answers.Count; a++)
+                                {
+                                    var answer = Model?.Destination?.Question.Answers[a];
+
+                                    var inputId = $"{inputGroupId}-a-{answer?.Id}";
+                                    var itemHintId = $"{inputId}-hint";
+
+                                    string? itemDescribedBy = null;
+
+                                    if (answer?.Description != null)
+                                    {
+                                        itemDescribedBy = itemHintId;
+                                    }
+
+                                    if (hasFieldError)
+                                    {
+                                        itemDescribedBy = itemDescribedBy != null
+                                          ? $"{itemDescribedBy} {inputGroupId}-error"
+                                          : $"{inputGroupId}-error";
+                                    }
+
+                                    var isChecked = Model.Destination.PreviouslySelectedAnswerIds?.Contains(answer?.Id ?? Guid.Empty) ?? false;
+
+                                    <div class="govuk-radios__item">
+                                        <input class="govuk-radios__input @(hasFieldError ? "govuk-input--error" : "")"
+                                               id="@inputId"
+                                               name="NextStateRequest.SelectedAnswerIds"
+                                               type="radio"
+                                               value="@answer.Id"
+                                               aria-describedby="@itemDescribedBy"
+                                        @(isChecked ? "checked" : "")>
+                                        <label class="govuk-label govuk-radios__label" for="@inputId">
+                                            @answer.Content
+                                        </label>
+                                        @if (answer.Description != null)
+                                        {
+                                            <div id="@itemHintId" class="govuk-hint govuk-radios__hint">
+                                                @(Html.Raw(GovUkMarkdown.ToGovUkHtml(answer.Description)))
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else if (Model.Destination.Question.Type == QuestionType.MultiSelect)
+                        {
+                            var answers = Model.Destination.Question.Answers;
+
+                            @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
+                            {
+                                <p id="@inputGroupId-error" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
+                                </p>
+                            }
+
+                            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                                @for (var a = 0; a < answers.Count; a++)
+                                {
+                                    var answer = Model?.Destination?.Question.Answers[a];
+                                    var inputId = $"{inputGroupId}-a-{answer?.Id}";
+                                    var itemHintId = $"{inputId}-hint";
+
+                                    string? itemDescribedBy = null;
+
+                                    if (answer?.Description != null)
+                                    {
+                                        itemDescribedBy = itemHintId;
+                                    }
+
+                                    if (hasFieldError)
+                                    {
+                                        itemDescribedBy = itemDescribedBy != null
+                                          ? $"{itemDescribedBy} {inputGroupId}-error"
+                                          : $"{inputGroupId}-error";
+                                    }
+
+                                    var isChecked = Model.Destination.PreviouslySelectedAnswerIds?.Contains(answer?.Id ?? Guid.Empty) ?? false;
+
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input @(hasFieldError ? "govuk-input--error" : "")"
+                                               id="@inputId"
+                                               name="NextStateRequest.SelectedAnswerIds"
+                                               type="checkbox"
+                                               value="@answer.Id"
+                                               aria-describedby="@itemDescribedBy"
+                                        @(isChecked ? "checked" : "")>
+                                        <label class="govuk-label govuk-checkboxes__label" for="@inputId">
+                                            @answer.Content
+                                        </label>
+                                        @if (answer.Description != null)
+                                        {
+                                            <div id="@itemHintId" class="govuk-hint govuk-checkboxes__hint">
+                                                @(Html.Raw(GovUkMarkdown.ToGovUkHtml(answer.Description)))
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else if (Model.Destination.Question.Type == QuestionType.DropdownSelect)
+                        {
+                            var answers = Model.Destination.Question.Answers;
+
+                            @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
+                            {
+                                <p id="@inputGroupId-error" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
+                                </p>
+                            }
+                            <label class="govuk-label" for="@($"{inputGroupId}-select")">
+                                Choose answer
+                            </label>
+                            <select class="govuk-select" id="@($"{inputGroupId}-select")" name="NextStateRequest.SelectedAnswerIds">
+                                @{
+                                    var firstPreviouslySelectedId = Model.Destination.PreviouslySelectedAnswerIds?.FirstOrDefault();
+                                }
+                                @if (firstPreviouslySelectedId == null || firstPreviouslySelectedId == Guid.Empty)
+                                {
+                                    <option value="choose" selected="selected">Select an answer</option>
+                                }
+                                else
+                                {
+                                    <option value="choose">Select an answer</option>
+                                }
+                                @foreach (var answer in answers)
+                                {
+                                    var isSelected = firstPreviouslySelectedId == answer.Id;
+                                    if (isSelected)
+                                    {
+                                        <option value="@answer.Id" selected>@answer.Content</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@answer.Id">@answer.Content</option>
+                                    }
+                                }
+                            </select>
+                        }
+                    </fieldset>
+                </div>
+                <button type="submit" formnovalidate="formnovalidate" class="govuk-button" name="submitButton" value="continueButton"
+                        data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
+                    @(Model?.Questionnaire?.ContinueButtonText ?? "Continue")
+                </button>
+
+                <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
+                <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
             }
-            @if (Model.Destination.Question.Type == QuestionType.SingleSelect)
+            else if (Model is { Destination.Type: DestinationType.CustomContent }
+                     or { Destination.Type: DestinationType.InterimThenQuestion, NextStateRequest.ValidateAnswers: true })
             {
-              var answers = Model.Destination.Question.Answers;
-
-              @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
-              {
-                <p id="@inputGroupId-error" class="govuk-error-message">
-                  <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
-                </p>
-              }
-
-              <div class="govuk-radios" data-module="govuk-radios">
-                @for (var a = 0; a < answers.Count; a++)
+                <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="customContentBackButton">Back</button>
+                @if (Model.IsEmbedded)
                 {
-                  var answer = Model?.Destination?.Question.Answers[a];
+                    <div class="govuk-!-padding-top-9">
+                        <fieldset class="govuk-fieldset" aria-describedby="results-page-details">
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                                <h1 id="results-page-title" class="govuk-fieldset__heading">
+                                    @Model.Destination.Title
+                                </h1>
+                            </legend>
 
-                  var inputId = $"{inputGroupId}-a-{answer?.Id}";
-                  var itemHintId = $"{inputId}-hint";
-
-                  string? itemDescribedBy = null;
-
-                  if (answer?.Description != null)
-                  {
-                    itemDescribedBy = itemHintId;
-                  }
-
-                  if (hasFieldError)
-                  {
-                    itemDescribedBy = itemDescribedBy != null
-                      ? $"{itemDescribedBy} {inputGroupId}-error"
-                      : $"{inputGroupId}-error";
-                  }
-
-                  var isChecked = Model.Destination.PreviouslySelectedAnswerIds?.Contains(answer?.Id ?? Guid.Empty) ?? false;
-
-                  <div class="govuk-radios__item">
-                    <input
-                      class="govuk-radios__input @(hasFieldError ? "govuk-input--error" : "")"
-                      id="@inputId"
-                      name="NextStateRequest.SelectedAnswerIds"
-                      type="radio"
-                      value="@answer.Id"
-                      aria-describedby="@itemDescribedBy"
-                      @(isChecked ? "checked" : "")>
-                    <label class="govuk-label govuk-radios__label" for="@inputId">
-                      @answer.Content
-                    </label>
-                    @if (answer.Description != null)
-                    {
-                      <div id="@itemHintId" class="govuk-hint govuk-radios__hint">
-                        @(Html.Raw(GovUkMarkdown.ToGovUkHtml(answer.Description)))
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
-            }
-            else if (Model.Destination.Question.Type == QuestionType.MultiSelect)
-            {
-              var answers = Model.Destination.Question.Answers;
-
-              @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
-              {
-                <p id="@inputGroupId-error" class="govuk-error-message">
-                  <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
-                </p>
-              }
-
-              <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                @for (var a = 0; a < answers.Count; a++)
-                {
-                  var answer = Model?.Destination?.Question.Answers[a];
-                  var inputId = $"{inputGroupId}-a-{answer?.Id}";
-                  var itemHintId = $"{inputId}-hint";
-
-                  string? itemDescribedBy = null;
-
-                  if (answer?.Description != null)
-                  {
-                    itemDescribedBy = itemHintId;
-                  }
-
-                  if (hasFieldError)
-                  {
-                    itemDescribedBy = itemDescribedBy != null
-                      ? $"{itemDescribedBy} {inputGroupId}-error"
-                      : $"{inputGroupId}-error";
-                  }
-
-                  var isChecked = Model.Destination.PreviouslySelectedAnswerIds?.Contains(answer?.Id ?? Guid.Empty) ?? false;
-
-                  <div class="govuk-checkboxes__item">
-                    <input
-                      class="govuk-checkboxes__input @(hasFieldError ? "govuk-input--error" : "")"
-                      id="@inputId"
-                      name="NextStateRequest.SelectedAnswerIds"
-                      type="checkbox"
-                      value="@answer.Id"
-                      aria-describedby="@itemDescribedBy"
-                      @(isChecked ? "checked" : "")>
-                    <label class="govuk-label govuk-checkboxes__label" for="@inputId">
-                      @answer.Content
-                    </label>
-                    @if (answer.Description != null)
-                    {
-                      <div id="@itemHintId" class="govuk-hint govuk-checkboxes__hint">
-                        @(Html.Raw(GovUkMarkdown.ToGovUkHtml(answer.Description)))
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
-            }
-            else if (Model.Destination.Question.Type == QuestionType.DropdownSelect)
-            {
-              var answers = Model.Destination.Question.Answers;
-
-              @if (hasFieldError && !string.IsNullOrWhiteSpace(firstErrorMessage))
-              {
-                <p id="@inputGroupId-error" class="govuk-error-message">
-                  <span class="govuk-visually-hidden">Error:</span> @firstErrorMessage
-                </p>
-              }
-              <label class="govuk-label" for="@($"{inputGroupId}-select")">
-                Choose answer
-              </label>
-              <select class="govuk-select" id="@($"{inputGroupId}-select")" name="NextStateRequest.SelectedAnswerIds">
-                @{
-                  var firstPreviouslySelectedId = Model.Destination.PreviouslySelectedAnswerIds?.FirstOrDefault();
-                }
-                @if (firstPreviouslySelectedId == null || firstPreviouslySelectedId == Guid.Empty)
-                {
-                  <option value="choose" selected="selected">Select an answer</option>
+                            <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
+                        </fieldset>
+                    </div>
                 }
                 else
                 {
-                  <option value="choose">Select an answer</option>
+                    <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
                 }
-                @foreach (var answer in answers)
+                @if (Model.Destination.Type == DestinationType.InterimThenQuestion)
                 {
-                  var isSelected = firstPreviouslySelectedId == answer.Id;
-                  if (isSelected)
-                  {
-                    <option value="@answer.Id" selected>@answer.Content</option>
-                  }
-                  else
-                  {
-                    <option value="@answer.Id">@answer.Content</option>
-                  }
+                    <button type="submit" formnovalidate="formnovalidate" class="govuk-button"
+                            data-module="govuk-button" data-prevent-double-click="true"
+                            data-govuk-button-init="">
+                        @(Model?.Questionnaire?.ContinueButtonText ?? "Continue")
+                    </button>
+                    <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
+                    <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
+                    <input type="hidden" name="NextStateRequest.ValidateAnswers" value="false">
                 }
-              </select>
             }
-          </fieldset>
-        </div>
-        <button type="submit" formnovalidate="formnovalidate" class="govuk-button" name="submitButton" value="continueButton"
-                data-module="govuk-button" data-prevent-double-click="true" data-govuk-button-init="">
-          @(Model?.Questionnaire?.ContinueButtonText ?? "Continue")
-        </button>
-
-        <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
-        <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
-    }
-    else if (Model is { Destination.Type: DestinationType.CustomContent} 
-             or { Destination.Type: DestinationType.InterimThenQuestion, NextStateRequest.ValidateAnswers: true })    {
-                <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="customContentBackButton">Back</button>
-      Func<dynamic?, object> resultsPageDetails = @<div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>;
-        @if (Model.IsEmbedded)
-        {
-            <div class="govuk-!-padding-top-9">
-                <fieldset class="govuk-fieldset" aria-describedby="results-page-details">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                    <h1 id="results-page-title" class="govuk-fieldset__heading">
-                    @Model.Destination.Title
-                    </h1>
-                </legend>
-
-                @resultsPageDetails(null)
-                </fieldset>
-            </div>
-        }
-        else
-        {
-            @resultsPageDetails(null)
-        }
-      @if (Model.Destination.Type == DestinationType.InterimThenQuestion)
-      {
-          <button type="submit" formnovalidate="formnovalidate" class="govuk-button"
-                  data-module="govuk-button" data-prevent-double-click="true"
-                  data-govuk-button-init="">
-            @(Model?.Questionnaire?.ContinueButtonText ?? "Continue")
-          </button>
-          <input type="hidden" name="NextStateRequest.CurrentQuestionId" value="@Model.Destination.Question.Id">
-          <input type="hidden" name="NextStateRequest.CurrentQuestionOrder" value="@Model.Destination.Question.Order">
-          <input type="hidden" name="NextStateRequest.ValidateAnswers" value="false">
-      }
-    }
-    else if (Model?.Destination?.Type == DestinationType.ExternalLink)
-    {
-         <input type="hidden" id="external-link-dest" value="@Model.Destination.Content">
-        }
-
+            else if (Model?.Destination?.Type == DestinationType.ExternalLink)
+            {
+                <input type="hidden" id="external-link-dest" value="@Model.Destination.Content">
+            }           
         </form>
 
-  </div>
+    </div>
 </div>
