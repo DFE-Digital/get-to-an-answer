@@ -77,6 +77,12 @@ builder.Services.AddSingleton<IImageStorageClient>(sp =>
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.IsEssential = true;
+});
+
 builder.Services.AddAntiforgery(options =>
 {
     options.SuppressXFrameOptionsHeader = true;
@@ -134,6 +140,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllers();
 

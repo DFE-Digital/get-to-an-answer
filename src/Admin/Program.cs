@@ -163,6 +163,12 @@ builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AddPageRoute("/Home/Index", "/");
 });
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.IsEssential = true;
+});
     
 builder.Services.AddHealthChecks();
 
@@ -279,6 +285,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSession();
 
 if (builderIsLocalEnvironment)
 {

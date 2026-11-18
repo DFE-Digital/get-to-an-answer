@@ -1,4 +1,5 @@
 using Admin.Pages.Preview;
+using Unit.Tests.Fakes;
 using Common.Client;
 using Common.Domain;
 using Common.Domain.Frontend;
@@ -41,7 +42,6 @@ public class QuestionnaireNextPageModelTests
                 ValidateAnswers = true
             },
             IsEmbedded = false,
-            AnswerHistory = "{}",
             Embed = false,
             PageContext = new PageContext(),
             Questionnaire = new QuestionnaireInfoDto { Id = Guid.NewGuid() },
@@ -50,6 +50,7 @@ public class QuestionnaireNextPageModelTests
 
         _pageModel.PageContext.HttpContext = _mockHttpContext.Object;
         _mockHttpContext.Setup(x => x.Request.Form).Returns(_mockFormCollection.Object);
+        _mockHttpContext.Setup(x => x.Session).Returns(new InMemorySession());
     }
 
     #region OnPost - Continue Button Tests
@@ -663,6 +664,7 @@ public class QuestionnaireNextPageModelTests
 
         _mockFormCollection.Setup(x => x[It.IsAny<string>()]).Returns("backButton");
         _pageModel.QuestionnaireId = questionnaireId;
+        _pageModel.Questionnaire = questionnaire;
         _pageModel.NextStateRequest = new GetNextStateRequest
         {
             CurrentQuestionId = currentQuestionId,

@@ -3,6 +3,7 @@ using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
 using Common.Helpers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -20,7 +21,13 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
 
     [BindProperty] public required GetNextStateRequest NextStateRequest { get; set; }
     [BindProperty] public required bool IsEmbedded { get; set; }
-    [BindProperty] public string AnswerHistory { get; set; } = "{}"; // JSON string to store answer history
+    public string AnswerHistory
+    {
+        get => HttpContext.Session.GetString(AnswerHistoryKey) ?? "{}";
+        set => HttpContext.Session.SetString(AnswerHistoryKey, value);
+    }
+
+    private string AnswerHistoryKey => $"AnswerHistory:{Questionnaire.Id}";
     public required QuestionnaireInfoDto Questionnaire { get; set; }
     public required DestinationDto Destination { get; set; }
 

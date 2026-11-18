@@ -5,6 +5,7 @@ using Common.Enum;
 using FluentAssertions;
 using Frontend.Models;
 using Frontend.Pages.Questionnaire;
+using Unit.Tests.Fakes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -44,7 +45,6 @@ public class QuestionnaireNextPageModelTests
                 ValidateAnswers = true
             },
             IsEmbedded = false,
-            AnswerHistory = "{}",
             Embed = false,
             PageContext = new Microsoft.AspNetCore.Mvc.RazorPages.PageContext(),
             Questionnaire = new QuestionnaireInfoDto { Id = Guid.NewGuid() },
@@ -54,6 +54,7 @@ public class QuestionnaireNextPageModelTests
         _pageModel.PageContext.HttpContext = _mockHttpContext.Object;
         _mockHttpContext.Setup(x => x.Request.Form).Returns(_mockFormCollection.Object);
         _mockHttpContext.Setup(x => x.Features.Set(It.IsAny<QuestionnaireRunFeature>()));
+        _mockHttpContext.Setup(x => x.Session).Returns(new InMemorySession());
     }
 
     #region OnPost - Continue Button Tests
@@ -732,6 +733,7 @@ public class QuestionnaireNextPageModelTests
             SelectedAnswerIds = new List<Guid>(),
             ValidateAnswers = true
         };
+        _pageModel.Questionnaire = questionnaire;
         _pageModel.AnswerHistory = answerHistory;
 
         _mockApiClient
