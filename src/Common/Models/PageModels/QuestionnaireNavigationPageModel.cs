@@ -27,7 +27,13 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
     public VoteTally? Tally { get; set; }
     public string? GetVoteResult()
     {
-        return Tally is null ? null : Tally.Yes > Tally.No ? "Yes" : "No";
+        if (Tally is null)
+            return null;
+
+        if (Tally.Yes > Tally.No)
+            return "Yes";
+
+        return "No";
     }
 
     [FromQuery(Name = "embed")] 

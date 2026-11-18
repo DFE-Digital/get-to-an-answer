@@ -30,76 +30,13 @@
     </div>
     <form method="post" accept-charset="UTF-8">
       <input type="hidden" asp-for="@Model.BackLinkSlug" />
-      <!-- Content title -->
-      <govuk-form-group asp-for="@Model.ContentTitle">
-        @await Html.PartialAsync("_ContentFieldLabelHint", new { Name = "ContentTitle", LabelText = "Title", HintHtml = "The title will appear at the top of the results page." })
-
-        <govuk-field-error asp-for="@Model.ContentTitle" error-id="ContentTitle-error">
-        </govuk-field-error>
-
-        <govuk-input id="ContentTitle"
-                     class="govuk-input"
-                     aria-describedby="ContentTitle-hint"
-                     type="text"
-                     asp-for="ContentTitle"
-                     value="@Model.ContentTitle"
-                     govuk-error-for="@Model.ContentTitle"/>
-      </govuk-form-group>
-
-      <!-- Main content -->
-      <govuk-form-group asp-for="@Model.ContentValue">
-        <label class="govuk-label govuk-label--m" for="ContentValue">
-          Main content
-        </label>
-        <div class="govuk-hint" id="ContentValue-hint">
-          <p>This content could:</p>
-          <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
-            <li class="govuk-hint">provide more information based on the user’s answer (before they continue to the next question)</li>
-            <li class="govuk-hint">explain what the user’s results mean and what they might do next</li>
-          </ul>
-          <p>You can format your text using Markdown. For example, to add headings or links. To find out more, <a href="https://becoming-a-teacher.design-history.education.gov.uk/how-to/how-to-write-markdown/" target="_blank">read this guidance on how to write Markdown (opens in a new tab)</a>.</p>
-        </div>
-
-        <govuk-field-error asp-for="@Model.ContentValue" error-id="ContentValue-error">
-        </govuk-field-error>
-
-        <textarea class="govuk-textarea"
-                  id="ContentValue"
-                  rows="4"
-                  asp-for="ContentValue"
-                               aria-describedby="ContentValue-hint"></textarea>
-                  </govuk-form-group>
-
-                  <!-- No result content -->
-                  <govuk-form-group asp-for="@Model.NoResultContentValue">
-                    <label class="govuk-label govuk-label--m" for="NoResultContentValue">
-                      No result content (optional)
-                    </label>
-                    <div class="govuk-hint" id="NoResultContentValue-hint">
-                    Shown instead of the main content when the No count is the majority for a voting questionnaire.
-                    </div>
-                    <textarea class="govuk-textarea"
-                              id="NoResultContentValue"
-                              rows="4"
-                              asp-for="NoResultContentValue"
-                              aria-describedby="NoResultContentValue-hint"></textarea>
-                  </govuk-form-group>
-
-      <!-- Question text -->
-      <govuk-form-group asp-for="@Model.ContentRefName">
-        @await Html.PartialAsync("_ContentFieldLabelHint", new { Name = "ContentRefName", LabelText = "Results reference (optional)", HintHtml = "<p>Add a reference to help you find the right results page when making edits. These are not visible to users.</p><p>If you do not add a reference, the results page will be listed as its title.</p>" })
-
-        <govuk-field-error asp-for="@Model.ContentRefName" error-id="ContentRefName-error">
-        </govuk-field-error>
-
-        <govuk-input id="ContentRefName"
-                     class="govuk-input"
-                     aria-describedby="ContentRefName-hint"
-                     type="text"
-                     asp-for="ContentRefName"
-                     value="@Model.ContentRefName"
-                     govuk-error-for="@Model.ContentRefName"/>
-      </govuk-form-group>
+      @await Html.PartialAsync("Shared/_ContentFormFields", new Admin.Models.ContentFormViewModel
+      {
+        ContentTitle = Model.ContentTitle,
+        ContentValue = Model.ContentValue,
+        NoResultContentValue = Model.NoResultContentValue,
+        ContentRefName = Model.ContentRefName
+      })
 
       <div class="govuk-button-group">
         <button id="save-and-continue" class="govuk-button" type="submit" formnovalidate="formnovalidate" data-module="govuk-button"
