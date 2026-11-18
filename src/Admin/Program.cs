@@ -165,11 +165,7 @@ builder.Services.AddRazorPages(options =>
 });
 
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.Cookie.IsEssential = true;
-});
-    
+
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
@@ -285,8 +281,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseSession();
 
 if (builderIsLocalEnvironment)
 {

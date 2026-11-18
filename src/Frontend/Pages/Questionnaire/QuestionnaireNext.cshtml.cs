@@ -4,11 +4,12 @@ using Common.Enum;
 using Common.Models.PageModels;
 using Frontend.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace Frontend.Pages.Questionnaire;
 
 [IgnoreAntiforgeryToken]
-public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> logger) : QuestionnaireNavigationPageModel(apiClient, logger)
+public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> logger, IDistributedCache cache) : QuestionnaireNavigationPageModel(apiClient, logger, cache)
 {
     [FromRoute(Name = "questionnaireSlug")] 
     public new string? QuestionnaireSlug { get; set; }

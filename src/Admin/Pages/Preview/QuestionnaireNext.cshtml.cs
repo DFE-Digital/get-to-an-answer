@@ -4,12 +4,13 @@ using Common.Enum;
 using Common.Models.PageModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace Admin.Pages.Preview;
 
 [Authorize]
 [IgnoreAntiforgeryToken]
-public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> logger) : QuestionnaireNavigationPageModel(apiClient, logger)
+public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> logger, IDistributedCache cache) : QuestionnaireNavigationPageModel(apiClient, logger, cache)
 {
     [FromRoute(Name = "questionnaireId")] 
     public required Guid QuestionnaireId { get; set; }

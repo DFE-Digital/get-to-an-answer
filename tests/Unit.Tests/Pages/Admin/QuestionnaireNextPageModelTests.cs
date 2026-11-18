@@ -1,5 +1,4 @@
 using Admin.Pages.Preview;
-using Unit.Tests.Fakes;
 using Common.Client;
 using Common.Domain;
 using Common.Domain.Frontend;
@@ -8,7 +7,10 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -31,7 +33,7 @@ public class QuestionnaireNextPageModelTests
         _mockHttpContext = new Mock<HttpContext>();
         _mockFormCollection = new Mock<IFormCollection>();
 
-        _pageModel = new QuestionnaireNext(_mockApiClient.Object, _mockLogger.Object)
+        _pageModel = new QuestionnaireNext(_mockApiClient.Object, _mockLogger.Object, new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions())))
         {
             QuestionnaireId = Guid.NewGuid(),
             NextStateRequest = new GetNextStateRequest
@@ -50,7 +52,6 @@ public class QuestionnaireNextPageModelTests
 
         _pageModel.PageContext.HttpContext = _mockHttpContext.Object;
         _mockHttpContext.Setup(x => x.Request.Form).Returns(_mockFormCollection.Object);
-        _mockHttpContext.Setup(x => x.Session).Returns(new InMemorySession());
     }
 
     #region OnPost - Continue Button Tests

@@ -3,8 +3,8 @@ using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
 using Common.Helpers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
 namespace Common.Models.PageModels;
@@ -16,28 +16,42 @@ namespace Common.Models.PageModels;
 /// </summary>
 public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
 {
+    private static readonly DistributedCacheEntryOptions AnswerHistoryCacheOptions = new()
+    {
+        SlidingExpiration = TimeSpan.FromHours(2)
+    };
+
     protected readonly IApiClient ApiClient;
     protected readonly ILogger Logger;
+    protected readonly IDistributedCache Cache;
 
     [BindProperty] public required GetNextStateRequest NextStateRequest { get; set; }
     [BindProperty] public required bool IsEmbedded { get; set; }
+    [BindProperty] public string? AnswerHistoryToken { get; set; }
+
     public string AnswerHistory
     {
-        get => HttpContext.Session.GetString(AnswerHistoryKey) ?? "{}";
-        set => HttpContext.Session.SetString(AnswerHistoryKey, value);
+        get => (string.IsNullOrEmpty(AnswerHistoryToken) ? null : Cache.GetString(AnswerHistoryCacheKey(AnswerHistoryToken))) ?? "{}";
+        set
+        {
+            if (string.IsNullOrEmpty(AnswerHistoryToken))
+                AnswerHistoryToken = Guid.NewGuid().ToString("N");
+            Cache.SetString(AnswerHistoryCacheKey(AnswerHistoryToken), value, AnswerHistoryCacheOptions);
+        }
     }
 
-    private string AnswerHistoryKey => $"AnswerHistory:{Questionnaire.Id}";
+    private static string AnswerHistoryCacheKey(string token) => $"AnswerHistory:{token}";
     public required QuestionnaireInfoDto Questionnaire { get; set; }
     public required DestinationDto Destination { get; set; }
 
     [FromQuery(Name = "embed")] 
     public bool Embed { get; set; }
 
-    protected QuestionnaireNavigationPageModel(IApiClient apiClient, ILogger<QuestionnaireNavigationPageModel> logger)
+    protected QuestionnaireNavigationPageModel(IApiClient apiClient, ILogger<QuestionnaireNavigationPageModel> logger, IDistributedCache cache)
     {
         ApiClient = apiClient;
         Logger = logger;
+        Cache = cache;
     }
 
     /// <summary>

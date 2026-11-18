@@ -5,12 +5,14 @@ using Common.Enum;
 using FluentAssertions;
 using Frontend.Models;
 using Frontend.Pages.Questionnaire;
-using Unit.Tests.Fakes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -34,7 +36,7 @@ public class QuestionnaireNextPageModelTests
         _mockHttpContext = new Mock<HttpContext>();
         _mockFormCollection = new Mock<IFormCollection>();  
 
-        _pageModel = new QuestionnaireNext(_mockApiClient.Object, _mockLogger.Object)
+        _pageModel = new QuestionnaireNext(_mockApiClient.Object, _mockLogger.Object, new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions())))
         {
             QuestionnaireSlug = "test-questionnaire",
             NextStateRequest = new GetNextStateRequest
@@ -54,7 +56,6 @@ public class QuestionnaireNextPageModelTests
         _pageModel.PageContext.HttpContext = _mockHttpContext.Object;
         _mockHttpContext.Setup(x => x.Request.Form).Returns(_mockFormCollection.Object);
         _mockHttpContext.Setup(x => x.Features.Set(It.IsAny<QuestionnaireRunFeature>()));
-        _mockHttpContext.Setup(x => x.Session).Returns(new InMemorySession());
     }
 
     #region OnPost - Continue Button Tests

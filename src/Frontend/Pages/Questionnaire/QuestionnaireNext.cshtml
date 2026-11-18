@@ -58,6 +58,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <form id="question-form" action="/questionnaires/@Model.Questionnaire?.Slug/next?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
+            <input type="hidden" name="AnswerHistoryToken" value="@Model.AnswerHistoryToken">
             @if (Model?.Destination?.Question?.Order == 1 && Model?.Questionnaire?.HasStartPage == true)
             {
                 <button type="submit" formnovalidate="formnovalidate" class="govuk-back-link" name="submitButton" value="backButtonForStartPage"

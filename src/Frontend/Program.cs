@@ -78,10 +78,6 @@ builder.Services.AddSingleton<IImageStorageClient>(sp =>
 builder.Services.AddRazorPages();
 
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.Cookie.IsEssential = true;
-});
 
 builder.Services.AddAntiforgery(options =>
 {
@@ -140,8 +136,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseSession();
 
 app.MapControllers();
 

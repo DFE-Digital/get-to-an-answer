@@ -42,6 +42,7 @@
 <div class="govuk-grid-row">  
   <div class="govuk-grid-column-full">
     <form id="question-form" action="/admin/questionnaires/@Model.Questionnaire.Id/next-preview?embed=@Model.IsEmbedded" accept-charset="UTF-8" method="post">
+      <input type="hidden" name="AnswerHistoryToken" value="@Model.AnswerHistoryToken">
     
       @if (Model?.Destination is { Type: DestinationType.Question, Question: not null } || 
            Model is { Destination: { Type: DestinationType.InterimThenQuestion, Question: not null}, NextStateRequest.ValidateAnswers: false })
