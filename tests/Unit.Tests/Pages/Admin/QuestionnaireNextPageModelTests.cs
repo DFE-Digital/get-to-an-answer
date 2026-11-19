@@ -704,7 +704,7 @@ public class QuestionnaireNextPageModelTests
 
         _pageModel.QuestionnaireId = questionnaireId;
         _pageModel.NextStateRequest = new GetNextStateRequest { CurrentQuestionOrder = 2 };
-        _pageModel.AnswerHistory = "{}";
+        _pageModel.AnswerHistory = string.Empty;
         _pageModel.Embed = false;
         _pageModel.ModelState.AddModelError("test", "test error");
 

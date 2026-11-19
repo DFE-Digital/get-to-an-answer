@@ -20,7 +20,7 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
 
     [BindProperty] public required GetNextStateRequest NextStateRequest { get; set; }
     [BindProperty] public required bool IsEmbedded { get; set; }
-    [BindProperty] public string AnswerHistory { get; set; } = "~"; // Compact hex-encoded answer history
+    [BindProperty] public string? AnswerHistory { get; set; } = string.Empty; // Compact hex-encoded answer history
     public required QuestionnaireInfoDto Questionnaire { get; set; }
     public required DestinationDto Destination { get; set; }
 
