@@ -44,7 +44,7 @@ public class QuestionnaireNextPageModelTests
                 ValidateAnswers = true
             },
             IsEmbedded = false,
-            AnswerHistory = "{}",
+            AnswerHistory = string.Empty,
             Embed = false,
             PageContext = new Microsoft.AspNetCore.Mvc.RazorPages.PageContext(),
             Questionnaire = new QuestionnaireInfoDto { Id = Guid.NewGuid() },
@@ -719,10 +719,8 @@ public class QuestionnaireNextPageModelTests
             Question = previousQuestion
         };
 
-        // Setup answer history JSON
-        var answerHistory = $@"{{
-            ""{previousQuestionId}"": [""{answerId1}"", ""{answerId2}""]
-        }}";
+        // Setup answer history
+        var answerHistory = $"{previousQuestionId:N}.{answerId1:N}_{answerId2:N}";
 
         _mockFormCollection.Setup(x => x[It.IsAny<string>()]).Returns("backButton");
         _pageModel.NextStateRequest = new GetNextStateRequest
@@ -846,7 +844,7 @@ public class QuestionnaireNextPageModelTests
             SelectedAnswerIds = new List<Guid> { answerId },
             ValidateAnswers = true
         };
-        _pageModel.AnswerHistory = "{}";
+        _pageModel.AnswerHistory = string.Empty;
 
         _mockApiClient
             .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync("test-questionnaire"))
@@ -865,8 +863,8 @@ public class QuestionnaireNextPageModelTests
 
         // Assert
         result.Should().BeOfType<PageResult>();
-        _pageModel.AnswerHistory.Should().Contain(currentQuestionId.ToString());
-        _pageModel.AnswerHistory.Should().Contain(answerId.ToString());
+        _pageModel.AnswerHistory.Should().Contain(currentQuestionId.ToString("N"));
+        _pageModel.AnswerHistory.Should().Contain(answerId.ToString("N"));
     }
 
     [Fact]
@@ -905,7 +903,7 @@ public class QuestionnaireNextPageModelTests
             SelectedAnswerIds = new List<Guid> { currentAnswerId },
             ValidateAnswers = true
         };
-        _pageModel.AnswerHistory = "{}";
+        _pageModel.AnswerHistory = string.Empty;
 
         _mockApiClient
             .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync("test-questionnaire"))
@@ -921,8 +919,8 @@ public class QuestionnaireNextPageModelTests
         // Assert
         result.Should().BeOfType<PageResult>();
         // Verify current answers were saved to history
-        _pageModel.AnswerHistory.Should().Contain(currentQuestionId.ToString());
-        _pageModel.AnswerHistory.Should().Contain(currentAnswerId.ToString());
+        _pageModel.AnswerHistory.Should().Contain(currentQuestionId.ToString("N"));
+        _pageModel.AnswerHistory.Should().Contain(currentAnswerId.ToString("N"));
     }
 
     #endregion
