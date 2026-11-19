@@ -27,7 +27,7 @@ public static class AnswerHistoryHelper
     /// <summary>
     /// Retrieves previously selected answers for a question from the history.
     /// </summary>
-    public static List<Guid> GetAnswersFromHistory(string history, Guid questionId)
+    public static List<Guid> GetAnswersFromHistory(string? history, Guid questionId)
     {
         if (questionId == Guid.Empty)
             return new();
