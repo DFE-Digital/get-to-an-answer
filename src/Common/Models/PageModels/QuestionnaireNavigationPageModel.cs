@@ -20,7 +20,7 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
 
     [BindProperty] public required GetNextStateRequest NextStateRequest { get; set; }
     [BindProperty] public required bool IsEmbedded { get; set; }
-    [BindProperty] public string AnswerHistory { get; set; } = "{}"; // JSON string to store answer history
+    [BindProperty] public string AnswerHistory { get; set; } = "~"; // Compact hex-encoded answer history
     public required QuestionnaireInfoDto Questionnaire { get; set; }
     public required DestinationDto Destination { get; set; }
 
@@ -59,7 +59,7 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
             await InitializeQuestionnaireAsync();
 
             if (!ModelState.IsValid)
-                return await HandleValidationErrorAsync();
+                return await HandleValidationErrorAsync();            
 
             var destination = await ApiClient.GetNextState(Questionnaire.Id, NextStateRequest, GetPreviewFlag());
             if (destination == null)
