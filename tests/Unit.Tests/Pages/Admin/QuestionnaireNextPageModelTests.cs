@@ -164,7 +164,7 @@ public class QuestionnaireNextPageModelTests
             Question = nextQuestion
         };
 
-        _pageModel.AnswerHistory = AnswerHistoryHelper.SaveAnswersToHistory("{}", nextQuestionId, new List<Guid> { storedAnswerId });
+        _pageModel.AnswerHistory = AnswerHistoryHelper.SaveAnswersToHistory(string.Empty, nextQuestionId, new List<Guid> { storedAnswerId });
 
         _mockFormCollection.Setup(x => x[It.IsAny<string>()]).Returns("continueButton");
         _pageModel.QuestionnaireId = questionnaireId;
@@ -236,7 +236,7 @@ public class QuestionnaireNextPageModelTests
             Question = nextQuestion
         };
 
-        _pageModel.AnswerHistory = AnswerHistoryHelper.SaveAnswersToHistory("{}", otherQuestionId, new List<Guid> { Guid.NewGuid() });
+        _pageModel.AnswerHistory = AnswerHistoryHelper.SaveAnswersToHistory(string.Empty, otherQuestionId, new List<Guid> { Guid.NewGuid() });
 
         _mockFormCollection.Setup(x => x[It.IsAny<string>()]).Returns("continueButton");
         _pageModel.QuestionnaireId = questionnaireId;
