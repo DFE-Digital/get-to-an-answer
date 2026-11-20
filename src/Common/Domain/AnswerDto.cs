@@ -13,7 +13,9 @@ public class AnswerDto
     public float Priority { get; set; }
     
     public DestinationType? DestinationType { get; set; }
-    
+
+    public VoteValue? VoteValue { get; set; }
+
     public string? DestinationUrl { get; set; }
     
     public Guid? DestinationQuestionId { get; set; }

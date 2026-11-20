@@ -49,6 +49,12 @@ public class QuestionnaireRunnerController(IQuestionnaireRunnerService questionn
         return (await questionnaireRunnerService.GetNextState(questionnaireId, request, preview)).ToActionResult();
     }
 
+    [HttpPost("questionnaires/{questionnaireId:guid}/vote-tally")]
+    public async Task<IActionResult> GetVoteTally(Guid questionnaireId, [FromBody] List<Guid> answerIds)
+    {
+        return (await questionnaireRunnerService.GetVoteTally(questionnaireId, answerIds)).ToActionResult();
+    }
+
     [HttpGet("questionnaires/{questionnaireId:guid}/previous-state")]
     public async Task<IActionResult> GetPreviousState(Guid questionnaireId, [FromQuery] int currentQuestionOrder, [FromQuery] bool preview = false)
     {

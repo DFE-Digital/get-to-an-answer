@@ -23,6 +23,17 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
     [BindProperty] public string? AnswerHistory { get; set; } = string.Empty; // Compact hex-encoded answer history
     public required QuestionnaireInfoDto Questionnaire { get; set; }
     public required DestinationDto Destination { get; set; }
+    public VoteTally? Tally { get; set; }
+    public string? GetVoteResult()
+    {
+        if (Tally is null)
+            return null;
+
+        if (Tally.Yes > Tally.No)
+            return "Yes";
+
+        return "No";
+    }
 
     [FromQuery(Name = "embed")] 
     public bool Embed { get; set; }
@@ -74,6 +85,7 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
 
             IsEmbedded = Embed;
             Destination = destination;
+            Tally = destination.Type == DestinationType.CustomContent ? await GetVoteTallyFromHistoryAsync() : null;
             NextStateRequest = new GetNextStateRequest();
             return Page();
         }
@@ -256,6 +268,18 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
         NextStateRequest.CurrentQuestionId = previousQuestionId;
         NextStateRequest.CurrentQuestionOrder = previousDestination.Question?.Order ?? 0;
         NextStateRequest.SelectedAnswerIds = restoredAnswers;
+    }
+
+    /// <summary>
+    /// Flattens all selected answer IDs from the answer history and retrieves the Yes/No vote tally
+    /// </summary>
+    protected async Task<VoteTally?> GetVoteTallyFromHistoryAsync()
+    {
+        var answerIds = AnswerHistoryHelper.GetAllAnswersFromHistory(AnswerHistory);
+        if (answerIds.Count == 0)
+            return null;
+
+        return await ApiClient.GetVoteTallyAsync(Questionnaire.Id, answerIds);
     }
 
     /// <summary>

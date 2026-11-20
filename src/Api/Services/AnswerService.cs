@@ -110,6 +110,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                 DestinationQuestionId = request.DestinationQuestionId,
                 DestinationContentId = request.DestinationContentId,
                 DestinationType = request.DestinationType == DestinationType.Auto ? null : request.DestinationType,
+                VoteValue = request.VoteValue,
                 CreatedBy = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
@@ -257,6 +258,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
             answer.DestinationQuestionId = request.DestinationQuestionId ?? answer.DestinationQuestionId;
             answer.DestinationContentId = request.DestinationContentId ?? answer.DestinationContentId;
             answer.Priority = request.Priority ?? answer.Priority;
+            answer.VoteValue = request.VoteValue;
             answer.UpdatedAt = DateTime.UtcNow;
             
             preSaveAction?.Invoke(answer);
@@ -285,6 +287,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                     Content = request.Content,
                     Description = request.Description,
                     DestinationType = request.DestinationType,
+                    VoteValue = request.VoteValue,
                     DestinationQuestionId = request.DestinationQuestionId,
                     DestinationContentId = request.DestinationContentId,
                     DestinationUrl = request.DestinationUrl,
@@ -305,6 +308,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
                     Content = request.Content,
                     Description = request.Description,
                     DestinationType = request.DestinationType,
+                    VoteValue = request.VoteValue,
                     DestinationQuestionId = request.DestinationQuestionId,
                     DestinationContentId = request.DestinationContentId,
                     DestinationUrl = request.DestinationUrl,
@@ -362,6 +366,7 @@ public class AnswerService(GetToAnAnswerDbContext db, ILogger<AnswerService> log
             Description = entity.Description,
             DestinationUrl = entity.DestinationUrl,
             DestinationType = entity.DestinationType,
+            VoteValue = entity.VoteValue,
             DestinationQuestionId = entity.DestinationQuestionId,
             DestinationContentId = entity.DestinationContentId,
             QuestionId = entity.QuestionId,

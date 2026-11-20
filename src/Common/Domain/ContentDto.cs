@@ -6,7 +6,8 @@ public class ContentDto
     public Guid QuestionnaireId { get; set; }
     public required string Title { get; set; }
     public required string Content { get; set; }
-    
+    public string? NoResultContent { get; set; }
+
     public string? ReferenceName { get; set; }
     
     public DateTime CreatedAt { get; set; }

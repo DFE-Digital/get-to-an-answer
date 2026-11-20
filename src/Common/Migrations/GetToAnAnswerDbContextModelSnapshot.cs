@@ -71,6 +71,9 @@ namespace Common.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("VoteValue")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("QuestionId", "IsDeleted");
@@ -101,6 +104,10 @@ namespace Common.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("NoResultContent")
+                        .HasMaxLength(10000)
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("QuestionnaireId")
                         .HasColumnType("uniqueidentifier");
