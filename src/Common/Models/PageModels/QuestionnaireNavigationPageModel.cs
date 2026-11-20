@@ -95,7 +95,7 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
 
             SaveCurrentAnswersToHistory();
 
-            var previousDestination = await ApiClient.GetPreviousState(Questionnaire.Id, NextStateRequest.CurrentQuestionOrder, GetPreviewFlag());
+            var previousDestination = await ApiClient.GetPreviousState(Questionnaire.Id, NextStateRequest.CurrentQuestionOrder, GetPreviewFlag(), AnswerHistory);
             if (previousDestination == null)
                 return NotFound();
 

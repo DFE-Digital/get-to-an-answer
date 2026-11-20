@@ -20,6 +20,13 @@ public static class AnswerHistoryHelper
             return currentHistory ?? string.Empty;
 
         var history = Decode(currentHistory);
+        var index = history.Keys.ToList().IndexOf(questionId);
+        if (index >= 0)
+        {
+            foreach (var staleQuestionId in history.Keys.Skip(index).ToList())
+                history.Remove(staleQuestionId);
+        }
+
         history[questionId] = selectedAnswerIds;
         return Encode(history);
     }
@@ -35,7 +42,15 @@ public static class AnswerHistoryHelper
         return Decode(history).TryGetValue(questionId, out var answers) ? answers : new();
     }
 
-    private static string Encode(Dictionary<Guid, List<Guid>> history)
+    /// <summary>
+    /// Returns the IDs of answered questions in the order they were answered.
+    /// </summary>
+    public static List<Guid> GetAnsweredQuestionIds(string? history)
+    {
+        return Decode(history).Keys.ToList();
+    }
+
+    private static string Encode(OrderedDictionary<Guid, List<Guid>> history)
     {
         return string.Join(EntrySeparator, history
             .Where(entry => entry.Value.Count > 0)
@@ -43,9 +58,9 @@ public static class AnswerHistoryHelper
                 string.Join(AnswerSeparator, entry.Value.Where(id => id != Guid.Empty).Select(id => id.ToString("N")))));
     }
 
-    private static Dictionary<Guid, List<Guid>> Decode(string? history)
+    private static OrderedDictionary<Guid, List<Guid>> Decode(string? history)
     {
-        var result = new Dictionary<Guid, List<Guid>>();
+        var result = new OrderedDictionary<Guid, List<Guid>>();
         if (string.IsNullOrEmpty(history) || history == "~")
             return result;
 

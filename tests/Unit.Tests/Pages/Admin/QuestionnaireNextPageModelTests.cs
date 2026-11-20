@@ -708,7 +708,7 @@ public class QuestionnaireNextPageModelTests
             .ReturnsAsync(questionnaire);
 
         _mockApiClient
-            .Setup(x => x.GetPreviousState(questionnaireId, 2, preview: true))
+            .Setup(x => x.GetPreviousState(questionnaireId, 2, true, It.IsAny<string?>()))
             .ReturnsAsync(previousDestination);
 
         // Act
@@ -762,7 +762,7 @@ public class QuestionnaireNextPageModelTests
             .ReturnsAsync(questionnaire);
 
         _mockApiClient
-            .Setup(x => x.GetPreviousState(questionnaireId, 2, preview: true))
+            .Setup(x => x.GetPreviousState(questionnaireId, 2, true, It.IsAny<string?>()))
             .ReturnsAsync((DestinationDto)null);
 
         // Act
@@ -818,7 +818,7 @@ public class QuestionnaireNextPageModelTests
             .ReturnsAsync(questionnaire);
 
         _mockApiClient
-            .Setup(x => x.GetPreviousState(questionnaireId, 2, preview: true))
+            .Setup(x => x.GetPreviousState(questionnaireId, 2, true, It.IsAny<string?>()))
             .ReturnsAsync(previousDestination);
 
         // Act
@@ -858,7 +858,7 @@ public class QuestionnaireNextPageModelTests
             .ReturnsAsync(questionnaire);
 
         _mockApiClient
-            .Setup(x => x.GetPreviousState(questionnaireId, 2, preview: true))
+            .Setup(x => x.GetPreviousState(questionnaireId, 2, true, It.IsAny<string?>()))
             .ReturnsAsync(previousDestination);
 
         // Act
@@ -1000,7 +1000,7 @@ public class QuestionnaireNextPageModelTests
             .ReturnsAsync(questionnaire);
 
         _mockApiClient
-            .Setup(x => x.GetPreviousState(questionnaireId, 2, preview: true))
+            .Setup(x => x.GetPreviousState(questionnaireId, 2, true, It.IsAny<string?>()))
             .ReturnsAsync(previousDestination);
 
         // Act
