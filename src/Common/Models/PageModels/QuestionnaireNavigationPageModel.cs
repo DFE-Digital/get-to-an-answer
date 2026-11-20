@@ -3,7 +3,6 @@ using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
 using Common.Helpers;
-using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -276,8 +275,7 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
     /// </summary>
     protected async Task<VoteTally?> GetVoteTallyFromHistoryAsync()
     {
-        var history = JsonSerializer.Deserialize<Dictionary<string, List<Guid>>>(AnswerHistory) ?? new();
-        var answerIds = history.Values.SelectMany(ids => ids).Distinct().ToList();
+        var answerIds = AnswerHistoryHelper.GetAllAnswersFromHistory(AnswerHistory);
         if (answerIds.Count == 0)
             return null;
 
