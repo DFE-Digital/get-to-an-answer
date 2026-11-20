@@ -66,6 +66,8 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
                 return NotFound();
 
             SaveCurrentAnswersToHistory();
+            if (destination.Question is not null)
+                destination.PreviouslySelectedAnswerIds = GetAnswersFromHistory(destination.Question.Id);
 
             if (!Embed && destination is { Type: DestinationType.ExternalLink, Content: not null })
                 return HandleExternalLinkRedirect(destination.Content);

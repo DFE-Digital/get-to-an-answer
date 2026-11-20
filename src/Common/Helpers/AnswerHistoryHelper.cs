@@ -14,10 +14,10 @@ public static class AnswerHistoryHelper
     /// <summary>
     /// Saves the selected answers to the answer history for the current question.
     /// </summary>
-    public static string SaveAnswersToHistory(string currentHistory, Guid questionId, List<Guid> selectedAnswerIds)
+    public static string SaveAnswersToHistory(string? currentHistory, Guid questionId, List<Guid> selectedAnswerIds)
     {
         if (questionId == Guid.Empty || selectedAnswerIds == null || selectedAnswerIds.Count == 0)
-            return currentHistory;
+            return currentHistory ?? string.Empty;
 
         var history = Decode(currentHistory);
         history[questionId] = selectedAnswerIds;
@@ -27,7 +27,7 @@ public static class AnswerHistoryHelper
     /// <summary>
     /// Retrieves previously selected answers for a question from the history.
     /// </summary>
-    public static List<Guid> GetAnswersFromHistory(string history, Guid questionId)
+    public static List<Guid> GetAnswersFromHistory(string? history, Guid questionId)
     {
         if (questionId == Guid.Empty)
             return new();
