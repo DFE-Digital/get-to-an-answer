@@ -3,6 +3,7 @@ using Common.Client;
 using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
+using Common.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +42,7 @@ public class QuestionnaireNextPageModelTests
                 ValidateAnswers = true
             },
             IsEmbedded = false,
-            AnswerHistory = "{}",
+            AnswerHistory = string.Empty,
             Embed = false,
             PageContext = new PageContext(),
             Questionnaire = new QuestionnaireInfoDto { Id = Guid.NewGuid() },
@@ -122,6 +123,148 @@ public class QuestionnaireNextPageModelTests
         result.Should().BeOfType<PageResult>();
         _pageModel.Destination.Should().Be(nextDestination);
         _pageModel.Questionnaire.Should().Be(questionnaire);
+    }
+
+    [Fact]
+    public async Task OnPost_Continue_Preselects_Answers_From_AnswerHistory_For_Next_Question()
+    {
+        // Arrange
+        var questionnaireId = Guid.NewGuid();
+        var currentQuestionId = Guid.NewGuid();
+        var nextQuestionId = Guid.NewGuid();
+        var storedAnswerId = Guid.NewGuid();
+
+        var questionnaire = new QuestionnaireInfoDto
+        {
+            Id = questionnaireId,
+            DisplayTitle = "Test Questionnaire"
+        };
+
+        var currentQuestion = new QuestionDto
+        {
+            Id = currentQuestionId,
+            Order = 1,
+            Content = "Current Question",
+            Type = QuestionType.SingleSelect,
+            Answers = new List<AnswerDto>()
+        };
+
+        var nextQuestion = new QuestionDto
+        {
+            Id = nextQuestionId,
+            Order = 2,
+            Content = "Next Question",
+            Type = QuestionType.SingleSelect,
+            Answers = new List<AnswerDto>()
+        };
+
+        var nextDestination = new DestinationDto
+        {
+            Type = DestinationType.Question,
+            Question = nextQuestion
+        };
+
+        _pageModel.AnswerHistory = AnswerHistoryHelper.SaveAnswersToHistory(string.Empty, nextQuestionId, new List<Guid> { storedAnswerId });
+
+        _mockFormCollection.Setup(x => x[It.IsAny<string>()]).Returns("continueButton");
+        _pageModel.QuestionnaireId = questionnaireId;
+        _pageModel.NextStateRequest = new GetNextStateRequest
+        {
+            CurrentQuestionId = currentQuestionId,
+            CurrentQuestionOrder = 1,
+            SelectedAnswerIds = new List<Guid>(),
+            ValidateAnswers = true
+        };
+
+        _mockApiClient
+            .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync(questionnaireId.ToString(), true))
+            .ReturnsAsync(questionnaire);
+
+        _mockApiClient
+            .Setup(x => x.GetCurrentQuestion(questionnaireId, currentQuestionId, true))
+            .ReturnsAsync(currentQuestion);
+
+        _mockApiClient
+            .Setup(x => x.GetNextState(questionnaireId, _pageModel.NextStateRequest, true))
+            .ReturnsAsync(nextDestination);
+
+        // Act
+        var result = await _pageModel.OnPost();
+
+        // Assert
+        result.Should().BeOfType<PageResult>();
+        _pageModel.Destination.Should().Be(nextDestination);
+        _pageModel.Destination.PreviouslySelectedAnswerIds.Should().BeEquivalentTo(new List<Guid> { storedAnswerId });
+    }
+
+    [Fact]
+    public async Task OnPost_Continue_Does_Not_Preselect_Answers_From_AnswerHistory_For_Other_Questions()
+    {
+        // Arrange
+        var questionnaireId = Guid.NewGuid();
+        var currentQuestionId = Guid.NewGuid();
+        var nextQuestionId = Guid.NewGuid();
+        var otherQuestionId = Guid.NewGuid();
+
+        var questionnaire = new QuestionnaireInfoDto
+        {
+            Id = questionnaireId,
+            DisplayTitle = "Test Questionnaire"
+        };
+
+        var currentQuestion = new QuestionDto
+        {
+            Id = currentQuestionId,
+            Order = 1,
+            Content = "Current Question",
+            Type = QuestionType.SingleSelect,
+            Answers = new List<AnswerDto>()
+        };
+
+        var nextQuestion = new QuestionDto
+        {
+            Id = nextQuestionId,
+            Order = 2,
+            Content = "Next Question",
+            Type = QuestionType.SingleSelect,
+            Answers = new List<AnswerDto>()
+        };
+
+        var nextDestination = new DestinationDto
+        {
+            Type = DestinationType.Question,
+            Question = nextQuestion
+        };
+
+        _pageModel.AnswerHistory = AnswerHistoryHelper.SaveAnswersToHistory(string.Empty, otherQuestionId, new List<Guid> { Guid.NewGuid() });
+
+        _mockFormCollection.Setup(x => x[It.IsAny<string>()]).Returns("continueButton");
+        _pageModel.QuestionnaireId = questionnaireId;
+        _pageModel.NextStateRequest = new GetNextStateRequest
+        {
+            CurrentQuestionId = currentQuestionId,
+            CurrentQuestionOrder = 1,
+            SelectedAnswerIds = new List<Guid>(),
+            ValidateAnswers = true
+        };
+
+        _mockApiClient
+            .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync(questionnaireId.ToString(), true))
+            .ReturnsAsync(questionnaire);
+
+        _mockApiClient
+            .Setup(x => x.GetCurrentQuestion(questionnaireId, currentQuestionId, true))
+            .ReturnsAsync(currentQuestion);
+
+        _mockApiClient
+            .Setup(x => x.GetNextState(questionnaireId, _pageModel.NextStateRequest, true))
+            .ReturnsAsync(nextDestination);
+
+        // Act
+        await _pageModel.OnPost();
+
+        // Assert
+        _pageModel.Destination.PreviouslySelectedAnswerIds.Should().BeEmpty();
     }
 
     [Fact]
@@ -657,9 +800,7 @@ public class QuestionnaireNextPageModelTests
             Question = previousQuestion
         };
 
-        var answerHistory = $@"{{
-            ""{previousQuestionId}"": [""{answerId1}"", ""{answerId2}""]
-        }}";
+        var answerHistory = $"{previousQuestionId:N}.{answerId1:N}_{answerId2:N}";
 
         _mockFormCollection.Setup(x => x[It.IsAny<string>()]).Returns("backButton");
         _pageModel.QuestionnaireId = questionnaireId;
@@ -706,7 +847,7 @@ public class QuestionnaireNextPageModelTests
 
         _pageModel.QuestionnaireId = questionnaireId;
         _pageModel.NextStateRequest = new GetNextStateRequest { CurrentQuestionOrder = 2 };
-        _pageModel.AnswerHistory = "{}";
+        _pageModel.AnswerHistory = string.Empty;
         _pageModel.Embed = false;
         _pageModel.ModelState.AddModelError("test", "test error");
 
@@ -793,7 +934,7 @@ public class QuestionnaireNextPageModelTests
             SelectedAnswerIds = new List<Guid> { answerId },
             ValidateAnswers = true
         };
-        _pageModel.AnswerHistory = "{}";
+        _pageModel.AnswerHistory = string.Empty;
 
         _mockApiClient
             .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync(questionnaireId.ToString(), true))
@@ -812,8 +953,8 @@ public class QuestionnaireNextPageModelTests
 
         // Assert
         result.Should().BeOfType<PageResult>();
-        _pageModel.AnswerHistory.Should().Contain(currentQuestionId.ToString());
-        _pageModel.AnswerHistory.Should().Contain(answerId.ToString());
+        _pageModel.AnswerHistory.Should().Contain(currentQuestionId.ToString("N"));
+        _pageModel.AnswerHistory.Should().Contain(answerId.ToString("N"));
     }
 
     [Fact]
@@ -852,7 +993,7 @@ public class QuestionnaireNextPageModelTests
             SelectedAnswerIds = new List<Guid> { currentAnswerId },
             ValidateAnswers = true
         };
-        _pageModel.AnswerHistory = "{}";
+        _pageModel.AnswerHistory = string.Empty;
 
         _mockApiClient
             .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync(questionnaireId.ToString(), true))
@@ -867,8 +1008,8 @@ public class QuestionnaireNextPageModelTests
 
         // Assert
         result.Should().BeOfType<PageResult>();
-        _pageModel.AnswerHistory.Should().Contain(currentQuestionId.ToString());
-        _pageModel.AnswerHistory.Should().Contain(currentAnswerId.ToString());
+        _pageModel.AnswerHistory.Should().Contain(currentQuestionId.ToString("N"));
+        _pageModel.AnswerHistory.Should().Contain(currentAnswerId.ToString("N"));
     }
 
     #endregion

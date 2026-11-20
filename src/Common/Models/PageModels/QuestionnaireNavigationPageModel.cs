@@ -21,7 +21,7 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
 
     [BindProperty] public required GetNextStateRequest NextStateRequest { get; set; }
     [BindProperty] public required bool IsEmbedded { get; set; }
-    [BindProperty] public string AnswerHistory { get; set; } = "{}"; // JSON string to store answer history
+    [BindProperty] public string? AnswerHistory { get; set; } = string.Empty; // Compact hex-encoded answer history
     public required QuestionnaireInfoDto Questionnaire { get; set; }
     public required DestinationDto Destination { get; set; }
     public VoteTally? Tally { get; set; }
@@ -71,13 +71,15 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
             await InitializeQuestionnaireAsync();
 
             if (!ModelState.IsValid)
-                return await HandleValidationErrorAsync();
+                return await HandleValidationErrorAsync();            
 
             var destination = await ApiClient.GetNextState(Questionnaire.Id, NextStateRequest, GetPreviewFlag());
             if (destination == null)
                 return NotFound();
 
             SaveCurrentAnswersToHistory();
+            if (destination.Question is not null)
+                destination.PreviouslySelectedAnswerIds = GetAnswersFromHistory(destination.Question.Id);
 
             if (!Embed && destination is { Type: DestinationType.ExternalLink, Content: not null })
                 return HandleExternalLinkRedirect(destination.Content);
