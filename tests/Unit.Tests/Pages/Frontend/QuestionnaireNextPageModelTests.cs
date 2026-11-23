@@ -398,7 +398,7 @@ public class QuestionnaireNextPageModelTests
             .ReturnsAsync(new QuestionDto { Id = currentQuestionId, Order = 2, Type = QuestionType.SingleSelect });
 
         _mockApiClient
-            .Setup(x => x.GetPreviousState(questionnaireId, 2, false))
+            .Setup(x => x.GetPreviousState(questionnaireId, 2, false, It.IsAny<string?>()))
             .ReturnsAsync(new DestinationDto { Type = DestinationType.Question, Question = previousQuestion });
 
         // Act
@@ -441,7 +441,7 @@ public class QuestionnaireNextPageModelTests
             .ReturnsAsync(new DestinationDto { Type = DestinationType.Question, Question = question2 });
 
         _mockApiClient
-            .Setup(x => x.GetPreviousState(questionnaireId, 2, false))
+            .Setup(x => x.GetPreviousState(questionnaireId, 2, false, It.IsAny<string?>()))
             .ReturnsAsync(new DestinationDto { Type = DestinationType.Question, Question = question1 });
 
         _mockFormCollection.Setup(x => x[It.IsAny<string>()]).Returns("continueButton");

@@ -50,9 +50,9 @@ public class QuestionnaireRunnerController(IQuestionnaireRunnerService questionn
     }
 
     [HttpGet("questionnaires/{questionnaireId:guid}/previous-state")]
-    public async Task<IActionResult> GetPreviousState(Guid questionnaireId, [FromQuery] int currentQuestionOrder, [FromQuery] bool preview = false)
+    public async Task<IActionResult> GetPreviousState(Guid questionnaireId, [FromQuery] int currentQuestionOrder, [FromQuery] bool preview = false, [FromQuery] string? answerHistory = null)
     {
-        return (await questionnaireRunnerService.GetPreviousState(questionnaireId, currentQuestionOrder, preview)).ToActionResult();
+        return (await questionnaireRunnerService.GetPreviousState(questionnaireId, currentQuestionOrder, preview, answerHistory)).ToActionResult();
     }
 
     [HttpGet("questionnaires/{questionnaireId:guid}/questions/{questionId:guid}")]
