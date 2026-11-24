@@ -86,7 +86,7 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
             IsEmbedded = Embed;
             Destination = destination;
             Tally = destination.Type == DestinationType.CustomContent ? await GetVoteTallyFromHistoryAsync() : null;
-            NextStateRequest = new GetNextStateRequest();
+            NextStateRequest = new GetNextStateRequest();       
             return Page();
         }
         catch (Exception e)
