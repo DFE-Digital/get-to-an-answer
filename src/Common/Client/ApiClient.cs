@@ -73,7 +73,7 @@ public interface IApiClient
     Task<QuestionDto?> GetCurrentQuestion(Guid questionnaireId, Guid questionId, bool preview = false);
     Task<QuestionDto?> GetLastQuestion(Guid questionnaireId, bool preview = false);
     Task<DestinationDto?> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool preview = false);
-    Task<DestinationDto?> GetPreviousState(Guid questionnaireId, int currentQuestionOrder, bool preview = false);
+    Task<DestinationDto?> GetPreviousState(Guid questionnaireId, int currentQuestionOrder, bool preview = false, string? answerHistory = null); 
     Task<VoteTally?> GetVoteTallyAsync(Guid questionnaireId, IEnumerable<Guid> answerIds);
 }
 
@@ -364,10 +364,11 @@ public class ApiClient : IApiClient
     }
 
     public async Task<DestinationDto?> GetPreviousState(Guid questionnaireId, int currentQuestionOrder,
-        bool preview = false)
+        bool preview = false, string? answerHistory = null)
     {
+        var historyQuery = string.IsNullOrEmpty(answerHistory) ? string.Empty : $"&answerHistory={Uri.EscapeDataString(answerHistory)}";
         var response =
-            await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/previous-state?currentQuestionOrder={currentQuestionOrder}&preview={preview}");
+            await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/previous-state?currentQuestionOrder={currentQuestionOrder}&preview={preview}{historyQuery}");
         return await GetResponse<DestinationDto>(response);
     }
 

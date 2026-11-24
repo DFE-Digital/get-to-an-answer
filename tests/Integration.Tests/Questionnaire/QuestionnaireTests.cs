@@ -5,6 +5,7 @@ using System.Text.Json;
 using Common.Domain;
 using Common.Domain.Request.Create;
 using Common.Enum;
+using Common.Helpers;
 using FluentAssertions;
 using Integration.Tests.Fake;
 using Integration.Tests.Fixture;
@@ -1068,6 +1069,250 @@ public class QuestionnaireTests(ApiFixture factory) :
         previousState.Question.Should().NotBeNull();
         previousState.Question.Id.Should().Be(q1.Id);
         previousState.Question.Order.Should().Be(1);
+    }
+
+    [Fact(DisplayName = "Back button navigation: Back after a skipped question returns the previously shown question")]
+    public async Task BackButton_After_Skipped_Question_Returns_Previously_Shown_Question()
+    {
+        // Arrange: Q1 (order 1) branches directly to Q3, skipping Q2 (order 2)
+        var questionnaire = await Create<QuestionnaireDto>(new { title = "Branch Back Test", description = "Back after branch skip" });
+        var questionnaireId = questionnaire.Id;
+
+        var q1 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q1?", type = QuestionType.SingleSelect, order = 1 },
+            routePrefixOverride: "/api/questions");
+
+        var q2 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q2?", type = QuestionType.SingleSelect, order = 2 },
+            routePrefixOverride: "/api/questions");
+
+        var q3 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q3?", type = QuestionType.SingleSelect, order = 3 },
+            routePrefixOverride: "/api/questions");
+
+        var q1ToQ3Answer = await Create<AnswerDto>(new
+        {
+            QuestionId = q1.Id,
+            QuestionnaireId = questionnaireId,
+            Content = "Go to Q3",
+            DestinationType = DestinationType.Question,
+            DestinationQuestionId = q3.Id
+        }, routePrefixOverride: "/api/answers");
+
+        // Answer history as the frontend would have saved it after answering Q1 (Q2 was skipped)
+        var answerHistory = $"{q1.Id:N}.{q1ToQ3Answer.Id:N}";
+
+        // Act: Back from Q3 (order 3) with preview=true for draft questionnaire
+        using var response = await GetAll(
+            routePrefixOverride: $"/api/questionnaires/{questionnaireId}/previous-state?currentQuestionOrder=3&preview=true&answerHistory={Uri.EscapeDataString(answerHistory)}");
+
+        // Assert: Q1 is the question the user actually saw before Q3, Q2 must not be shown
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var previousState = responseBody.Deserialize<DestinationDto>()!;
+        previousState.Question.Should().NotBeNull();
+        previousState.Question!.Id.Should().Be(q1.Id);
+        previousState.Question.Id.Should().NotBe(q2.Id);
+    }
+
+    [Fact(DisplayName = "Back button navigation: Back returns the most recently answered question routing to the current question")]
+    public async Task BackButton_Returns_Most_Recently_Answered_Question_When_Several_Route_To_Same_Target()
+    {
+        var questionnaire = await Create<QuestionnaireDto>(new { title = "Branch Recent Test", description = "Multiple routes to same target" });
+        var questionnaireId = questionnaire.Id;
+
+        var q1 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q1?", type = QuestionType.SingleSelect, order = 1 },
+            routePrefixOverride: "/api/questions");
+
+        var q2 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q2?", type = QuestionType.SingleSelect, order = 2 },
+            routePrefixOverride: "/api/questions");
+
+        var q3 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q3?", type = QuestionType.SingleSelect, order = 3 },
+            routePrefixOverride: "/api/questions");
+
+        var q1ToQ3Answer = await Create<AnswerDto>(new
+        {
+            QuestionId = q1.Id,
+            QuestionnaireId = questionnaireId,
+            Content = "Go to Q3 from Q1",
+            DestinationType = DestinationType.Question,
+            DestinationQuestionId = q3.Id
+        }, routePrefixOverride: "/api/answers");
+
+        var q2ToQ3Answer = await Create<AnswerDto>(new
+        {
+            QuestionId = q2.Id,
+            QuestionnaireId = questionnaireId,
+            Content = "Go to Q3 from Q2",
+            DestinationType = DestinationType.Question,
+            DestinationQuestionId = q3.Id
+        }, routePrefixOverride: "/api/answers");
+
+        var answerHistory = AnswerHistoryHelper.SaveAnswersToHistory(
+            AnswerHistoryHelper.SaveAnswersToHistory(string.Empty, q1.Id, new List<Guid> { q1ToQ3Answer.Id }),
+            q2.Id,
+            new List<Guid> { q2ToQ3Answer.Id });
+
+        using var response = await GetAll(
+            routePrefixOverride: $"/api/questionnaires/{questionnaireId}/previous-state?currentQuestionOrder=3&preview=true&answerHistory={Uri.EscapeDataString(answerHistory)}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var previousState = responseBody.Deserialize<DestinationDto>()!;
+        previousState.Question.Should().NotBeNull();
+        previousState.Question!.Id.Should().Be(q2.Id);
+    }
+
+    [Fact(DisplayName = "Back button navigation: Switching branch slices off the old branch and back follows the new path")]
+    public async Task BackButton_After_Switching_Branch_Follows_New_Path()
+    {
+        // Arrange: Q1 can branch directly to Q4, or go to Q2 -> Q3 -> Q4
+        var questionnaire = await Create<QuestionnaireDto>(new { title = "Branch Switch Test", description = "Old branch sliced off" });
+        var questionnaireId = questionnaire.Id;
+
+        var q1 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q1?", type = QuestionType.SingleSelect, order = 1 },
+            routePrefixOverride: "/api/questions");
+
+        var q2 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q2?", type = QuestionType.SingleSelect, order = 2 },
+            routePrefixOverride: "/api/questions");
+
+        var q3 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q3?", type = QuestionType.SingleSelect, order = 3 },
+            routePrefixOverride: "/api/questions");
+
+        var q4 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q4?", type = QuestionType.SingleSelect, order = 4 },
+            routePrefixOverride: "/api/questions");
+
+        var q1ToQ4Answer = await Create<AnswerDto>(new
+        {
+            QuestionId = q1.Id,
+            QuestionnaireId = questionnaireId,
+            Content = "Go to Q4",
+            DestinationType = DestinationType.Question,
+            DestinationQuestionId = q4.Id
+        }, routePrefixOverride: "/api/answers");
+
+        var q1ToQ2Answer = await Create<AnswerDto>(new
+        {
+            QuestionId = q1.Id,
+            QuestionnaireId = questionnaireId,
+            Content = "Go to Q2",
+            DestinationType = DestinationType.Question,
+            DestinationQuestionId = q2.Id
+        }, routePrefixOverride: "/api/answers");
+
+        var q2Answer = await Create<AnswerDto>(new
+        {
+            QuestionId = q2.Id,
+            QuestionnaireId = questionnaireId,
+            Content = "Q2 answer",
+            DestinationType = DestinationType.Question,
+            DestinationQuestionId = q3.Id
+        }, routePrefixOverride: "/api/answers");
+
+        var q3Answer = await Create<AnswerDto>(new
+        {
+            QuestionId = q3.Id,
+            QuestionnaireId = questionnaireId,
+            Content = "Q3 answer"
+        }, routePrefixOverride: "/api/answers");
+
+        // First path: Q1 -> Q4, back to Q1
+        var answerHistory = AnswerHistoryHelper.SaveAnswersToHistory(string.Empty, q1.Id, new List<Guid> { q1ToQ4Answer.Id });
+
+        using (var firstResponse = await GetAll(
+            routePrefixOverride: $"/api/questionnaires/{questionnaireId}/previous-state?currentQuestionOrder=4&preview=true&answerHistory={Uri.EscapeDataString(answerHistory)}"))
+        {
+            firstResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            var firstState = (await firstResponse.Content.ReadAsStringAsync()).Deserialize<DestinationDto>()!;
+            firstState.Question!.Id.Should().Be(q1.Id);
+        }
+
+        // Second path: re-answer Q1 -> Q2 -> Q3 -> Q4
+        answerHistory = AnswerHistoryHelper.SaveAnswersToHistory(answerHistory, q1.Id, new List<Guid> { q1ToQ2Answer.Id });
+        answerHistory = AnswerHistoryHelper.SaveAnswersToHistory(answerHistory, q2.Id, new List<Guid> { q2Answer.Id });
+        answerHistory = AnswerHistoryHelper.SaveAnswersToHistory(answerHistory, q3.Id, new List<Guid> { q3Answer.Id });
+
+        AnswerHistoryHelper.GetAnsweredQuestionIds(answerHistory).Should().Equal(q1.Id, q2.Id, q3.Id);
+        AnswerHistoryHelper.GetAnswersFromHistory(answerHistory, q1.Id).Should().Equal(q1ToQ2Answer.Id);
+
+        // Act: Back from Q4
+        using var response = await GetAll(
+            routePrefixOverride: $"/api/questionnaires/{questionnaireId}/previous-state?currentQuestionOrder=4&preview=true&answerHistory={Uri.EscapeDataString(answerHistory)}");
+
+        // Assert: Q3 is returned, not Q1 from the old branch
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var previousState = (await response.Content.ReadAsStringAsync()).Deserialize<DestinationDto>()!;
+        previousState.Question.Should().NotBeNull();
+        previousState.Question!.Id.Should().Be(q3.Id);
+    }
+
+    [Fact(DisplayName = "Back button navigation: Back from an answered question returns the question before it in the history")]
+    public async Task BackButton_From_Answered_Question_Returns_Question_Before_It_In_History()
+    {
+        var questionnaire = await Create<QuestionnaireDto>(new { title = "Branch Answered Test", description = "Current question already in history" });
+        var questionnaireId = questionnaire.Id;
+
+        var q1 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q1?", type = QuestionType.SingleSelect, order = 1 },
+            routePrefixOverride: "/api/questions");
+
+        var q2 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q2?", type = QuestionType.SingleSelect, order = 2 },
+            routePrefixOverride: "/api/questions");
+
+        var q3 = await Create<QuestionDto>(
+            new { questionnaireId, content = "Q3?", type = QuestionType.SingleSelect, order = 3 },
+            routePrefixOverride: "/api/questions");
+
+        var q1ToQ2Answer = await Create<AnswerDto>(new
+        {
+            QuestionId = q1.Id,
+            QuestionnaireId = questionnaireId,
+            Content = "Go to Q2",
+            DestinationType = DestinationType.Question,
+            DestinationQuestionId = q2.Id
+        }, routePrefixOverride: "/api/answers");
+
+        var q2ToQ3Answer = await Create<AnswerDto>(new
+        {
+            QuestionId = q2.Id,
+            QuestionnaireId = questionnaireId,
+            Content = "Go to Q3",
+            DestinationType = DestinationType.Question,
+            DestinationQuestionId = q3.Id
+        }, routePrefixOverride: "/api/answers");
+
+        var q3Answer = await Create<AnswerDto>(new
+        {
+            QuestionId = q3.Id,
+            QuestionnaireId = questionnaireId,
+            Content = "Q3 answer"
+        }, routePrefixOverride: "/api/answers");
+
+        var answerHistory = AnswerHistoryHelper.SaveAnswersToHistory(
+            AnswerHistoryHelper.SaveAnswersToHistory(
+                AnswerHistoryHelper.SaveAnswersToHistory(string.Empty, q1.Id, new List<Guid> { q1ToQ2Answer.Id }),
+                q2.Id,
+                new List<Guid> { q2ToQ3Answer.Id }),
+            q3.Id,
+            new List<Guid> { q3Answer.Id });
+
+        using var response = await GetAll(
+            routePrefixOverride: $"/api/questionnaires/{questionnaireId}/previous-state?currentQuestionOrder=3&preview=true&answerHistory={Uri.EscapeDataString(answerHistory)}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var previousState = (await response.Content.ReadAsStringAsync()).Deserialize<DestinationDto>()!;
+        previousState.Question.Should().NotBeNull();
+        previousState.Question!.Id.Should().Be(q2.Id);
     }
 
     [Fact(DisplayName = "Back button navigation: Navigate forward with next-state then back")]

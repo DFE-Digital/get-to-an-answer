@@ -6,6 +6,7 @@ using Api.Services;
 using Common.Domain;
 using Common.Domain.Frontend;
 using Common.Enum;
+using Common.Helpers;
 using Common.Infrastructure.Persistence;
 using Common.Infrastructure.Persistence.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -21,9 +22,9 @@ public interface IQuestionnaireRunnerService
     Task<ServiceResult> GetInitialQuestion(Guid questionnaireId, bool isPreview = false);
     Task<ServiceResult> GetCurrentQuestion(Guid questionnaireId, Guid questionId, bool isPreview = false);
     Task<ServiceResult> GetLastQuestion(Guid questionnaireId, bool isPreview = false);
-    Task<ServiceResult> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool isPreview = false);
-    Task<ServiceResult> GetPreviousState(Guid questionnaireId, int currentQuestionOrder, bool isPreview = false);
+    Task<ServiceResult> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool isPreview = false);   
     Task<ServiceResult> GetVoteTally(Guid questionnaireId, List<Guid> answerIds);
+    Task<ServiceResult> GetPreviousState(Guid questionnaireId, int currentQuestionOrder, bool isPreview = false, string? answerHistory = null);
 }
 
 public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<QuestionnaireRunnerService> logger) : AbstractService, IQuestionnaireRunnerService
@@ -538,7 +539,7 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
         return JsonSerializer.Deserialize<QuestionnaireEntity>(questionnaireJson, options);
     }
 
-    public async Task<ServiceResult> GetPreviousState(Guid questionnaireId, int currentQuestionOrder, bool isPreview = false)
+    public async Task<ServiceResult> GetPreviousState(Guid questionnaireId, int currentQuestionOrder, bool isPreview = false, string? answerHistory = null)
     {
         try
         {
@@ -553,16 +554,14 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             if (currentQuestionOrder <= 1)
                 return BadRequest(ProblemTrace("Cannot go back from the first question.", 400));
 
-            int previousQuestionOrder = currentQuestionOrder - 1;
-            QuestionEntity? previousQuestion;
+            List<QuestionEntity> questions;
 
             if (isPreview)
             {
-                previousQuestion = await db.Questions
+                questions = await db.Questions
                     .Include(x => x.Answers.Where(a => !a.IsDeleted))
-                    .FirstOrDefaultAsync(x => x.QuestionnaireId == questionnaireId && 
-                                              x.Order == previousQuestionOrder && 
-                                              !x.IsDeleted);
+                    .Where(x => x.QuestionnaireId == questionnaireId && !x.IsDeleted)
+                    .ToListAsync();
             }
             else
             {
@@ -573,8 +572,10 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
 
                 var questionnaire = ToQuestionnaire(questionnaireVersionJson);
 
-                previousQuestion = questionnaire?.Questions.FirstOrDefault(q => q is { Order: > 0, IsDeleted: false } && q.Order == previousQuestionOrder);
+                questions = questionnaire?.Questions.Where(q => q is { Order: > 0, IsDeleted: false }).ToList() ?? [];
             }
+
+            var previousQuestion = ResolvePreviousQuestion(questions, currentQuestionOrder, answerHistory);
 
             if (previousQuestion == null)
                 return BadRequest(ProblemTrace("Previous question could not be determined.", 400));
@@ -587,5 +588,29 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             logger.LogError(ex, "GetPreviousState failed QuestionnaireId={QuestionnaireId}", questionnaireId);
             return Problem(ProblemTrace("Something went wrong. Try again later.", 500));
         }
+    }
+
+    private static QuestionEntity? ResolvePreviousQuestion(List<QuestionEntity> questions, int currentQuestionOrder, string? answerHistory)
+    {
+        var currentQuestion = questions.FirstOrDefault(q => q.Order == currentQuestionOrder);
+
+        if (currentQuestion != null)
+        {
+            // History is the actual path taken (stale branches are sliced off when a question is re-answered),
+            // so the previous question is the entry immediately before the current one.
+            var answeredIds = AnswerHistoryHelper.GetAnsweredQuestionIds(answerHistory);
+            var currentIndex = answeredIds.IndexOf(currentQuestion.Id);
+            var path = currentIndex >= 0 ? answeredIds.Take(currentIndex) : answeredIds;
+
+            var previous = path
+                .Select(id => questions.FirstOrDefault(q => q.Id == id))
+                .OfType<QuestionEntity>()
+                .LastOrDefault();
+
+            if (previous != null)
+                return previous;
+        }
+
+        return questions.FirstOrDefault(q => q.Order == currentQuestionOrder - 1);
     }
 }
