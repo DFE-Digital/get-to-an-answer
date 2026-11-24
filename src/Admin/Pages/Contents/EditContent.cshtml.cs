@@ -24,6 +24,8 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
     [Required(ErrorMessage = "Enter text for the main content to save")] 
     [BindProperty] public string ContentValue { get; set; } = string.Empty;
 
+    [BindProperty] public string? NoResultContentValue { get; set; }
+
     [BindProperty] public string? ContentRefName { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
@@ -62,6 +64,7 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
             {
                 Title = ContentTitle,
                 Content = ContentValue,
+                NoResultContent = NoResultContentValue,
                 ReferenceName = ContentRefName
             });
             
@@ -90,6 +93,7 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
     {
         ContentTitle = content.Title;
         ContentValue = content.Content;
+        NoResultContentValue = content.NoResultContent;
         ContentRefName = content.ReferenceName!;
     }
 }

@@ -23,6 +23,9 @@ public class AddContent(ILogger<AddContent> logger, IApiClient apiClient) : Base
     [Required(ErrorMessage = "Enter text for the main content to save")] 
     public string ContentValue { get; set; } = "";
 
+    [BindProperty]
+    public string? NoResultContentValue { get; set; }
+
     [BindProperty] 
     public string? ContentRefName { get; set; } = "";
 
@@ -45,6 +48,7 @@ public class AddContent(ILogger<AddContent> logger, IApiClient apiClient) : Base
                 QuestionnaireId = QuestionnaireId,
                 Title = ContentTitle,
                 Content = ContentValue,
+                NoResultContent = NoResultContentValue,
                 ReferenceName = ContentRefName
             });
             

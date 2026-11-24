@@ -151,11 +151,26 @@
                 One or more options (using the <a class="govuk-link" href="https://design-system.service.gov.uk/components/checkboxes/">checkbox component</a>)
               </label>
               <div class="govuk-hint govuk-radios__hint">
-                Use for selecting one or more options
-              </div>
-            </div>
-          </div>
-        </fieldset>
+                         Use for selecting one or more options
+                      </div>
+                    </div>
+
+                    <div class="govuk-radios__item">
+                      <govuk-input class="govuk-radios__input"
+                                   id="QuestionType-VoteValue"
+                                   asp-for="QuestionType"
+                                   type="radio"
+                                   value="@((int)QuestionType.VoteValue)"
+                                   govuk-error-for="@Model.QuestionType" />
+                      <label class="govuk-label govuk-radios__label" for="QuestionType-VoteValue">
+                                Yes or no (vote) (using the <a class="govuk-link" href="https://design-system.service.gov.uk/components/radios/">radio component</a>)
+                      </label>
+                      <div class="govuk-hint govuk-radios__hint">
+                        Use for yes or no questions where the result depends on the number of yes and no answers. This answer type will assist in creating voting questionnaire.
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
       </govuk-form-group>
       
 

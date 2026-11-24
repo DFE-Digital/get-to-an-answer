@@ -42,6 +42,11 @@ public static class AnswerHistoryHelper
         return Decode(history).TryGetValue(questionId, out var answers) ? answers : new();
     }
 
+    public static List<Guid> GetAllAnswersFromHistory(string? history)
+    {
+        return Decode(history).Values.SelectMany(answers => answers).ToList();
+    }
+
     /// <summary>
     /// Returns the IDs of answered questions in the order they were answered.
     /// </summary>

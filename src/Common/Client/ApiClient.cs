@@ -73,7 +73,8 @@ public interface IApiClient
     Task<QuestionDto?> GetCurrentQuestion(Guid questionnaireId, Guid questionId, bool preview = false);
     Task<QuestionDto?> GetLastQuestion(Guid questionnaireId, bool preview = false);
     Task<DestinationDto?> GetNextState(Guid questionnaireId, GetNextStateRequest request, bool preview = false);
-    Task<DestinationDto?> GetPreviousState(Guid questionnaireId, int currentQuestionOrder, bool preview = false, string? answerHistory = null);
+    Task<DestinationDto?> GetPreviousState(Guid questionnaireId, int currentQuestionOrder, bool preview = false, string? answerHistory = null); 
+    Task<VoteTally?> GetVoteTallyAsync(Guid questionnaireId, IEnumerable<Guid> answerIds);
 }
 
 public class ApiClient : IApiClient
@@ -369,6 +370,13 @@ public class ApiClient : IApiClient
         var response =
             await _httpClient.GetAsync($"{Questionnaires}/{questionnaireId}/previous-state?currentQuestionOrder={currentQuestionOrder}&preview={preview}{historyQuery}");
         return await GetResponse<DestinationDto>(response);
+    }
+
+    public async Task<VoteTally?> GetVoteTallyAsync(Guid questionnaireId, IEnumerable<Guid> answerIds)
+    {
+        var response =
+            await _httpClient.PostAsJsonAsync($"{Questionnaires}/{questionnaireId}/vote-tally", answerIds.ToList());
+        return await GetResponse<VoteTally>(response);
     }
 
     private async Task<TResponse?> GetResponse<TResponse>(HttpResponseMessage response) where TResponse : class

@@ -16,14 +16,16 @@ public class AnswerEntity
     public Guid Id { get; set; }
 
     [Required]
-    public string Content { get; set; }
+    public required string Content { get; set; }
     
     public string? Description { get; set; }
     
     public float Priority { get; set; }
     
     public DestinationType? DestinationType { get; set; }
-    
+
+    public VoteValue? VoteValue { get; set; }
+
     [MaxLength(250)]
     public string? DestinationUrl { get; set; }
     
