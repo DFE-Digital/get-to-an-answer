@@ -21,9 +21,11 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
     [BindProperty] public required GetNextStateRequest NextStateRequest { get; set; }
     [BindProperty] public required bool IsEmbedded { get; set; }
     [BindProperty] public string? AnswerHistory { get; set; } = string.Empty; // Compact hex-encoded answer history
+    [BindProperty] public string? CurrentSelectedAnswers { get; set; } = string.Empty; // Compact hex-encoded selected answers per question
     public required QuestionnaireInfoDto Questionnaire { get; set; }
     public required DestinationDto Destination { get; set; }
-
+    public List<ResultsSummaryRow> ResultsSummaryRows { get; set; } = new();
+    
     [FromQuery(Name = "embed")] 
     public bool Embed { get; set; }
 
@@ -38,15 +40,43 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
     /// </summary>
     public async Task<IActionResult> OnPost()
     {
+        if (Request.Form.ContainsKey("changeQuestionId"))
+            return await HandleChangeAsync();
+
         string? buttonValue = Request.Form["submitButton"];
         return buttonValue switch
         {
             "continueButton" => await HandleContinueAsync(),
             "backButton" => await HandleBackAsync(),
             "customContentBackButton" => await HandleCustomContentAsync(),
-            "backButtonForStartPage" => await HandleStartPageBackAsync(),
+            "backButtonForStartPage" => await HandleStartPageBackAsync(),            
             _ => HandleUnknownButton(buttonValue ?? string.Empty)
         };
+    }
+
+    /// <summary>
+    /// Handles the Change button on the results summary - renders the selected question using the posted history
+    /// </summary>
+    private async Task<IActionResult> HandleChangeAsync()
+    {
+        if (!Guid.TryParse(Request.Form["changeQuestionId"], out var questionId))
+            return BadRequest("Invalid question");
+
+        var questionnaire = await GetQuestionnaireAsync();
+        if (questionnaire == null)
+            return NotFound();
+
+        Questionnaire = questionnaire;
+        IsEmbedded = Embed;        
+        ResultsSummaryRows = new();
+
+        var question = await ApiClient.GetCurrentQuestion(Questionnaire.Id, questionId, GetPreviewFlag());
+        if (question == null)
+            return NotFound();
+
+        RestorePreviousQuestion(new DestinationDto { Type = DestinationType.Question, Question = question });
+        ModelState.Clear();
+        return Page();
     }
 
     /// <summary>
@@ -67,13 +97,16 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
 
             SaveCurrentAnswersToHistory();
             if (destination.Question is not null)
-                destination.PreviouslySelectedAnswerIds = GetAnswersFromHistory(destination.Question.Id);
+                destination.PreviouslySelectedAnswerIds = AnswerHistoryHelper.GetSelectedAnswers(CurrentSelectedAnswers, destination.Question.Id);
+
+            if (destination is { Type: DestinationType.CustomContent, ShowResultsSummary: true } or {Type: DestinationType.ExternalLink })
+                return await ShowResultsSummaryAsync(destination);
 
             if (!Embed && destination is { Type: DestinationType.ExternalLink, Content: not null })
                 return HandleExternalLinkRedirect(destination.Content);
 
             IsEmbedded = Embed;
-            Destination = destination;
+            Destination = destination;            
             NextStateRequest = new GetNextStateRequest();
             return Page();
         }
@@ -95,7 +128,20 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
 
             SaveCurrentAnswersToHistory();
 
-            var previousDestination = await ApiClient.GetPreviousState(Questionnaire.Id, NextStateRequest.CurrentQuestionOrder, GetPreviewFlag(), AnswerHistory);
+            DestinationDto? previousDestination;
+            var previousQuestionId = AnswerHistoryHelper.GetPreviousQuestionId(AnswerHistory, NextStateRequest.CurrentQuestionId);
+            if (previousQuestionId is { } questionId)
+            {
+                var previousQuestion = await ApiClient.GetCurrentQuestion(Questionnaire.Id, questionId, GetPreviewFlag());
+                previousDestination = previousQuestion == null
+                    ? null
+                    : new DestinationDto { Type = DestinationType.Question, Question = previousQuestion };
+            }
+            else
+            {
+                previousDestination = await ApiClient.GetPreviousState(Questionnaire.Id, NextStateRequest.CurrentQuestionOrder, GetPreviewFlag());
+            }
+
             if (previousDestination == null)
                 return NotFound();
 
@@ -111,7 +157,7 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
     }
 
     /// <summary>
-    /// Handles custom content back button - returns to last question in questionnaire
+    /// Handles custom content back button - returns to the last question on the user's route taken from answer history
     /// </summary>
     private async Task<IActionResult> HandleCustomContentAsync()
     {
@@ -122,10 +168,13 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
                 throw new InvalidOperationException("Questionnaire not found");
 
             Questionnaire = questionnaire;
+            var routeQuestionIds = AnswerHistoryHelper.GetAnsweredQuestionIds(AnswerHistory);
             Destination = new DestinationDto
             {
                 Type = DestinationType.Question,
-                Question = await ApiClient.GetLastQuestion(Questionnaire.Id, GetPreviewFlag())
+                Question = routeQuestionIds.Count > 0
+                    ? await ApiClient.GetCurrentQuestion(Questionnaire.Id, routeQuestionIds[^1])
+                    : await ApiClient.GetLastQuestion(Questionnaire.Id)
             };
 
             if (Destination?.Question == null)
@@ -168,6 +217,43 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
     {
         Logger.LogWarning("Unknown button value submitted: {ButtonValue}", buttonValue);
         return BadRequest("Unknown action");
+    }
+
+    /// <summary>
+    /// Displays the results summary before the final destination is shown
+    /// </summary>
+    private async Task<IActionResult> ShowResultsSummaryAsync(DestinationDto destination)
+    {
+        ResultsSummaryRows = await BuildResultsSummaryRowsAsync();        
+        Destination = destination;
+        IsEmbedded = Embed;
+        return Page();
+    }
+
+    /// <summary>
+    /// Decodes the selected answers into human readable question and answer text
+    /// </summary>
+    private async Task<List<ResultsSummaryRow>> BuildResultsSummaryRowsAsync()
+    {
+        var rows = new List<ResultsSummaryRow>();
+        foreach (var questionId in AnswerHistoryHelper.GetAnsweredQuestionIds(CurrentSelectedAnswers))
+        {
+            var question = await ApiClient.GetCurrentQuestion(Questionnaire.Id, questionId, GetPreviewFlag());
+            if (question == null)
+                continue;
+
+            var answers = new List<string>();
+            foreach (var answerId in AnswerHistoryHelper.GetSelectedAnswers(CurrentSelectedAnswers, questionId))
+            {
+                var answer = question.Answers.FirstOrDefault(a => a.Id == answerId);
+                if (answer != null)
+                    answers.Add(answer.Content);
+            }
+
+            rows.Add(new ResultsSummaryRow(questionId, question.Content, answers));
+        }
+
+        return rows;
     }
 
     /// <summary>
@@ -224,8 +310,11 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
     protected void SaveCurrentAnswersToHistory()
     {
         if (NextStateRequest.CurrentQuestionId != Guid.Empty && NextStateRequest.SelectedAnswerIds.Count > 0)
-            AnswerHistory = AnswerHistoryHelper.SaveAnswersToHistory(AnswerHistory, NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
-    }
+                {
+                    AnswerHistory = AnswerHistoryHelper.SaveAnswersToHistory(AnswerHistory, NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
+                    CurrentSelectedAnswers = AnswerHistoryHelper.UpsertAnswers(CurrentSelectedAnswers, NextStateRequest.CurrentQuestionId, NextStateRequest.SelectedAnswerIds);
+                }
+            }
 
     /// <summary>
     /// Handles external link redirects with protocol validation
@@ -245,7 +334,7 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
     protected void RestorePreviousQuestion(DestinationDto previousDestination)
     {
         var previousQuestionId = previousDestination.Question?.Id ?? Guid.Empty;
-        var restoredAnswers = GetAnswersFromHistory(previousQuestionId);
+        var restoredAnswers = AnswerHistoryHelper.GetSelectedAnswers(CurrentSelectedAnswers, previousQuestionId);
         previousDestination.PreviouslySelectedAnswerIds = restoredAnswers;
 
         Logger.LogInformation("OnPostBack: Question={QuestionId}, PreviouslySelectedAnswers={AnswerCount}, AnswerHistory={HistoryJson}",
@@ -256,27 +345,13 @@ public abstract class QuestionnaireNavigationPageModel : QuestionnairesPageModel
         NextStateRequest.CurrentQuestionId = previousQuestionId;
         NextStateRequest.CurrentQuestionOrder = previousDestination.Question?.Order ?? 0;
         NextStateRequest.SelectedAnswerIds = restoredAnswers;
-    }
-
-    /// <summary>
-    /// Retrieves previously selected answers for a question from the history
-    /// </summary>
-    protected List<Guid> GetAnswersFromHistory(Guid questionId)
-    {
-        return AnswerHistoryHelper.GetAnswersFromHistory(AnswerHistory, questionId);
-    }
+    }    
 
     /// <summary>
     /// Gets the questionnaire based on route parameters.
     /// Must be implemented by derived classes to provide route-specific logic.
     /// </summary>
     protected abstract Task<QuestionnaireInfoDto?> GetQuestionnaireAsync();
-
-    /// <summary>
-    /// Gets the initial question for first-time page load.
-    /// Must be implemented by derived classes to provide route-specific logic.
-    /// </summary>
-    protected abstract Task<QuestionDto?> GetInitialQuestionAsync();
 
     /// <summary>
     /// Gets the start page route for back-to-start navigation.

@@ -8,6 +8,7 @@ public class DestinationDto
     public string? Title { get; set; }
     public string? Content { get; set; } // Markdown
     public string? ReferenceName { get; set; }
+    public bool ShowResultsSummary { get; set; }
     public QuestionDto? Question { get; set; }
      public List<Guid> PreviouslySelectedAnswerIds { get; set; } = new();
 

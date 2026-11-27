@@ -112,7 +112,7 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
         {
             logger.LogInformation("UpdateContent started ContentId={ContentId}", id);
 
-            if (request.Content == null && request.Title == null)
+            if (request.Content == null && request.Title == null && request.ShowResultsSummary == null)
             {
                 return BadRequest(ValidationProblemTrace(new Dictionary<string, string[]>
                 {
@@ -133,6 +133,7 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
             answer.Content = request.Content ?? answer.Content;
             answer.Title = request.Title ?? answer.Title;
             answer.ReferenceName = request.ReferenceName ?? answer.ReferenceName;
+            answer.ShowResultsSummary = request.ShowResultsSummary ?? answer.ShowResultsSummary;
             answer.UpdatedAt = DateTime.UtcNow;
 
             await db.SaveChangesAsync();
@@ -187,6 +188,7 @@ public class ContentService(GetToAnAnswerDbContext db, ILogger<ContentService> l
             Title = entity.Title,
             Content = entity.Content,
             ReferenceName = entity.ReferenceName,
+            ShowResultsSummary = entity.ShowResultsSummary,
             QuestionnaireId = entity.QuestionnaireId,
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,

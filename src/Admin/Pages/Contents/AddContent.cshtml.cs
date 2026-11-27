@@ -26,6 +26,9 @@ public class AddContent(ILogger<AddContent> logger, IApiClient apiClient) : Base
     [BindProperty] 
     public string? ContentRefName { get; set; } = "";
 
+    [BindProperty] 
+    public bool ShowResultsSummary { get; set; }
+
     public IActionResult OnGet()
     {
         BackLinkSlug = string.Format(Routes.AddAndEditResultPages, QuestionnaireId);
@@ -45,7 +48,8 @@ public class AddContent(ILogger<AddContent> logger, IApiClient apiClient) : Base
                 QuestionnaireId = QuestionnaireId,
                 Title = ContentTitle,
                 Content = ContentValue,
-                ReferenceName = ContentRefName
+                ReferenceName = ContentRefName,
+                ShowResultsSummary = ShowResultsSummary
             });
             
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustAddedResultsPage = true, ResultsPageTitle = ContentTitle });

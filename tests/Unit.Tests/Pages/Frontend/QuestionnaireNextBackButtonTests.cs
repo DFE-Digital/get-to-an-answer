@@ -83,7 +83,7 @@ public class QuestionnaireNextBackButtonTests
         page.Destination.Question!.Id.Should().Be(q1.Id);
         page.Destination.Question.Id.Should().NotBe(q2.Id);
         page.Destination.PreviouslySelectedAnswerIds.Should().ContainSingle().Which.Should().Be(answerA);
-        _mockApiClient.Verify(x => x.GetPreviousState(questionnaireId, q3.Order, It.IsAny<bool>(), It.IsAny<string?>()), Times.Once);
+        _mockApiClient.Verify(x => x.GetPreviousState(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<string?>()), Times.Never);
         _mockApiClient.Verify(x => x.GetCurrentQuestion(questionnaireId, q2.Id, It.IsAny<bool>()), Times.Never);
     }
 

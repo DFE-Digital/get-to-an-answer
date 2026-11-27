@@ -545,6 +545,7 @@ public class QuestionnaireService(GetToAnAnswerDbContext db, ILogger<Questionnai
                 Title = content.Title,
                 Content = content.Content,
                 ReferenceName = content.ReferenceName,
+                ShowResultsSummary = content.ShowResultsSummary,
                 CreatedBy = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,

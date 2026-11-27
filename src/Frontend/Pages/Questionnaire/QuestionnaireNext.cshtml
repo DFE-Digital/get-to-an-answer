@@ -76,7 +76,7 @@
     {
         @await Html.PartialAsync("_ErrorSummary", Model)
     }
-      @if (Model?.Destination is { Type: DestinationType.Question, Question: not null } || 
+    @if (Model?.Destination is { Type: DestinationType.Question, Question: not null } ||
            Model is { Destination: { Type: DestinationType.InterimThenQuestion, Question: not null}, NextStateRequest.ValidateAnswers: false })
       {    
       var hasFieldError = ViewData.ModelState.TryGetValue("NextStateRequest.SelectedAnswerIds", out var ms2) && ms2.Errors.Count > 0;
@@ -294,6 +294,10 @@
       {
         <div id="results-page-details">@(Html.Raw(GovUkMarkdown.ToGovUkHtml(Model.Destination.Content)))</div>
       }
+        @if (Model.Destination.Type != DestinationType.CustomContent || Model.Destination.ShowResultsSummary)
+        {
+          @await Html.PartialAsync("_ResultsSummary", Model.ResultsSummaryRows)
+        }
       @if (Model.Destination.Type == DestinationType.InterimThenQuestion)
       {
           <button type="submit" formnovalidate="formnovalidate" class="govuk-button"
@@ -313,6 +317,7 @@
 
         <!-- Answer history is persisted across all form submissions -->
         <input type="hidden" name="AnswerHistory" value="@Model.AnswerHistory">
+        <input type="hidden" name="CurrentSelectedAnswers" value="@Model.CurrentSelectedAnswers">
       </form>
 
   </div>

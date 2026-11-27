@@ -126,7 +126,7 @@ public class QuestionnaireNextPageModelTests
     }
 
     [Fact]
-    public async Task OnPost_Continue_Preselects_Answers_From_AnswerHistory_For_Next_Question()
+    public async Task OnPost_Continue_Preselects_Answers_From_CurrentSelectedAnswers_For_Next_Question()
     {
         // Arrange
         var questionnaireId = Guid.NewGuid();
@@ -164,7 +164,7 @@ public class QuestionnaireNextPageModelTests
             Question = nextQuestion
         };
 
-        _pageModel.AnswerHistory = AnswerHistoryHelper.SaveAnswersToHistory(string.Empty, nextQuestionId, new List<Guid> { storedAnswerId });
+        _pageModel.CurrentSelectedAnswers = AnswerHistoryHelper.UpsertAnswers(string.Empty, nextQuestionId, new List<Guid> { storedAnswerId });
 
         _mockFormCollection.Setup(x => x[It.IsAny<string>()]).Returns("continueButton");
         _pageModel.QuestionnaireId = questionnaireId;
@@ -548,120 +548,7 @@ public class QuestionnaireNextPageModelTests
         // Assert
         result.Should().BeOfType<PageResult>();
         _pageModel.ModelState.IsValid.Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task OnPost_Continue_Redirects_To_External_Link()
-    {
-        // Arrange
-        var questionnaireId = Guid.NewGuid();
-        var currentQuestionId = Guid.NewGuid();
-        var answerId = Guid.NewGuid();
-
-        var questionnaire = new QuestionnaireInfoDto
-        {
-            Id = questionnaireId
-        };
-
-        var currentQuestion = new QuestionDto
-        {
-            Id = currentQuestionId,
-            Order = 1,
-            Type = QuestionType.SingleSelect
-        };
-
-        var externalLinkDestination = new DestinationDto
-        {
-            Type = DestinationType.ExternalLink,
-            Content = "https://example.com/"
-        };
-
-        _mockFormCollection.Setup(x => x[It.IsAny<string>()]).Returns("continueButton");
-        _pageModel.QuestionnaireId = questionnaireId;
-        _pageModel.NextStateRequest = new GetNextStateRequest
-        {
-            CurrentQuestionId = currentQuestionId,
-            CurrentQuestionOrder = 1,
-            SelectedAnswerIds = new List<Guid> { answerId },
-            ValidateAnswers = true
-        };
-
-        _mockApiClient
-            .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync(questionnaireId.ToString(), true))
-            .ReturnsAsync(questionnaire);
-
-        _mockApiClient
-            .Setup(x => x.GetCurrentQuestion(questionnaireId, currentQuestionId, true))
-            .ReturnsAsync(currentQuestion);
-
-        _mockApiClient
-            .Setup(x => x.GetNextState(questionnaireId, It.IsAny<GetNextStateRequest>(), true))
-            .ReturnsAsync(externalLinkDestination);
-
-        // Act
-        var result = await _pageModel.OnPost();
-
-        // Assert
-        result.Should().BeOfType<RedirectResult>();
-        var redirect = result as RedirectResult;
-        redirect.Url.Should().Contain("example.com");
-    }
-
-    [Fact]
-    public async Task OnPost_Continue_Adds_Https_To_External_Link_If_Missing()
-    {
-        // Arrange
-        var questionnaireId = Guid.NewGuid();
-        var currentQuestionId = Guid.NewGuid();
-        var answerId = Guid.NewGuid();
-
-        var questionnaire = new QuestionnaireInfoDto
-        {
-            Id = questionnaireId
-        };
-
-        var currentQuestion = new QuestionDto
-        {
-            Id = currentQuestionId,
-            Order = 1,
-            Type = QuestionType.SingleSelect
-        };
-
-        var externalLinkDestination = new DestinationDto
-        {
-            Type = DestinationType.ExternalLink,
-            Content = "example.com"
-        };
-
-        _mockFormCollection.Setup(x => x[It.IsAny<string>()]).Returns("continueButton");
-        _pageModel.QuestionnaireId = questionnaireId;
-        _pageModel.NextStateRequest = new GetNextStateRequest
-        {
-            CurrentQuestionId = currentQuestionId,
-            CurrentQuestionOrder = 1,
-            SelectedAnswerIds = new List<Guid> { answerId },
-            ValidateAnswers = true
-        };
-
-        _mockApiClient
-            .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync(questionnaireId.ToString(), true))
-            .ReturnsAsync(questionnaire);
-
-        _mockApiClient
-            .Setup(x => x.GetCurrentQuestion(questionnaireId, currentQuestionId, true))
-            .ReturnsAsync(currentQuestion);
-
-        _mockApiClient
-            .Setup(x => x.GetNextState(questionnaireId, It.IsAny<GetNextStateRequest>(), true))
-            .ReturnsAsync(externalLinkDestination);
-
-        // Act
-        var result = await _pageModel.OnPost();
-
-        // Assert
-        var redirect = result as RedirectResult;
-        redirect.Url.Should().Be("https://example.com");
-    }
+    }   
 
     #endregion
 
@@ -812,14 +699,15 @@ public class QuestionnaireNextPageModelTests
             ValidateAnswers = true
         };
         _pageModel.AnswerHistory = answerHistory;
+        _pageModel.CurrentSelectedAnswers = answerHistory;
 
         _mockApiClient
             .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync(questionnaireId.ToString(), true))
             .ReturnsAsync(questionnaire);
 
         _mockApiClient
-            .Setup(x => x.GetPreviousState(questionnaireId, 2, true, It.IsAny<string?>()))
-            .ReturnsAsync(previousDestination);
+            .Setup(x => x.GetCurrentQuestion(questionnaireId, previousQuestionId, true))
+            .ReturnsAsync(previousQuestion);
 
         // Act
         var result = await _pageModel.OnPost();
