@@ -1,0 +1,21 @@
+@using Common.Models.PageModels
+@model List<ResultsSummaryRow>
+
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full govuk-grid-column-two-thirds-from-desktop">        
+        <dl class="govuk-summary-list summary-list-action">
+        <dt class="govuk-summary-list__key">Question</dt>
+        <dt class="govuk-summary-list__key">Answer</dt>
+    @foreach (var row in Model)
+    {
+        <div class="govuk-summary-list__row" style="border-bottom: 1px solid #b1b4b6;">
+            <dt class="govuk-summary-list__key">@row.Question</dt>
+            <dd class="govuk-summary-list__value">@string.Join(", ", row.Answers)</dd>
+            <dd class="govuk-summary-list__actions"><button type="submit" class="govuk-change-link" name="changeQuestionId" value="@row.QuestionId" formnovalidate="formnovalidate">Change</button></dd>
+        </div>
+    }
+        </dl>
+    </div>
+</div>
+

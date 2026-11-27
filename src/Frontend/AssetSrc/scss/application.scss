@@ -901,3 +901,26 @@ $toc-width-tablet: 210px;
 .govuk-template--rebranded {
     background-color: #ffffff;
 }
+
+.govuk-change-link {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-thickness: max(1px, .0625rem);
+    text-underline-offset: .1578em;
+    background-color: white;
+}
+
+.govuk-change-link:focus {
+    color: #0b0c0c;
+    background-color: #fd0;
+}
+
+.govuk-change-link:hover {
+    color: var(--govuk-link-hover-colour,#0f385c);
+    text-decoration-thickness: max(3px,.1875rem);
+    text-decoration-skip-ink:none;
+}

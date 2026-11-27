@@ -17,4 +17,5 @@ public class CreateContentRequestDto
     [MaxLength(10000, ErrorMessage = "Content must be 10000 characters or fewer")]
     public required string Content { get; set; }
     public string? ReferenceName { get; set; }
+    public bool? ShowResultsSummary { get; set; }
 } 

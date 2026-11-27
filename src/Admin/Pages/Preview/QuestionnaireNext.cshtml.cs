@@ -70,12 +70,7 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
     protected override async Task<QuestionnaireInfoDto?> GetQuestionnaireAsync()
     {
         return await ApiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireId.ToString(), true);
-    }
-
-    protected override async Task<QuestionDto?> GetInitialQuestionAsync()
-    {
-        return await ApiClient.GetInitialQuestion(Questionnaire.Id, true);
-    }
+    }    
 
     protected override async Task<string> GetStartPageRouteAsync()
     {

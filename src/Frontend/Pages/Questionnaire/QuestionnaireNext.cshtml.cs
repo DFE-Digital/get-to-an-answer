@@ -44,11 +44,6 @@ public class QuestionnaireNext(IApiClient apiClient, ILogger<QuestionnaireNext> 
         return await ApiClient.GetLastPublishedQuestionnaireInfoAsync(QuestionnaireSlug);
     }
 
-    protected override async Task<QuestionDto?> GetInitialQuestionAsync()
-    {
-        return await ApiClient.GetInitialQuestion(Questionnaire.Id);
-    }
-
     protected override async Task<string> GetStartPageRouteAsync()
     {
         if (QuestionnaireSlug == null)

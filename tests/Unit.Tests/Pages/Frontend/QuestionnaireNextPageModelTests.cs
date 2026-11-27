@@ -56,64 +56,7 @@ public class QuestionnaireNextPageModelTests
     }
 
     #region OnPost - Continue Button Tests
-
-    [Fact]
-    public async Task OnPost_Continue_Redirects_To_External_Link_When_Not_Embedded()
-    {
-        // Arrange
-        var questionnaireId = Guid.NewGuid();
-        var currentQuestionId = Guid.NewGuid();
-        var answerId = Guid.NewGuid();
-
-        var questionnaire = new QuestionnaireInfoDto
-        {
-            Id = questionnaireId,
-            Slug = "test-questionnaire"
-        };
-
-        var currentQuestion = new QuestionDto
-        {
-            Id = currentQuestionId,
-            Order = 1,
-            Type = QuestionType.SingleSelect
-        };
-
-        var externalLinkDestination = new DestinationDto
-        {
-            Type = DestinationType.ExternalLink,
-            Content = "https://example.com/"
-        };
-
-        _mockFormCollection.Setup(x => x[It.IsAny<string>()]).Returns("continueButton");
-        _pageModel.NextStateRequest = new GetNextStateRequest
-        {
-            CurrentQuestionId = currentQuestionId,
-            CurrentQuestionOrder = 1,
-            SelectedAnswerIds = new List<Guid> { answerId },
-            ValidateAnswers = true
-        };
-        _pageModel.Embed = false;
-
-        _mockApiClient
-            .Setup(x => x.GetLastPublishedQuestionnaireInfoAsync("test-questionnaire"))
-            .ReturnsAsync(questionnaire);
-
-        _mockApiClient
-            .Setup(x => x.GetCurrentQuestion(questionnaireId, currentQuestionId))
-            .ReturnsAsync(currentQuestion);
-
-        _mockApiClient
-            .Setup(x => x.GetNextState(questionnaireId, It.IsAny<GetNextStateRequest>()))
-            .ReturnsAsync(externalLinkDestination);
-
-        // Act
-        var result = await _pageModel.OnPost();
-
-        // Assert
-        result.Should().BeOfType<RedirectResult>();
-        var redirect = result as RedirectResult;
-        redirect.Url.Should().Contain("example.com");
-    }
+    
 
     [Fact]
     public async Task OnPost_Continue_Does_Not_Redirect_When_Embedded()

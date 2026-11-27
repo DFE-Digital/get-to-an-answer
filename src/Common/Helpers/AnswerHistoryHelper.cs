@@ -32,6 +32,30 @@ public static class AnswerHistoryHelper
     }
 
     /// <summary>
+    /// Adds or updates the selected answers for a question without removing other questions' entries.
+    /// </summary>
+    public static string UpsertAnswers(string? currentSelections, Guid questionId, List<Guid> selectedAnswerIds)
+    {
+        if (questionId == Guid.Empty || selectedAnswerIds == null || selectedAnswerIds.Count == 0)
+            return currentSelections ?? string.Empty;
+
+        var selections = Decode(currentSelections);
+        selections[questionId] = new List<Guid>(selectedAnswerIds);
+        return Encode(selections);
+    }
+
+    /// <summary>
+    /// Retrieves the selected answers for a question from the current selected answers.
+    /// </summary>
+    public static List<Guid> GetSelectedAnswers(string? currentSelections, Guid questionId)
+    {
+        if (questionId == Guid.Empty)
+            return new();
+
+        return Decode(currentSelections).TryGetValue(questionId, out var answers) ? answers : new();
+    }
+
+    /// <summary>
     /// Retrieves previously selected answers for a question from the history.
     /// </summary>
     public static List<Guid> GetAnswersFromHistory(string? history, Guid questionId)
@@ -48,6 +72,20 @@ public static class AnswerHistoryHelper
     public static List<Guid> GetAnsweredQuestionIds(string? history)
     {
         return Decode(history).Keys.ToList();
+    }
+
+    /// <summary>
+    /// Returns the question answered immediately before the given question on the recorded path.
+    /// If the question is not in the history, the last answered question is returned.
+    /// </summary>
+    public static Guid? GetPreviousQuestionId(string? history, Guid currentQuestionId)
+    {
+        var questionIds = Decode(history).Keys.ToList();
+        var index = questionIds.IndexOf(currentQuestionId);
+        if (index < 0)
+            return questionIds.Count > 0 ? questionIds[^1] : null;
+
+        return index > 0 ? questionIds[index - 1] : null;
     }
 
     private static string Encode(OrderedDictionary<Guid, List<Guid>> history)

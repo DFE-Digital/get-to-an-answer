@@ -324,8 +324,7 @@ test.describe('Questionnaire run (start & next)', () => {
 
         await nextPage.selectFirstRadioOption();
         await nextPage.clickContinue();
-        await page.waitForURL(externalUrl);
-        expect(page.url()).toBe(externalUrl);
+        await expect(page.locator('#external-link-dest')).toHaveValue(externalUrl);
     });
 
     test('questionnaire uses current custom styling (primary colour and button label)', async ({ request, page }) => {

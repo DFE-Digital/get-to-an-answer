@@ -482,7 +482,8 @@ public class QuestionnaireRunnerService(GetToAnAnswerDbContext db, ILogger<Quest
             Type = DestinationType.CustomContent,
             Content = contentEntity.Content,
             Title = contentEntity.Title,
-            ReferenceName = contentEntity.ReferenceName
+            ReferenceName = contentEntity.ReferenceName,
+            ShowResultsSummary = contentEntity.ShowResultsSummary
         });
     }
 

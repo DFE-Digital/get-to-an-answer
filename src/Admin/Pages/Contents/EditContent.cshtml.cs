@@ -26,6 +26,8 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
 
     [BindProperty] public string? ContentRefName { get; set; }
 
+    [BindProperty] public bool ShowResultsSummary { get; set; }
+
     public async Task<IActionResult> OnGetAsync()
     {
         BackLinkSlug = string.Format(Routes.AddAndEditResultPages, QuestionnaireId);
@@ -62,7 +64,8 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
             {
                 Title = ContentTitle,
                 Content = ContentValue,
-                ReferenceName = ContentRefName
+                ReferenceName = ContentRefName,
+                ShowResultsSummary = ShowResultsSummary
             });
             
             TempData[nameof(QuestionnaireState)] = JsonConvert.SerializeObject(new QuestionnaireState { JustUpdatedResultsPage = true, ResultsPageTitle = ContentTitle });
@@ -91,5 +94,6 @@ public class EditContent(IApiClient apiClient, ILogger<EditContent> logger) : Ba
         ContentTitle = content.Title;
         ContentValue = content.Content;
         ContentRefName = content.ReferenceName!;
+        ShowResultsSummary = content.ShowResultsSummary;
     }
 }
